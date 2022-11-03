@@ -37,7 +37,7 @@ module.exports = {
 
     },
     insertpatientsurv: (data, callback) => {
-
+        console.log(data);
         pool.query(
             `insert into we_patient_surv_log 
             (
@@ -260,13 +260,13 @@ module.exports = {
            we_daily_activity.ip_no,
            diet_status,
            ptc_ptname,
-           (case when room_clean = "1" then 'yes' else 'no' end) as roomclean ,
-           (case when sheet_change = "1" then 'yes' else 'no' end) as sheetchange ,
-           (case when dr_round = "1" then 'yes' else 'no' end) as drround ,
-           (case when dietian_round = "1" then 'yes' else 'no' end) as dietianround ,
-           (case when bill_audit = "1" then 'yes' else 'no' end) as billaudit ,
-           (case when patient_board_update = "1" then 'yes' else 'no' end) as patientboardupdate ,
-           (case when insurance_status = "1" then 'yes' else 'no' end) as insurancestatus ,
+           (case when room_clean = "1" then 'yes' else 'no' end) as room_clean ,
+           (case when sheet_change = "1" then 'yes' else 'no' end) as sheet_change ,
+           (case when dr_round = "1" then 'yes' else 'no' end) as dr_round ,
+           (case when dietian_round = "1" then 'yes' else 'no' end) as dietian_round ,
+           (case when bill_audit = "1" then 'yes' else 'no' end) as bill_audit ,
+           (case when patient_board_update = "1" then 'yes' else 'no' end) as patient_board_update ,
+           (case when insurance_status = "1" then 'yes' else 'no' end) as insurance_status ,
            asset_usage,
            imortant_note
            from we_daily_activity 
@@ -288,7 +288,6 @@ module.exports = {
         pool.query(
             `select inter_remark_slno ,remark_date,
             particular,
-            
              wework_patient.ptc_ptname,
             status,remarks 
             from we_interaction_remarks
@@ -479,5 +478,25 @@ module.exports = {
                 return callback(null, results);
             }
         );
+    },
+    selectsurvslno: (data, callBack) => {
+        pool.query(
+            ` select surv_slno from we_patient_survillance
+            where ip_no =? and pt_no=?`,
+
+            [
+                data.ip_no,
+                data.pt_no
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+
     }
+
 }

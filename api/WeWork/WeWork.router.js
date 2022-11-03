@@ -2,7 +2,8 @@ const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { getinpatientList, insertpatientsurv, InsertDailyActivity, getsurvslno,
     Insertsrvtable, getsurvslnointraction, getsurvslnoonly, getAsignedStaff,
-    getdailyactivity, getintraction, updateActivity, updateIntraction, getwedetail, updateweDetail } = require('../WeWork/WeWork.controller')
+    getdailyactivity, getintraction, updateActivity, updateIntraction, getwedetail, selectsurvslno,
+    updateweDetail } = require('../WeWork/WeWork.controller')
 
 
 router.get('/getinpatient/:id', checkToken, getinpatientList);
@@ -19,6 +20,7 @@ router.patch('/updateAct', checkToken, updateActivity);
 router.patch('/patintraction', checkToken, updateIntraction);
 router.get('/patdetail/:id', checkToken, getwedetail);
 router.patch('/patchsurv', checkToken, updateweDetail)
+router.patch('/survslno', checkToken, selectsurvslno)
 
 
 module.exports = router;

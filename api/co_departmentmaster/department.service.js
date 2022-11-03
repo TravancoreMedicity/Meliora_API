@@ -80,13 +80,13 @@ module.exports = {
                 SET dept_name = ?,
                     dept_alias = ?,
                     dept_status = ?,
-                    edit_user = ?
+                    create_user = ?
                 WHERE dept_id = ?`,
             [
                 data.dept_name,
                 data.dept_alias,
                 data.dept_status,
-                data.edit_user,
+                data.create_user,
                 data.dept_id
             ],
             (error, results, feilds) => {

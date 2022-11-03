@@ -6,12 +6,14 @@ module.exports = {
             `INSERT INTO co_request_type
             (
                 req_type_name,
-                req_type_status
+                req_type_status.
+                create_user
                )
-                VALUES(?,?)`,
+                VALUES(?,?,?)`,
             [
                 data.req_type_name,
                 data.req_type_status,
+                data.create_user
             ],
             (error, results, fields) => {
                 if (error) {
@@ -93,11 +95,13 @@ module.exports = {
         pool.query(
             `UPDATE co_request_type 
                 SET req_type_name = ?,
-                req_type_status = ?
+                req_type_status = ?,
+                edit_user=?
                 WHERE req_type_slno = ?`,
             [
                 data.req_type_name,
                 data.req_type_status,
+                data.edit_user,
                 data.req_type_slno
             ],
             (error, results, feilds) => {

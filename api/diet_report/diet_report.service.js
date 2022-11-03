@@ -57,11 +57,12 @@ module.exports = {
             `select  diet_process_mast.pt_no,
             diet_process_mast.diet_slno,
             diet_process_mast.plan_slno,
-            diet_process_mast.proc_slno,
+            diet_process_mast.proc_slno,diet_plan.discharge,
             date_format(process_date,'%d-%m-%y') as process_date,
             diet_name,ROW_NUMBER() OVER () as slno  ,
-            sum(rate_hos) as hossum , ora_roomtype.rtc_desc as roomtype, room_master.rmc_name as roonno
+            sum(rate_hos) as hossum ,sum(rate_cant) as cantsum,ora_roomtype.rtc_desc as roomtype, room_master.rmc_name as roonno
             from diet_process_mast
+            left join diet_plan on diet_plan.plan_slno=diet_process_mast.plan_slno
             left join ora_bed on ora_bed.bd_code=diet_process_mast.bd_code
             left join ora_roomtype on ora_roomtype.rt_code=ora_bed.rt_code
             left join room_master on room_master.rm_code=ora_bed.rm_code
@@ -84,13 +85,15 @@ module.exports = {
     },
     getPatientReportExtra: (data, callBack) => {
         pool.query(
-            `select 
-            date_format(process_date,'%d-%m-%y') as process_date,         
-            sum(rate_hos) as exhossum  
-            from diet_process_mast
-            left join diet_process_detl on diet_process_detl.proc_slno=diet_process_mast.proc_slno
-            left join diet_master on diet_master.diet_slno=diet_process_mast.diet_slno
-            where diet_process_mast.pt_no=? and
+            `select  
+            diet_process_mast.pt_no,
+            diet_process_mast.proc_slno,
+                       date_format(process_date,'%d-%m-%y') as process_date,          
+                       sum(rate_hos) as exhossum,
+                       sum(rate_cant) as excantsum 
+                   from diet_process_detl
+           left join diet_process_mast on diet_process_mast.proc_slno=diet_process_detl.proc_slno
+            where diet_process_mast.pt_no=? and            
               date(process_date) between ? and ? and supply_stat=1 and is_extra_billed=1 group by process_date`,
             [
                 data.pt_no,
@@ -121,7 +124,7 @@ module.exports = {
             left join room_master on room_master.rm_code=ora_bed.rm_code
             left join diet_process_detl on diet_process_detl.proc_slno=diet_process_mast.proc_slno
             left join diet_master on diet_master.diet_slno=diet_process_mast.diet_slno
-             where date(process_date) between ? and ? and supply_stat=1 and is_extra_billed=0 group by process_date`,
+             where date(process_date) between ? and ? and supply_stat=1 and is_extra_billed=0 group by proc_slno`,
             [
                 data.start_date,
                 data.end_date
@@ -144,7 +147,7 @@ module.exports = {
                        sum(rate_cant) as excantsum 
                    from diet_process_detl
            left join diet_process_mast on diet_process_mast.proc_slno=diet_process_detl.proc_slno
-            where date(process_date) between ? and ? and supply_stat=1 and is_extra_billed=1 group by process_date`,
+            where date(process_date) between ? and ? and supply_stat=1 and is_extra_billed=1 group by proc_slno`,
             [
                 data.start_date,
                 data.end_date

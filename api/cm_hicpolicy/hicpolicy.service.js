@@ -3,19 +3,17 @@ const { pool } = require('../../config/database')
 module.exports = {
     hicPolicyInsert: (data, callback) => {
         pool.query(
-            `INSERT INTO meliora_old.cm_hic_policy
+            `INSERT INTO cm_hic_policy
             (
                 hic_policy_name,
                 hic_policy_status,
-                start_time,
-                end_time
+                create_user
                )
-                VALUES(?,?,?,?)`,
+                VALUES(?,?,?)`,
             [
                 data.hic_policy_name,
                 data.hic_policy_status,
-                data.start_time,
-                data.end_time
+                data.create_user
             ],
             (error, results, fields) => {
                 if (error) {
@@ -64,11 +62,13 @@ module.exports = {
         pool.query(
             `UPDATE cm_hic_policy 
                 SET hic_policy_name = ?,
-                hic_policy_status = ?
+                hic_policy_status = ?,
+                edit_user=?
                 WHERE hic_policy_slno = ?`,
             [
                 data.hic_policy_name,
                 data.hic_policy_status,
+                data.edit_user,
                 data.hic_policy_slno
             ],
             (error, results, feilds) => {

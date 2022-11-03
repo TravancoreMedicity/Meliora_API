@@ -5,18 +5,18 @@ const logger = require('../../logger/logger')
 module.exports = {
     hicPolicyInsert: (req, res) => {
         const body = req.body;
-        // //validate hicpolicy insertion function
-        // const body_result = validateHicPolicy.validate(body);
-        // if (body_result.error) {
-        //     // logger.logwindow(body_result.error.details[0].message)
-        //     logger.warnlogwindow(body_result.error.details[0].message)
-        //     return res.status(200).json({
-        //         success: 2,
-        //         message: body_result.error.details[0].message
-        //     });
-        // }
+        //validate hicpolicy insertion function
+        const body_result = validateHicPolicy.validate(body);
+        if (body_result.error) {
+            // logger.logwindow(body_result.error.details[0].message)
+            logger.warnlogwindow(body_result.error.details[0].message)
+            return res.status(200).json({
+                success: 2,
+                message: body_result.error.details[0].message
+            });
+        }
         // //let   body.hic_policy_name=body_result
-        // body.hic_policy_name = body_result.value.hic_policy_name;
+        body.hic_policy_name = body_result.value.hic_policy_name;
         checkInsertVal(body, (err, results) => {
             const value = JSON.parse(JSON.stringify(results))
             if (Object.keys(value).length === 0) {

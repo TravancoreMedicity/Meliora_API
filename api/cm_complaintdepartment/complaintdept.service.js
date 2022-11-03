@@ -6,14 +6,15 @@ module.exports = {
             (
                 complaint_dept_name,
                 department_slno,
-                complaint_dept_status
+                complaint_dept_status,
+                create_user
                )
-                VALUES(?,?,?)`,
+                VALUES(?,?,?,?)`,
             [
                 data.complaint_dept_name,
                 data.department_slno,
                 data.complaint_dept_status,
-
+                data.create_user
             ],
             (error, results, fields) => {
                 if (error) {
@@ -63,12 +64,14 @@ module.exports = {
             `UPDATE cm_complaint_dept 
                 SET complaint_dept_name = ?,
                 department_slno=?,
-                complaint_dept_status = ?
+                complaint_dept_status = ?,
+                edit_user=?
                 WHERE complaint_dept_slno = ?`,
             [
                 data.complaint_dept_name,
                 data.department_slno,
                 data.complaint_dept_status,
+                data.edit_user,
                 data.complaint_dept_slno
             ],
             (error, results, feilds) => {

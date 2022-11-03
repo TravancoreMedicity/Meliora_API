@@ -95,7 +95,7 @@ const validateDeptSec = Joi.object({
     dept_sub_sect: Joi.optional(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
-    ou_code: Joi.string().optional()
+    ou_code: Joi.optional()
 });
 //ModuleMaster Validation 
 const validateModulemaster = Joi.object({

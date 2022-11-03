@@ -1,7 +1,7 @@
 const logger = require('../../logger/logger')
 const { getinpatientList, insertpatientsurv, InsertDailyActivity, getsurvslno,
     Insertsrvtable, getsurvslnointraction, getsurvslnoonly, getAsignedStaff, getdailyactivity,
-    getintraction, updateActivity, updateIntraction, getwedetail, updateweDetail } = require('../WeWork/WeWork.service')
+    getintraction, updateActivity, updateIntraction, getwedetail, updateweDetail, selectsurvslno } = require('../WeWork/WeWork.service')
 const { validationsurvLog } = require('../../validation/validation_schema')
 
 module.exports = {
@@ -63,7 +63,7 @@ module.exports = {
             if (results.length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Results Found"
+                    message: "please sumbit patient survillence"
                 });
             }
             return res.status(200).json({
@@ -160,7 +160,7 @@ module.exports = {
             if (results.length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Results Found"
+                    message: "Add patient intarction after submit patient intaction"
                 });
             }
             return res.status(200).json({
@@ -206,7 +206,7 @@ module.exports = {
                 // logger.infologwindow("No Record Found")
                 return res.status(200).json({
                     success: 2,
-                    message: "their is no verified complaints"
+                    message: "please add activity details"
                 });
             }
             return res.status(200).json({
@@ -334,5 +334,30 @@ module.exports = {
             });
         });
 
+    },
+    selectsurvslno: (req, res) => {
+        const body = req.body;
+        selectsurvslno(body, (err, results) => {
+            if (err) {
+                logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results.length == 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results,
+
+            });
+        });
     },
 }

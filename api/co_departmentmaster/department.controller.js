@@ -1,11 +1,13 @@
 const { createDept, updateDept, checkInsertVal, checkUpdateVal,
-    checkDeptalias, checkUpdateAlias, deleteDept, getDept, getDeptById, getDeptStatus } = require('../co_departmentmaster/department.service');
+    checkDeptalias, checkUpdateAlias, deleteDept, getDept, getDeptById,
+    getDeptStatus, getDepartmentId, updateserialnum } = require('../co_departmentmaster/department.service');
 const { validateDepartment } = require('../../validation/validation_schema')
 const logger = require('../../logger/logger')
 
 module.exports = {
     createDept: (req, res) => {
         const body = req.body;
+        console.log(body);
         //validate department Instert function
         const body_result = validateDepartment.validate(body);
         if (body_result.error) {
@@ -32,10 +34,29 @@ module.exports = {
                                     message: err
                                 });
                             }
-                            return res.status(200).json({
-                                success: 1,
-                                message: "Department Inserted Successfully"
+                            updateserialnum((err, results) => {
+                                if (err) {
+                                    //logger.errorLogger(err)
+                                    return res.status(400).json({
+                                        success: 0,
+                                        message: res.err
+                                    });
+                                }
+                                if (!results) {
+                                    return res.status(400).json({
+                                        success: 1,
+                                        message: "Record Not Found"
+                                    });
+                                }
+                                return res.status(200).json({
+                                    success: 1,
+                                    message: "Data Created Successfully"
+                                });
                             });
+                            // return res.status(200).json({
+                            //     success: 1,
+                            //     message: "Department Inserted Successfully"
+                            // });
                         });
                     } else {
                         logger.infologwindow("Department Alias Already Exist")
@@ -178,6 +199,28 @@ module.exports = {
     },
     getDeptStatus: (req, res) => {
         getDeptStatus((err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getDepartmentId: (req, res) => {
+        getDepartmentId((err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({

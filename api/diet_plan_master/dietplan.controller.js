@@ -1,5 +1,6 @@
 const { dietPlanInsert, getdietplan, updateDietplan, getdietplanNeworder, getdietplanProcess, dietApproval, getDietPlanList,
-    getneworderbydateNs, getNewOrderBydate, pendingApproval, ApprovedList, AllList, checkInsertVal, getNewOrderByDiet
+    getneworderbydateNs, getNewOrderBydate, pendingApproval, ApprovedList, AllList, checkInsertVal,
+    getNewOrderByDiet, pendingAppConsult
 } = require('../diet_plan_master/dietplan.service');
 const logger = require('../../logger/logger')
 module.exports = {
@@ -9,8 +10,8 @@ module.exports = {
             const value = JSON.parse(JSON.stringify(results));
             if (Object.keys(value).length === 0) {
                 dietPlanInsert(body, (err, results) => {
-                    console.log("controll");
-                    console.log(results);
+                    // console.log("controll");
+                    // console.log(results);
                     if (err) {
                         return res.status(200).json({
                             success: 0,
@@ -310,6 +311,28 @@ module.exports = {
                 data: results
             });
         });
-    }
+    },
+    pendingAppConsult: (req, res) => {
+        pendingAppConsult((err, results) => {
+            if (err) {
+                // logger.logwindow(err)
+                return res.status(200).json({
+                    success: 10,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                // logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
 }
 

@@ -37,7 +37,8 @@ module.exports = {
 
     },
     insertpatientsurv: (data, callback) => {
-        console.log(data);
+
+
         pool.query(
             `insert into we_patient_surv_log 
             (
@@ -107,7 +108,7 @@ module.exports = {
         );
     },
     InsertDailyActivity: (data, callback) => {
-        console.log(data);
+
         pool.query(
             `insert into we_daily_activity
             (srv_slno,
@@ -146,7 +147,7 @@ module.exports = {
 
             ],
             (error, results, fields) => {
-                console.log(results);
+
                 if (error) {
                     return callback(error);
                 }
@@ -234,7 +235,7 @@ module.exports = {
         )
     },
     getAsignedStaff: (id, callBack) => {
-        console.log(id);
+
         pool.query(
             `select co_employee_master.em_id,co_employee_master.em_name
         from co_nursestation
@@ -341,8 +342,7 @@ module.exports = {
                 data.activity_slno
             ],
             (error, results, feilds) => {
-                console.log("service");
-                console.log(results);
+
                 if (error) {
                     return callback(error);
                 }
@@ -397,7 +397,8 @@ module.exports = {
             sfa_mfa,
             assigned_nurse,
             pateint_service,
-            remarks_we,we_surv_slno
+            remarks_we,we_surv_slno,
+            surv_log_slno
              FROM meliora.we_patient_surv_log
              left join ora_nurstation on we_patient_surv_log.shift_from = ora_nurstation.ns_code
              left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
@@ -415,7 +416,7 @@ module.exports = {
         );
     },
     updateweDetail: (data, callback) => {
-        console.log(data);
+
         pool.query(
             `update  we_patient_surv_log
             set discharge_wright = ?,
@@ -487,6 +488,25 @@ module.exports = {
             [
                 data.ip_no,
                 data.pt_no
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+
+    },
+    selectsurlogslno: (data, callBack) => {
+        pool.query(
+            ` SELECT surv_log_slno FROM meliora.we_patient_surv_log
+            where shift_from =? and shift_to = ?`,
+
+            [
+                data.shift_from,
+                data.shift_to
 
             ],
             (error, results, feilds) => {

@@ -2,13 +2,15 @@ const { pool } = require('../../config/database')
 module.exports = {
     createDept: (data, callBack) => {
         pool.query(
-            `INSERT INTO co_department_mast
-            (dept_name,
+            `INSERT INTO  meliora.test_co_department
+            (  dept_id,
+                dept_name,
             dept_alias,
             dept_status,
             create_user)
-            VALUES(?,?,?,?)`,
+            VALUES(?,?,?,?,?)`,
             [
+                data.dept_id,
                 data.dept_name,
                 data.dept_alias,
                 data.dept_status,
@@ -80,13 +82,13 @@ module.exports = {
                 SET dept_name = ?,
                     dept_alias = ?,
                     dept_status = ?,
-                    create_user = ?
+                    edit_user = ?
                 WHERE dept_id = ?`,
             [
                 data.dept_name,
                 data.dept_alias,
                 data.dept_status,
-                data.create_user,
+                data.edit_user,
                 data.dept_id
             ],
             (error, results, feilds) => {
@@ -172,6 +174,30 @@ module.exports = {
                     return callBack(error)
                 }
                 return callBack(null, results)
+            }
+        )
+    },
+    getDepartmentId: (callBack) => {
+        pool.query(
+            `SELECT * FROM serial_nos where serial_slno=2`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    updateserialnum: (callBack) => {
+        pool.query(
+            `update serial_nos set serial_current=serial_current+1 where serial_slno=2`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
             }
         )
     },

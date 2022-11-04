@@ -1,5 +1,6 @@
 const { createDept, updateDept, checkInsertVal, checkUpdateVal, deleteDept, getDept, getDeptById,
-    getDeptsectionStatus, getSelectedSectionByDept, getOutlet } = require('../co_deptsectionmaster/deptsection.service');
+    getDeptsectionStatus, getSelectedSectionByDept,
+    getOutlet, getDepartmentsectionId, updateserialnum } = require('../co_deptsectionmaster/deptsection.service');
 const { validateDeptSec } = require('../../validation/validation_schema')
 const logger = require('../../logger/logger')
 
@@ -29,10 +30,29 @@ module.exports = {
                             message: err
                         });
                     }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Department Section Inserted Successfully"
+                    updateserialnum((err, results) => {
+                        if (err) {
+                            //logger.errorLogger(err)
+                            return res.status(400).json({
+                                success: 0,
+                                message: res.err
+                            });
+                        }
+                        if (!results) {
+                            return res.status(400).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Data Created Successfully"
+                        });
                     });
+                    // return res.status(200).json({
+                    //     success: 1,
+                    //     message: "Department Section Inserted Successfully"
+                    // });
                 });
             } else {
                 logger.infologwindow("Department Section  Already Exist")
@@ -203,7 +223,29 @@ module.exports = {
     },
     getOutlet: (req, res) => {
         getOutlet((err, results) => {
-            console.log(results);
+            // console.log(results);
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getDepartmentsectionId: (req, res) => {
+        getDepartmentsectionId((err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({

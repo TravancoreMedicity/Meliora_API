@@ -1,7 +1,7 @@
 const logger = require('../../logger/logger')
 const { getinpatientList, insertpatientsurv, InsertDailyActivity, getsurvslno,
     Insertsrvtable, getsurvslnointraction, getsurvslnoonly, getAsignedStaff, getdailyactivity,
-    getintraction, updateActivity, updateIntraction, getwedetail, updateweDetail, selectsurvslno } = require('../WeWork/WeWork.service')
+    getintraction, updateActivity, updateIntraction, getwedetail, updateweDetail, selectsurvslno, selectsurlogslno } = require('../WeWork/WeWork.service')
 const { validationsurvLog } = require('../../validation/validation_schema')
 
 module.exports = {
@@ -240,8 +240,7 @@ module.exports = {
     },
     updateActivity: (req, res) => {
         const body = req.body;
-        console.log(body);
-        console.log("controll");
+
         updateActivity(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
@@ -360,4 +359,29 @@ module.exports = {
             });
         });
     },
+    selectsurlogslno: (req, res) => {
+        const body = req.body;
+        selectsurlogslno(body, (err, results) => {
+            if (err) {
+                logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results.length == 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results,
+
+            });
+        });
+    }
 }

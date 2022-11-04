@@ -142,7 +142,8 @@ module.exports = {
     empInsert: (data, callBack) => {
         pool.query(
             `INSERT INTO co_employee_master (em_id,em_no,em_salutation,em_name,em_gender,em_dob,em_doj,
-                em_mobile, em_email, em_branch ,em_department,em_dept_section,em_designation,em_status,create_user)
+                em_mobile, em_email, em_branch ,em_department,em_dept_section,em_designation,em_status,
+                create_user)
             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.em_id,
@@ -202,7 +203,7 @@ module.exports = {
     },
 
     updateEmployee: (data, callBack) => {
-        console.log("Update emp");
+        // console.log("Update emp");
         pool.query(
             `UPDATE co_employee_master
             SET  em_no=?,
@@ -246,7 +247,7 @@ module.exports = {
         );
     },
     updateEmployeeCo: (data, callBack) => {
-        console.log("pass update");
+        // console.log("pass update");
         pool.query(
             `UPDATE co_employee
             SET emp_username=?,

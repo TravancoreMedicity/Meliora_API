@@ -1,7 +1,7 @@
 const { pool } = require('../../config/database');
 module.exports = {
     getExtraorder: (data, callBack) => {
-        console.log(data);
+        // console.log(data);
         pool.query(
             ` select proc_slno,diet_slno ,date(process_date) as process_date , diet_process_mast.pt_no  ,
             diet_patient.ptc_ptname,diet_slno FROM diet_process_mast

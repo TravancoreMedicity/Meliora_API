@@ -4,14 +4,17 @@ module.exports = {
     createDept: (data, callBack) => {
         pool.query(
             `INSERT INTO co_deptsec_mast
-            (sec_name,
+            (
+                 sec_id,
+                sec_name,
                 dept_id,
                 dept_sub_sect,
                 sec_status,
             create_user,
             ou_code)
-            VALUES(?,?,?,?,?,?)`,
+            VALUES(?,?,?,?,?,?,?)`,
             [
+                data.sec_id,
                 data.sec_name,
                 data.dept_id,
                 data.dept_sub_sect,
@@ -182,4 +185,29 @@ module.exports = {
             }
         );
     },
+    getDepartmentsectionId: (callBack) => {
+        pool.query(
+            `SELECT * FROM serial_nos where serial_slno=3`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    updateserialnum: (callBack) => {
+        pool.query(
+            `update serial_nos set serial_current=serial_current+1 where serial_slno=3`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
 }

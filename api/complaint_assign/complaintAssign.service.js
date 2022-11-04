@@ -126,7 +126,7 @@ module.exports = {
         );
     },
     detailedAssigncompstatus: (data, callBack) => {
-        console.log(data);
+        //console.log(data);
         pool.query(
             `UPDATE cm_complaint_mast
             SET compalint_status=1

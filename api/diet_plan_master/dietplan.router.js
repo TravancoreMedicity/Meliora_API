@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { dietPlanInsert, getdietplan, updateDietplan, getdietplanNeworder, getdietplanProcess, dietApproval,
-    getDietPlanList, getneworderbydateNs, getNewOrderBydate, pendingApproval, ApprovedList, AllList, getNewOrderByDiet
+    getDietPlanList, getneworderbydateNs, getNewOrderBydate, pendingApproval, ApprovedList, AllList,
+    getNewOrderByDiet, pendingAppConsult
 } = require('../diet_plan_master/dietplan.controller')
 
 router.post('/insert', checkToken, dietPlanInsert)
@@ -20,5 +21,6 @@ router.get("/pendingApproval/:id", checkToken, pendingApproval)
 router.get("/ApprovedList/:id", checkToken, ApprovedList)
 router.get("/AllList/:id", checkToken, AllList)
 
+router.get("/consult/approvsl/pending", checkToken, pendingAppConsult)
 
 module.exports = router;

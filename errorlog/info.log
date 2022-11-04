@@ -29650,3 +29650,689 @@
 02-11-2022 4:53:31 info : Server Up and Running 5000
 02-11-2022 4:56:28 info : Server Up and Running 5000
 02-11-2022 4:57:03 info : Server Up and Running 5000
+02-11-2022 4:57:05 info : Server Up and Running 5000
+03-11-2022 9:16:24 info : Server Up and Running 5000
+03-11-2022 9:16:54 info : Server Up and Running 5000
+03-11-2022 10:22:54 info : No Record Found
+03-11-2022 10:23:18 info : Server Up and Running 5000
+03-11-2022 10:23:20 info : Server Up and Running 5000
+03-11-2022 10:28:36 info : No Record Found
+03-11-2022 10:28:59 info : No Results Found
+03-11-2022 10:28:59 info : No Results Found
+03-11-2022 10:29:24 info : No Results Found
+03-11-2022 10:29:36 info : No Results Found
+03-11-2022 10:29:37 info : No Results Found
+03-11-2022 11:10:20 info : Server Up and Running 5000
+03-11-2022 11:14:34 info : Server Up and Running 5000
+03-11-2022 11:14:51 info : Server Up and Running 5000
+03-11-2022 11:23:26 info : Server Up and Running 5000
+03-11-2022 11:24:07 info : Server Up and Running 5000
+03-11-2022 11:41:58 warn : Hicpolicy Name is Required
+03-11-2022 11:48:37 info : Server Up and Running 5000
+03-11-2022 11:52:51 info : Server Up and Running 5000
+03-11-2022 11:59:01 info : Server Up and Running 5000
+03-11-2022 11:59:36 info : Server Up and Running 5000
+03-11-2022 12:1:20 info : Server Up and Running 5000
+03-11-2022 12:1:32 info : Server Up and Running 5000
+03-11-2022 12:1:51 info : Server Up and Running 5000
+03-11-2022 12:2:02 info : Server Up and Running 5000
+03-11-2022 12:2:30 info : Server Up and Running 5000
+03-11-2022 12:2:37 info : Server Up and Running 5000
+03-11-2022 12:8:32 info : Server Up and Running 5000
+03-11-2022 12:9:15 info : Server Up and Running 5000
+03-11-2022 12:10:29 info : Server Up and Running 5000
+03-11-2022 1:2:34 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect datetime value: 'Invalid date' for column 'discharge_wright' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateweDetail (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:419:14)
+    at updateweDetail (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:316:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+03-11-2022 1:2:36 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect datetime value: 'Invalid date' for column 'discharge_wright' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateweDetail (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:419:14)
+    at updateweDetail (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:316:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+03-11-2022 1:2:36 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect datetime value: 'Invalid date' for column 'discharge_wright' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateweDetail (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:419:14)
+    at updateweDetail (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:316:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+03-11-2022 1:2:36 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect datetime value: 'Invalid date' for column 'discharge_wright' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateweDetail (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:419:14)
+    at updateweDetail (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:316:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+03-11-2022 1:2:36 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect datetime value: 'Invalid date' for column 'discharge_wright' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateweDetail (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:419:14)
+    at updateweDetail (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:316:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+03-11-2022 1:29:03 info : Server Up and Running 5000
+03-11-2022 1:30:27 info : Server Up and Running 5000
+03-11-2022 1:30:33 info : Server Up and Running 5000
+03-11-2022 1:31:34 info : Server Up and Running 5000
+03-11-2022 1:32:36 info : Server Up and Running 5000
+03-11-2022 1:33:36 info : Server Up and Running 5000
+03-11-2022 1:35:10 info : Server Up and Running 5000
+03-11-2022 1:36:13 info : Invalid user Name  or password
+03-11-2022 1:36:16 info : Invalid user Name  or password
+03-11-2022 1:38:05 info : Server Up and Running 5000
+03-11-2022 1:41:53 info : Server Up and Running 5000
+03-11-2022 1:43:14 info : Server Up and Running 5000
+03-11-2022 1:43:53 info : Server Up and Running 5000
+03-11-2022 1:44:10 info : Server Up and Running 5000
+03-11-2022 1:44:36 info : Server Up and Running 5000
+03-11-2022 2:20:18 info : Server Up and Running 5000
+03-11-2022 2:20:41 info : Server Up and Running 5000
+03-11-2022 2:21:01 info : Server Up and Running 5000
+03-11-2022 2:22:57 info : Server Up and Running 5000
+03-11-2022 2:24:02 info : Server Up and Running 5000
+03-11-2022 2:24:57 info : Server Up and Running 5000
+03-11-2022 2:25:06 info : Server Up and Running 5000
+03-11-2022 2:25:28 info : Server Up and Running 5000
+03-11-2022 2:29:08 info : Server Up and Running 5000
+03-11-2022 2:29:24 info : Server Up and Running 5000
+03-11-2022 2:29:39 info : Server Up and Running 5000
+03-11-2022 2:35:07 info : Server Up and Running 5000
+03-11-2022 2:35:29 info : Server Up and Running 5000
+03-11-2022 2:35:31 info : Server Up and Running 5000
+03-11-2022 2:39:44 info : Server Up and Running 5000
+03-11-2022 2:40:07 info : Server Up and Running 5000
+03-11-2022 2:40:28 info : Server Up and Running 5000
+03-11-2022 2:40:44 info : Server Up and Running 5000
+03-11-2022 2:40:49 info : Server Up and Running 5000
+03-11-2022 2:41:06 info : Server Up and Running 5000
+03-11-2022 2:59:06 info : Server Up and Running 5000
+03-11-2022 2:59:08 info : Server Up and Running 5000
+03-11-2022 2:59:11 error : Error: ER_PARSE_ERROR: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '?,?,?,?,?,?,?)' at line 11
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at createDept (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:17:14)
+    at D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert.controller.js:35:13
+    at Query.<anonymous> (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:12:24)
+    at Query.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:488:16)
+    at Query.Sequence.end (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+03-11-2022 3:1:37 info : Server Up and Running 5000
+03-11-2022 3:1:45 info : Server Up and Running 5000
+03-11-2022 3:1:54 error : Error: ER_DUP_ENTRY: Duplicate entry '1' for key 'co_department_mast.PRIMARY'
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at createDept (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:17:14)
+    at D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert.controller.js:35:13
+    at Query.<anonymous> (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:12:24)
+    at Query.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:488:16)
+    at Query.Sequence.end (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+03-11-2022 3:5:03 info : Server Up and Running 5000
+03-11-2022 3:5:30 error : Error: ER_DATA_TOO_LONG: Data too long for column 'dept_alias' at row 5
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at createDept (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:17:14)
+    at D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert.controller.js:35:13
+    at Query.<anonymous> (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:12:24)
+    at Query.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:488:16)
+    at Query.Sequence.end (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+03-11-2022 3:6:15 info : Server Up and Running 5000
+03-11-2022 3:7:35 info : Server Up and Running 5000
+03-11-2022 3:7:54 info : Server Up and Running 5000
+03-11-2022 3:8:03 info : Server Up and Running 5000
+03-11-2022 3:8:13 info : Server Up and Running 5000
+03-11-2022 3:8:23 info : Server Up and Running 5000
+03-11-2022 3:8:29 info : Server Up and Running 5000
+03-11-2022 3:8:47 info : Server Up and Running 5000
+03-11-2022 3:9:07 info : Server Up and Running 5000
+03-11-2022 3:10:06 info : Server Up and Running 5000
+03-11-2022 3:11:55 info : Server Up and Running 5000
+03-11-2022 3:16:34 info : Server Up and Running 5000
+03-11-2022 3:17:29 info : Server Up and Running 5000
+03-11-2022 3:17:56 info : Server Up and Running 5000
+03-11-2022 3:18:06 info : Server Up and Running 5000
+03-11-2022 3:18:38 info : Server Up and Running 5000
+03-11-2022 3:19:07 info : Server Up and Running 5000
+03-11-2022 3:19:14 info : Server Up and Running 5000
+03-11-2022 3:19:25 info : Server Up and Running 5000
+03-11-2022 3:19:26 info : Server Up and Running 5000
+03-11-2022 3:19:51 info : Server Up and Running 5000
+03-11-2022 3:22:08 info : Server Up and Running 5000
+03-11-2022 3:22:36 info : Server Up and Running 5000
+03-11-2022 3:23:24 info : Server Up and Running 5000
+03-11-2022 3:23:56 info : Server Up and Running 5000
+03-11-2022 3:24:27 info : Server Up and Running 5000
+03-11-2022 3:29:03 info : Server Up and Running 5000
+03-11-2022 3:29:18 info : Server Up and Running 5000
+03-11-2022 3:29:31 info : Server Up and Running 5000
+03-11-2022 3:30:06 info : Server Up and Running 5000
+03-11-2022 3:30:35 info : Server Up and Running 5000
+03-11-2022 3:32:18 info : Server Up and Running 5000
+03-11-2022 3:32:37 info : Server Up and Running 5000
+03-11-2022 3:32:41 info : Server Up and Running 5000
+03-11-2022 3:35:33 info : Server Up and Running 5000
+03-11-2022 3:36:12 info : Server Up and Running 5000
+03-11-2022 3:36:22 info : Server Up and Running 5000
+03-11-2022 3:36:24 info : Server Up and Running 5000
+03-11-2022 3:36:37 info : Server Up and Running 5000
+03-11-2022 3:36:58 info : Server Up and Running 5000
+03-11-2022 3:37:08 info : Server Up and Running 5000
+03-11-2022 3:37:42 info : Server Up and Running 5000
+03-11-2022 3:38:28 info : Server Up and Running 5000
+03-11-2022 3:40:09 info : Server Up and Running 5000
+03-11-2022 4:9:34 info : Server Up and Running 5000
+03-11-2022 4:10:11 info : Server Up and Running 5000
+03-11-2022 4:11:13 info : Server Up and Running 5000
+03-11-2022 4:14:49 info : Server Up and Running 5000
+03-11-2022 4:15:23 info : Server Up and Running 5000
+03-11-2022 4:16:07 info : Server Up and Running 5000
+03-11-2022 4:17:03 info : Server Up and Running 5000
+03-11-2022 4:17:58 info : Server Up and Running 5000
+03-11-2022 4:18:09 info : Server Up and Running 5000
+03-11-2022 4:18:39 info : Server Up and Running 5000
+03-11-2022 4:20:40 info : Server Up and Running 5000
+03-11-2022 4:21:00 info : Server Up and Running 5000
+03-11-2022 4:21:42 info : Server Up and Running 5000
+03-11-2022 4:22:22 info : Server Up and Running 5000
+03-11-2022 4:22:40 info : Server Up and Running 5000
+03-11-2022 4:22:45 info : Server Up and Running 5000
+03-11-2022 4:24:28 info : Server Up and Running 5000
+03-11-2022 4:25:08 info : Server Up and Running 5000
+03-11-2022 4:25:25 info : Server Up and Running 5000
+03-11-2022 4:25:50 info : Server Up and Running 5000
+03-11-2022 4:26:49 info : Server Up and Running 5000
+03-11-2022 4:26:51 info : Server Up and Running 5000
+03-11-2022 4:26:52 info : Server Up and Running 5000
+03-11-2022 4:30:15 info : Server Up and Running 5000
+03-11-2022 4:31:26 info : Server Up and Running 5000
+03-11-2022 4:37:22 info : Server Up and Running 5000
+03-11-2022 4:39:06 info : Server Up and Running 5000
+03-11-2022 4:39:13 info : Server Up and Running 5000
+03-11-2022 4:49:49 info : Server Up and Running 5000
+03-11-2022 4:51:28 info : Server Up and Running 5000
+03-11-2022 4:51:50 info : Server Up and Running 5000
+03-11-2022 4:52:10 info : Server Up and Running 5000
+03-11-2022 4:52:24 info : Server Up and Running 5000
+03-11-2022 4:52:28 info : Server Up and Running 5000
+03-11-2022 4:52:36 info : Server Up and Running 5000
+03-11-2022 4:52:42 info : Server Up and Running 5000
+03-11-2022 4:52:54 info : Server Up and Running 5000
+03-11-2022 4:52:58 info : Server Up and Running 5000
+03-11-2022 4:53:03 info : Server Up and Running 5000
+03-11-2022 4:53:52 info : Server Up and Running 5000
+03-11-2022 4:54:04 info : Server Up and Running 5000
+03-11-2022 4:54:08 info : Server Up and Running 5000
+03-11-2022 4:54:17 info : Server Up and Running 5000
+03-11-2022 4:54:36 info : Server Up and Running 5000
+03-11-2022 4:55:15 info : Server Up and Running 5000
+03-11-2022 4:55:27 info : Server Up and Running 5000
+03-11-2022 4:56:04 info : Server Up and Running 5000
+03-11-2022 4:56:08 info : Server Up and Running 5000
+03-11-2022 4:56:19 error : Error: ER_BAD_FIELD_ERROR: Unknown column 'sec_id' in 'field list'
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at createDeptSec (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:80:14)
+    at D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert.controller.js:110:17
+    at Query.<anonymous> (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:75:24)
+    at Query.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:488:16)
+    at Query.Sequence.end (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+03-11-2022 4:57:28 info : Server Up and Running 5000
+03-11-2022 4:58:18 error : Error: ER_BAD_FIELD_ERROR: Unknown column 'sect_id' in 'field list'
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at createDeptSec (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:80:14)
+    at D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert.controller.js:110:17
+    at Query.<anonymous> (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:75:24)
+    at Query.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:488:16)
+    at Query.Sequence.end (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+03-11-2022 4:58:59 info : Server Up and Running 5000
+03-11-2022 4:59:08 info : Server Up and Running 5000
+03-11-2022 4:59:15 error : Error: ER_BAD_FIELD_ERROR: Unknown column 'sect_id' in 'field list'
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at createDeptSec (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:80:14)
+    at D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert.controller.js:110:17
+    at Query.<anonymous> (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:75:24)
+    at Query.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:488:16)
+    at Query.Sequence.end (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+03-11-2022 5:0:09 info : Server Up and Running 5000
+03-11-2022 5:0:23 info : Server Up and Running 5000
+03-11-2022 5:0:33 info : Server Up and Running 5000
+03-11-2022 5:0:51 info : Server Up and Running 5000
+03-11-2022 5:1:06 info : Server Up and Running 5000
+03-11-2022 5:1:19 info : Server Up and Running 5000
+03-11-2022 5:1:32 info : Server Up and Running 5000
+03-11-2022 5:2:04 info : Server Up and Running 5000
+03-11-2022 5:2:28 info : Server Up and Running 5000
+03-11-2022 5:2:31 info : Server Up and Running 5000
+03-11-2022 5:2:39 info : No Results Found
+03-11-2022 5:3:22 info : Server Up and Running 5000
+03-11-2022 5:3:28 info : No Results Found
+03-11-2022 5:15:22 info : Server Up and Running 5000
+03-11-2022 5:15:29 info : No Results Found
+03-11-2022 5:15:49 info : Server Up and Running 5000
+03-11-2022 5:16:16 info : Server Up and Running 5000
+03-11-2022 5:16:35 info : Server Up and Running 5000
+03-11-2022 5:16:42 info : Server Up and Running 5000
+04-11-2022 10:22:36 info : Invalid user Name  or password
+04-11-2022 10:23:16 info : Invalid user Name  or password
+04-11-2022 10:23:24 info : Invalid user Name  or password
+04-11-2022 10:23:26 info : Invalid user Name  or password
+04-11-2022 10:42:46 info : Invalid user Name  or password
+04-11-2022 10:46:15 info : Server Up and Running 5000
+04-11-2022 10:58:48 info : Server Up and Running 5000
+04-11-2022 11:7:12 info : Server Up and Running 5000
+04-11-2022 11:10:29 info : Server Up and Running 5000
+04-11-2022 11:10:30 info : Server Up and Running 5000
+04-11-2022 11:11:10 info : Server Up and Running 5000
+04-11-2022 11:11:23 info : Server Up and Running 5000
+04-11-2022 11:12:03 info : Server Up and Running 5000
+04-11-2022 11:12:23 info : Server Up and Running 5000
+04-11-2022 11:12:35 info : Server Up and Running 5000
+04-11-2022 11:12:37 info : Server Up and Running 5000
+04-11-2022 11:12:41 info : Server Up and Running 5000
+04-11-2022 11:12:54 info : Server Up and Running 5000
+04-11-2022 11:13:12 info : Server Up and Running 5000
+04-11-2022 11:13:21 info : Server Up and Running 5000
+04-11-2022 11:13:22 info : Server Up and Running 5000
+04-11-2022 11:13:30 info : Server Up and Running 5000
+04-11-2022 11:14:01 info : Server Up and Running 5000
+04-11-2022 11:14:22 info : Server Up and Running 5000
+04-11-2022 11:15:22 info : Server Up and Running 5000
+04-11-2022 11:15:37 info : Server Up and Running 5000
+04-11-2022 11:15:52 info : Server Up and Running 5000
+04-11-2022 11:18:24 info : Server Up and Running 5000
+04-11-2022 11:19:17 info : Server Up and Running 5000
+04-11-2022 11:19:36 info : Server Up and Running 5000
+04-11-2022 11:20:00 info : Server Up and Running 5000
+04-11-2022 11:20:10 info : Server Up and Running 5000
+04-11-2022 11:21:43 info : Server Up and Running 5000
+04-11-2022 11:24:55 info : Server Up and Running 5000
+04-11-2022 11:25:28 info : Server Up and Running 5000
+04-11-2022 11:26:12 info : Server Up and Running 5000
+04-11-2022 11:26:34 info : Server Up and Running 5000
+04-11-2022 11:29:35 error : Error: ER_PARSE_ERROR: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'hod,
+                incharge            
+            )
+            VALUES (1, 1' at line 20
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at creategetemployeemaster (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:131:14)
+    at D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert.controller.js:134:17
+    at Query.<anonymous> (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:125:24)
+    at Query.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:488:16)
+    at Query.Sequence.end (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+04-11-2022 11:30:06 info : Server Up and Running 5000
+04-11-2022 11:30:08 error : Error: ER_DATA_TOO_LONG: Data too long for column 'em_mobile' at row 224
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at creategetemployeemaster (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:131:14)
+    at D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert.controller.js:134:17
+    at Query.<anonymous> (D:\MELIORA_BACKEND\api\hrm_data_get\data_get_insert_service.js:125:24)
+    at Query.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:488:16)
+    at Query.Sequence.end (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+04-11-2022 11:31:15 info : Server Up and Running 5000
+04-11-2022 11:31:21 info : Server Up and Running 5000
+04-11-2022 11:33:43 info : Server Up and Running 5000
+04-11-2022 11:33:52 info : Server Up and Running 5000
+04-11-2022 11:34:02 info : Server Up and Running 5000
+04-11-2022 11:38:04 info : Server Up and Running 5000
+04-11-2022 11:38:53 info : Server Up and Running 5000
+04-11-2022 11:39:48 info : Server Up and Running 5000
+04-11-2022 11:39:56 info : Server Up and Running 5000
+04-11-2022 11:40:01 info : Server Up and Running 5000
+04-11-2022 11:43:44 info : Server Up and Running 5000
+04-11-2022 11:43:44 info : Server Up and Running 5000
+04-11-2022 11:44:21 info : Server Up and Running 5000
+04-11-2022 11:44:42 info : Server Up and Running 5000
+04-11-2022 11:45:18 info : Server Up and Running 5000
+04-11-2022 11:45:31 info : Server Up and Running 5000
+04-11-2022 11:45:51 info : Server Up and Running 5000
+04-11-2022 11:46:11 info : Server Up and Running 5000
+04-11-2022 11:46:12 info : Server Up and Running 5000
+04-11-2022 11:46:46 info : Server Up and Running 5000
+04-11-2022 11:47:04 info : Server Up and Running 5000
+04-11-2022 11:48:01 info : Server Up and Running 5000
+04-11-2022 11:49:05 info : Server Up and Running 5000
+04-11-2022 11:49:06 info : Server Up and Running 5000
+04-11-2022 11:49:32 info : Server Up and Running 5000
+04-11-2022 11:51:58 info : Server Up and Running 5000
+04-11-2022 11:52:01 info : Server Up and Running 5000
+04-11-2022 11:52:10 info : Server Up and Running 5000
+04-11-2022 11:58:10 info : Server Up and Running 5000
+04-11-2022 11:58:29 info : Server Up and Running 5000
+04-11-2022 11:58:34 info : Server Up and Running 5000
+04-11-2022 11:58:38 info : Server Up and Running 5000
+04-11-2022 11:58:43 info : Server Up and Running 5000
+04-11-2022 12:1:14 info : Server Up and Running 5000
+04-11-2022 12:2:15 info : Server Up and Running 5000
+04-11-2022 12:3:10 info : Server Up and Running 5000
+04-11-2022 12:5:37 info : Server Up and Running 5000
+04-11-2022 12:6:53 info : Server Up and Running 5000
+04-11-2022 12:8:04 info : Server Up and Running 5000
+04-11-2022 12:8:10 info : Server Up and Running 5000
+04-11-2022 12:8:47 info : Server Up and Running 5000
+04-11-2022 12:8:57 info : Server Up and Running 5000
+04-11-2022 12:10:24 info : Server Up and Running 5000
+04-11-2022 12:10:26 info : Server Up and Running 5000
+04-11-2022 12:10:36 info : Server Up and Running 5000
+04-11-2022 12:20:12 info : Server Up and Running 5000
+04-11-2022 12:35:07 info : Server Up and Running 5000
+04-11-2022 12:35:09 info : Server Up and Running 5000
+04-11-2022 12:35:13 info : Server Up and Running 5000
+04-11-2022 12:36:04 info : Server Up and Running 5000
+04-11-2022 12:38:21 info : Server Up and Running 5000
+04-11-2022 12:38:21 info : Server Up and Running 5000
+04-11-2022 12:41:51 info : Server Up and Running 5000
+04-11-2022 12:42:05 info : Server Up and Running 5000
+04-11-2022 12:42:16 error : ER_NO_DEFAULT_FOR_FIELD: Field 'emp_slno' doesn't have a default value
+04-11-2022 12:46:21 info : Server Up and Running 5000
+04-11-2022 12:46:22 info : Server Up and Running 5000
+04-11-2022 12:46:41 info : Server Up and Running 5000
+04-11-2022 12:47:15 info : Server Up and Running 5000
+04-11-2022 12:48:07 info : Server Up and Running 5000
+04-11-2022 12:50:02 warn : Alias Name length must be less than or equal to 5 characters long
+04-11-2022 12:50:08 error : Error: ER_DUP_ENTRY: Duplicate entry '501' for key 'test_co_department.PRIMARY'
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at createDept (D:\MELIORA_BACKEND\api\co_departmentmaster\department.service.js:4:14)
+    at D:\MELIORA_BACKEND\api\co_departmentmaster\department.controller.js:28:25
+    at Query.<anonymous> (D:\MELIORA_BACKEND\api\co_departmentmaster\department.service.js:57:24)
+    at Query.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:488:16)
+    at Query.Sequence.end (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+04-11-2022 12:50:22 info : Server Up and Running 5000
+04-11-2022 12:51:12 error : Error: ER_DUP_ENTRY: Duplicate entry '502' for key 'test_co_department.PRIMARY'
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at createDept (D:\MELIORA_BACKEND\api\co_departmentmaster\department.service.js:4:14)
+    at D:\MELIORA_BACKEND\api\co_departmentmaster\department.controller.js:28:25
+    at Query.<anonymous> (D:\MELIORA_BACKEND\api\co_departmentmaster\department.service.js:57:24)
+    at Query.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:488:16)
+    at Query.Sequence.end (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+04-11-2022 12:51:15 error : Error: ER_DUP_ENTRY: Duplicate entry '502' for key 'test_co_department.PRIMARY'
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at createDept (D:\MELIORA_BACKEND\api\co_departmentmaster\department.service.js:4:14)
+    at D:\MELIORA_BACKEND\api\co_departmentmaster\department.controller.js:28:25
+    at Query.<anonymous> (D:\MELIORA_BACKEND\api\co_departmentmaster\department.service.js:57:24)
+    at Query.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:488:16)
+    at Query.Sequence.end (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+04-11-2022 12:52:05 info : Server Up and Running 5000
+04-11-2022 12:52:11 info : Server Up and Running 5000
+04-11-2022 12:53:07 error : Error: ER_DUP_ENTRY: Duplicate entry '503' for key 'test_co_department.PRIMARY'
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at createDept (D:\MELIORA_BACKEND\api\co_departmentmaster\department.service.js:4:14)
+    at D:\MELIORA_BACKEND\api\co_departmentmaster\department.controller.js:28:25
+    at Query.<anonymous> (D:\MELIORA_BACKEND\api\co_departmentmaster\department.service.js:57:24)
+    at Query.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:488:16)
+    at Query.Sequence.end (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+04-11-2022 12:53:44 info : Server Up and Running 5000
+04-11-2022 12:53:48 info : Server Up and Running 5000
+04-11-2022 1:0:20 info : Server Up and Running 5000
+04-11-2022 1:1:59 info : Server Up and Running 5000
+04-11-2022 1:2:04 info : Server Up and Running 5000
+04-11-2022 1:2:09 info : Server Up and Running 5000
+04-11-2022 1:2:16 info : Server Up and Running 5000
+04-11-2022 1:2:35 info : Server Up and Running 5000
+04-11-2022 1:3:57 info : Server Up and Running 5000
+04-11-2022 1:4:35 info : Server Up and Running 5000
+04-11-2022 1:6:00 warn : "sect_id" is not allowed
+04-11-2022 1:7:27 info : Server Up and Running 5000
+04-11-2022 1:12:39 info : Server Up and Running 5000
+04-11-2022 1:14:44 info : Server Up and Running 5000
+04-11-2022 1:35:32 info : Server Up and Running 5000
+04-11-2022 1:36:16 info : Server Up and Running 5000
+04-11-2022 1:36:29 info : Server Up and Running 5000
+04-11-2022 1:37:01 info : Server Up and Running 5000
+04-11-2022 1:38:37 info : Server Up and Running 5000
+04-11-2022 1:38:58 info : Server Up and Running 5000
+04-11-2022 1:39:24 info : Server Up and Running 5000
+04-11-2022 1:45:20 info : Server Up and Running 5000

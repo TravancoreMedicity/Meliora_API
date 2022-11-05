@@ -2,7 +2,7 @@ const { pool } = require('../../config/database')
 module.exports = {
     createDept: (data, callBack) => {
         pool.query(
-            `INSERT INTO  meliora.test_co_department
+            `INSERT INTO  co_department_mast
             (  dept_id,
                 dept_name,
             dept_alias,

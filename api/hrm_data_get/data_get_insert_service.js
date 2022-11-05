@@ -79,7 +79,7 @@ module.exports = {
     createDeptSec: (data, callBack) => {
         pool.query(
             `INSERT INTO co_deptsec_mast
-            (sect_id,
+            (sec_id,
                 sec_name,
                 dept_id,
                 dept_sub_sect,

@@ -360,5 +360,19 @@ where module_slno = ?`,
             }
         )
     },
+    getEmployeedeptSec: (id, callBack) => {
+        pool.query(
+            `SELECT em_id, em_name FROM meliora.co_employee_master where em_dept_section=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 
 }

@@ -319,11 +319,13 @@ const validateUserGroupRights = Joi.object({
 })
 
 const validateModuleGroupRight = Joi.object({
-    emp_slno: Joi.number().optional(),
-    mod_grp_slno: Joi.number().optional(),
-    user_group_slno: Joi.number().optional(),
-    mod_grp_user_status: Joi.number().optional(),
+    emp_slno: Joi.number().required(),
+    mod_grp_slno: Joi.number().required(),
+    user_group_slno: Joi.number().required(),
+    mod_grp_user_status: Joi.number().required(),
     mod_grp_user_slno: Joi.number().optional(),
+    dept_slno: Joi.number().required(),
+    deptsec_slno: Joi.number().required(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
 })
@@ -405,6 +407,13 @@ const validateuserCreation = Joi.object({
     emp_password: Joi.string().required(),
     emp_email: Joi.string().required(),
     emp_status: Joi.number().required(),
+    mod_grp_slno: Joi.number().optional(),
+    user_group_slno: Joi.number().optional(),
+    mod_grp_user_status: Joi.number().optional(),
+    mod_grp_user_slno: Joi.number().optional(),
+    emp_slno: Joi.number().optional(),
+    dept_slno: Joi.number().optional(),
+    deptsec_slno: Joi.number().optional(),
 })
 
 validationsurvLog = Joi.object({

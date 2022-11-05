@@ -2,7 +2,7 @@ const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { sign } = require("jsonwebtoken");
 const { employeeinsert, employeeupdate, getemplpyee, employeeGetById, checkUpdateVal, checkInsertVal, employeedelete,
     getEmployeeByUserName, empInsert, updateserialnum, employeeGetAll, updateEmployee, updateEmployeeCo,
-    checkEmployeeExist
+    checkEmployeeExist, employeemoduleGroup, updatemodulegroup
 } = require('../employee/employee.service');
 const { validateuserCreation, validateEmployee } = require('../../validation/validation_schema')
 const logger = require('../../logger/logger')
@@ -228,27 +228,41 @@ module.exports = {
                                 message: err.message
                             });
                         }
-                        updateserialnum((err, results) => {
+                        employeemoduleGroup(body, (err, results) => {
                             if (err) {
-                                //logger.errorLogger(err)
+                                logger.logwindow(err.message)
                                 return res.status(400).json({
                                     success: 0,
-                                    message: res.err
+                                    message: err.message
                                 });
                             }
 
-                            if (!results) {
-                                return res.status(400).json({
+
+                            updateserialnum((err, results) => {
+                                if (err) {
+                                    //logger.errorLogger(err)
+                                    return res.status(400).json({
+                                        success: 0,
+                                        message: res.err
+                                    });
+                                }
+
+                                if (!results) {
+                                    return res.status(400).json({
+                                        success: 1,
+                                        message: "Record Not Found"
+                                    });
+                                }
+
+                                return res.status(200).json({
                                     success: 1,
-                                    message: "Record Not Found"
+                                    message: "Data Created Successfully"
                                 });
-                            }
-
-                            return res.status(200).json({
-                                success: 1,
-                                message: "Data Created Successfully"
                             });
-                        });
+                        })
+
+
+
                     })
                 });
             } else {
@@ -306,11 +320,20 @@ module.exports = {
                         message: res.err
                     });
                 }
+                updatemodulegroup(body, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(400).json({
+                            success: 7,
+                            message: res.err
+                        });
+                    }
 
-                return res.status(200).json({
-                    success: 2,
-                    message: "Updated Successfully"
-                });
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Updated Successfully"
+                    });
+                })
             })
 
 

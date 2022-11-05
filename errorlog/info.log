@@ -30336,3 +30336,474 @@
 04-11-2022 1:38:58 info : Server Up and Running 5000
 04-11-2022 1:39:24 info : Server Up and Running 5000
 04-11-2022 1:45:20 info : Server Up and Running 5000
+04-11-2022 2:35:38 info : Server Up and Running 5000
+04-11-2022 2:47:31 info : Server Up and Running 5000
+04-11-2022 3:13:53 info : Server Up and Running 5000
+04-11-2022 3:14:01 info : Server Up and Running 5000
+04-11-2022 3:14:02 info : Server Up and Running 5000
+04-11-2022 3:17:11 info : Server Up and Running 5000
+04-11-2022 3:17:34 info : Server Up and Running 5000
+04-11-2022 3:17:52 info : Server Up and Running 5000
+04-11-2022 3:21:21 info : Server Up and Running 5000
+04-11-2022 3:21:28 info : Server Up and Running 5000
+04-11-2022 3:21:36 info : Server Up and Running 5000
+04-11-2022 3:24:05 info : Server Up and Running 5000
+04-11-2022 3:24:08 info : Server Up and Running 5000
+04-11-2022 3:24:13 info : Server Up and Running 5000
+04-11-2022 3:32:25 info : Server Up and Running 5000
+04-11-2022 3:33:18 info : Server Up and Running 5000
+04-11-2022 3:34:30 info : Server Up and Running 5000
+04-11-2022 3:34:44 info : Server Up and Running 5000
+04-11-2022 3:34:57 info : Server Up and Running 5000
+04-11-2022 4:11:56 info : Server Up and Running 5000
+04-11-2022 4:12:08 info : Server Up and Running 5000
+04-11-2022 4:12:13 info : Server Up and Running 5000
+04-11-2022 4:12:32 info : Server Up and Running 5000
+04-11-2022 4:12:33 info : Server Up and Running 5000
+04-11-2022 4:12:43 info : Server Up and Running 5000
+04-11-2022 4:12:49 info : Server Up and Running 5000
+05-11-2022 9:59:20 info : Server Up and Running 5000
+05-11-2022 10:2:18 info : Server Up and Running 5000
+05-11-2022 10:5:23 info : Server Up and Running 5000
+05-11-2022 10:13:00 error : Error: ER_NO_DEFAULT_FOR_FIELD: Field 'edit_user' doesn't have a default value
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at createDept (D:\MELIORA_BACKEND\api\co_departmentmaster\department.service.js:4:14)
+    at D:\MELIORA_BACKEND\api\co_departmentmaster\department.controller.js:29:25
+    at Query.<anonymous> (D:\MELIORA_BACKEND\api\co_departmentmaster\department.service.js:57:24)
+    at Query.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:488:16)
+    at Query.Sequence.end (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+05-11-2022 10:13:32 error : Error: ER_NO_DEFAULT_FOR_FIELD: Field 'edit_user' doesn't have a default value
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at createDept (D:\MELIORA_BACKEND\api\co_departmentmaster\department.service.js:4:14)
+    at D:\MELIORA_BACKEND\api\co_departmentmaster\department.controller.js:29:25
+    at Query.<anonymous> (D:\MELIORA_BACKEND\api\co_departmentmaster\department.service.js:57:24)
+    at Query.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Query._callback (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:488:16)
+    at Query.Sequence.end (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
+    at Query._handleFinalResultPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:149:8)
+    at Query.EofPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:133:8)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+05-11-2022 10:30:36 info : Server Up and Running 5000
+05-11-2022 10:40:33 info : Server Up and Running 5000
+05-11-2022 10:40:53 info : Server Up and Running 5000
+05-11-2022 10:41:22 info : Server Up and Running 5000
+05-11-2022 10:41:38 info : Server Up and Running 5000
+05-11-2022 10:43:01 info : Server Up and Running 5000
+05-11-2022 10:43:10 info : Server Up and Running 5000
+05-11-2022 10:43:12 info : Server Up and Running 5000
+05-11-2022 10:43:59 info : Server Up and Running 5000
+05-11-2022 10:48:55 info : Server Up and Running 5000
+05-11-2022 10:49:18 info : Server Up and Running 5000
+05-11-2022 10:49:43 info : Server Up and Running 5000
+05-11-2022 11:1:02 info : Server Up and Running 5000
+05-11-2022 11:1:19 info : Server Up and Running 5000
+05-11-2022 11:1:55 info : Server Up and Running 5000
+05-11-2022 11:36:03 info : Server Up and Running 5000
+05-11-2022 11:37:18 info : Server Up and Running 5000
+05-11-2022 11:37:21 info : Server Up and Running 5000
+05-11-2022 11:37:48 info : Server Up and Running 5000
+05-11-2022 11:37:50 info : Server Up and Running 5000
+05-11-2022 12:3:26 info : Server Up and Running 5000
+05-11-2022 12:4:08 info : No Record Found
+05-11-2022 12:4:26 info : No Results Found
+05-11-2022 12:4:26 info : No Results Found
+05-11-2022 12:4:28 info : No Results Found
+05-11-2022 12:6:55 info : No Results Found
+05-11-2022 12:22:58 info : Server Up and Running 5000
+05-11-2022 12:24:37 info : Server Up and Running 5000
+05-11-2022 12:24:49 info : Server Up and Running 5000
+05-11-2022 12:24:54 info : Server Up and Running 5000
+05-11-2022 12:25:39 info : Server Up and Running 5000
+05-11-2022 12:25:40 info : Server Up and Running 5000
+05-11-2022 12:25:53 info : No Results Found
+05-11-2022 12:25:53 info : No Results Found
+05-11-2022 12:27:09 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect date value: 'Invalid date' for column 'activity_date' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:310:14)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:244:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+05-11-2022 12:27:12 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect date value: 'Invalid date' for column 'activity_date' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:310:14)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:244:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+05-11-2022 12:27:22 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect date value: 'Invalid date' for column 'activity_date' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:310:14)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:244:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+05-11-2022 12:27:22 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect date value: 'Invalid date' for column 'activity_date' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:310:14)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:244:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+05-11-2022 12:27:22 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect date value: 'Invalid date' for column 'activity_date' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:310:14)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:244:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+05-11-2022 12:27:22 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect date value: 'Invalid date' for column 'activity_date' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:310:14)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:244:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+05-11-2022 12:27:23 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect date value: 'Invalid date' for column 'activity_date' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:310:14)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:244:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+05-11-2022 12:27:23 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect date value: 'Invalid date' for column 'activity_date' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:310:14)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:244:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+05-11-2022 12:35:14 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect date value: 'Invalid date' for column 'activity_date' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:310:14)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:244:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+05-11-2022 12:35:15 error : Error: ER_TRUNCATED_WRONG_VALUE: Incorrect date value: 'Invalid date' for column 'activity_date' at row 1
+    at Query.Sequence._packetToError (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Sequence.js:47:14)
+    at Query.ErrorPacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\sequences\Query.js:79:18)
+    at Protocol._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+    at Parser._parsePacket (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:433:10)
+    at Parser.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Parser.js:43:10)
+    at Protocol.write (D:\MELIORA_BACKEND\node_modules\mysql\lib\protocol\Protocol.js:38:16)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:88:28)
+    at Socket.<anonymous> (D:\MELIORA_BACKEND\node_modules\mysql\lib\Connection.js:526:10)
+    at Socket.emit (node:events:527:28)
+    at addChunk (node:internal/streams/readable:315:12)
+    --------------------
+    at Pool.query (D:\MELIORA_BACKEND\node_modules\mysql\lib\Pool.js:199:23)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.service.js:310:14)
+    at updateActivity (D:\MELIORA_BACKEND\api\WeWork\WeWork.controller.js:244:9)
+    at Layer.handle [as handle_request] (D:\MELIORA_BACKEND\node_modules\express\lib\router\layer.js:95:5)
+    at next (D:\MELIORA_BACKEND\node_modules\express\lib\router\route.js:137:13)
+    at D:\MELIORA_BACKEND\authentication\token_validation.js:21:21
+    at D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:223:12
+    at getSecret (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:90:14)
+    at Object.module.exports [as verify] (D:\MELIORA_BACKEND\node_modules\jsonwebtoken\verify.js:94:10)
+    at checkToken (D:\MELIORA_BACKEND\authentication\token_validation.js:8:17)
+05-11-2022 1:40:14 info : Module master  Already Exist
+05-11-2022 1:47:58 info : Server Up and Running 5000
+05-11-2022 1:48:07 info : No Results Found
+05-11-2022 1:48:07 info : No Results Found
+05-11-2022 2:36:40 info : Server Up and Running 5000
+05-11-2022 2:39:18 info : Server Up and Running 5000
+05-11-2022 2:55:38 info : Server Up and Running 5000
+05-11-2022 2:57:51 info : No Record Found
+05-11-2022 3:2:41 info : No Results Found
+05-11-2022 3:2:41 info : No Results Found
+05-11-2022 3:2:44 info : No Results Found
+05-11-2022 3:3:57 info : No Results Found
+05-11-2022 3:4:43 info : Server Up and Running 5000
+05-11-2022 3:5:30 info : Server Up and Running 5000
+05-11-2022 3:5:33 info : Server Up and Running 5000
+05-11-2022 3:6:06 info : Server Up and Running 5000
+05-11-2022 3:6:37 info : No Results Found
+05-11-2022 3:6:37 info : No Results Found
+05-11-2022 3:7:08 info : No Results Found
+05-11-2022 3:8:47 warn : "dept_slno" is not allowed
+05-11-2022 3:9:26 info : No Results Found
+05-11-2022 3:9:26 info : No Results Found
+05-11-2022 3:9:28 info : Server Up and Running 5000
+05-11-2022 3:9:45 info : Server Up and Running 5000
+05-11-2022 3:9:58 warn : "mod_grp_user_slno" is required
+05-11-2022 3:10:21 info : Server Up and Running 5000
+05-11-2022 3:17:32 info : No Results Found
+05-11-2022 3:17:32 info : No Results Found
+05-11-2022 3:19:19 info : No Results Found
+05-11-2022 3:19:19 info : No Results Found
+05-11-2022 3:21:48 info : No Results Found
+05-11-2022 3:40:47 info : Invalid user Name  or password
+05-11-2022 3:45:05 info : Server Up and Running 5000
+05-11-2022 3:45:22 info : Server Up and Running 5000
+05-11-2022 3:45:39 info : Server Up and Running 5000
+05-11-2022 3:46:24 info : No Results Found
+05-11-2022 3:46:24 info : No Results Found
+05-11-2022 3:48:28 info : Server Up and Running 5000
+05-11-2022 3:48:30 info : Server Up and Running 5000
+05-11-2022 3:50:35 info : Server Up and Running 5000
+05-11-2022 3:50:44 info : Server Up and Running 5000
+05-11-2022 3:52:21 info : Server Up and Running 5000
+05-11-2022 3:52:22 info : Server Up and Running 5000
+05-11-2022 3:53:02 info : Server Up and Running 5000
+05-11-2022 3:54:12 info : No Record Found
+05-11-2022 3:54:24 info : No Results Found
+05-11-2022 3:54:24 info : No Results Found
+05-11-2022 3:54:25 info : No Results Found
+05-11-2022 3:54:46 info : No Results Found
+05-11-2022 3:55:41 info : Server Up and Running 5000
+05-11-2022 3:56:18 info : No Results Found
+05-11-2022 3:56:18 info : No Results Found
+05-11-2022 3:56:27 info : No Results Found
+05-11-2022 3:58:59 info : Server Up and Running 5000
+05-11-2022 4:7:24 info : No Results Found
+05-11-2022 4:7:24 info : No Results Found
+05-11-2022 4:7:36 info : No Results Found
+05-11-2022 4:8:39 info : Server Up and Running 5000
+05-11-2022 4:8:49 info : No Results Found
+05-11-2022 4:8:49 info : No Results Found
+05-11-2022 4:10:01 info : No Results Found
+05-11-2022 4:10:01 info : No Results Found
+05-11-2022 4:10:14 info : Server Up and Running 5000
+05-11-2022 4:10:19 info : Server Up and Running 5000
+05-11-2022 4:24:25 info : No Results Found
+05-11-2022 4:24:25 info : No Results Found
+05-11-2022 4:24:29 info : No Results Found
+05-11-2022 4:26:40 info : No Record Found
+05-11-2022 4:27:11 info : No Record Found
+05-11-2022 4:27:36 info : No Results Found
+05-11-2022 4:27:36 info : No Results Found
+05-11-2022 4:27:36 info : No Results Found
+05-11-2022 4:27:36 info : No Results Found
+05-11-2022 4:28:35 info : No Results Found
+05-11-2022 4:30:37 info : Server Up and Running 5000
+05-11-2022 4:30:40 info : No Results Found
+05-11-2022 4:31:25 info : No Results Found
+05-11-2022 4:31:25 info : No Results Found
+05-11-2022 4:31:48 info : No Results Found
+05-11-2022 4:32:45 info : No Results Found
+05-11-2022 4:32:45 info : No Results Found
+05-11-2022 4:32:45 info : No Results Found
+05-11-2022 4:32:45 info : No Results Found
+05-11-2022 4:32:45 info : No Results Found
+05-11-2022 4:32:45 info : No Results Found
+05-11-2022 4:32:45 info : No Results Found
+05-11-2022 4:32:45 info : No Results Found
+05-11-2022 4:33:01 info : No Results Found
+05-11-2022 4:33:01 info : No Results Found
+05-11-2022 4:33:01 info : No Results Found
+05-11-2022 4:33:01 info : No Results Found
+05-11-2022 4:33:41 info : No Results Found
+05-11-2022 4:33:41 info : No Results Found
+05-11-2022 4:34:35 info : Server Up and Running 5000
+05-11-2022 4:36:57 info : No Results Found
+05-11-2022 4:36:57 info : No Results Found
+05-11-2022 4:37:45 info : No Results Found
+05-11-2022 4:37:45 info : No Results Found
+05-11-2022 4:38:10 info : No Results Found
+05-11-2022 4:38:10 info : No Results Found
+05-11-2022 4:38:16 info : No Results Found
+05-11-2022 4:38:39 info : No Results Found
+05-11-2022 4:38:39 info : No Results Found
+05-11-2022 4:39:19 info : Server Up and Running 5000
+05-11-2022 4:40:57 info : Server Up and Running 5000
+05-11-2022 4:41:20 info : No Results Found
+05-11-2022 4:41:20 info : No Results Found
+05-11-2022 4:41:22 info : No Results Found
+05-11-2022 4:41:22 info : No Results Found
+05-11-2022 4:41:35 info : Server Up and Running 5000
+05-11-2022 4:41:43 info : Server Up and Running 5000
+05-11-2022 4:41:43 info : Server Up and Running 5000
+05-11-2022 4:42:02 info : Server Up and Running 5000
+05-11-2022 4:42:21 info : No Results Found
+05-11-2022 4:42:21 info : No Results Found
+05-11-2022 4:43:40 info : their is no assign complaints
+05-11-2022 4:43:53 info : Server Up and Running 5000
+05-11-2022 4:44:34 info : No Results Found
+05-11-2022 4:44:34 info : No Results Found
+05-11-2022 4:44:34 info : No Results Found
+05-11-2022 4:44:34 info : No Results Found
+05-11-2022 4:44:34 info : No Results Found
+05-11-2022 4:44:34 info : No Results Found
+05-11-2022 4:44:34 info : No Results Found
+05-11-2022 4:44:34 info : No Results Found
+05-11-2022 4:44:54 info : No Results Found
+05-11-2022 4:44:54 info : No Results Found
+05-11-2022 4:44:54 info : No Results Found
+05-11-2022 4:44:54 info : No Results Found
+05-11-2022 4:44:54 info : No Results Found
+05-11-2022 4:44:54 info : No Results Found
+05-11-2022 4:46:16 info : No Results Found
+05-11-2022 4:46:16 info : No Results Found
+05-11-2022 4:46:16 info : No Results Found
+05-11-2022 4:46:16 info : No Results Found
+05-11-2022 4:46:16 info : No Results Found
+05-11-2022 4:46:16 info : No Results Found
+05-11-2022 4:46:46 info : No Results Found
+05-11-2022 4:46:46 info : No Results Found
+05-11-2022 4:46:46 info : No Results Found
+05-11-2022 4:46:46 info : No Results Found
+05-11-2022 4:46:46 info : No Results Found
+05-11-2022 4:46:46 info : No Results Found
+05-11-2022 4:47:02 info : Server Up and Running 5000

@@ -170,7 +170,7 @@ module.exports = {
                 }
                 return res.status(200).json({
                     success: 1,
-                    message: "Complaint Assigned Successfully"
+                    message: "Complaint Assisted Successfully"
                 });
             })
         });

@@ -6,7 +6,7 @@ module.exports = {
             `INSERT INTO co_request_type
             (
                 req_type_name,
-                req_type_status.
+                req_type_status,
                 create_user
                )
                 VALUES(?,?,?)`,

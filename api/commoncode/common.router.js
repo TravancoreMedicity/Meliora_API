@@ -3,7 +3,7 @@ const { checkToken } = require("../../authentication/token_validation");
 const { getEmployeeID, getMenuBasedRights, getModuleGroupByID, getSubModuleRights, getSelectMenu, getEmpName,
     getModuleGroup, getModuleRights, getempId, inpatientList, getBranch, getDesignation, getSalutation, getSerialnumber,
     getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
-    getDashboardRights } = require('../commoncode/common.controller');
+    getDashboardRights, getEmployeedeptSec } = require('../commoncode/common.controller');
 
 router.get("/getempid/:id", checkToken, getEmployeeID)
 router.get("/getMenu/:id", checkToken, getMenuBasedRights)
@@ -28,6 +28,8 @@ router.get("/dMenu/:id", checkToken, getDietMenu)
 router.get("/getLoginProfile/:id", checkToken, getLoginProfile)
 router.get("/dashrights/:id", checkToken, getDashboardRights) //Dashboard Rights
 
+
+router.get("/emp/deptsec/:id", checkToken, getEmployeedeptSec);
 
 
 

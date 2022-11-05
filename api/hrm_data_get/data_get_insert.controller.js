@@ -75,7 +75,7 @@ module.exports = {
 
                 let newmeli = deprtmentSec.filter(value => {
                     return !melidepartmentSec.find(values => {
-                        return values.sect_id === value.sect_id
+                        return values.sec_id === value.sect_id
                     })
                 })
                 var a1 = newmeli.map((value, index) => {

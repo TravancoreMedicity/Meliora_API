@@ -397,8 +397,7 @@ module.exports = {
             sfa_mfa,
             assigned_nurse,
             pateint_service,
-            remarks_we,we_surv_slno,
-            surv_log_slno
+            remarks_we,we_surv_slno,surv_log_slno
              FROM meliora.we_patient_surv_log
              left join ora_nurstation on we_patient_surv_log.shift_from = ora_nurstation.ns_code
              left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
@@ -416,7 +415,6 @@ module.exports = {
         );
     },
     updateweDetail: (data, callback) => {
-
         pool.query(
             `update  we_patient_surv_log
             set discharge_wright = ?,
@@ -441,7 +439,7 @@ module.exports = {
                         tv_ac_remot = ?,
                        room_amentites = ?,
                        pateint_service = ?
-                        where  we_surv_slno = ?`,
+                        where  surv_log_slno = ?`,
             [
                 data.discharge_wright,
                 // data.bill_ready,
@@ -467,7 +465,7 @@ module.exports = {
                 JSON.stringify(data.tv_ac_remot),
                 JSON.stringify(data.room_amentites),
                 JSON.stringify(data.pateint_service),
-                data.we_surv_slno
+                data.surv_log_slno
 
             ],
             (error, results, feilds) => {
@@ -501,12 +499,13 @@ module.exports = {
     },
     selectsurlogslno: (data, callBack) => {
         pool.query(
-            ` SELECT surv_log_slno FROM meliora.we_patient_surv_log
-            where shift_from =? and shift_to = ?`,
+            ` select surv_log_slno from we_patient_surv_log
+            where shift_from = ? and shift_to=? and we_surv_slno=?`,
 
             [
                 data.shift_from,
-                data.shift_to
+                data.shift_to,
+                data.we_surv_slno
 
             ],
             (error, results, feilds) => {

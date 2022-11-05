@@ -29,6 +29,36 @@ module.exports = {
             }
         )
     },
+    employeemoduleGroup: (data, callback) => {
+        pool.query(
+            `INSERT INTO module_group_user_rights
+            (
+                emp_slno,
+                mod_grp_slno,
+                user_group_slno,
+                mod_grp_user_status,
+                dept_slno,
+                deptsec_slno,
+                create_user
+               )
+                VALUES(?,?,?,?,?,?,?)`,
+            [
+                data.emp_slno,
+                data.mod_grp_slno,
+                data.user_group_slno,
+                data.mod_grp_user_status,
+                data.dept_slno,
+                data.deptsec_slno,
+                data.create_user
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
     checkInsertVal: (data, callBack) => {
         pool.query(
             `SELECT emp_username,
@@ -188,10 +218,12 @@ module.exports = {
         pool.query(
             `select co_employee.emp_no,em_name,emp_username,em_designation,em_dept_section,sec_name ,
             em_no,co_employee_master.em_id,em_salutation,em_doj,em_dob,em_gender,em_branch,em_department,
-            em_dept_section, em_status ,em_mobile,em_email
+            em_dept_section, em_status ,em_mobile,em_email,module_group_user_rights.mod_grp_slno,
+            module_group_user_rights.user_group_slno,module_group_user_rights.mod_grp_user_slno
             from co_employee
              left join co_employee_master on co_employee.em_id=co_employee_master.em_id
-             left join co_deptsec_mast on co_employee_master.em_dept_section=co_deptsec_mast.sec_id`,
+             left join co_deptsec_mast on co_employee_master.em_dept_section=co_deptsec_mast.sec_id
+             left join module_group_user_rights on module_group_user_rights.emp_slno=co_employee_master.em_id`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -203,7 +235,7 @@ module.exports = {
     },
 
     updateEmployee: (data, callBack) => {
-        // console.log("Update emp");
+
         pool.query(
             `UPDATE co_employee_master
             SET  em_no=?,
@@ -247,7 +279,7 @@ module.exports = {
         );
     },
     updateEmployeeCo: (data, callBack) => {
-        // console.log("pass update");
+
         pool.query(
             `UPDATE co_employee
             SET emp_username=?,
@@ -289,6 +321,34 @@ module.exports = {
                 return callBack(null, results)
             }
         )
+    },
+
+    updatemodulegroup: (data, callback) => {
+        pool.query(
+            `UPDATE module_group_user_rights 
+                SET emp_slno = ?,
+                deptsec_slno=?,
+                dept_slno=?,
+                mod_grp_slno=?,
+                user_group_slno=?,
+                mod_grp_user_status=?
+                WHERE mod_grp_user_slno = ?`,
+            [
+                data.emp_slno,
+                data.deptsec_slno,
+                data.dept_slno,
+                data.mod_grp_slno,
+                data.user_group_slno,
+                data.mod_grp_user_status,
+                data.mod_grp_user_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
     },
 
 }

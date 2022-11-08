@@ -173,8 +173,6 @@ module.exports = {
                 data.diet_slno
             ],
             (error, results, feilds) => {
-                // console.log("Service");
-                // console.log(results);
                 if (error) {
                     return callBack(error)
                 }

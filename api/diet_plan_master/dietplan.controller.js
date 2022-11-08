@@ -10,8 +10,6 @@ module.exports = {
             const value = JSON.parse(JSON.stringify(results));
             if (Object.keys(value).length === 0) {
                 dietPlanInsert(body, (err, results) => {
-                    // console.log("controll");
-                    // console.log(results);
                     if (err) {
                         return res.status(200).json({
                             success: 0,

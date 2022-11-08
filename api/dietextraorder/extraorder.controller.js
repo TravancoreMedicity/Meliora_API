@@ -3,7 +3,6 @@ const { getExtraorder, getItemrate, ExtraOrderInsert, ExtraOrderListInsert, getD
 module.exports = {
     getExtraorder: (req, res) => {
         const body = req.body
-        // console.log(body);
         getExtraorder(body, (err, results) => {
             if (err) {
                 // logger.logwindow(err)

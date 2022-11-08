@@ -201,7 +201,6 @@ module.exports = {
         )
     },
     getItemSlno: (data, callBack) => {
-        console.log(data);
         pool.query(
             `select kot_item_master.item_slno,item_group.grp_slno,rate_hos,rate_cant,
             kot_item_master.item_name, item_group.group_name,ddetl_slno

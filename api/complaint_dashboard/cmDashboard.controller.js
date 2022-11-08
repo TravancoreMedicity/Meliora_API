@@ -119,7 +119,6 @@ module.exports = {
     },
     getVerifycomplaints: (req, res) => {
         const id = req.params.id
-        // console.log(id);
         getVerifycomplaints(id, (err, results) => {
             if (err) {
                 logger.logwindow(err)

@@ -223,7 +223,6 @@ module.exports = {
     },
     getOutlet: (req, res) => {
         getOutlet((err, results) => {
-            // console.log(results);
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({

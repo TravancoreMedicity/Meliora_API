@@ -7,7 +7,6 @@ const logger = require('../../logger/logger')
 module.exports = {
     createDept: (req, res) => {
         const body = req.body;
-        console.log(body);
         //validate department Instert function
         const body_result = validateDepartment.validate(body);
         if (body_result.error) {

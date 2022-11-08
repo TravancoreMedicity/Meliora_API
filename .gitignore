@@ -1,1 +1,8 @@
 /node_modules
+
+/errorlog
+
+
+/errorlog/error.log*
+/errorlog/info.log*
+/errorlog/warn.log*

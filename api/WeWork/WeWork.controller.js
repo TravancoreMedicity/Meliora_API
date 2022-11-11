@@ -2,7 +2,8 @@ const logger = require('../../logger/logger')
 const { getinpatientList, insertpatientsurv, InsertDailyActivity, getsurvslno,
     Insertsrvtable, getsurvslnointraction, getsurvslnoonly, getAsignedStaff, getdailyactivity,
     getintraction, updateActivity, updateIntraction, getwedetail, updateweDetail, selectsurvslno, selectsurlogslno } = require('../WeWork/WeWork.service')
-const { validationsurvLog } = require('../../validation/validation_schema')
+const { validationsurvLog } = require('../../validation/validation_schema');
+const { log } = require('winston');
 
 module.exports = {
     getinpatientList: (req, res) => {
@@ -101,7 +102,6 @@ module.exports = {
     getsurvslnoonly: (req, res) => {
         const id = req.params.id;
         getsurvslnoonly(id, (err, results) => {
-            // console.log(id);
             if (err) {
                 logger.errorLogger(err)
                 return res.status(200).json({
@@ -113,7 +113,7 @@ module.exports = {
             if (results.length == 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result Found"
+                    message: "pleade enter patient survillence before adding the details"
                 });
             }
 
@@ -229,7 +229,7 @@ module.exports = {
                 // logger.infologwindow("No Record Found")
                 return res.status(200).json({
                     success: 2,
-                    message: "their is no verified complaints"
+                    message: "please add patient intraction"
                 });
             }
             return res.status(200).json({
@@ -240,7 +240,6 @@ module.exports = {
     },
     updateActivity: (req, res) => {
         const body = req.body;
-
         updateActivity(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
@@ -288,8 +287,8 @@ module.exports = {
 
     },
     getwedetail: (req, res) => {
-        const id = req.params.id
-        getwedetail(id, (err, results) => {
+        const body = req.body;
+        getwedetail(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({

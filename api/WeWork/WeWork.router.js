@@ -18,8 +18,8 @@ router.get('/activity/:id', checkToken, getdailyactivity);
 router.get('/intraction/:id', checkToken, getintraction);
 router.patch('/updateAct', checkToken, updateActivity);
 router.patch('/patintraction', checkToken, updateIntraction);
-router.get('/patdetail/:id', checkToken, getwedetail);
-router.patch('/patchsurv', checkToken, updateweDetail)
+router.post('/patdetail', checkToken, getwedetail);
+router.patch('/patchsurv', checkToken, updateweDetail);
 router.post('/survslno', checkToken, selectsurvslno);
 router.post('/logslno', checkToken, selectsurlogslno)
 

@@ -235,7 +235,6 @@ module.exports = {
         )
     },
     getAsignedStaff: (id, callBack) => {
-
         pool.query(
             `select co_employee_master.em_id,co_employee_master.em_name
         from co_nursestation
@@ -256,8 +255,8 @@ module.exports = {
     getdailyactivity: (id, callBack) => {
         pool.query(
             `select activity_slno, 
-            activity_date,
-            visit_time,
+            (case when activity_date is null  then null else activity_date end)activity_date,
+            (case when visit_time is null then null else visit_time end) visit_time,
            we_daily_activity.ip_no,
            diet_status,
            ptc_ptname,
@@ -287,7 +286,8 @@ module.exports = {
     },
     getintraction: (id, callBack) => {
         pool.query(
-            `select inter_remark_slno ,remark_date,
+            `select inter_remark_slno ,
+            (case when remark_date is null then null else remark_date end)remark_date,
             particular,
              wework_patient.ptc_ptname,
             status,remarks 
@@ -373,24 +373,24 @@ module.exports = {
             }
         );
     },
-    getwedetail: (id, callBack) => {
+    getwedetail: (data, callBack) => {
         pool.query(
             `SELECT we_patient_surv_log.ip_no,
             ptc_ptname,we_patient_surv_log.bd_code,
-            (case when discharge_wright != null then discharge_wright else null end)discharge_wright,
+            (case when discharge_wright is null then null else discharge_wright end)discharge_wright,
             shift_from,
             shift_to,
-            (case when recieved_time != null then recieved_time else null end ) recieved_time ,
+            (case when recieved_time is null then null else recieved_time end ) recieved_time ,
             room_category,
              bed_type,
              room_amentites,
              tv_ac_remot,
             telephone,
-           geezer,
-            (case when dietition_visit_tme != null then dietition_visit_tme else null end) dietition_visit_tme ,
-            (case when stat_medicine != null then stat_medicine else null end) stat_medicine,
-            (case  when stat_recived_time != null then stat_recived_time else null end) stat_recived_time,
-           payment_mode,
+            geezer,
+            (case when dietition_visit_tme is null then null else dietition_visit_tme end) dietition_visit_tme ,
+            (case when stat_medicine  is null then null else stat_medicine end) stat_medicine,
+            (case  when stat_recived_time is null then null else stat_recived_time end) stat_recived_time,
+            payment_mode,
             document_status,
             creadit_detail,
              package as patpackage,
@@ -401,12 +401,13 @@ module.exports = {
              FROM meliora.we_patient_surv_log
              left join ora_nurstation on we_patient_surv_log.shift_from = ora_nurstation.ns_code
              left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
-             where we_patient_surv_log.ip_no = ?`,
-
+             where we_patient_surv_log.ip_no = ? and we_patient_surv_log.bd_code = ?`,
             [
-                id
+                data.ip_no,
+                data.bd_code
             ],
             (error, results, feilds) => {
+
                 if (error) {
                     return callBack(error);
                 }

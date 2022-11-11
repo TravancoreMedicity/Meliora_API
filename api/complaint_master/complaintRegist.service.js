@@ -85,7 +85,8 @@ module.exports = {
                 LEFT JOIN cm_complaint_dept ON cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
                 LEFT JOIN cm_hic_policy ON cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno 
                 LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id=cm_complaint_mast.complaint_dept_secslno
-                LEFT JOIN cm_complaint_type ON cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno`,
+                LEFT JOIN cm_complaint_type ON cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
+                ORDER BY compalint_date DESC`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -226,7 +227,7 @@ module.exports = {
                 LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id=cm_complaint_mast.complaint_dept_secslno
                 LEFT JOIN cm_complaint_type ON cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
                   left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
-                where compalint_status = 1`,
+                where compalint_status = 1 ORDER BY compalint_date DESC`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -258,7 +259,7 @@ module.exports = {
                 LEFT JOIN cm_hic_policy ON cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno 
                 LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id=cm_complaint_mast.complaint_dept_secslno
                 LEFT JOIN cm_complaint_type ON cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
-                where compalint_status = 2`,
+                where compalint_status = 2 ORDER BY compalint_date DESC`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -290,7 +291,7 @@ module.exports = {
                 LEFT JOIN cm_hic_policy ON cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno 
                 LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id=cm_complaint_mast.complaint_dept_secslno
                 LEFT JOIN cm_complaint_type ON cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
-                where compalint_status = 3   `,
+                where compalint_status = 3  ORDER BY compalint_date DESC `,
             [],
             (error, results, feilds) => {
                 if (error) {

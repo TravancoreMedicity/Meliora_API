@@ -1,6 +1,6 @@
 const logger = require('../../logger/logger');
 const { getTotalcomplaints, getPendingcomplaints, getAssignedcomplaints,
-    getOnholdcomplaints, getRectifycomplaints, getVerifycomplaints } = require('../complaint_dashboard/cmDashboard.service');
+    getOnholdcomplaints, getRectifycomplaints, getVerifycomplaints, getEmployeeProgressDash, getEmployeeProgressPending } = require('../complaint_dashboard/cmDashboard.service');
 module.exports = {
     getTotalcomplaints: (req, res) => {
         const id = req.params.id
@@ -137,6 +137,52 @@ module.exports = {
             return res.status(200).json({
                 success5: 1,
                 data5: results
+            });
+        });
+    },
+    getEmployeeProgressDash: (req, res) => {
+        const body = req.body;
+        getEmployeeProgressDash(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getEmployeeProgressPending: (req, res) => {
+        // const id = req.params.id;
+        getEmployeeProgressPending((err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
             });
         });
     },

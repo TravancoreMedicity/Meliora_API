@@ -1,7 +1,7 @@
 const { validateComplaintRegist } = require('../../validation/validation_schema');
 const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign, getcomplaintAssignbyEmployee, quickAssigncompstatus,
     detailedAssigncompstatus, getassistantEmployee, insertAssistemp, AssignRemark, getALLcomplaintbyEmployee, getIndividualassitemployee,
-    AssistantRecieved } = require('../complaint_assign/complaintAssign.service');
+    AssistantRecieved, checkInsertVal } = require('../complaint_assign/complaintAssign.service');
 const logger = require('../../logger/logger');
 
 module.exports = {
@@ -30,28 +30,45 @@ module.exports = {
     },
     quickAssign: (req, res) => {
         const body = req.body;
-        quickAssign(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(400).json({
-                    success: 2,
-                    message: err
+
+        checkInsertVal(body, (err, results) => {
+            const value = JSON.parse(JSON.stringify(results));
+            if (Object.keys(value).length === 0) {
+
+
+                quickAssign(body, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(400).json({
+                            success: 2,
+                            message: err
+                        });
+                    }
+                    quickAssigncompstatus(body, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(400).json({
+                                success: 2,
+                                message: err
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Complaint Assigned Successfully"
+                        });
+                    })
                 });
-            }
-            quickAssigncompstatus(body, (err, results) => {
-                if (err) {
-                    logger.logwindow(err)
-                    return res.status(400).json({
-                        success: 2,
-                        message: err
-                    });
-                }
+            } else {
+                logger.infologwindow("Already Assigned Selected Employee")
                 return res.status(200).json({
-                    success: 1,
-                    message: "Complaint Assigned Successfully"
-                });
-            })
-        });
+                    success: 7,
+                    message: "Already Assigned Selected Employee"
+                })
+            }
+        })
+
+
+
     },
     getEmployee: (req, res) => {
         const id = req.params.id

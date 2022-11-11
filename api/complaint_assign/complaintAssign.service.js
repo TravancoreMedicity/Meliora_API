@@ -14,7 +14,7 @@ module.exports = {
                       left join cm_hic_policy on cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno
                       left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.complaint_dept_secslno 
            where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
-           where department_slno=? AND compalint_status=0)`,
+           where department_slno=? AND compalint_status=0) ORDER BY compalint_date DESC`,
             [
                 id
             ],
@@ -25,6 +25,23 @@ module.exports = {
                 return callBack(null, results);
             }
         );
+    },
+
+    checkInsertVal: (data, callBack) => {
+        pool.query(
+            `select detl_slno from cm_complaint_detail
+            where complaint_slno=? and assigned_emp=? `,
+            [
+                data.complaint_slno,
+                data.assigned_emp
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
     },
     quickAssign: (data, callBack) => {
         pool.query(
@@ -66,7 +83,8 @@ module.exports = {
     },
     getEmployee: (id, callBack) => {
         pool.query(
-            ` SELECT em_id, em_name FROM meliora.co_employee_master where em_department=?`,
+            ` SELECT em_id, em_name FROM meliora.co_employee_master where em_department=?
+            and em_status=1 and em_no!=1 and em_id!=1606 `,
             [
                 id
             ],
@@ -113,7 +131,7 @@ module.exports = {
         left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
         left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
         left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
-        where assigned_emp=? AND assist_flag =0`,
+        where assigned_emp=? AND assist_flag =0 ORDER BY compalint_date DESC`,
             [
                 id
             ],
@@ -143,7 +161,8 @@ module.exports = {
     },
     getassistantEmployee: (data, callBack) => {
         pool.query(
-            ` SELECT em_id, em_name FROM meliora.co_employee_master where em_department=? and em_id !=?`,
+            ` SELECT em_id, em_name FROM meliora.co_employee_master where em_department=? and em_id !=?
+            and em_status=1 and em_no!=1 and em_id!=1606`,
             [
                 data.em_department,
                 data.em_id
@@ -219,7 +238,7 @@ module.exports = {
            left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
             where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
-                      where department_slno=?)`,
+                      where department_slno=?) ORDER BY compalint_date DESC`,
             [
                 id
             ],
@@ -245,7 +264,7 @@ module.exports = {
         left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
         left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
          left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assist_requested_emp
-        where assigned_emp=? AND assist_flag=1`,
+        where assigned_emp=? AND assist_flag=1 ORDER BY compalint_date DESC`,
             [
                 id
             ],

@@ -120,7 +120,11 @@ module.exports = {
     },
     getEmployeeByUserName: (userName, callBack) => {
         pool.query(
-            `SELECT * FROM meliora.co_employee WHERE emp_username = ? AND emp_status = '1'`,
+            `SELECT co_employee_master.em_name,emp_username,emp_password,
+            co_employee_master.em_id,co_employee.emp_no
+             FROM meliora.co_employee
+            LEFT JOIN co_employee_master ON co_employee_master.em_no=co_employee.emp_no
+             WHERE emp_username = ? AND emp_status = '1'`,
             [userName],
             (error, results, fields) => {
                 if (error) {

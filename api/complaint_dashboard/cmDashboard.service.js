@@ -2,8 +2,6 @@ const { pool } = require('../../config/database')
 module.exports = {
     getTotalcomplaints: (id, callBack) => {
         pool.query(
-            // `select count(complaint_desc) as count_totalcmp from cm_complaint_mast WHERE complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
-            //     where department_slno=?)`,
             `select count(complaint_slno) as count_totalcmp from cm_complaint_mast WHERE complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
                 where department_slno=?)`,
             [
@@ -64,8 +62,6 @@ module.exports = {
     },
     getRectifycomplaints: (id, callBack) => {
         pool.query(
-            // `  select count(complaint_desc) as rectify_cmp from cm_complaint_mast WHERE complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
-            //     where department_slno=? AND cm_rectify_status='R')`
             ` select count(cm_rectify_time) as rectify_cmp from cm_complaint_mast WHERE complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
                     where department_slno=? AND cm_rectify_time is not null)`,
             [

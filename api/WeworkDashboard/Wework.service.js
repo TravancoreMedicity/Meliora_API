@@ -16,7 +16,8 @@ module.exports = {
     },
     getDamacount: (id, callBack) => {
         pool.query(
-            `select count(ip_no) as total_admission from wework_patient`,
+            `select count(ip_no ) as damacount from we_patient_surv_log 
+            where if_dama = 1`,
             [
                 id
             ],

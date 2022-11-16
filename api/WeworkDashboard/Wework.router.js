@@ -4,6 +4,6 @@ const { totaladmissioncount, getDamacount } = require('../WeworkDashboard/Wework
 
 
 router.get('/admission/count', checkToken, totaladmissioncount)
-router.get('/damacount:id', checkToken, getDamacount)
+router.get('/damacount/:id', checkToken, getDamacount)
 
 module.exports = router;

@@ -150,7 +150,7 @@ module.exports = {
         pool.query(
             `SELECT dept_id,
              dept_name 
-             FROM co_department_mast WHERE dept_status=1`,
+             FROM co_department_mast WHERE dept_status=1 order by dept_name ASC`,
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);

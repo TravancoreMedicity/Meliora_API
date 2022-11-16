@@ -3,7 +3,7 @@ const { checkToken } = require("../../authentication/token_validation");
 const { getinpatientList, insertpatientsurv, InsertDailyActivity, getsurvslno,
     Insertsrvtable, getsurvslnointraction, getsurvslnoonly, getAsignedStaff,
     getdailyactivity, getintraction, updateActivity, updateIntraction, getwedetail, selectsurvslno,
-    updateweDetail, selectsurlogslno } = require('../WeWork/WeWork.controller')
+    updateweDetail, selectsurlogslno, getTotalAdmission } = require('../WeWork/WeWork.controller')
 
 
 router.get('/getinpatient/:id', checkToken, getinpatientList);
@@ -21,7 +21,8 @@ router.patch('/patintraction', checkToken, updateIntraction);
 router.post('/patdetail', checkToken, getwedetail);
 router.patch('/patchsurv', checkToken, updateweDetail);
 router.post('/survslno', checkToken, selectsurvslno);
-router.post('/logslno', checkToken, selectsurlogslno)
+router.post('/logslno', checkToken, selectsurlogslno);
+router.get('/total/admission', checkToken, getTotalAdmission)
 
 
 module.exports = router;

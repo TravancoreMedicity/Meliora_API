@@ -343,7 +343,8 @@ const validateComplaintRegist = Joi.object({
     compalint_date: Joi.number().optional(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
-    complaint_remark: Joi.number().optional()
+    complaint_remark: Joi.number().optional(),
+    cm_location: Joi.number().optional()
 })
 
 
@@ -431,10 +432,51 @@ validationsurvLog = Joi.object({
     geezer: Joi.number().optional(),
     document_status: Joi.string().optional(),
     remarks_we: Joi.string().optional(),
-    sfa_mfa: Joi.string().optional()
+    sfa_mfa: Joi.string().optional(),
+    discharge_wright: Joi.date().optional(),
+    bill_ready: Joi.date().optional(),
+    actual_discharge: Joi.date().optional(),
+    recieved_time: Joi.date().optional(),
+    // tv_ac_remot: Joi.Json().optional(),
+    dietition_visit_tme: Joi.date().optional(),
+    stat_medicine: Joi.date().optional(),
+    stat_recived_time: Joi.date().optional(),
+    we_employee: Joi.number().optional(),
+    submit_time: Joi.date().optional(),
+    // room_amentites: Joi.Json().optional(),
+    // pateint_service: Joi.Json().optional()
+})
+
+validationdailyactivity = Joi.object({
+    srv_slno: Joi.number().optional(),
+    visit_time: Joi.date().required(),
+    activity_date: Joi.date().required(),
+    room_clean: Joi.number().optional(),
+    sheet_change: Joi.number().optional(),
+    dr_round: Joi.number().optional(),
+    imortant_note: Joi.string().optional(),
+    dietian_round: Joi.number().optional(),
+    bill_audit: Joi.number().optional(),
+    patient_board_update: Joi.number().optional(),
+    insurance_status: Joi.number().optional(),
+    create_empid: Joi.number().optional(),
+    update_date: Joi.number().optional(),
+    ip_no: Joi.string().optional(),
+    diet_status: Joi.optional(),
+    asset_usage: Joi.optional()
 
 })
 
+validationpatientIntraction = Joi.object({
+    surv_slno: Joi.number().required(),
+    remark_date: Joi.date().required(),
+    particular: Joi.string().optional(),
+    status: Joi.string().optional(),
+    remarks: Joi.string().optional(),
+    submit_time: Joi.date().optional(),
+    edit_time: Joi.string().optional(),
+    submit_employee: Joi.number().optional()
+})
 
 module.exports = {
     validateEmployee,
@@ -462,11 +504,13 @@ module.exports = {
     ValidateDietMaster,
     ValidateDietType,
     validateitemgroup,
-    validatekotitem,
+    // validatekotitem,
     validateDietmenusetting,
     validateNurseStation,
     validateuserCreation,
-    validationsurvLog
+    validationsurvLog,
+    validationpatientIntraction,
+    validationdailyactivity
 
 
 }

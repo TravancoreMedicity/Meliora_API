@@ -47,7 +47,8 @@ module.exports = {
             complaint_typeslno,
             complaint_type_name,
             cm_complaint_mast.create_user,
-            sec_name,
+            S.sec_name as sec_name, 
+            IFNULL( L.sec_name,"Nill" ) location,
             compalint_status,
             hic_policy_status,
             cm_rectify_status,
@@ -64,7 +65,8 @@ module.exports = {
             left join co_request_type on cm_complaint_mast.complaint_request_slno = co_request_type.req_type_slno
             left join cm_complaint_dept on cm_complaint_mast.complaint_deptslno = cm_complaint_dept.complaint_dept_slno
             left join cm_complaint_type on cm_complaint_mast.complaint_typeslno = cm_complaint_type.complaint_type_slno
-            left join co_deptsec_mast on cm_complaint_mast.complaint_dept_secslno = co_deptsec_mast.sec_id
+            left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
+            left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
             left join cm_hic_policy on cm_complaint_mast.complaint_hicslno = cm_hic_policy.hic_policy_slno
             where cm_complaint_mast.create_user =?`,
             [

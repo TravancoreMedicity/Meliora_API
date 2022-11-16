@@ -1,9 +1,10 @@
 const logger = require('../../logger/logger')
 const { getinpatientList, insertpatientsurv, InsertDailyActivity, getsurvslno,
     Insertsrvtable, getsurvslnointraction, getsurvslnoonly, getAsignedStaff, getdailyactivity,
-    getintraction, updateActivity, updateIntraction, getwedetail, updateweDetail, selectsurvslno, selectsurlogslno } = require('../WeWork/WeWork.service')
-const { validationsurvLog } = require('../../validation/validation_schema');
-const { log } = require('winston');
+    getintraction, updateActivity, updateIntraction, checkinsertintra, getwedetail,
+    updateweDetail, selectsurvslno, selectsurlogslno, getTotalAdmission } = require('../WeWork/WeWork.service')
+const { validationsurvLog, validationdailyactivity, validationpatientIntraction } = require('../../validation/validation_schema');
+
 
 module.exports = {
     getinpatientList: (req, res) => {
@@ -54,17 +55,26 @@ module.exports = {
 
     InsertDailyActivity: (req, res) => {
         const body = req.body;
+        // const body_result = validationpatientIntraction.validate(body);
+        // if (body_result.error) {
+        //     // logger.logwindow(body_result.error.details[0].message)
+        //     logger.warnlogwindow(body_result.error.details[0].message)
+        //     return res.status(200).json({
+        //         success: 2,
+        //         message: body_result.error.details[0].message
+        //     });
+        // }
+        // body.srv_slno = body_result.value.srv_slno;
+        // checkInsertVal(body, (err, results) => {
+        //     const value = JSON.parse(JSON.stringify(results))
+        //     if (Object.keys(value).length === 0) {
         InsertDailyActivity(body, (err, results) => {
+            const id = results.insertId
             if (err) {
+                logger.logwindow(err)
                 return res.status(200).json({
                     success: 0,
                     message: err
-                });
-            }
-            if (results.length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "please sumbit patient survillence"
                 });
             }
             return res.status(200).json({
@@ -72,6 +82,14 @@ module.exports = {
                 message: "Daily Activity inserted succesfully"
             });
         });
+        // } else {
+        //     logger.infologwindow("daily activity in this date is all ready added")
+        //     return res.status(200).json({
+        //         success: 7,
+        //         message: "daily activity in this date is all ready added"
+        //     })
+        // }
+        // })
     },
     getsurvslno: (req, res) => {
         const id = req.params.id;
@@ -113,7 +131,7 @@ module.exports = {
             if (results.length == 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "pleade enter patient survillence before adding the details"
+                    message: "please enter patient survillence before adding the details"
                 });
             }
 
@@ -149,25 +167,41 @@ module.exports = {
     },
     getsurvslnointraction: (req, res) => {
         const body = req.body;
-        getsurvslnointraction(body, (err, results) => {
-            const id = results.insertId
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (results.length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "Add patient intarction after submit patient intaction"
-                });
-            }
+        const body_result = validationpatientIntraction.validate(body);
+        if (body_result.error) {
+            // logger.logwindow(body_result.error.details[0].message)
+            logger.warnlogwindow(body_result.error.details[0].message)
             return res.status(200).json({
-                success: 1,
-                message: "patient intraction inserted successfully!"
+                success: 2,
+                message: body_result.error.details[0].message
             });
-        });
+        }
+        body.srv_slno = body_result.value.srv_slno;
+        checkinsertintra(body, (err, results) => {
+            const value = JSON.parse(JSON.stringify(results))
+            if (Object.keys(value).length === 0) {
+                getsurvslnointraction(body, (err, results) => {
+                    const id = results.insertId
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "patient intraction inserted successfully!"
+                    });
+                })
+            } else {
+                logger.infologwindow("daily activity in this date is all ready added")
+                return res.status(200).json({
+                    success: 7,
+                    message: "Intraction in this date is all ready added"
+                })
+            }
+
+        })
     },
     getAsignedStaff: (req, res) => {
         const id = req.params.id;
@@ -372,6 +406,31 @@ module.exports = {
             if (results.length == 0) {
                 return res.status(200).json({
                     success: 2,
+                    message: "No Result Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results,
+
+            });
+        });
+    },
+    getTotalAdmission: (req, res) => {
+        getTotalAdmission((err, results) => {
+            console.log(results);
+            if (err) {
+                logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+
+            if (results.length == 0) {
+                return res.status(200).json({
+                    success: 0,
                     message: "No Result Found"
                 });
             }

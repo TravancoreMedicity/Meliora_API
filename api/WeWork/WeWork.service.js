@@ -8,7 +8,7 @@ module.exports = {
             wework_patient.pt_no,
             wework_patient.bd_code,
             wework_patient.ipd_date as DOA,
-             TIMESTAMPDIFF(YEAR, ptd_dob, CURDATE()) AS age,
+            TIMESTAMPDIFF(YEAR, ptd_dob, CURDATE()) AS age,
             wework_patient.ptc_ptname,
             doc_name,
             rmc_desc,
@@ -23,7 +23,6 @@ module.exports = {
             left join room_master on ora_bed.rm_code = room_master.rm_code
             left join ora_roommaster on ora_bed.rm_code= ora_roommaster.rm_code    
             where ora_nurstation.ns_code = ?`,
-
             [
                 id
             ],
@@ -66,9 +65,12 @@ module.exports = {
             sfa_mfa,
             we_employee,
             room_amentites,
-            pateint_service
+            pateint_service,
+            bhrc_patient,
+            if_dama,
+            dama_remarks
             )
-            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
 
                 data.we_surv_slno,
@@ -97,7 +99,10 @@ module.exports = {
                 data.sfa_mfa,
                 data.we_employee,
                 JSON.stringify(data.room_amentites),
-                JSON.stringify(data.pateint_service)
+                JSON.stringify(data.pateint_service),
+                data.bhrc_patient,
+                data.if_dama,
+                data.dama_remarks
             ],
             (error, results, fields) => {
                 if (error) {
@@ -108,7 +113,6 @@ module.exports = {
         );
     },
     InsertDailyActivity: (data, callback) => {
-
         pool.query(
             `insert into we_daily_activity
             (srv_slno,
@@ -125,9 +129,10 @@ module.exports = {
             insurance_status,
             ip_no,
             create_empid,
-            activity_date
+            activity_date,
+            dr_visit_time
             )
-            values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+            values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.srv_slno,
                 data.visit_time,
@@ -143,7 +148,8 @@ module.exports = {
                 data.insurance_status,
                 data.ip_no,
                 data.create_empid,
-                data.activity_date
+                data.activity_date,
+                data.dr_visit_time
 
             ],
             (error, results, fields) => {
@@ -397,6 +403,9 @@ module.exports = {
             sfa_mfa,
             assigned_nurse,
             pateint_service,
+            dama_remarks,
+            if_dama,
+            bhrc_patient,
             remarks_we,we_surv_slno,surv_log_slno
              FROM meliora.we_patient_surv_log
              left join ora_nurstation on we_patient_surv_log.shift_from = ora_nurstation.ns_code
@@ -439,7 +448,10 @@ module.exports = {
                         we_employee = ?,
                         tv_ac_remot = ?,
                        room_amentites = ?,
-                       pateint_service = ?
+                       pateint_service = ?,
+                       bhrc_patient = ?,
+                       if_dama = ?,
+                       dama_remarks = ?
                         where  surv_log_slno = ?`,
             [
                 data.discharge_wright,
@@ -466,6 +478,9 @@ module.exports = {
                 JSON.stringify(data.tv_ac_remot),
                 JSON.stringify(data.room_amentites),
                 JSON.stringify(data.pateint_service),
+                data.bhrc_patient,
+                data.if_dama,
+                data.dama_remarks,
                 data.surv_log_slno
 
             ],
@@ -517,6 +532,55 @@ module.exports = {
             }
         )
 
-    }
+    },
+    checkInsertVal: (data, callBack) => {
+        pool.query(
+            `select srv_slno from we_daily_activity
+            where activity_date = ?`,
+            [
+                data.activity_date
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    checkinsertintra: (data, callBack) => {
+        pool.query(
+            `select surv_slno from we_interaction_remarks
+            where remark_date = ?`,
+            [
+                data.remark_date
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
 
+    },
+    getTotalAdmission: (callBack) => {
+        pool.query(
+            `select ip_no ,pt_no,ipd_date,ptc_ptname,ptc_sex,bdc_no,rcc_desc,doc_name,nsc_desc,ipd_disc,ptc_mobile
+            from wework_patient
+            left join ora_bed on wework_patient.bd_code = ora_bed.bd_code
+            left join ora_nurstation on ora_bed.ns_code = ora_nurstation.ns_code
+            left join ora_roomcategory on wework_patient.rc_code = ora_roomcategory.rc_code
+            left join ora_doctor on wework_patient.do_code = ora_doctor.do_code`,
+            [],
+            (error, results, fields) => {
+                console.log("service");
+                console.log(results);
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    }
 }

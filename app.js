@@ -77,6 +77,7 @@ const dietReport = require('./api/diet_report/diet_report.router');
 const cmdashboardRouter = require('./api/complaint_dashboard/cmDashboard.router');
 const directcmregRouter = require('./api/cm_directcomplaintRegister/directcmReg.router');
 const getHrmDatas = require('./api/hrm_data_get/data_get_insert.router')
+const weworkdashboard = require('./api/WeworkDashboard/Wework.router')
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -138,6 +139,7 @@ app.use('/api/dietReport', dietReport)
 app.use('/api/cmdashboard', cmdashboardRouter)
 app.use('/api/directcmreg', directcmregRouter)
 app.use('/api/hrmdataGet', getHrmDatas)
+app.use('/api/wewrkdash', weworkdashboard)
 
 app.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

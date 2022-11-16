@@ -144,7 +144,7 @@ module.exports = {
         pool.query(
             `SELECT sec_id,sec_name
             FROM co_deptsec_mast
-             WHERE sec_status=1
+             WHERE sec_status=1 order by sec_name ASC
            `,
             [],
             (error, results, feilds) => {
@@ -161,7 +161,7 @@ module.exports = {
             sec_id,
             sec_name
         FROM co_deptsec_mast 
-        WHERE dept_id = ?`,
+        WHERE dept_id = ? order by sec_name ASC`,
             [id],
             (error, results, feilds) => {
                 if (error) {

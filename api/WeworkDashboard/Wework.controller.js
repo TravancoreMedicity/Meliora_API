@@ -39,7 +39,7 @@ module.exports = {
             if (results.length == 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result Found"
+                    message: "No Result"
                 });
             }
 

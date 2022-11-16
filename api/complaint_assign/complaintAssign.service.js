@@ -2,7 +2,7 @@ const { pool } = require('../../config/database')
 module.exports = {
     getcomplaintAssign: (id, callBack) => {
         pool.query(
-            `     select complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
+            `  select complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
             complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
             S.sec_name as sec_name, 
             IFNULL( L.sec_name,"Nill" ) location,
@@ -122,7 +122,7 @@ module.exports = {
     },
     getcomplaintAssignbyEmployee: (id, callBack) => {
         pool.query(
-            `        select cm_complaint_mast.complaint_slno,complaint_desc,assigned_date,complaint_dept_name,
+            `select cm_complaint_mast.complaint_slno,complaint_desc,assigned_date,complaint_dept_name,
             req_type_name,complaint_type_name,
             S.sec_name as sec_name, 
             IFNULL( L.sec_name,"Nill" ) location,cm_rectify_status,assigned_date,
@@ -314,14 +314,4 @@ module.exports = {
             }
         );
     },
-
-
-
-
-
-
-
-
-
-
 }

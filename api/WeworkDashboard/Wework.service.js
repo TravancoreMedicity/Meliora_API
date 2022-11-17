@@ -30,4 +30,21 @@ module.exports = {
 
         )
     },
+
+    getcountbhrc: (id, callBack) => {
+        pool.query(
+            `select count(ip_no)  as count_bhrc from we_patient_surv_log 
+            where bhrc_patient = 1`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+
+        )
+    }
 }

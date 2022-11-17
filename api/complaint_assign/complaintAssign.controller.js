@@ -66,9 +66,6 @@ module.exports = {
                 })
             }
         })
-
-
-
     },
     getEmployee: (req, res) => {
         const id = req.params.id

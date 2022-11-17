@@ -61,8 +61,6 @@ module.exports = {
                     message: err
                 });
             }
-
-
             getdepartmentSecMeli((err, results) => {
                 const melidepartmentSec = [...results]
                 if (err) {
@@ -188,7 +186,7 @@ module.exports = {
                     }
                     return res.status(200).json({
                         success: 1,
-                        message: "Employee Master Inserted Successfully"
+                        message: "Employee Inserted Successfully"
                     });
                 });
             })

@@ -300,6 +300,7 @@ module.exports = {
                 req_type_name,
                 complaint_dept_name,
                 complaint_type_name,
+                cm_verfy_time,
                 (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High" else "Medium" end ) as priority,
                 (case when hic_policy_name is not null then hic_policy_name else 'Not Suggested' end )as hic_policy_name,
                 (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"

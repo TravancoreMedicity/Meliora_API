@@ -574,8 +574,6 @@ module.exports = {
             left join ora_doctor on wework_patient.do_code = ora_doctor.do_code`,
             [],
             (error, results, fields) => {
-                console.log("service");
-                console.log(results);
                 if (error) {
                     return callBack(error)
                 }

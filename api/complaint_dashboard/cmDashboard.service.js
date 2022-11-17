@@ -2,8 +2,6 @@ const { pool } = require('../../config/database')
 module.exports = {
     getTotalcomplaints: (id, callBack) => {
         pool.query(
-            // `select count(complaint_desc) as count_totalcmp from cm_complaint_mast WHERE complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
-            //     where department_slno=?)`,
             `select count(complaint_slno) as count_totalcmp from cm_complaint_mast WHERE complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
                 where department_slno=?)`,
             [

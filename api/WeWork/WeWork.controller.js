@@ -419,7 +419,6 @@ module.exports = {
     },
     getTotalAdmission: (req, res) => {
         getTotalAdmission((err, results) => {
-            console.log(results);
             if (err) {
                 logger.errorLogger(err)
                 return res.status(200).json({

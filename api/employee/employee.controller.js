@@ -192,6 +192,7 @@ module.exports = {
     },
 
 
+
     empInsert: (req, res) => {
         const body = req.body;
         const body_result = validateuserCreation.validate(body);

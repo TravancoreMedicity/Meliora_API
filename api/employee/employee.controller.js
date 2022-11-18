@@ -180,6 +180,7 @@ module.exports = {
                     emp_no: results.emp_no,
                     emp_id: results.em_id,
                     emp_name: results.em_name,
+                    emp_sec: results.sec_name,
                     logintime: new Date()
                 });
             } else {

@@ -166,7 +166,7 @@ module.exports = {
                         left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
                         left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
                         left join cm_hic_policy on cm_complaint_mast.complaint_hicslno = cm_hic_policy.hic_policy_slno
-                        where complaint_dept_secslno =?`,
+                        where complaint_dept_secslno =?  ORDER BY compalint_date DESC `,
             [
                 id
             ],
@@ -278,7 +278,7 @@ module.exports = {
                 left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
                 LEFT JOIN cm_complaint_type ON cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
                   left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
-                where compalint_status = 2 ORDER BY compalint_date DESC`,
+                where compalint_status = 2 GROUP BY complaint_slno ORDER BY compalint_date DESC`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -314,7 +314,7 @@ module.exports = {
                 left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
                 LEFT JOIN cm_complaint_type ON cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
                   left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
-                where compalint_status = 3 ORDER BY compalint_date DESC `,
+                where compalint_status = 3  GROUP BY complaint_slno ORDER BY compalint_date DESC `,
             [],
             (error, results, feilds) => {
                 if (error) {

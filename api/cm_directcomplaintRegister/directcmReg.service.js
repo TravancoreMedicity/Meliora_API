@@ -68,7 +68,7 @@ module.exports = {
             left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
             left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
             left join cm_hic_policy on cm_complaint_mast.complaint_hicslno = cm_hic_policy.hic_policy_slno
-            where cm_complaint_mast.create_user =?`,
+            where cm_complaint_mast.create_user =?  ORDER BY compalint_date DESC `,
             [
                 id
             ],

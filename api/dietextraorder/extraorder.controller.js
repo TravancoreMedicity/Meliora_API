@@ -1,5 +1,7 @@
 const logger = require('../../logger/logger')
-const { getExtraorder, getItemrate, ExtraOrderInsert, ExtraOrderListInsert, getDietType } = require('../dietextraorder/extrorder.sevice')
+const { getExtraorder, getItemrate, ExtraOrderInsert, ExtraOrderListInsert, getDietType, getExtraOrder,
+    getExtraOrderDetail
+} = require('../dietextraorder/extrorder.sevice')
 module.exports = {
     getExtraorder: (req, res) => {
         const body = req.body
@@ -108,5 +110,49 @@ module.exports = {
             });
         });
     },
-
+    getExtraOrder: (req, res) => {
+        getExtraOrder((err, results) => {
+            if (err) {
+                // logger.logwindow(err)
+                return res.status(400).json({
+                    success: 10,
+                    message: err
+                });
+            }
+            if (!results) {
+                // logger.infologwindow("No Results Found")
+                return res.status(400).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getExtraOrderDetail: (req, res) => {
+        const id = req.params.id;
+        getExtraOrderDetail(id, (err, results) => {
+            if (err) {
+                // logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length == 0) {
+                // logger.infologwindow("No Record Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "their is no complaint under this department"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
 }

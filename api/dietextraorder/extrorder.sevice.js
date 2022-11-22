@@ -41,15 +41,17 @@ module.exports = {
                 type_slno,
                 rate_hos,
                 rate_cant,
-                is_extra_billed
+                is_extra_billed,
+                extra_bill_date
             ) 
-            VALUES(?,?,?,?,?)`,
+            VALUES(?,?,?,?,?,?)`,
             [
                 data.proc_slno,
                 data.type_slno,
                 data.rate_hos,
                 data.rate_cant,
-                data.is_extra_billed
+                data.is_extra_billed,
+                data.extra_bill_date
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -100,6 +102,49 @@ module.exports = {
                 return callBack(null, results)
             }
         )
+    },
+
+    getExtraOrder: (callBack) => {
+        pool.query(
+            `select prod_slno,diet_process_detl.proc_slno,type_slno,rate_hos,rate_cant ,diet_plan.plan_slno,
+            date(process_date) as orderdate,diet_plan.pt_no,ptc_ptname,bdc_no, date(extra_bill_date) as reqdate,
+       co_nursestation.co_ora_nurse ,co_nursestation.co_nurse_desc  ,room_master.rm_code
+  from diet_process_detl
+  left join diet_process_mast on diet_process_mast.proc_slno=diet_process_detl.proc_slno
+  left join diet_plan on diet_plan.plan_slno=diet_process_mast.plan_slno
+  left join ora_patient on ora_patient.pt_no=diet_plan.pt_no
+  left join ora_bed on ora_bed.bd_code=diet_plan.bd_code
+left join co_nursestation on co_nursestation.co_ora_nurse=ora_bed.ns_code
+left join room_master on room_master.rm_code=ora_bed.rm_code
+  where is_extra_billed=1;
+            `, [],
+            function (err, results) {
+
+                if (err) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+
+    getExtraOrderDetail: (id, callBack) => {
+        pool.query(
+            `select extra_slno,hos_rate as rate_hos,cant_rate as rate_cant,item_name,diet_extra_oder_list.item_slno,type_slno
+            from diet_extra_oder_list
+            left join kot_item_master on kot_item_master.item_slno=diet_extra_oder_list.item_slno
+            where prod_slno=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
     },
 
 }

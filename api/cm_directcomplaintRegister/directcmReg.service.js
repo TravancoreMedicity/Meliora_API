@@ -11,9 +11,10 @@ module.exports = {
                 compalint_status,
                 complaint_hicslno,
                 complaint_dept_secslno,
+                cm_location,
                 create_user
                )
-                VALUES(?,?,?,?,?,?,?,?,?)`,
+                VALUES(?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.complaint_desc,
                 data.complaint_typeslno,
@@ -23,6 +24,7 @@ module.exports = {
                 data.compalint_status,
                 data.complaint_hicslno,
                 data.complaint_dept_secslno,
+                data.cm_location,
                 data.create_user
             ],
             (error, results, fields) => {
@@ -42,6 +44,7 @@ module.exports = {
             complaint_request_slno,
             complaint_hicslno,
             compalint_priority,
+            cm_location,
             complaint_dept_name,
             complaint_deptslno,
             complaint_typeslno,
@@ -91,6 +94,7 @@ module.exports = {
                 complaint_typeslno = ?,
                 compalint_priority = ?,
                 complaint_hicslno = ?, 
+                cm_location=?,
                 edit_user=?          
                 WHERE complaint_slno = ?`,
             [
@@ -101,6 +105,7 @@ module.exports = {
                 data.complaint_typeslno,
                 data.compalint_priority,
                 data.complaint_hicslno,
+                data.cm_location,
                 data.edit_user,
                 data.complaint_slno
             ],

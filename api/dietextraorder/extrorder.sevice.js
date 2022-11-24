@@ -69,7 +69,8 @@ module.exports = {
                 hos_rate,
                 cant_rate,
                 type_slno,
-                extra_status
+                extra_status,
+                count
             ) 
             VALUES ?`,
             [
@@ -130,9 +131,56 @@ left join room_master on room_master.rm_code=ora_bed.rm_code
 
     getExtraOrderDetail: (id, callBack) => {
         pool.query(
-            `select extra_slno,hos_rate as rate_hos,cant_rate as rate_cant,item_name,diet_extra_oder_list.item_slno,type_slno
-            from diet_extra_oder_list
+            `select extra_slno,hos_rate as rate_hos,cant_rate as rate_cant,item_name,
+            diet_extra_oder_list.item_slno,type_slno,count, count*hos_rate as total_hos,
+            count*cant_rate as total_cant
+                        from diet_extra_oder_list
             left join kot_item_master on kot_item_master.item_slno=diet_extra_oder_list.item_slno
+            where prod_slno=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    updateExta: (data, callBack) => {
+        pool.query(
+            `update diet_process_detl
+            set proc_slno=?,
+            type_slno=?,
+             rate_hos=?, 
+             rate_cant=?,
+             is_extra_billed=?, 
+             extra_bill_date=?
+             where prod_slno=? `,
+            [
+                data.proc_slno,
+                data.type_slno,
+                data.rate_hos,
+                data.rate_cant,
+                data.is_extra_billed,
+                data.extra_bill_date,
+                data.prod_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+
+    deleteExtraOrderDetail: (id, callBack) => {
+        pool.query(
+            `delete  from diet_extra_oder_list
             where prod_slno=?`,
             [
                 id

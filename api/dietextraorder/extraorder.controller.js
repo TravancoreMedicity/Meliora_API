@@ -1,7 +1,6 @@
 const logger = require('../../logger/logger')
 const { getExtraorder, getItemrate, ExtraOrderInsert, ExtraOrderListInsert, getDietType, getExtraOrder,
-    getExtraOrderDetail
-} = require('../dietextraorder/extrorder.sevice')
+    getExtraOrderDetail, updateExta, deleteExtraOrderDetail } = require('../dietextraorder/extrorder.sevice')
 module.exports = {
     getExtraorder: (req, res) => {
         const body = req.body
@@ -70,7 +69,8 @@ module.exports = {
     ExtraOrderListInsert: (req, res) => {
         const body = req.body;
         var orderList = body.map((val, index) => {
-            return [val.prod_slno, val.item_slno, val.hos_rate, val.cant_rate, val.type_slno, val.extra_status
+            return [val.prod_slno, val.item_slno, val.hos_rate, val.cant_rate, val.type_slno, val.extra_status,
+            val.count
             ]
         })
         ExtraOrderListInsert(orderList, (err, results) => {
@@ -153,6 +153,53 @@ module.exports = {
                 success: 1,
                 data: results
             });
+        });
+    },
+    updateExta: (req, res) => {
+        const body = req.body
+        updateExta(body, (err, results) => {
+            if (err) {
+                // logger.logwindow(err)
+                return res.status(400).json({
+                    success: 10,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                // logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+
+            const id = body.prod_slno
+
+
+            deleteExtraOrderDetail(id, (err, results) => {
+                if (err) {
+                    // logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                if (results.length == 0) {
+                    // logger.infologwindow("No Record Found")
+                    return res.status(200).json({
+                        success: 2,
+                        message: "No data found"
+                    });
+                }
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            });
+
+
+
+
         });
     },
 }

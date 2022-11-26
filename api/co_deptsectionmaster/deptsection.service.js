@@ -110,7 +110,7 @@ module.exports = {
     getDept: (callBack) => {
         pool.query(
             `SELECT sec_id,sec_name,dept_name,co_deptsec_mast.dept_id,dept_sub_sect,ouc_desc,ora_outlet.ou_code,
-            if(sec_status = 1 ,'Yes','No')status , (case when dept_sub_sect='1' then "GENERAL" when dept_sub_sect='2' then "OT" when dept_sub_sect='3' then 'ICU'when dept_sub_sect='4' then 'ER'  else "Nill" end ) as dept_sub_sect1
+            if(sec_status = 1 ,'Yes','No')status , (case when dept_sub_sect='1' then "GENERAL" when dept_sub_sect='2' then "OT" when dept_sub_sect='3' then 'ICU'when dept_sub_sect='4' then 'ER'  else "Nil" end ) as dept_sub_sect1
              FROM co_deptsec_mast
             LEFT JOIN co_department_mast on co_department_mast.dept_id=co_deptsec_mast.dept_id
             LEFT JOIN ora_outlet on co_deptsec_mast.ou_code=ora_outlet.ou_code`,

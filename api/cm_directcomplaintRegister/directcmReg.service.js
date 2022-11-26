@@ -51,7 +51,7 @@ module.exports = {
             complaint_type_name,
             cm_complaint_mast.create_user,
             S.sec_name as sec_name, 
-            IFNULL( L.sec_name,"Nill" ) location,
+            IFNULL( L.sec_name,"Nil" ) location,
             compalint_status,
             hic_policy_status,
             cm_rectify_status,

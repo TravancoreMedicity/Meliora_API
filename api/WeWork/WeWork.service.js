@@ -36,8 +36,6 @@ module.exports = {
 
     },
     insertpatientsurv: (data, callback) => {
-
-
         pool.query(
             `insert into we_patient_surv_log 
             (
@@ -580,5 +578,213 @@ module.exports = {
                 return callBack(null, results)
             }
         )
+    },
+    getDamalist: (callBack) => {
+        pool.query(
+            `SELECT we_patient_surv_log.ip_no ,
+            ipd_date,pt_no,ptc_ptname,
+            ora_roommaster.rmc_desc,
+            date(discharge_wright) as disc_date,
+            time(discharge_wright) as disc_time,
+            dama_remarks,
+            doc_name,
+            (case when payment_mode = 1 then "Cash" when payment_mode = 2 then "Insurence" when payment_mode = 3 then "Other credit" else "no payemnt" end) payment_mode
+            FROM meliora.we_patient_surv_log
+            left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
+            left join ora_bed on wework_patient.bd_code =ora_bed.bd_code
+            left join room_master on  ora_bed.rm_code = room_master.rm_code
+            left join ora_roommaster on room_master.rm_code = ora_roommaster.rm_code
+            left join ora_doctor on wework_patient.do_code = ora_doctor.do_code
+            where if_dama = 1 `,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getBhrcList: (callBack) => {
+        pool.query(
+            `SELECT we_patient_surv_log.ip_no ,
+            pt_no,ipd_date,ptc_ptname,
+            t.ns_code as shift_from ,
+            ora_roommaster.rmc_desc,
+            f.ns_code as shift_to,bdc_no,
+            dietition_visit_tme,
+            stat_medicine,
+            stat_recived_time,
+            doc_name
+            FROM meliora.we_patient_surv_log
+            left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
+            left join ora_nurstation t on t.ns_code = we_patient_surv_log.shift_from
+            left join ora_nurstation f on f.ns_code = we_patient_surv_log.shift_to
+            left join ora_bed on wework_patient.bd_code =ora_bed.bd_code
+            left join room_master on  ora_bed.rm_code = room_master.rm_code
+            left join ora_roommaster on room_master.rm_code = ora_roommaster.rm_code
+            left join ora_doctor on wework_patient.do_code = ora_doctor.do_code
+            where bhrc_patient = 1 and ipd_status = 'y'
+            group by ip_no`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getDocVisit: (callBack) => {
+        pool.query(
+            `SELECT date(dr_visit_time) Visit_date,
+            we_patient_survillance.ip_no,
+            we_patient_survillance.pt_no,
+            ptc_ptname,
+            doc_name,
+            admission_date,
+            ora_roommaster.rmc_desc,
+            we_patient_survillance.admission_date,
+            t.ns_code as shift_from,
+             f.ns_code as shift_to,
+            time(dr_visit_time) as visit_tme
+            FROM meliora.we_daily_activity
+            left join we_patient_survillance on we_daily_activity.srv_slno = we_patient_survillance.surv_slno
+            left join wework_patient on we_patient_survillance.ip_no = wework_patient.ip_no
+            left join ora_doctor on wework_patient.do_code = ora_doctor.do_code
+            left join ora_bed on wework_patient.bd_code =ora_bed.bd_code
+            left join room_master on  ora_bed.rm_code = room_master.rm_code
+            left join ora_roommaster on room_master.rm_code = ora_roommaster.rm_code
+            left join we_patient_surv_log on wework_patient.ip_no = we_patient_surv_log.ip_no
+            left join ora_nurstation t on t.ns_code = we_patient_surv_log.shift_from
+            left join ora_nurstation f on f.ns_code = we_patient_surv_log.shift_to
+            where time(dr_visit_time) > "02-00-00"
+            group by ip_no`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    DischargeAfternoonList: (callBack) => {
+        pool.query(
+            `  select we_patient_surv_log.ip_no,
+            pt_no,ipd_date,ptc_ptname,
+            t.nsc_desc as shift_from ,
+            doc_name,
+            ora_roommaster.rmc_desc,
+			f.nsc_desc as shift_to,bdc_no ,discharge_wright,
+            date(actual_discharge) actual_disc,
+            time(actual_discharge) disc_time,
+            (case when payment_mode= 1 then "cash" when payment_mode=2 then "insurence" else "other credit" end ) as payment_mode
+            from we_patient_surv_log
+            left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
+                        left join ora_nurstation t on t.ns_code =  we_patient_surv_log.shift_to
+                        left join ora_nurstation f on f.ns_code =  we_patient_surv_log.shift_from
+                        left join ora_bed on wework_patient.bd_code =ora_bed.bd_code
+                        left join room_master on  ora_bed.rm_code = room_master.rm_code
+                        left join ora_roommaster on room_master.rm_code = ora_roommaster.rm_code
+                        left join ora_doctor on wework_patient.do_code = ora_doctor.do_code
+            where time(actual_discharge) > '02-00-00'`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getOneSheetList: (callBack) => {
+        pool.query(
+            `SELECT we_patient_surv_log.ip_no,
+            pt_no,ipd_date,ptc_ptname,
+            t.nsc_desc as shift_from ,
+            doc_name,
+                        ora_roommaster.rmc_desc,
+                        f.nsc_desc as shift_to,bdc_no
+                        FROM meliora.we_patient_surv_log
+                        left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
+                        left join ora_nurstation t on t.ns_code =  we_patient_surv_log.shift_to
+                        left join ora_nurstation f on f.ns_code =  we_patient_surv_log.shift_from
+                        left join ora_bed on wework_patient.bd_code =ora_bed.bd_code
+                        left join room_master on  ora_bed.rm_code = room_master.rm_code
+                        left join ora_roommaster on room_master.rm_code = ora_roommaster.rm_code
+                        left join ora_doctor on wework_patient.do_code = ora_doctor.do_code
+                        group by we_patient_surv_log.ip_no
+                        HAVING COUNT(we_patient_surv_log.ip_no) = 1`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getsruvillenceDetl: (id, callBack) => {
+        pool.query(
+            `select we_patient_surv_log.ip_no, 
+            ptc_ptname,
+            t.nsc_desc as shift_to,
+            f.nsc_desc as shift_from,
+            recieved_time,
+            bdc_no,
+            (case when room_category = 1 then 'normal' when room_category = 2 then 'Ac' when room_category = 3 then 'Ac delux' when room_category = 4 then 'Vip' when room_category = 2 then 'VIP suite' else 'none' end) as room_category,
+            (case when bed_type = 1 then 'Basic Bed' when bed_type = 2 then 'Semi flower' when bed_type = 3 then 'Side Rail' when bed_type = 4 then 'Bariatric Bed' 
+            when bed_type = 5 then 'Electric Bed' else "none" end ) bed_type,
+            (case when bhrc_patient = 1 then "yes" else "no" end )bhrc_patient,
+            dietition_visit_tme,
+            stat_medicine,
+            sfa_mfa,
+            (case when payment_mode = 1 then "cash"  when payment_mode = 2 then "credit"  when payment_mode = 3 then "Other credit" else "none" end) as payment_mode,
+            stat_recived_time
+            from we_patient_surv_log
+            left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
+            left join ora_nurstation t on t.ns_code =  we_patient_surv_log.shift_to
+            left join ora_nurstation f on f.ns_code =  we_patient_surv_log.shift_from
+            left join ora_bed on we_patient_surv_log.bd_code = ora_bed.bd_code
+            where we_patient_surv_log.ip_no = ?`,
+            [id],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getAdmittebhrc: (callBack) => {
+        pool.query(
+            `SELECT we_patient_surv_log.ip_no ,
+            pt_no,ipd_date,ptc_ptname,
+            t.ns_code as shift_from ,
+            ora_roommaster.rmc_desc,
+            f.ns_code as shift_to,bdc_no,
+            dietition_visit_tme,
+            stat_medicine,
+            stat_recived_time,
+            doc_name
+            FROM meliora.we_patient_surv_log
+            left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
+            left join ora_nurstation t on t.ns_code = we_patient_surv_log.shift_from
+            left join ora_nurstation f on f.ns_code = we_patient_surv_log.shift_to
+            left join ora_bed on wework_patient.bd_code =ora_bed.bd_code
+            left join room_master on  ora_bed.rm_code = room_master.rm_code
+            left join ora_roommaster on room_master.rm_code = ora_roommaster.rm_code
+            left join ora_doctor on wework_patient.do_code = ora_doctor.do_code
+            where bhrc_patient = 1 and ipd_status = 'N'
+            group by ip_no`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
     }
 }

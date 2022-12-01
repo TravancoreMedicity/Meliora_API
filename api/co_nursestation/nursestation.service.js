@@ -7,13 +7,19 @@ module.exports = {
             co_nurse_desc,
             co_ora_nurse,
             co_status,
+            ns_building,
+            ns_floor,
+            ns_ora_outlet,
             em_id
-            ) values (?,?,?,?)`,
+            ) values (?,?,?,?,?,?,?)`,
             [
 
                 data.co_nurse_desc,
                 data.co_ora_nurse,
                 data.co_status,
+                data.ns_building,
+                data.ns_floor,
+                data.ns_ora_outlet,
                 data.em_id
 
             ],
@@ -49,6 +55,7 @@ module.exports = {
             nsc_desc,
             co_ora_nurse,
             co_status,
+            ns_floor,ns_ora_outlet,ns_building,
             if(co_status = 1 ,'Yes','No')status ,
             em_id 
             from co_nursestation
@@ -87,14 +94,20 @@ module.exports = {
             SET co_nurse_desc = ?,
             co_ora_nurse = ?,
             co_status=?,
-            em_id = ?
+            em_id = ?,
+            ns_building=?,
+            ns_floor=?,
+            ns_ora_outlet=?
             WHERE co_nurse_slno = ?`,
             [
                 data.co_nurse_desc,
                 data.co_ora_nurse,
                 data.co_status,
                 data.em_id,
-                data.co_nurse_slno
+                data.ns_building,
+                data.ns_floor,
+                data.ns_ora_outlet,
+                data.co_nurse_slno,
 
             ],
             (error, results, feilds) => {

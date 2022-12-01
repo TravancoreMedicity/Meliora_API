@@ -14,13 +14,11 @@ module.exports = {
 
         )
     },
-    getDamacount: (id, callBack) => {
+    getDamacount: (callBack) => {
         pool.query(
-            `select count(ip_no ) as damacount from we_patient_surv_log 
+            `select count(ip_no ) as dama_count from we_patient_surv_log 
             where if_dama = 1`,
-            [
-                id
-            ],
+            [],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -31,13 +29,39 @@ module.exports = {
         )
     },
 
-    getcountbhrc: (id, callBack) => {
+    getcountbhrc: (callBack) => {
         pool.query(
             `select count(ip_no)  as count_bhrc from we_patient_surv_log 
             where bhrc_patient = 1`,
-            [
-                id
-            ],
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+
+        )
+    },
+    getdocVisitCount: (callBack) => {
+        pool.query(
+            `select count(ip_no) as shift_count from we_daily_activity
+            where time(dr_visit_time) > "02-00-00"`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+
+        )
+    },
+    getDischargecountAfterNoon: (callBack) => {
+        pool.query(
+            `select count(ip_no) as Discharge_count from we_patient_surv_log 
+            where time(actual_discharge) > '02:00:00'`,
+            [],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);

@@ -383,7 +383,10 @@ const validateNurseStation = Joi.object({
     co_ora_nurse: Joi.string().required(),
     em_id: Joi.number().required(),
     co_status: Joi.number().required(),
-    co_nurse_slno: Joi.number().optional()
+    co_nurse_slno: Joi.number().optional(),
+    ns_building: Joi.number().required(),
+    ns_floor: Joi.number().required(),
+    ns_ora_outlet: Joi.string().optional()
 })
 
 const validateuserCreation = Joi.object({
@@ -437,14 +440,14 @@ validationsurvLog = Joi.object({
     bill_ready: Joi.date().optional(),
     actual_discharge: Joi.date().optional(),
     recieved_time: Joi.date().optional(),
-    // tv_ac_remot: Joi.Json().optional(),
+    tv_ac_remot: Joi.optional(),
     dietition_visit_tme: Joi.date().optional(),
     stat_medicine: Joi.date().optional(),
     stat_recived_time: Joi.date().optional(),
     we_employee: Joi.number().optional(),
     submit_time: Joi.date().optional(),
-    // room_amentites: Joi.Json().optional(),
-    // pateint_service: Joi.Json().optional()
+    room_amentites: Joi.optional(),
+    pateint_service: Joi.optional()
 })
 
 validationdailyactivity = Joi.object({
@@ -463,7 +466,7 @@ validationdailyactivity = Joi.object({
     update_date: Joi.number().optional(),
     ip_no: Joi.string().optional(),
     diet_status: Joi.optional(),
-    asset_usage: Joi.optional()
+    asset_usage: Joi.optional(),
 
 })
 
@@ -476,6 +479,30 @@ validationpatientIntraction = Joi.object({
     submit_time: Joi.date().optional(),
     edit_time: Joi.string().optional(),
     submit_employee: Joi.number().optional()
+})
+
+validationhighbiotic = Joi.object({
+    high_item_code: Joi.string().required(),
+    high_item_desc: Joi.string().required(),
+    high_item_alias: Joi.string().max(4).optional().messages({
+        'string.max': 'Hicpolicy Name length must be less than or equal to 4 characters long'
+    }),
+    high_item_status: Joi.number().optional()
+})
+
+
+ValidationEmpMappingNurStation = Joi.object({
+    map_dept_slno: Joi.number().required(),
+    map_deptsec_slno: Joi.number().required(),
+    map_emp_id: Joi.number().required(),
+    map_building: Joi.number().required(),
+    map_floor: Joi.number().required(),
+    create_user: Joi.number().required(),
+    edit_user: Joi.number().optional(),
+    create_date: Joi.date().optional(),
+    update_date: Joi.date().optional(),
+    map_status: Joi.number().optional(),
+    map_nsurse_station: Joi.required()
 })
 
 module.exports = {
@@ -510,7 +537,9 @@ module.exports = {
     validateuserCreation,
     validationsurvLog,
     validationpatientIntraction,
-    validationdailyactivity
+    validationdailyactivity,
+    validationhighbiotic,
+    ValidationEmpMappingNurStation
 
 
 }

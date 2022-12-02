@@ -375,5 +375,31 @@ where module_slno = ?`,
             }
         );
     },
-
+    getfloor: (callBack) => {
+        pool.query(
+            `SELECT floor_code,
+            floor_desc
+            FROM floor_master WHERE floor_status=1`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+    getnurstationbyfloor: (id, callBack) => {
+        pool.query(
+            `select co_nurse_desc ,co_nurse_slno from co_nursestation 
+            where ns_floor = ? `,
+            [id],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    }
 }

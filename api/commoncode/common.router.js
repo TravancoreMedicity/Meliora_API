@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { getEmployeeID, getMenuBasedRights, getModuleGroupByID, getSubModuleRights, getSelectMenu, getEmpName,
-    getModuleGroup, getModuleRights, getempId, inpatientList, getBranch, getDesignation, getSalutation, getSerialnumber,
+    getModuleGroup, getModuleRights, getempId, inpatientList, getBranch, getDesignation, getSalutation,
+    getSerialnumber,
     getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
     getDashboardRights, getEmployeedeptSec } = require('../commoncode/common.controller');
 

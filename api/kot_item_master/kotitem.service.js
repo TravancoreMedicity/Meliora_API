@@ -70,7 +70,7 @@ module.exports = {
             kot_item_master.status,
             kot_item_master.em_id 
             from  meliora.kot_item_master
-            left join meliora.item_group on kot_item_master.grp_slno = item_group.grp_slno`,
+            left join meliora.item_group on kot_item_master.grp_slno = item_group.grp_slno order by item_name asc`,
             [],
             function (err, results) {
 

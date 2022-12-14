@@ -41,9 +41,10 @@ module.exports = {
             `SELECT 
             item_name           
             FROM kot_item_master 
-            WHERE item_name=? `,
+            WHERE item_name=? and diet_item=?`,
             [
-                data.item_name
+                data.item_name,
+                data.diet_item
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -70,7 +71,8 @@ module.exports = {
             kot_item_master.status,
             kot_item_master.em_id 
             from  meliora.kot_item_master
-            left join meliora.item_group on kot_item_master.grp_slno = item_group.grp_slno order by item_name asc`,
+            left join meliora.item_group on kot_item_master.grp_slno = item_group.grp_slno
+            order by item_slno desc`,
             [],
             function (err, results) {
 

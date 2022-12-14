@@ -4,7 +4,7 @@ const { getEmployeeID, getMenuBasedRights, getModuleGroupByID, getSubModuleRight
     getModuleGroup, getModuleRights, getempId, inpatientList, getBranch, getDesignation, getSalutation,
     getSerialnumber,
     getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
-    getDashboardRights, getEmployeedeptSec } = require('../commoncode/common.controller');
+    getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor } = require('../commoncode/common.controller');
 
 router.get("/getempid/:id", checkToken, getEmployeeID)
 router.get("/getMenu/:id", checkToken, getMenuBasedRights)
@@ -31,8 +31,8 @@ router.get("/dashrights/:id", checkToken, getDashboardRights) //Dashboard Rights
 
 
 router.get("/emp/deptsec/:id", checkToken, getEmployeedeptSec);
-
-
+router.get('/get/floor', checkToken, getfloor)
+router.get('/nursfloor/:id', checkToken, getnurstationbyfloor)
 
 
 module.exports = router;

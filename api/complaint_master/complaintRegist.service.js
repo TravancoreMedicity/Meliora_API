@@ -69,41 +69,7 @@ module.exports = {
             }
         );
     },
-    getcomplaintRegist: (callBack) => {
-        pool.query(
-            `SELECT cm_complaint_mast.complaint_slno,complaint_desc,DATE_FORMAT(compalint_date,'%d-%m-%Y ')compalint_date1,
-            compalint_date,    
-              IFNULL(em_name,"Not assigned" ) em_name,
-                       S.sec_name as sec_name, 
-              IFNULL( L.sec_name,"Nil" ) location,
-                complaint_dept_secslno,
-                complaint_request_slno,
-                compalint_priority,
-                req_type_name,
-                complaint_dept_name,
-                complaint_type_name,
-                (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High" else "Medium" end ) as priority,
-                (case when hic_policy_name is not null then hic_policy_name else 'Not Suggested' end )as hic_policy_name,
-                (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"  when compalint_status = '3' then "Verified"  else "Not" end ) as compalint_status1
-                FROM cm_complaint_mast
-                LEFT JOIN co_request_type ON co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
-                LEFT JOIN cm_complaint_dept ON cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
-                LEFT JOIN cm_hic_policy ON cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno 
-               left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
-                        left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
-                LEFT JOIN cm_complaint_type ON cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
-                LEFT JOIN cm_complaint_detail ON cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
-                LEFT JOIN co_employee_master ON co_employee_master.em_id=cm_complaint_detail.assigned_emp
-                ORDER BY compalint_date DESC`,
-            [],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
+
     getcomplaintRegistByID: (data, callBack) => {
         pool.query(
             `
@@ -217,33 +183,36 @@ module.exports = {
             }
         );
     },
-    getAssignedcomplaint: (callBack) => {
+
+    getcomplaintAll: (callBack) => {
         pool.query(
-            `        SELECT  cm_complaint_mast.complaint_slno,complaint_desc,DATE_FORMAT(compalint_date,'%d-%m-%Y ')compalint_date1,
-            compalint_date,assigned_emp,em_name,assigned_date,
-            S.sec_name as sec_name, 
-            IFNULL( L.sec_name,"Nil" ) location,
-                assigned_emp,
+            `SELECT cm_complaint_mast.complaint_slno,complaint_desc,DATE_FORMAT(compalint_date,'%d-%m-%Y ')compalint_date1,
+            compalint_date, 
+            IFNULL(assigned_date,"Not Assign") as assigned_date,
+            IFNULL(cm_rectify_time,"Not Updated") as cm_rectify_time,
+               IFNULL(cm_verfy_time,"Not updated") as cm_verfy_time,   
+              IFNULL(em_name,"Not assigned" ) em_name,
+                       S.sec_name as sec_name, 
+              IFNULL( L.sec_name,"Nil" ) location,
                 complaint_dept_secslno,
                 complaint_request_slno,
                 compalint_priority,
                 req_type_name,
                 complaint_dept_name,
-                complaint_type_name,
+                complaint_type_name,compalint_status,
                 (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High" else "Medium" end ) as priority,
                 (case when hic_policy_name is not null then hic_policy_name else 'Not Suggested' end )as hic_policy_name,
-                (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
-                when compalint_status = '3' then "Verified" end ) as compalint_status1  
-              from meliora.cm_complaint_detail
-				LEFT JOIN cm_complaint_mast on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
+                (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"  when compalint_status = '3' then "Verified"  else "Not" end ) as compalint_status1
+                FROM cm_complaint_mast
                 LEFT JOIN co_request_type ON co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
                 LEFT JOIN cm_complaint_dept ON cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
                 LEFT JOIN cm_hic_policy ON cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno 
-                left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
-                left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
+               left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
+                        left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
                 LEFT JOIN cm_complaint_type ON cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
-                  left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
-                where compalint_status = 1 ORDER BY compalint_date DESC`,
+                LEFT JOIN cm_complaint_detail ON cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
+                LEFT JOIN co_employee_master ON co_employee_master.em_id=cm_complaint_detail.assigned_emp
+               group by cm_complaint_mast.complaint_slno ORDER BY compalint_date DESC `,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -253,76 +222,5 @@ module.exports = {
             }
         );
     },
-    getRctifiedcomplaint: (callBack) => {
-        pool.query(
-            `SELECT  cm_complaint_mast.complaint_slno,complaint_desc,DATE_FORMAT(compalint_date,'%d-%m-%Y ')compalint_date1,
-            compalint_date,assigned_emp,em_name,assigned_date,cm_rectify_time,
-            S.sec_name as sec_name, 
-            IFNULL( L.sec_name,"Nil" ) location,assigned_emp,
-                complaint_dept_secslno,
-                complaint_request_slno,
-                compalint_priority,
-                req_type_name,
-                complaint_dept_name,
-                complaint_type_name,
-                (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High" else "Medium" end ) as priority,
-                (case when hic_policy_name is not null then hic_policy_name else 'Not Suggested' end )as hic_policy_name,
-                (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
-                when compalint_status = '3' then "Verified" end ) as compalint_status1  
-              from meliora.cm_complaint_detail
-				LEFT JOIN cm_complaint_mast on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
-                LEFT JOIN co_request_type ON co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
-                LEFT JOIN cm_complaint_dept ON cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
-                LEFT JOIN cm_hic_policy ON cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno 
-                left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
-                left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
-                LEFT JOIN cm_complaint_type ON cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
-                  left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
-                where compalint_status = 2 GROUP BY complaint_slno ORDER BY compalint_date DESC`,
-            [],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
-    getverifiedcmp: (callBack) => {
-        pool.query(
-            ` SELECT  cm_complaint_mast.complaint_slno,complaint_desc,DATE_FORMAT(compalint_date,'%d-%m-%Y ')compalint_date1,
-            compalint_date,assigned_emp,em_name,assigned_date,cm_rectify_time,
-            S.sec_name as sec_name, 
-            IFNULL( L.sec_name,"Nil" ) location,assigned_emp,
-                complaint_dept_secslno,
-                complaint_request_slno,
-                compalint_priority,
-                req_type_name,
-                complaint_dept_name,
-                complaint_type_name,
-                cm_verfy_time,
-                (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High" else "Medium" end ) as priority,
-                (case when hic_policy_name is not null then hic_policy_name else 'Not Suggested' end )as hic_policy_name,
-                (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
-                when compalint_status = '3' then "Verified" end ) as compalint_status1  
-              from meliora.cm_complaint_detail
-				LEFT JOIN cm_complaint_mast on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
-                LEFT JOIN co_request_type ON co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
-                LEFT JOIN cm_complaint_dept ON cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
-                LEFT JOIN cm_hic_policy ON cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno 
-                left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
-                left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
-                LEFT JOIN cm_complaint_type ON cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
-                  left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
-                where compalint_status = 3  GROUP BY complaint_slno ORDER BY compalint_date DESC `,
-            [],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    }
 
 }

@@ -504,6 +504,21 @@ ValidationEmpMappingNurStation = Joi.object({
     map_status: Joi.number().optional(),
     map_nsurse_station: Joi.required()
 })
+validateBedTransfer = Joi.object({
+    trasf_slno: Joi.number().required(),
+    bed_trans_surv_slno: Joi.number().required(),
+    trasfer_to: Joi.string().required(),
+    transfer_time: Joi.date().required(),
+    counseling_status: Joi.string().optional(),
+    sfa_mfa_clearence: Joi.string().optional(),
+    room_amenties: Joi.optional(),
+    bystander_room_retain: Joi.string().optional(),
+    transfer_in_time: Joi.date().optional(),
+    remarks: Joi.string().optional(),
+    ip_no: Joi.string().required()
+
+})
+
 
 module.exports = {
     validateEmployee,
@@ -539,7 +554,7 @@ module.exports = {
     validationpatientIntraction,
     validationdailyactivity,
     validationhighbiotic,
-    ValidationEmpMappingNurStation
-
+    ValidationEmpMappingNurStation,
+    validateBedTransfer
 
 }

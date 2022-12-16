@@ -78,7 +78,7 @@ const cmdashboardRouter = require('./api/complaint_dashboard/cmDashboard.router'
 const directcmregRouter = require('./api/cm_directcomplaintRegister/directcmReg.router');
 const getHrmDatas = require('./api/hrm_data_get/data_get_insert.router')
 const weworkdashboard = require('./api/WeworkDashboard/Wework.router')
-const hidhantibiotic = require('./api/HighAntiBioticMaster/HighAntiBiotic.router')
+const highantibiotic = require('./api/HighAntiBioticMaster/HighAntiBiotic.router')
 const WeEmpMapping = require('./api/WeEmpMapping/WeEmpMapping.router')
 app.use(express.json());
 app.use((req, res, next) => {
@@ -141,7 +141,7 @@ app.use('/api/cmdashboard', cmdashboardRouter)
 app.use('/api/directcmreg', directcmregRouter)
 app.use('/api/hrmdataGet', getHrmDatas)
 app.use('/api/wewrkdash', weworkdashboard)
-app.use('/api/highBioticMast', hidhantibiotic)
+app.use('/api/highBioticMast', highantibiotic)
 app.use('/api/weEmpMap', WeEmpMapping)
 
 

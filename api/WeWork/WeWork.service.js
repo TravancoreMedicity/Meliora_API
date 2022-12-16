@@ -3,7 +3,7 @@ const { pool } = require('../../config/database');
 module.exports = {
     getinpatientList: (id, callBack) => {
         pool.query(
-            ` SELECT 
+            `SELECT 
             wework_patient.ip_no,
             wework_patient.pt_no,
             wework_patient.bd_code,
@@ -13,6 +13,7 @@ module.exports = {
             doc_name,
             rmc_desc,
             wework_patient.ptc_sex,
+            ora_nurstation.nsc_desc,
             wework_patient.ipd_disc as DOD
             FROM meliora.wework_patient
             left join ora_roomcategory on wework_patient.rc_code = ora_roomcategory.rc_code
@@ -21,8 +22,8 @@ module.exports = {
             left join ora_bed on wework_patient.bd_code = ora_bed.bd_code
             left join ora_nurstation on ora_bed.ns_code = ora_nurstation.ns_code
             left join room_master on ora_bed.rm_code = room_master.rm_code
-            left join ora_roommaster on ora_bed.rm_code= ora_roommaster.rm_code    
-            where ora_nurstation.ns_code = ?`,
+            left join ora_roommaster on ora_bed.rm_code= ora_roommaster.rm_code           
+            where ora_nurstation.ns_code IN(?) `,
             [
                 id
             ],
@@ -38,8 +39,7 @@ module.exports = {
     insertpatientsurv: (data, callback) => {
         pool.query(
             `insert into we_patient_surv_log 
-            (
-         we_surv_slno,
+            (we_surv_slno,
             ip_no,
             bd_code,
             discharge_wright,
@@ -786,5 +786,228 @@ module.exports = {
                 return callBack(null, results);
             }
         );
-    }
+    },
+    Insertdischarge: (data, callback) => {
+        pool.query(
+            `insert into we_discharge
+            ( 
+            surv_slno , 
+            ip_no,
+            discharge_type,
+            dis_annoc_time,
+            cros_consult,
+            summary_time,
+            disc_medicine_indent,
+            disc_medicine_recive,
+            bill_ready_time,
+            feed_back_collected,
+            room_clear_time)
+            values (?,?,?,?,?,?,?,?,?,?,?)`,
+            [
+                data.surv_slno,
+                data.ip_no,
+                data.discharge_type,
+                data.dis_annoc_time,
+                data.cros_consult,
+                data.summary_time,
+                data.disc_medicine_indent,
+                data.disc_medicine_recive,
+                data.bill_ready_time,
+                data.feed_back_collected,
+                data.room_clear_time,
+
+
+            ],
+            (error, results, fields) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    getdischarge: (id, callBack) => {
+        pool.query(
+            `select we_discharge.ip_no,discharge_type,dis_slno,
+            dis_annoc_time,
+            ptc_ptname,
+            cros_consult,summary_time,disc_medicine_indent,disc_medicine_recive,
+            bill_ready_time,
+            (case when feed_back_collected = 1 then "yes" else "no" end ) as feed_back_collected,
+            room_clear_time
+            from we_discharge 
+            left join wework_patient on we_discharge.ip_no = wework_patient.ip_no
+            where we_discharge.ip_no = ? `,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    updateDischarge: (data, callback) => {
+        console.log("service");
+        console.log(data);
+        pool.query(
+            `update we_discharge 
+            set discharge_type=?,
+            dis_annoc_time = ?,
+            cros_consult=?,
+            summary_time=?,
+            disc_medicine_indent = ?,
+            disc_medicine_recive =?,
+            bill_ready_time=?,
+            feed_back_collected=?,
+            room_clear_time =?
+            where dis_slno = ?`,
+            [
+                data.discharge_type,
+                data.dis_annoc_time,
+                data.cros_consult,
+                data.summary_time,
+                data.disc_medicine_indent,
+                data.disc_medicine_recive,
+                data.bill_ready_time,
+                data.feed_back_collected,
+                data.room_clear_time,
+                data.dis_slno
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    insertBedtracking: (data, callback) => {
+        pool.query(
+            `insert into we_patient_bed_transfer
+            (bed_trans_surv_slno,
+            ip_no,
+            trasfer_to,
+            transfer_from,
+            transfer_time,
+            counseling_status,
+            sfa_mfa_clearence,
+            room_amenties,
+            bystander_room_retain,
+            transfer_in_time,
+            remarks
+            ) values(?,?,?,?,?,?,?,?,?,?,?)`,
+            [
+                data.bed_trans_surv_slno,
+                data.ip_no,
+                data.trasfer_to,
+                data.transfer_from,
+                data.transfer_time,
+                data.counseling_status,
+                data.sfa_mfa_clearence,
+                JSON.stringify(data.room_amenties),
+                data.bystander_room_retain,
+                data.transfer_in_time,
+                data.remarks
+            ],
+            (error, results, fields) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    getBedTransfer: (id, callBack) => {
+        pool.query(
+            `SELECT trasf_slno,
+            trasfer_to,
+            transfer_time,
+            counseling_status,
+            sfa_mfa_clearence,
+            bystander_room_retain,
+            transfer_in_time,
+            remarks,
+            transfer_from,
+            room_amenties,
+            ptc_ptname,
+            t.nsc_desc as transfer_too,
+            f.nsc_desc as transfer_fromm ,
+            we_patient_bed_transfer.ip_no
+            FROM meliora.we_patient_bed_transfer
+            left join wework_patient on we_patient_bed_transfer.ip_no = wework_patient.ip_no 
+            left join ora_nurstation t on we_patient_bed_transfer.trasfer_to = t.ns_code
+            left join ora_nurstation f on we_patient_bed_transfer.transfer_from = f.ns_code
+            where we_patient_bed_transfer.ip_no = ?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    updateBedTrans: (data, callback) => {
+        pool.query(
+            `update we_patient_bed_transfer 
+            set trasfer_to = ? ,
+            transfer_time = ? ,
+            counseling_status = ? ,
+            sfa_mfa_clearence=?,
+            room_amenties=?,
+            bystander_room_retain = ?,
+            transfer_in_time=?,
+            remarks = ? 
+            where trasf_slno = ?`,
+            [
+                data.trasfer_to,
+                data.transfer_time,
+                data.counseling_status,
+                data.sfa_mfa_clearence,
+                JSON.stringify(data.room_amenties),
+                data.bystander_room_retain,
+                data.transfer_in_time,
+                data.remarks,
+                data.trasf_slno
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    getbedtransSlno: (data, callBack) => {
+        pool.query(
+            `select trasf_slno from we_patient_bed_transfer 
+            where transfer_from = ? and trasfer_to = ? and bed_trans_surv_slno= ?`,
+
+            [
+                data.transfer_from,
+                data.trasfer_to,
+                data.bed_trans_surv_slno
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+
+    },
 }

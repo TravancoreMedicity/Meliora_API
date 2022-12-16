@@ -22,7 +22,7 @@ module.exports = {
     },
     getItemrate: (data, callBack) => {
         pool.query(
-            `select item_slno,rate_hos,rate_cant FROM diet_menu_setting_detl where item_slno=?`,
+            `select item_slno,rate_hosp as rate_hos, rate as rate_cant FROM kot_item_master where item_slno=?`,
             [
                 data.item_slno
             ],

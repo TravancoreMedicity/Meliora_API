@@ -1,6 +1,6 @@
 const logger = require('../../logger/logger')
 const { getItemmaster, dietmenudtlInsert, dietmenusettingInsert, dietmenudtlSelect, updatedietmenusettingdtl,
-    updatedietmenusetting, dmenuInsert, checkInsertVal } = require("../dietmenusettingdetail/dietmenudetl.service")
+    updatedietmenusetting, dmenuInsert, checkInsertVal, getItemmasterExtra, getItemRate } = require("../dietmenusettingdetail/dietmenudetl.service")
 module.exports = {
     dietmenusettingInsert: (req, res) => {
         const body = req.body
@@ -42,7 +42,53 @@ module.exports = {
         });
     },
     getItemmaster: (req, res) => {
-        getItemmaster((err, results) => {
+        const id = req.params.id;
+        getItemmaster(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length == 0) {
+                logger.infologwindow("No Records Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Records Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getItemRate: (req, res) => {
+        const id = req.params.id;
+        getItemRate(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length == 0) {
+                logger.infologwindow("No Records Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Records Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getItemmasterExtra: (req, res) => {
+        getItemmasterExtra((err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({

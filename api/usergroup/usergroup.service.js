@@ -3,11 +3,12 @@ const { pool } = require('../../config/database');
 module.exports = {
     usergroupInsert: (data, callBack) => {
         pool.query(
-            `INSERT INTO user_group_mast (user_grp_name,user_grp_status)
-                VALUES(?,?)`,
+            `INSERT INTO user_group_mast (user_grp_name,user_grp_status,create_user)
+                VALUES(?,?,?)`,
             [
                 data.user_grp_name,
                 data.user_grp_status,
+                data.create_user
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -56,11 +57,13 @@ module.exports = {
         pool.query(
             `UPDATE user_group_mast 
                 SET user_grp_name = ?,
-                user_grp_status =?
+                user_grp_status =?,
+                edit_user=?
                 WHERE user_grp_slno = ?`,
             [
                 data.user_grp_name,
                 data.user_grp_status,
+                data.edit_user,
                 data.user_grp_slno
             ],
             (error, results, feilds) => {

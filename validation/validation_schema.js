@@ -20,7 +20,9 @@ const validateUserGroup = Joi.object({
             'string.max': 'User group Name length must be less than or equal to 45 characters long'
         }),
     user_grp_status: Joi.number().min(0).max(1),
-    user_grp_slno: Joi.optional()
+    user_grp_slno: Joi.optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
 })
 //User rights validation
 const validateUserRights = Joi.object({
@@ -107,6 +109,8 @@ const validateModulemaster = Joi.object({
         }),
     module_status: Joi.number().min(0).max(1).required(),
     module_slno: Joi.number().optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
 });
 //Module group master
 const validateModuleGroup = Joi.object({

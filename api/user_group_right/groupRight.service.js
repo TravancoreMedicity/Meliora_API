@@ -61,9 +61,9 @@ module.exports = {
         pool.query(
             `SELECT user_grp_slno,
             user_grp_name,
-            user_grp_status,
-                if(user_grp_status = 1 ,'Yes','No') status
-            FROM user_group_mast`,
+            user_grp_status
+                           FROM user_group_mast
+                           where user_grp_status=1`,
             [],
             (error, results, feilds) => {
 

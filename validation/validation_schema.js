@@ -20,7 +20,9 @@ const validateUserGroup = Joi.object({
             'string.max': 'User group Name length must be less than or equal to 45 characters long'
         }),
     user_grp_status: Joi.number().min(0).max(1),
-    user_grp_slno: Joi.optional()
+    user_grp_slno: Joi.optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
 })
 //User rights validation
 const validateUserRights = Joi.object({
@@ -107,6 +109,8 @@ const validateModulemaster = Joi.object({
         }),
     module_status: Joi.number().min(0).max(1).required(),
     module_slno: Joi.number().optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
 });
 //Module group master
 const validateModuleGroup = Joi.object({
@@ -358,10 +362,10 @@ const validateitemgroup = Joi.object({
 const validatekotitem = Joi.object({
     item_name: Joi.string().required(),
     grp_slno: Joi.number().required(),
-    rate: Joi.number().required(),
-    rate_hosp: Joi.number().required(),
-    qty: Joi.number().required(),
-    unit: Joi.number().required(),
+    rate: Joi.number().optional(),
+    rate_hosp: Joi.number().optional(),
+    qty: Joi.string().optional(),
+    unit: Joi.string().optional(),
     diet_item: Joi.number().required(),
     status: Joi.number().required(),
     em_id: Joi.number().required(),
@@ -546,7 +550,7 @@ module.exports = {
     ValidateDietMaster,
     ValidateDietType,
     validateitemgroup,
-    // validatekotitem,
+    validatekotitem,
     validateDietmenusetting,
     validateNurseStation,
     validateuserCreation,

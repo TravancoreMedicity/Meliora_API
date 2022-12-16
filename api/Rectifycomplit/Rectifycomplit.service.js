@@ -83,5 +83,40 @@ module.exports = {
                 return callBack(null, results);
             }
         );
-    }
+    },
+    getAssignEmps: (id, callBack) => {
+        pool.query(
+            `select assigned_emp,em_name from cm_complaint_detail
+            left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            where complaint_slno=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    updateassignDetail: (data, callBack) => {
+        pool.query(
+            `update cm_complaint_detail
+            set assign_rect_status=1
+            where assigned_emp=? and complaint_slno=?`,
+            [
+                data.assigned_emp,
+                data.complaint_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
 }

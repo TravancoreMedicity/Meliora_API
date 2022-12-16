@@ -93,7 +93,7 @@ module.exports = {
     detailedAssign: (req, res) => {
         const body = req.body;
         var newList = body.map((val, index) => {
-            return [val.complaint_slno, val.assigned_emp, val.assigned_date]
+            return [val.complaint_slno, val.assigned_emp, val.assigned_date, val.assign_rect_status, val.assigned_user]
         })
         detailedAssign(newList, (err, results) => {
             if (err) {

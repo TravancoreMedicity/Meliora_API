@@ -6,12 +6,14 @@ module.exports = {
             `INSERT INTO module_master
             (
                 module_name,
-                module_status
+                module_status,
+                create_user
                )
-                VALUES(?,?)`,
+                VALUES(?,?,?)`,
             [
                 data.module_name,
-                data.module_status
+                data.module_status,
+                data.create_user
             ],
             (error, results, fields) => {
                 if (error) {
@@ -93,11 +95,13 @@ module.exports = {
         pool.query(
             `UPDATE module_master 
                 SET module_name = ?,
-                module_status=?
+                module_status=?,
+                edit_user=?
                 WHERE module_slno = ?`,
             [
                 data.module_name,
                 data.module_status,
+                data.edit_user,
                 data.module_slno
             ],
             (error, results, feilds) => {

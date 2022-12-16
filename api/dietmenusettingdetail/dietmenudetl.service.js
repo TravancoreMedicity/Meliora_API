@@ -71,9 +71,41 @@ module.exports = {
             }
         );
     },
-    getItemmaster: (callback) => {
+    getItemmaster: (id, callBack) => {
         pool.query(
-            `SELECT item_slno,item_name from kot_item_master WHERE status=1`,
+            `SELECT item_slno,item_name                                
+            FROM kot_item_master 
+            WHERE status=1 and grp_slno=? and diet_item=1`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getItemRate: (id, callBack) => {
+        pool.query(
+            `select item_slno,rate_hosp as rate_hos, rate as rate_cant,qty,unit
+             FROM kot_item_master
+              where item_slno=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getItemmasterExtra: (callback) => {
+        pool.query(
+            `SELECT item_slno,item_name from kot_item_master WHERE status=1 and diet_item=0`,
             [],
             (error, results, fields) => {
                 if (error) {

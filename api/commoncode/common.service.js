@@ -163,12 +163,6 @@ where module_slno = ?`,
     },
     inpatientList: (id, callBack) => {
         pool.query(
-            // `SELECT dietpt_slno,ip_no,pt_no,doc_name,rcc_desc,ptc_ptname,bdc_no,dietpt_slno,diet_patient.bd_code FROM diet_patient
-            // LEFT JOIN ora_doctor on diet_patient.do_code=ora_doctor.do_code
-            // LEFT JOIN ora_roomcategory on diet_patient.rc_code=ora_roomcategory.rc_code
-            // LEFT JOIN ora_bed on diet_patient.bd_code=ora_bed.bd_code
-            // left join ora_nurstation on ora_bed.ns_code = ora_nurstation.ns_code
-            // where ora_nurstation.ns_code = ?`,
             `SELECT diet_patient.dietpt_slno,diet_patient.ip_no,diet_patient.pt_no,doc_name,rcc_desc,
             ptc_ptname,bdc_no,diet_patient.bd_code,plan_status,ora_roommaster.rmc_desc,ora_roomtype.rtc_desc,ipd_date
             FROM meliora.diet_patient
@@ -402,4 +396,5 @@ where module_slno = ?`,
             }
         )
     }
+
 }

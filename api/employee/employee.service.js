@@ -228,7 +228,8 @@ module.exports = {
             from co_employee
              left join co_employee_master on co_employee.em_id=co_employee_master.em_id
              left join co_deptsec_mast on co_employee_master.em_dept_section=co_deptsec_mast.sec_id
-             left join module_group_user_rights on module_group_user_rights.emp_slno=co_employee_master.em_id`,
+             left join module_group_user_rights on module_group_user_rights.emp_slno=co_employee_master.em_id
+             group by em_id`,
             [],
             (error, results, feilds) => {
                 if (error) {

@@ -23,7 +23,7 @@ module.exports = {
             left join ora_nurstation on ora_bed.ns_code = ora_nurstation.ns_code
             left join room_master on ora_bed.rm_code = room_master.rm_code
             left join ora_roommaster on ora_bed.rm_code= ora_roommaster.rm_code           
-            where ora_nurstation.ns_code IN(?) `,
+            where ora_nurstation.ns_code =? `,
             [
                 id
             ],
@@ -292,12 +292,13 @@ module.exports = {
         pool.query(
             `select inter_remark_slno ,
             (case when remark_date is null then null else remark_date end)remark_date,
-            particular,
+            case when particular = '' then  'not updated' else particular end as particular,
              wework_patient.ptc_ptname,
-            status,remarks 
+            status,
+           case when  remarks = '' then 'not updated' else remarks end as remarks
             from we_interaction_remarks
             left join we_patient_survillance on we_interaction_remarks.surv_slno = we_patient_survillance.surv_slno
-            left join wework_patient on we_patient_survillance.ip_no = wework_patient.ip_no
+            left join wework_patient on we_patient_survillance.ip_no = wework_patient.ip_no   
             where we_patient_survillance.ip_no = ?`,
             [
                 id
@@ -801,8 +802,11 @@ module.exports = {
             disc_medicine_recive,
             bill_ready_time,
             feed_back_collected,
-            room_clear_time)
-            values (?,?,?,?,?,?,?,?,?,?,?)`,
+            room_clear_time,
+            disc_key,
+            disc_callbell,
+            disc_tv_ac_remot)
+            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.surv_slno,
                 data.ip_no,
@@ -815,7 +819,9 @@ module.exports = {
                 data.bill_ready_time,
                 data.feed_back_collected,
                 data.room_clear_time,
-
+                data.disc_key,
+                data.disc_callbell,
+                JSON.stringify(data.disc_tv_ac_remot)
 
             ],
             (error, results, fields) => {
@@ -830,14 +836,20 @@ module.exports = {
     getdischarge: (id, callBack) => {
         pool.query(
             `select we_discharge.ip_no,discharge_type,dis_slno,
-            dis_annoc_time,
-            ptc_ptname,
-            cros_consult,summary_time,disc_medicine_indent,disc_medicine_recive,
-            bill_ready_time,
-            (case when feed_back_collected = 1 then "yes" else "no" end ) as feed_back_collected,
-            room_clear_time
-            from we_discharge 
-            left join wework_patient on we_discharge.ip_no = wework_patient.ip_no
+            case when dis_annoc_time is null then 'not updated' else dis_annoc_time end as dis_annoc_time ,
+           ptc_ptname,
+            case when cros_consult ='' then 'not updated' else cros_consult end as  cros_consult ,
+           case when summary_time  is null then 'not updated' else summary_time end as  summary_time,
+           case when disc_medicine_indent  is null then 'not updated' else disc_medicine_indent end as  disc_medicine_indent,
+             case when  disc_medicine_recive  is null then 'not updated' else disc_medicine_recive  end as disc_medicine_recive,
+            case when bill_ready_time is null then 'not updated' else bill_ready_time end as bill_ready_time,
+           (case when feed_back_collected = 1 then "yes" else "no" end ) as feed_back_collected,
+           case when room_clear_time is null then 'not updated' else room_clear_time end as room_clear_time,
+           case when disc_key = 1 then "yes" else "no" end as disc_key,
+           case when disc_callbell = 1 then "yes" else "no" end as disc_callbell,
+           disc_tv_ac_remot
+           from we_discharge 
+           left join wework_patient on we_discharge.ip_no = wework_patient.ip_no  
             where we_discharge.ip_no = ? `,
             [
                 id
@@ -852,8 +864,6 @@ module.exports = {
         );
     },
     updateDischarge: (data, callback) => {
-        console.log("service");
-        console.log(data);
         pool.query(
             `update we_discharge 
             set discharge_type=?,
@@ -864,7 +874,10 @@ module.exports = {
             disc_medicine_recive =?,
             bill_ready_time=?,
             feed_back_collected=?,
-            room_clear_time =?
+            room_clear_time =?,
+            disc_key = ?,
+            disc_callbell =?,
+            disc_tv_ac_remot =?
             where dis_slno = ?`,
             [
                 data.discharge_type,
@@ -876,7 +889,12 @@ module.exports = {
                 data.bill_ready_time,
                 data.feed_back_collected,
                 data.room_clear_time,
+                data.disc_key,
+                data.disc_callbell,
+                JSON.stringify(data.disc_tv_ac_remot),
                 data.dis_slno
+
+
             ],
             (error, results, feilds) => {
 
@@ -929,14 +947,14 @@ module.exports = {
         pool.query(
             `SELECT trasf_slno,
             trasfer_to,
-            transfer_time,
-            counseling_status,
-            sfa_mfa_clearence,
-            bystander_room_retain,
-            transfer_in_time,
-            remarks,
+			case when transfer_time is null then 'not updated' else transfer_time end as  transfer_time , 
+            case when counseling_status = '' then   'not updated' else counseling_status end as  counseling_status,
+            case when sfa_mfa_clearence = '' then 'not updated' else sfa_mfa_clearence end as sfa_mfa_clearence ,
+            case when bystander_room_retain  = '' then   'not updated' else bystander_room_retain end as  bystander_room_retain ,
+            case when transfer_in_time  is null then 'not updated' else transfer_in_time end as  transfer_in_time,
+            case when  remarks  = '' then 'not updated' else  remarks  end as remarks,
             transfer_from,
-            room_amenties,
+            room_amenties ,
             ptc_ptname,
             t.nsc_desc as transfer_too,
             f.nsc_desc as transfer_fromm ,
@@ -944,7 +962,7 @@ module.exports = {
             FROM meliora.we_patient_bed_transfer
             left join wework_patient on we_patient_bed_transfer.ip_no = wework_patient.ip_no 
             left join ora_nurstation t on we_patient_bed_transfer.trasfer_to = t.ns_code
-            left join ora_nurstation f on we_patient_bed_transfer.transfer_from = f.ns_code
+            left join ora_nurstation f on we_patient_bed_transfer.transfer_from = f.ns_code        
             where we_patient_bed_transfer.ip_no = ?`,
             [
                 id

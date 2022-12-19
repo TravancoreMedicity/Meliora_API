@@ -4,7 +4,8 @@ const { getinpatientList, insertpatientsurv, InsertDailyActivity, getsurvslno,
     Insertsrvtable, getsurvslnointraction, getsurvslnoonly, getAsignedStaff,
     getdailyactivity, getintraction, updateActivity, updateIntraction, getwedetail, selectsurvslno,
     updateweDetail, selectsurlogslno, getTotalAdmission, getDamalist, getBhrcList, getDocVisit,
-    DischargeAfternoonList, getsruvillenceDetl, getOneSheetList, getAdmittebhrc } = require('../WeWork/WeWork.controller')
+    DischargeAfternoonList, getsruvillenceDetl, getOneSheetList, getAdmittebhrc, Insertdischarge,
+    getdischarge, updateDischarge, insertBedtracking, getBedTransfer, updateBedTrans, getbedtransSlno } = require('../WeWork/WeWork.controller')
 
 
 router.get('/getinpatient/:id', checkToken, getinpatientList);
@@ -31,5 +32,11 @@ router.get('/get/discharge', checkToken, DischargeAfternoonList)
 router.get('/survdetl/:id', checkToken, getsruvillenceDetl)
 router.get('/noshift/detl', checkToken, getOneSheetList)
 router.get('/bhrc/admit', checkToken, getAdmittebhrc)
-
+router.post('/discahrge', checkToken, Insertdischarge)
+router.get('/getDisc/:id', checkToken, getdischarge)
+router.patch('/update/disc', checkToken, updateDischarge)
+router.post('/insertbed', checkToken, insertBedtracking)
+router.get('/getbedTrack/:id', checkToken, getBedTransfer)
+router.patch('/updatebedTrack', checkToken, updateBedTrans)
+router.post('/bedtranSlno', checkToken, getbedtransSlno)
 module.exports = router;

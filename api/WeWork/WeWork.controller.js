@@ -3,7 +3,8 @@ const { getinpatientList, insertpatientsurv, InsertDailyActivity, getsurvslno,
     Insertsrvtable, getsurvslnointraction, getsurvslnoonly, getAsignedStaff, getdailyactivity,
     getintraction, updateActivity, updateIntraction, checkinsertintra, getwedetail,
     updateweDetail, selectsurvslno, selectsurlogslno, getTotalAdmission, getDamalist, getBhrcList,
-    getDocVisit, DischargeAfternoonList, getsruvillenceDetl, getOneSheetList, getAdmittebhrc } = require('../WeWork/WeWork.service')
+    getDocVisit, DischargeAfternoonList, getsruvillenceDetl, getOneSheetList, getAdmittebhrc,
+    Insertdischarge, getdischarge, updateDischarge, insertBedtracking, getBedTransfer, updateBedTrans, getbedtransSlno } = require('../WeWork/WeWork.service')
 const { validationsurvLog, validationdailyactivity, validationpatientIntraction } = require('../../validation/validation_schema');
 
 
@@ -594,6 +595,164 @@ module.exports = {
                 return res.status(200).json({
                     success: 0,
                     message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    Insertdischarge: (req, res) => {
+        const body = req.body;
+        Insertdischarge(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Daily Activity inserted succesfully"
+            });
+        });
+
+    },
+    getdischarge: (req, res) => {
+        const id = req.params.id
+        getdischarge(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length == 0) {
+                // logger.infologwindow("No Record Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "please dailyActivity"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    updateDischarge: (req, res) => {
+        const body = req.body;
+        updateDischarge(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "DIscharge event Updated succesfully"
+            });
+        });
+
+    },
+    insertBedtracking: (req, res) => {
+        const body = req.body;
+        insertBedtracking(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "data inserted succesfully"
+            });
+        });
+
+    },
+    getBedTransfer: (req, res) => {
+        const id = req.params.id
+        getBedTransfer(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length == 0) {
+                // logger.infologwindow("No Record Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "no data to display"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    updateBedTrans: (req, res) => {
+        const body = req.body;
+        updateBedTrans(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Bed transfer detail Updated succesfully"
+            });
+        });
+
+    },
+    getbedtransSlno: (req, res) => {
+        const body = req.body;
+        getbedtransSlno(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length == 0) {
+                // logger.infologwindow("No Record Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "result not found"
                 });
             }
             return res.status(200).json({

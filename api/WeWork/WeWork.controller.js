@@ -4,7 +4,8 @@ const { getinpatientList, insertpatientsurv, InsertDailyActivity, getsurvslno,
     getintraction, updateActivity, updateIntraction, checkinsertintra, getwedetail,
     updateweDetail, selectsurvslno, selectsurlogslno, getTotalAdmission, getDamalist, getBhrcList,
     getDocVisit, DischargeAfternoonList, getsruvillenceDetl, getOneSheetList, getAdmittebhrc,
-    Insertdischarge, getdischarge, updateDischarge, insertBedtracking, getBedTransfer, updateBedTrans, getbedtransSlno } = require('../WeWork/WeWork.service')
+    Insertdischarge, getdischarge, updateDischarge, insertBedtracking, getBedTransfer,
+    updateBedTrans, getbedtransSlno, getTotalbhrcPat } = require('../WeWork/WeWork.service')
 const { validationsurvLog, validationdailyactivity, validationpatientIntraction } = require('../../validation/validation_schema');
 
 
@@ -583,6 +584,28 @@ module.exports = {
     },
     getAdmittebhrc: (req, res) => {
         getAdmittebhrc((err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length == 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getTotalbhrcPat: (req, res) => {
+        getTotalbhrcPat((err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({

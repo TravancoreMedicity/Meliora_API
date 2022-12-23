@@ -23,7 +23,7 @@ module.exports = {
             left join ora_nurstation on ora_bed.ns_code = ora_nurstation.ns_code
             left join room_master on ora_bed.rm_code = room_master.rm_code
             left join ora_roommaster on ora_bed.rm_code= ora_roommaster.rm_code           
-            where ora_nurstation.ns_code =? `,
+            where ora_nurstation.ns_code = 'C008' and wework_patient.ipd_status is null `,
             [
                 id
             ],
@@ -615,6 +615,7 @@ module.exports = {
             f.ns_code as shift_to,bdc_no,
             dietition_visit_tme,
             stat_medicine,
+            ipd_status,
             stat_recived_time,
             doc_name
             FROM meliora.we_patient_surv_log
@@ -625,7 +626,7 @@ module.exports = {
             left join room_master on  ora_bed.rm_code = room_master.rm_code
             left join ora_roommaster on room_master.rm_code = ora_roommaster.rm_code
             left join ora_doctor on wework_patient.do_code = ora_doctor.do_code
-            where bhrc_patient = 1 and ipd_status = 'y'
+            where bhrc_patient = 1
             group by ip_no`,
             [],
             (error, results, feilds) => {
@@ -788,6 +789,40 @@ module.exports = {
             }
         );
     },
+
+    getTotalbhrcPat: (callBack) => {
+        pool.query(
+            `SELECT we_patient_surv_log.ip_no ,
+        pt_no,ipd_date,ptc_ptname,
+        t.ns_code as shift_from ,
+        ora_roommaster.rmc_desc,
+        f.ns_code as shift_to,bdc_no,
+        dietition_visit_tme,
+        stat_medicine,
+        stat_recived_time,
+        doc_name
+        FROM meliora.we_patient_surv_log
+        left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
+        left join ora_nurstation t on t.ns_code = we_patient_surv_log.shift_from
+        left join ora_nurstation f on f.ns_code = we_patient_surv_log.shift_to
+        left join ora_bed on wework_patient.bd_code =ora_bed.bd_code
+        left join room_master on  ora_bed.rm_code = room_master.rm_code
+        left join ora_roommaster on room_master.rm_code = ora_roommaster.rm_code
+        left join ora_doctor on wework_patient.do_code = ora_doctor.do_code
+        where bhrc_patient = 1 
+        group by ip_no`,
+            [],
+            (error, results, feilds) => {
+                console.log(results);
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+
     Insertdischarge: (data, callback) => {
         pool.query(
             `insert into we_discharge

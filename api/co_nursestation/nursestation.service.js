@@ -55,11 +55,17 @@ module.exports = {
             nsc_desc,
             co_ora_nurse,
             co_status,
+            floor_desc,
+            build_name,
             ns_floor,ns_ora_outlet,ns_building,
             if(co_status = 1 ,'Yes','No')status ,
-            em_id 
+            ouc_desc,
+            co_nursestation.em_id 
             from co_nursestation
-            left join ora_nurstation on co_nursestation.co_ora_nurse =ora_nurstation.ns_code`,
+            left join ora_nurstation on co_nursestation.co_ora_nurse =ora_nurstation.ns_code
+            left join floor_master on co_nursestation.ns_floor=floor_master.floor_code
+            left join building_master on co_nursestation.ns_building =building_master.build_code 
+            left join ora_outlet on co_nursestation.ns_ora_outlet = ora_outlet.ou_code`,
             [],
             (error, results, fields) => {
                 if (error) {

@@ -173,7 +173,7 @@ where module_slno = ?`,
             left join ora_nurstation on  ora_bed.ns_code = ora_nurstation.ns_code
             left join ora_roomtype on ora_roomtype.rt_code=ora_bed.rt_code
             left join ora_roommaster on ora_bed.rm_code= ora_roommaster.rm_code        
-            where  ora_nurstation.ns_code  = ?`,
+            where  ora_nurstation.ns_code  = ? and ipd_status is null`,
 
 
             [

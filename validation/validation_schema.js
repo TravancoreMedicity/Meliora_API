@@ -383,11 +383,11 @@ const validateDietmenusetting = Joi.object({
 })
 
 const validateNurseStation = Joi.object({
+    co_nurse_slno: Joi.number().optional(),
     co_nurse_desc: Joi.string().required(),
     co_ora_nurse: Joi.string().required(),
     em_id: Joi.number().required(),
-    co_status: Joi.number().required(),
-    co_nurse_slno: Joi.number().optional(),
+    co_status: Joi.number().optional(),
     ns_building: Joi.number().required(),
     ns_floor: Joi.number().required(),
     ns_ora_outlet: Joi.string().optional()

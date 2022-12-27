@@ -86,7 +86,7 @@ module.exports = {
     gethighantibio: (req, res) => {
         gethighantibio((err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 2,
                     message: err

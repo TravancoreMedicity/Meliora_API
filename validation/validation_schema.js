@@ -237,7 +237,7 @@ const validateFloor = Joi.object({
         }),
     floor_code: Joi.number().optional(),
     build_code: Joi.number().optional(),
-    floor_number: Joi.number().optional(),
+    floor_number: Joi.string().optional(),
     floor_status: Joi.number().min(0).max(1).required(),
     em_id: Joi.number().optional(),
 });

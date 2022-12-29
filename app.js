@@ -80,6 +80,8 @@ const getHrmDatas = require('./api/hrm_data_get/data_get_insert.router')
 const weworkdashboard = require('./api/WeworkDashboard/Wework.router')
 const highantibiotic = require('./api/HighAntiBioticMaster/HighAntiBiotic.router')
 const WeEmpMapping = require('./api/WeEmpMapping/WeEmpMapping.router')
+const dietDashboard = require('./api/diet_dashboard/diet_dashboard.router')
+
 app.use(express.json());
 app.use((req, res, next) => {
     //     res.header("Access-Control-Allow-Origin", "http://192.168.10.170:8080
@@ -143,6 +145,7 @@ app.use('/api/hrmdataGet', getHrmDatas)
 app.use('/api/wewrkdash', weworkdashboard)
 app.use('/api/highBioticMast', highantibiotic)
 app.use('/api/weEmpMap', WeEmpMapping)
+app.use('/api/dietDashboard', dietDashboard)
 
 
 app.listen(process.env.APP_PORT, () =>

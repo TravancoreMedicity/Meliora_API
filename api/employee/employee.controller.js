@@ -181,6 +181,7 @@ module.exports = {
                     emp_id: results.em_id,
                     emp_name: results.em_name,
                     emp_sec: results.sec_name,
+                    app_token: results.app_token,
                     logintime: new Date()
                 });
             } else {

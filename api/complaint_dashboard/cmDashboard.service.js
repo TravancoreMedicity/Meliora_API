@@ -151,7 +151,7 @@ module.exports = {
         left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
         left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
         left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
-        where assigned_emp=? and cm_rectify_status='O' or  cm_rectify_status='P' `,
+        where assigned_emp=? and (cm_rectify_status='O' or  cm_rectify_status='P') `,
 
             [
                 id

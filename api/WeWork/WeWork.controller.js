@@ -4,9 +4,10 @@ const { getinpatientList, insertpatientsurv, InsertDailyActivity, getsurvslno,
     getintraction, updateActivity, updateIntraction, checkinsertintra, getwedetail,
     updateweDetail, selectsurvslno, selectsurlogslno, getTotalAdmission, getDamalist, getBhrcList,
     getDocVisit, DischargeAfternoonList, getsruvillenceDetl, getOneSheetList, getAdmittebhrc,
-    Insertdischarge, getdischarge, updateDischarge, insertBedtracking, getBedTransfer,
+    Insertdischarge, getdischarge, updateDischarge, getBedTransfer,
     updateBedTrans, getbedtransSlno, getTotalbhrcPat } = require('../WeWork/WeWork.service')
 const { validationsurvLog, validationdailyactivity, validationpatientIntraction } = require('../../validation/validation_schema');
+const { log } = require('winston');
 
 
 module.exports = {
@@ -690,30 +691,30 @@ module.exports = {
         });
 
     },
-    insertBedtracking: (req, res) => {
-        const body = req.body;
-        insertBedtracking(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (!results) {
-                logger.infologwindow("Record Not Found")
-                return res.status(200).json({
-                    success: 1,
-                    message: "Record Not Found"
-                });
-            }
-            return res.status(200).json({
-                success: 2,
-                message: "data inserted succesfully"
-            });
-        });
+    // insertBedtracking: (req, res) => {
+    //     const body = req.body;
+    //     insertBedtracking(body, (err, results) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         if (!results) {
+    //             logger.infologwindow("Record Not Found")
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 message: "Record Not Found"
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 2,
+    //             message: "data inserted succesfully"
+    //         });
+    //     });
 
-    },
+    // },
     getBedTransfer: (req, res) => {
         const id = req.params.id
         getBedTransfer(id, (err, results) => {
@@ -739,6 +740,7 @@ module.exports = {
     },
     updateBedTrans: (req, res) => {
         const body = req.body;
+        //console.log(body);
         updateBedTrans(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)

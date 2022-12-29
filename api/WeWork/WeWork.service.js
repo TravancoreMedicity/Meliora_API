@@ -1,3 +1,4 @@
+const { log } = require('winston');
 const { pool } = require('../../config/database');
 
 module.exports = {
@@ -23,7 +24,7 @@ module.exports = {
             left join ora_nurstation on ora_bed.ns_code = ora_nurstation.ns_code
             left join room_master on ora_bed.rm_code = room_master.rm_code
             left join ora_roommaster on ora_bed.rm_code= ora_roommaster.rm_code           
-            where ora_nurstation.ns_code = 'C008' and wework_patient.ipd_status is null `,
+            where ora_nurstation.ns_code = ? and wework_patient.ipd_status is null `,
             [
                 id
             ],
@@ -941,64 +942,64 @@ module.exports = {
         );
     },
 
-    insertBedtracking: (data, callback) => {
-        pool.query(
-            `insert into we_patient_bed_transfer
-            (bed_trans_surv_slno,
-            ip_no,
-            trasfer_to,
-            transfer_from,
-            transfer_time,
-            counseling_status,
-            sfa_mfa_clearence,
-            room_amenties,
-            bystander_room_retain,
-            transfer_in_time,
-            remarks
-            ) values(?,?,?,?,?,?,?,?,?,?,?)`,
-            [
-                data.bed_trans_surv_slno,
-                data.ip_no,
-                data.trasfer_to,
-                data.transfer_from,
-                data.transfer_time,
-                data.counseling_status,
-                data.sfa_mfa_clearence,
-                JSON.stringify(data.room_amenties),
-                data.bystander_room_retain,
-                data.transfer_in_time,
-                data.remarks
-            ],
-            (error, results, fields) => {
+    // insertBedtracking: (data, callback) => {
+    //     pool.query(
+    //         `insert into we_patient_bed_transfer
+    //         (bed_trans_surv_slno,
+    //         ip_no,
+    //         trasfer_to,
+    //         transfer_from,
+    //         transfer_time,
+    //         counseling_status,
+    //         sfa_mfa_clearence,
+    //         room_amenties,
+    //         bystander_room_retain,
+    //         transfer_in_time,
+    //         remarks
+    //         ) values(?,?,?,?,?,?,?,?,?,?,?)`,
+    //         [
+    //             data.bed_trans_surv_slno,
+    //             data.ip_no,
+    //             data.trasfer_to,
+    //             data.transfer_from,
+    //             data.transfer_time,
+    //             data.counseling_status,
+    //             data.sfa_mfa_clearence,
+    //             JSON.stringify(data.room_amenties),
+    //             data.bystander_room_retain,
+    //             data.transfer_in_time,
+    //             data.remarks
+    //         ],
+    //         (error, results, fields) => {
 
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
+    //             if (error) {
+    //                 return callback(error);
+    //             }
+    //             return callback(null, results);
+    //         }
+    //     );
+    // },
     getBedTransfer: (id, callBack) => {
         pool.query(
             `SELECT trasf_slno,
-            trasfer_to,
-			case when transfer_time is null then 'not updated' else transfer_time end as  transfer_time , 
-            case when counseling_status = '' then   'not updated' else counseling_status end as  counseling_status,
-            case when sfa_mfa_clearence = '' then 'not updated' else sfa_mfa_clearence end as sfa_mfa_clearence ,
-            case when bystander_room_retain  = '' then   'not updated' else bystander_room_retain end as  bystander_room_retain ,
-            case when transfer_in_time  is null then 'not updated' else transfer_in_time end as  transfer_in_time,
-            case when  remarks  = '' then 'not updated' else  remarks  end as remarks,
-            transfer_from,
-            room_amenties ,
-            ptc_ptname,
-            t.nsc_desc as transfer_too,
-            f.nsc_desc as transfer_fromm ,
-            we_patient_bed_transfer.ip_no
-            FROM meliora.we_patient_bed_transfer
-            left join wework_patient on we_patient_bed_transfer.ip_no = wework_patient.ip_no 
-            left join ora_nurstation t on we_patient_bed_transfer.trasfer_to = t.ns_code
-            left join ora_nurstation f on we_patient_bed_transfer.transfer_from = f.ns_code        
-            where we_patient_bed_transfer.ip_no = ?`,
+             trasfer_to,
+		     transfer_time , 
+             counseling_status,
+             sfa_mfa_clearence ,
+              bystander_room_retain ,
+             transfer_in_time,
+             remarks,
+             transfer_from,
+             room_amenties ,
+             ptc_ptname,
+             t.nsc_desc as transfer_too,
+             f.nsc_desc as transfer_fromm,
+             we_patient_bed_transfer.ip_no
+             FROM meliora.we_patient_bed_transfer
+             left join wework_patient on we_patient_bed_transfer.ip_no = wework_patient.ip_no 
+             left join ora_nurstation t on we_patient_bed_transfer.trasfer_to = t.ns_code
+             left join ora_nurstation f on we_patient_bed_transfer.transfer_from = f.ns_code        
+             where we_patient_bed_transfer.ip_no =?`,
             [
                 id
             ],
@@ -1021,7 +1022,8 @@ module.exports = {
             room_amenties=?,
             bystander_room_retain = ?,
             transfer_in_time=?,
-            remarks = ? 
+            remarks = ?,
+            transfer_from=? 
             where trasf_slno = ?`,
             [
                 data.trasfer_to,
@@ -1032,6 +1034,7 @@ module.exports = {
                 data.bystander_room_retain,
                 data.transfer_in_time,
                 data.remarks,
+                data.transfer_from,
                 data.trasf_slno
             ],
             (error, results, feilds) => {
@@ -1063,4 +1066,6 @@ module.exports = {
         )
 
     },
+
+
 }

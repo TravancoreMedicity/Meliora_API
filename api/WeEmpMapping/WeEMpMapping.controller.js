@@ -1,6 +1,6 @@
 const logger = require('../../logger/logger')
 
-const { insertWeEmployee, getWeEmpMapping, updateWeEmployee, CheckinsertVal, getfloorbyEmp } = require('../WeEmpMapping/WeEmpMapping.service')
+const { insertWeEmployee, getWeEmpMapping, updateWeEmployee, CheckinsertVal, getfloorbyEmp, getnursebyfloor } = require('../WeEmpMapping/WeEmpMapping.service')
 
 module.exports = {
     insertWeEmployee: (req, res) => {
@@ -128,4 +128,27 @@ module.exports = {
             });
         });
     },
+    getnursebyfloor: (req, res) => {
+        const id = req.params.id
+        getnursebyfloor(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length == 0) {
+                // logger.infologwindow("No Record Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "no employee under this floor"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    }
 }

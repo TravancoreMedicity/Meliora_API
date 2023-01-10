@@ -107,10 +107,10 @@ module.exports = {
     },
     getfloorbyEmp: (id, callBack) => {
         pool.query(
-            `select map_floor,floor_desc,map_nsurse_station,(co_nurse_desc) as   co_nurse_desc
-            from we_emp_map
+            `select map_floor ,
+            floor_desc
+            from we_emp_map 
             left join floor_master on we_emp_map.map_floor = floor_master.floor_code
-             left join co_nursestation on JSON_CONTAINS(we_emp_map.map_nsurse_station,cast(co_nursestation.co_nurse_slno as json),'$')
             where map_emp_id = ?`,
             [id],
             (error, results, feilds) => {
@@ -121,4 +121,19 @@ module.exports = {
             }
         )
     },
+    getnursebyfloor: (id, callBack) => {
+        pool.query(
+            `SELECT 
+             co_nurse_desc, co_nurse_slno FROM meliora.co_nursestation
+             where ns_floor = ?`,
+            [id],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+
+        )
+    }
 }

@@ -216,4 +216,51 @@ module.exports = {
             }
         );
     },
+    getauthorization: (callback) => {
+        hrpool.query(
+            `select * from medi_hrm.hrm_authorization_assign`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    getauthorizationMeli: (callback) => {
+        pool.query(
+            `select * from meliora.co_emp_authorization_assign`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    createAuthorization: (data, callBack) => {
+        pool.query(
+            `INSERT INTO co_emp_authorization_assign
+            (auth_slno,
+                dept_section,
+                auth_post,
+                dept_section_post,
+                emp_id,
+                create_user,
+                create_date        
+            )
+            VALUES ?`,
+            [
+                data
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 }

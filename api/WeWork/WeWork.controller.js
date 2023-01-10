@@ -4,9 +4,10 @@ const { getinpatientList, insertpatientsurv, InsertDailyActivity, getsurvslno,
     getintraction, updateActivity, updateIntraction, checkinsertintra, getwedetail,
     updateweDetail, selectsurvslno, selectsurlogslno, getTotalAdmission, getDamalist, getBhrcList,
     getDocVisit, DischargeAfternoonList, getsruvillenceDetl, getOneSheetList, getAdmittebhrc,
-    Insertdischarge, getdischarge, updateDischarge, insertBedtracking, getBedTransfer,
-    updateBedTrans, getbedtransSlno, getTotalbhrcPat } = require('../WeWork/WeWork.service')
+    Insertdischarge, getdischarge, updateDischarge, getBedTransfer, insertBedtracking,
+    updateBedTrans, getbedtransSlno, getTotalbhrcPat, updateshiftStatus } = require('../WeWork/WeWork.service')
 const { validationsurvLog, validationdailyactivity, validationpatientIntraction } = require('../../validation/validation_schema');
+
 
 
 module.exports = {
@@ -739,6 +740,7 @@ module.exports = {
     },
     updateBedTrans: (req, res) => {
         const body = req.body;
+        //console.log(body);
         updateBedTrans(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
@@ -783,5 +785,29 @@ module.exports = {
                 data: results
             });
         });
+    },
+    updateshiftStatus: (req, res) => {
+        const body = req.body;
+        updateshiftStatus(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "shifing status updated succesfully"
+            });
+        });
+
     }
 }

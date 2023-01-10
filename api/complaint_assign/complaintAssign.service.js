@@ -2,23 +2,27 @@ const { pool } = require('../../config/database')
 module.exports = {
     getcomplaintAssign: (id, callBack) => {
         pool.query(
-            `  select complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
-            complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
-            S.sec_name as sec_name, 
-            IFNULL( L.sec_name,"Nil" ) location,
-            date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,
-            if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
-            (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
-            (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1,
-            (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High" else "Medium" end ) as priority from cm_complaint_mast
-                      left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
-                      left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
-                      left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
-                      left join cm_hic_policy on cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno
-                      left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
-         left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
-           where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
-           where department_slno=? AND compalint_status=0) ORDER BY complaint_slno DESC`,
+            `  
+            select complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
+                        complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
+                        S.sec_name as sec_name, 
+                        IFNULL( L.sec_name,"Nil" ) location,co_employee_master.em_name as comp_reg_emp,cm_complaint_mast.create_user,co_employee_master.em_department,
+                        co_department_mast.dept_name as empdept,
+                        date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,
+                        if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
+                        (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
+                        (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1,
+                        (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High" else "Medium" end ) as priority from cm_complaint_mast
+                                  left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
+                                  left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
+                                  left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
+                                  left join cm_hic_policy on cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno
+                                  left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
+                                  left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
+                                  left join co_department_mast on co_department_mast.dept_id=co_employee_master.em_department
+                     left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
+                       where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
+                       where department_slno=?) AND compalint_status=0 ORDER BY complaint_slno DESC`,
             [
                 id
             ],

@@ -1,7 +1,7 @@
 const logger = require('../../logger/logger')
 const { getdepartment, createDept, getdepartmentMeli, getdepartmentSection, getdepartmentSecMeli,
     createDeptSec, getemployeemasterHrm, getemployeemasterMeli, creategetemployeemaster, creategetemployeeuserPass,
-    getemployeeuserPassHrm, getemployeeuserPassMeli
+    getemployeeuserPassHrm, getemployeeuserPassMeli, getauthorization, getauthorizationMeli, createAuthorization
 } = require("../hrm_data_get/data_get_insert_service")
 module.exports = {
 
@@ -193,5 +193,49 @@ module.exports = {
         });
     },
 
-
+    getauthorization: (req, res) => {
+        getauthorization((err, results) => {
+            const authorization = [...results]
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            getauthorizationMeli((err, results) => {
+                const meliauthorization = [...results]
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 2,
+                        message: err
+                    });
+                }
+                let newmeli = authorization.filter(value => {
+                    return !meliauthorization.find(values => {
+                        return values.auth_slno === value.auth_slno
+                    })
+                })
+                var a1 = newmeli.map((value, index) => {
+                    return [value.auth_slno, value.dept_section, value.auth_post, value.dept_section_post,
+                    value.create_user, value.create_user, value.create_date
+                    ]
+                })
+                createAuthorization(a1, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Authorization Inserted Successfully"
+                    });
+                });
+            })
+        });
+    },
 }

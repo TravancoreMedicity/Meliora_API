@@ -7,7 +7,7 @@ module.exports = {
                         complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
                         S.sec_name as sec_name, 
                         IFNULL( L.sec_name,"Nil" ) location,co_employee_master.em_name as comp_reg_emp,cm_complaint_mast.create_user,co_employee_master.em_department,
-                        co_department_mast.dept_name as empdept,
+                        co_department_mast.dept_name as empdept,compalint_priority,
                         date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,
                         if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
                         (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,

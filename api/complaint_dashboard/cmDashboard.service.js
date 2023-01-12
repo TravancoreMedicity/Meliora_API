@@ -97,7 +97,7 @@ module.exports = {
             // `select * from cm_complaint_mast 
             // left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
             //           where department_slno=? and date(assigned_date)=?)`
-            `   select cm_complaint_mast.complaint_slno,complaint_deptslno,complaint_dept_secslno,cm_rectify_status,assigned_emp,date(assigned_date) as assigned_date ,complaint_desc,compalint_status from cm_complaint_mast 
+            `   select cm_complaint_mast.complaint_slno,complaint_deptslno,complaint_dept_secslno,cm_rectify_status,assigned_emp,date(assigned_date) as assigned_date ,complaint_desc,compalint_status,cm_rectify_time from cm_complaint_mast 
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno where date(compalint_date)=?`,
             [
                 data.compalint_date,
@@ -115,7 +115,7 @@ module.exports = {
             // `select * from cm_complaint_mast
             // left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
             //   where department_slno=? and compalint_status=1)`,
-            `   select cm_complaint_mast.complaint_slno,complaint_deptslno,complaint_dept_secslno,cm_rectify_status,assigned_emp,date(assigned_date) as assigned_date,complaint_desc,compalint_status from cm_complaint_mast 
+            `   select cm_complaint_mast.complaint_slno,complaint_deptslno,complaint_dept_secslno,cm_rectify_status,assigned_emp,date(assigned_date) as assigned_date,complaint_desc,compalint_status,cm_rectify_time from cm_complaint_mast 
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno where compalint_status=1`,
             [
 

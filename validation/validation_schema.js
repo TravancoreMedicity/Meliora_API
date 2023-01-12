@@ -308,6 +308,33 @@ const validateSubroomcreation = Joi.object({
     em_id: Joi.number().optional(),
 })
 
+//Escalation Time Master
+const validateEscalationtime = Joi.object({
+    esc_activity: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Activity Name  is Required',
+            'string.min': 'Activity Name must be at least 3 characters long',
+            'string.max': 'Activity Name  length must be less tahn or equal to 45 characters long'
+        }),
+    esc_responsibility: Joi.string().trim().uppercase().min(2).max(45).required()
+        .messages({
+            'string.empty': 'Responsibility Name  is Required',
+            'string.min': 'Responsibility Name must be at least 3 characters long',
+            'string.max': 'Responsibility Name  length must be less tahn or equal to 45 characters long'
+        }),
+    esc_slno: Joi.optional(),
+    esc_time_limit: Joi.optional(),
+    esc_lvl1: Joi.optional(),
+    esc_lvl2: Joi.optional(),
+    esc_lvl3: Joi.optional(),
+    esc_lvl4: Joi.optional(),
+    esc_top_lvl: Joi.optional(),
+    esc_top_lvl: Joi.optional(),
+    esc_status: Joi.number().optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+})
+
 
 //User Group rights validation
 const validateUserGroupRights = Joi.object({
@@ -510,7 +537,8 @@ module.exports = {
     validateuserCreation,
     validationsurvLog,
     validationpatientIntraction,
-    validationdailyactivity
+    validationdailyactivity,
+    validateEscalationtime
 
 
 }

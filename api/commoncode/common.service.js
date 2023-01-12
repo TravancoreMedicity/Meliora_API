@@ -163,12 +163,6 @@ where module_slno = ?`,
     },
     inpatientList: (id, callBack) => {
         pool.query(
-            // `SELECT dietpt_slno,ip_no,pt_no,doc_name,rcc_desc,ptc_ptname,bdc_no,dietpt_slno,diet_patient.bd_code FROM diet_patient
-            // LEFT JOIN ora_doctor on diet_patient.do_code=ora_doctor.do_code
-            // LEFT JOIN ora_roomcategory on diet_patient.rc_code=ora_roomcategory.rc_code
-            // LEFT JOIN ora_bed on diet_patient.bd_code=ora_bed.bd_code
-            // left join ora_nurstation on ora_bed.ns_code = ora_nurstation.ns_code
-            // where ora_nurstation.ns_code = ?`,
             `SELECT diet_patient.dietpt_slno,diet_patient.ip_no,diet_patient.pt_no,doc_name,rcc_desc,
             ptc_ptname,bdc_no,diet_patient.bd_code,plan_status,ora_roommaster.rmc_desc,ora_roomtype.rtc_desc,ipd_date
             FROM meliora.diet_patient
@@ -179,7 +173,7 @@ where module_slno = ?`,
             left join ora_nurstation on  ora_bed.ns_code = ora_nurstation.ns_code
             left join ora_roomtype on ora_roomtype.rt_code=ora_bed.rt_code
             left join ora_roommaster on ora_bed.rm_code= ora_roommaster.rm_code        
-            where  ora_nurstation.ns_code  = ?`,
+            where  ora_nurstation.ns_code  = ? and ipd_status is null`,
 
 
             [
@@ -375,5 +369,32 @@ where module_slno = ?`,
             }
         );
     },
+    getfloor: (callBack) => {
+        pool.query(
+            `SELECT floor_code,
+            floor_desc
+            FROM floor_master WHERE floor_status=1`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+    getnurstationbyfloor: (id, callBack) => {
+        pool.query(
+            `select co_nurse_desc ,co_nurse_slno from co_nursestation 
+            where ns_floor = ? `,
+            [id],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    }
 
 }

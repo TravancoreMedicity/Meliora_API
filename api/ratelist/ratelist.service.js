@@ -60,7 +60,7 @@ module.exports = {
             if( diet_rate_list.status=1,'Yes','No') status1 FROM diet_rate_list
             LEFT JOIN diet_master on diet_rate_list.diet_slno=diet_master.diet_slno
             LEFT JOIN ora_roomcategory on diet_rate_list.rc_code=ora_roomcategory.rc_code
-            LEFT JOIN diet_type on diet_rate_list.type_slno=diet_type.type_slno`,
+            LEFT JOIN diet_type on diet_rate_list.type_slno=diet_type.type_slno order by drate_slno  desc`,
             [],
             (error, results, fields) => {
                 if (error) {

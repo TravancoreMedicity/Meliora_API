@@ -11,9 +11,10 @@ module.exports = {
                 compalint_status,
                 complaint_hicslno,
                 complaint_dept_secslno,
+                cm_location,
                 create_user
                )
-                VALUES(?,?,?,?,?,?,?,?,?)`,
+                VALUES(?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.complaint_desc,
                 data.complaint_typeslno,
@@ -23,6 +24,7 @@ module.exports = {
                 data.compalint_status,
                 data.complaint_hicslno,
                 data.complaint_dept_secslno,
+                data.cm_location,
                 data.create_user
             ],
             (error, results, fields) => {
@@ -42,13 +44,14 @@ module.exports = {
             complaint_request_slno,
             complaint_hicslno,
             compalint_priority,
+            cm_location,
             complaint_dept_name,
             complaint_deptslno,
             complaint_typeslno,
             complaint_type_name,
             cm_complaint_mast.create_user,
             S.sec_name as sec_name, 
-            IFNULL( L.sec_name,"Nill" ) location,
+            IFNULL( L.sec_name,"Nil" ) location,
             compalint_status,
             hic_policy_status,
             cm_rectify_status,
@@ -68,7 +71,7 @@ module.exports = {
             left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
             left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
             left join cm_hic_policy on cm_complaint_mast.complaint_hicslno = cm_hic_policy.hic_policy_slno
-            where cm_complaint_mast.create_user =?`,
+            where cm_complaint_mast.create_user =?  ORDER BY compalint_date DESC `,
             [
                 id
             ],
@@ -91,6 +94,7 @@ module.exports = {
                 complaint_typeslno = ?,
                 compalint_priority = ?,
                 complaint_hicslno = ?, 
+                cm_location=?,
                 edit_user=?          
                 WHERE complaint_slno = ?`,
             [
@@ -101,6 +105,7 @@ module.exports = {
                 data.complaint_typeslno,
                 data.compalint_priority,
                 data.complaint_hicslno,
+                data.cm_location,
                 data.edit_user,
                 data.complaint_slno
             ],

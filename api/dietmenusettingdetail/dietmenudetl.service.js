@@ -55,7 +55,7 @@ module.exports = {
             diet_master.diet_name,if(diet_menu_setting.order_req=1,'Yes','No')order_req1,
             diet_menu_setting.order_req,
             diet_menu_setting.diet_slno,
-            (case when days='1' then 'Sunday' when days='2'then 'Monday' when days='3' then 'Tuesday' when days='4' then 'Wednesday' when days='5' then 'Thursday' when days='6' then 'Friday' when days='7' then 'Saturday' else 'Nill'end) as days1
+            (case when days='1' then 'Sunday' when days='2'then 'Monday' when days='3' then 'Tuesday' when days='4' then 'Wednesday' when days='5' then 'Thursday' when days='6' then 'Friday' when days='7' then 'Saturday' else 'Nil'end) as days1
              from diet_menu_setting_detl
             LEFT JOIN item_group on item_group.grp_slno=diet_menu_setting_detl.grp_slno
             LEFT JOIN kot_item_master on  kot_item_master.item_slno=diet_menu_setting_detl.item_slno
@@ -71,9 +71,41 @@ module.exports = {
             }
         );
     },
-    getItemmaster: (callback) => {
+    getItemmaster: (id, callBack) => {
         pool.query(
-            `SELECT item_slno,item_name from kot_item_master WHERE status=1`,
+            `SELECT item_slno,item_name                                
+            FROM kot_item_master 
+            WHERE status=1 and grp_slno=? and diet_item=1`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getItemRate: (id, callBack) => {
+        pool.query(
+            `select item_slno,rate_hosp as rate_hos, rate as rate_cant,qty,unit
+             FROM kot_item_master
+              where item_slno=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getItemmasterExtra: (callback) => {
+        pool.query(
+            `SELECT item_slno,item_name from kot_item_master WHERE status=1 and diet_item=0`,
             [],
             (error, results, fields) => {
                 if (error) {

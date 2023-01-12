@@ -5,7 +5,7 @@ module.exports = {
             `  select complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
             complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
             S.sec_name as sec_name, 
-            IFNULL( L.sec_name,"Nill" ) location,
+            IFNULL( L.sec_name,"Nil" ) location,
             date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,
             if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
             (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
@@ -18,7 +18,7 @@ module.exports = {
                       left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
          left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
            where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
-           where department_slno=? AND compalint_status=0) ORDER BY compalint_date DESC`,
+           where department_slno=? AND compalint_status=0) ORDER BY complaint_slno DESC`,
             [
                 id
             ],
@@ -53,13 +53,17 @@ module.exports = {
             (
                 complaint_slno,
                 assigned_emp,
-                assigned_date
+                assigned_date,
+                assign_rect_status,
+                assigned_user
             ) 
-            VALUES(?,?,?)`,
+            VALUES(?,?,?,?,?)`,
             [
                 data.complaint_slno,
                 data.assigned_emp,
                 data.assigned_date,
+                data.assign_rect_status,
+                data.assigned_user
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -87,7 +91,7 @@ module.exports = {
     },
     getEmployee: (id, callBack) => {
         pool.query(
-            ` SELECT em_id, em_name FROM meliora.co_employee_master where em_department=?
+            ` SELECT em_id, em_name ,em_no FROM meliora.co_employee_master where em_department=?
             and em_status=1 and em_no!=1 and em_id!=1606 order by em_name ASC `,
             [
                 id
@@ -106,7 +110,9 @@ module.exports = {
             (
                 complaint_slno,
                 assigned_emp,
-                assigned_date
+                assigned_date,
+                assign_rect_status,
+                assigned_user
             ) 
             VALUES ?`,
             [
@@ -125,7 +131,7 @@ module.exports = {
             `select cm_complaint_mast.complaint_slno,complaint_desc,assigned_date,complaint_dept_name,
             req_type_name,complaint_type_name,
             S.sec_name as sec_name, 
-            IFNULL( L.sec_name,"Nill" ) location,cm_rectify_status,assigned_date,
+            IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,assigned_date,
             (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
                  date(assigned_date) as date,TIME_FORMAT(assigned_date,"%r") AS Time,
                  if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
@@ -140,7 +146,7 @@ module.exports = {
         left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
         left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
         left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
-        where assigned_emp=? AND assist_flag =0 ORDER BY compalint_date DESC`,
+        where assigned_emp=? AND assist_flag =0 ORDER BY complaint_slno DESC`,
             [
                 id
             ],
@@ -192,15 +198,19 @@ module.exports = {
                 assigned_emp,
                 assist_assign_date,
                 assist_flag,
-                assist_requested_emp
+                assist_requested_emp,
+                assign_rect_status,
+                assigned_user
             ) 
-            VALUES(?,?,?,?,?)`,
+            VALUES(?,?,?,?,?,?,?)`,
             [
                 data.complaint_slno,
                 data.assigned_emp,
                 data.assist_assign_date,
                 data.assist_flag,
-                data.assist_requested_emp
+                data.assist_requested_emp,
+                data.assign_rect_status,
+                data.assigned_user
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -231,7 +241,7 @@ module.exports = {
         pool.query(
             `select cm_complaint_mast.complaint_slno,complaint_desc,assigned_date,complaint_dept_name,
             compalint_date,req_type_name,complaint_type_name,S.sec_name as sec_name, 
-             IFNULL( L.sec_name,"Nill" ) location,
+             IFNULL( L.sec_name,"Nil" ) location,
             assigned_emp,
             if(em_name is null ,'Not Assigned',em_name) as em_name,
              if(assigned_date is null,'Not Assigned',assigned_date) as assigned_date,
@@ -251,7 +261,7 @@ module.exports = {
            left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
             where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
-                      where department_slno=?) ORDER BY compalint_date DESC`,
+                      where department_slno=?) ORDER BY complaint_slno DESC`,
             [
                 id
             ],
@@ -268,7 +278,7 @@ module.exports = {
             ` 	  select cm_complaint_mast.complaint_slno,complaint_desc,assigned_date,complaint_dept_name,
             req_type_name,complaint_type_name,
             S.sec_name as sec_name, 
-             IFNULL( L.sec_name,"Nill" ) location,
+             IFNULL( L.sec_name,"Nil" ) location,
             assist_receive,detl_slno,assist_assign_date,em_name,
             (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
                  date(assigned_date) as date,TIME_FORMAT(assigned_date,"%r") AS Time,
@@ -282,7 +292,7 @@ module.exports = {
         left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
         left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
          left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assist_requested_emp
-        where assigned_emp=? AND assist_flag=1 ORDER BY compalint_date DESC`,
+        where assigned_emp=? AND assist_flag=1 ORDER BY complaint_slno DESC`,
             [
                 id
             ],

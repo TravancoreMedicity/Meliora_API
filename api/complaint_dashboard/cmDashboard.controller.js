@@ -1,6 +1,6 @@
 const logger = require('../../logger/logger');
-const { getTotalcomplaints, getPendingcomplaints, getAssignedcomplaints,
-    getOnholdcomplaints, getRectifycomplaints, getVerifycomplaints, getEmployeeProgressDash, getEmployeeProgressPending } = require('../complaint_dashboard/cmDashboard.service');
+const { getTotalcomplaints, getComplaintcount, getAssistRectyEmpWise, getPendingOnholdEmpWise,
+    getOnholdcomplaints, getTotalcomplaintsAllDpt, getOnholdcomplaintsAllDpt, getAllCompDeptwiseCount } = require('../complaint_dashboard/cmDashboard.service');
 module.exports = {
     getTotalcomplaints: (req, res) => {
         const id = req.params.id
@@ -25,52 +25,7 @@ module.exports = {
             });
         });
     },
-    getPendingcomplaints: (req, res) => {
-        const id = req.params.id
-        getPendingcomplaints(id, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(400).json({
-                    success1: 2,
-                    message: err
-                });
-            }
-            if (!results) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success1: 0,
-                    message: "No Results Found"
-                });
-            }
-            return res.status(200).json({
-                success1: 1,
-                data1: results
-            });
-        });
-    },
-    getAssignedcomplaints: (req, res) => {
-        const id = req.params.id
-        getAssignedcomplaints(id, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(400).json({
-                    success2: 2,
-                    message: err
-                });
-            }
-            if (!results) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success2: 0,
-                    message: "No Results Found"
-                });
-            }
-            return res.status(200).json({
-                success2: 1,
-                data2: results
-            });
-        });
-    },
+
     getOnholdcomplaints: (req, res) => {
         const id = req.params.id
         getOnholdcomplaints(id, (err, results) => {
@@ -90,59 +45,68 @@ module.exports = {
             }
             return res.status(200).json({
                 success3: 1,
-                data3: results
+                data: results
             });
         });
     },
-    getRectifycomplaints: (req, res) => {
+
+
+    getComplaintcount: (req, res) => {
         const id = req.params.id
-        getRectifycomplaints(id, (err, results) => {
+
+        getComplaintcount(id, (err, results) => {
             if (err) {
-                logger.logwindow(err)
+
                 return res.status(400).json({
-                    success4: 2,
+                    success: 0,
                     message: err
                 });
             }
+
             if (!results) {
-                logger.infologwindow("No Results Found")
                 return res.status(200).json({
-                    success4: 0,
-                    message: "No Results Found"
+                    success: 0,
+                    data: "No Record Found"
                 });
             }
+
             return res.status(200).json({
-                success4: 1,
-                data4: results
+                success: 1,
+                data: results
             });
-        });
+        })
+
     },
-    getVerifycomplaints: (req, res) => {
+    getAssistRectyEmpWise: (req, res) => {
         const id = req.params.id
-        getVerifycomplaints(id, (err, results) => {
+
+        getAssistRectyEmpWise(id, (err, results) => {
             if (err) {
-                logger.logwindow(err)
-                return res.status(400).json({
-                    success5: 2,
+
+                return res.status(200).json({
+                    success: 0,
                     message: err
                 });
             }
+
             if (!results) {
-                logger.infologwindow("No Results Found")
                 return res.status(200).json({
-                    success5: 0,
-                    message: "No Results Found"
+                    success: 0,
+                    data: "No Record Found"
                 });
             }
+
             return res.status(200).json({
-                success5: 1,
-                data5: results
+                success: 1,
+                data: results
             });
-        });
+        })
+
     },
-    getEmployeeProgressDash: (req, res) => {
-        const body = req.body;
-        getEmployeeProgressDash(body, (err, results) => {
+
+    getPendingOnholdEmpWise: (req, res) => {
+        const id = req.params.id
+        getPendingOnholdEmpWise(id, (err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(400).json({
@@ -163,12 +127,13 @@ module.exports = {
             });
         });
     },
-    getEmployeeProgressPending: (req, res) => {
-        // const id = req.params.id;
-        getEmployeeProgressPending((err, results) => {
+
+
+    getTotalcomplaintsAllDpt: (req, res) => {
+        getTotalcomplaintsAllDpt((err, results) => {
             if (err) {
                 logger.logwindow(err)
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 2,
                     message: err
                 });
@@ -185,6 +150,56 @@ module.exports = {
                 data: results
             });
         });
+    },
+
+    getOnholdcomplaintsAllDpt: (req, res) => {
+        getOnholdcomplaintsAllDpt((err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    getAllCompDeptwiseCount: (req, res) => {
+        const id = req.params.id
+
+        getAllCompDeptwiseCount(id, (err, results) => {
+            if (err) {
+
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+
     },
 
 }

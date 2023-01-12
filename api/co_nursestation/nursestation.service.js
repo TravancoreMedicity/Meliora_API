@@ -7,13 +7,19 @@ module.exports = {
             co_nurse_desc,
             co_ora_nurse,
             co_status,
+            ns_building,
+            ns_floor,
+            ns_ora_outlet,
             em_id
-            ) values (?,?,?,?)`,
+            ) values (?,?,?,?,?,?,?)`,
             [
 
                 data.co_nurse_desc,
                 data.co_ora_nurse,
                 data.co_status,
+                data.ns_building,
+                data.ns_floor,
+                data.ns_ora_outlet,
                 data.em_id
 
             ],
@@ -49,10 +55,17 @@ module.exports = {
             nsc_desc,
             co_ora_nurse,
             co_status,
+            floor_desc,
+            build_name,
+            ns_floor,ns_ora_outlet,ns_building,
             if(co_status = 1 ,'Yes','No')status ,
-            em_id 
+            ouc_desc,
+            co_nursestation.em_id 
             from co_nursestation
-            left join ora_nurstation on co_nursestation.co_ora_nurse =ora_nurstation.ns_code`,
+            left join ora_nurstation on co_nursestation.co_ora_nurse =ora_nurstation.ns_code
+            left join floor_master on co_nursestation.ns_floor=floor_master.floor_code
+            left join building_master on co_nursestation.ns_building =building_master.build_code 
+            left join ora_outlet on co_nursestation.ns_ora_outlet = ora_outlet.ou_code`,
             [],
             (error, results, fields) => {
                 if (error) {
@@ -87,14 +100,20 @@ module.exports = {
             SET co_nurse_desc = ?,
             co_ora_nurse = ?,
             co_status=?,
-            em_id = ?
+            em_id = ?,
+            ns_building=?,
+            ns_floor=?,
+            ns_ora_outlet=?
             WHERE co_nurse_slno = ?`,
             [
                 data.co_nurse_desc,
                 data.co_ora_nurse,
                 data.co_status,
                 data.em_id,
-                data.co_nurse_slno
+                data.ns_building,
+                data.ns_floor,
+                data.ns_ora_outlet,
+                data.co_nurse_slno,
 
             ],
             (error, results, feilds) => {

@@ -121,10 +121,11 @@ module.exports = {
     },
     getEmployeeByUserName: (userName, callBack) => {
         pool.query(
-            `SELECT co_employee_master.em_name,emp_username,emp_password,
-            co_employee_master.em_id,co_employee.emp_no
+            `SELECT co_employee_master.em_name,emp_username,emp_password,app_token,
+            co_employee_master.em_id,co_employee.emp_no,co_employee_master.em_dept_section,sec_name
              FROM meliora.co_employee
             LEFT JOIN co_employee_master ON co_employee_master.em_no=co_employee.emp_no
+            LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id=co_employee_master.em_dept_section
              WHERE emp_username = ? AND emp_status = '1'`,
             [userName],
             (error, results, fields) => {
@@ -228,7 +229,8 @@ module.exports = {
             from co_employee
              left join co_employee_master on co_employee.em_id=co_employee_master.em_id
              left join co_deptsec_mast on co_employee_master.em_dept_section=co_deptsec_mast.sec_id
-             left join module_group_user_rights on module_group_user_rights.emp_slno=co_employee_master.em_id`,
+             left join module_group_user_rights on module_group_user_rights.emp_slno=co_employee_master.em_id
+             group by em_id`,
             [],
             (error, results, feilds) => {
                 if (error) {

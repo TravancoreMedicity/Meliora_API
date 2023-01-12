@@ -85,6 +85,10 @@ const TimeescalationRouter2 = require('./api/time_escalation2/time_esclvl2.route
 const TimeescalationRouter3 = require('./api/time_escalation3/time_esclvl3.router');
 const TimeescalationRouter4 = require('./api/time_escalation4/time_esclvl4.router');
 const TimeescalationToplvlRouter = require('./api/time_escalationToplvl/time_esctop.router');
+const highantibiotic = require('./api/HighAntiBioticMaster/HighAntiBiotic.router')
+const WeEmpMapping = require('./api/WeEmpMapping/WeEmpMapping.router')
+const dietDashboard = require('./api/diet_dashboard/diet_dashboard.router')
+
 app.use(express.json());
 app.use((req, res, next) => {
     //     res.header("Access-Control-Allow-Origin", "http://192.168.10.170:8080
@@ -153,6 +157,9 @@ app.use('/api/timeescalation2', TimeescalationRouter2)
 app.use('/api/timeescalation3', TimeescalationRouter3)
 app.use('/api/timeescalation4', TimeescalationRouter4)
 app.use('/api/timeescalationtoplvl', TimeescalationToplvlRouter)
+app.use('/api/highBioticMast', highantibiotic)
+app.use('/api/weEmpMap', WeEmpMapping)
+app.use('/api/dietDashboard', dietDashboard)
 
 app.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

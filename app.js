@@ -78,6 +78,13 @@ const cmdashboardRouter = require('./api/complaint_dashboard/cmDashboard.router'
 const directcmregRouter = require('./api/cm_directcomplaintRegister/directcmReg.router');
 const getHrmDatas = require('./api/hrm_data_get/data_get_insert.router')
 const weworkdashboard = require('./api/WeworkDashboard/Wework.router')
+const escalationRouter = require('./api/co_escalationtimemast/escalationtime.router')
+const TimeescalationRouter = require('./api/time_escalation/timeescalation.router')
+const EscalationmappingRouter = require('./api/co_escalationmapping/escalationmapping.router')
+const TimeescalationRouter2 = require('./api/time_escalation2/time_esclvl2.router');
+const TimeescalationRouter3 = require('./api/time_escalation3/time_esclvl3.router');
+const TimeescalationRouter4 = require('./api/time_escalation4/time_esclvl4.router');
+const TimeescalationToplvlRouter = require('./api/time_escalationToplvl/time_esctop.router');
 const highantibiotic = require('./api/HighAntiBioticMaster/HighAntiBiotic.router')
 const WeEmpMapping = require('./api/WeEmpMapping/WeEmpMapping.router')
 const dietDashboard = require('./api/diet_dashboard/diet_dashboard.router')
@@ -143,10 +150,16 @@ app.use('/api/cmdashboard', cmdashboardRouter)
 app.use('/api/directcmreg', directcmregRouter)
 app.use('/api/hrmdataGet', getHrmDatas)
 app.use('/api/wewrkdash', weworkdashboard)
+app.use('/api/escalation', escalationRouter)
+app.use('/api/timeescalation', TimeescalationRouter)
+app.use('/api/escalationmaping', EscalationmappingRouter)
+app.use('/api/timeescalation2', TimeescalationRouter2)
+app.use('/api/timeescalation3', TimeescalationRouter3)
+app.use('/api/timeescalation4', TimeescalationRouter4)
+app.use('/api/timeescalationtoplvl', TimeescalationToplvlRouter)
 app.use('/api/highBioticMast', highantibiotic)
 app.use('/api/weEmpMap', WeEmpMapping)
 app.use('/api/dietDashboard', dietDashboard)
-
 
 app.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

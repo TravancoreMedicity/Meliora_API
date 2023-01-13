@@ -9,7 +9,6 @@ router.patch("/", checkToken, complaintRegistUpdate);
 router.post("/byid", checkToken, getcomplaintRegistByID);
 router.get('/loginbysec/:id', checkToken, getcomplaintListbylogin);
 router.get('/compltbydept/:id', checkToken, getcomplaintListbydept);
-
 router.get("/compalint/all", checkToken, getcomplaintAll);
 
 module.exports = router;

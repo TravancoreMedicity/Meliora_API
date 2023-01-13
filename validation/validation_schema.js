@@ -550,6 +550,29 @@ validateBedTransfer = Joi.object({
 
 })
 
+const validateRequestRegister = Joi.object({
+    actual_requirement: Joi.string().required(),
+    needed: Joi.string().required(),
+    request_dept_slno: Joi.number().required(),
+    request_deptsec_slno: Joi.number().required(),
+    location: Joi.string().required(),
+    create_user: Joi.number().optional(),
+    remarks: Joi.string().required(),
+})
+
+
+const validateRequestRegisterDetl = Joi.object({
+    req_slno: Joi.number().required(),
+    item_slno: Joi.number().required(),
+    item_desc: Joi.string().required(),
+    item_unit: Joi.number().required(),
+    item_qnty: Joi.number().required(),
+    item_specification: Joi.string().required(),
+    aprox_cost: Joi.number().required(),
+    item_status: Joi.number().required(),
+    create_user: Joi.number().optional(),
+})
+
 
 module.exports = {
     validateEmployee,
@@ -587,6 +610,8 @@ module.exports = {
     validateEscalationtime,
     validationhighbiotic,
     ValidationEmpMappingNurStation,
-    validateBedTransfer
+    validateBedTransfer,
+    validateRequestRegister,
+    validateRequestRegisterDetl
 
 }

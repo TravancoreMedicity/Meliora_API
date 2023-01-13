@@ -164,7 +164,6 @@ app.use('/api/weEmpMap', WeEmpMapping)
 app.use('/api/dietDashboard', dietDashboard)
 app.use('/api/requestRegister', requsetRegister)
 
-
 app.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),
     logger.productionLogger.log('info', `Server Up and Running ${process.env.APP_PORT}`, { meta1: 'meta1' })

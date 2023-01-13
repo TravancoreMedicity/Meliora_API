@@ -81,6 +81,8 @@ const weworkdashboard = require('./api/WeworkDashboard/Wework.router')
 const highantibiotic = require('./api/HighAntiBioticMaster/HighAntiBiotic.router')
 const WeEmpMapping = require('./api/WeEmpMapping/WeEmpMapping.router')
 const dietDashboard = require('./api/diet_dashboard/diet_dashboard.router')
+const requsetRegister = require('./api/crm_request_register/requestRegister.router')
+
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -146,7 +148,7 @@ app.use('/api/wewrkdash', weworkdashboard)
 app.use('/api/highBioticMast', highantibiotic)
 app.use('/api/weEmpMap', WeEmpMapping)
 app.use('/api/dietDashboard', dietDashboard)
-
+app.use('/api/requestRegister', requsetRegister)
 
 app.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

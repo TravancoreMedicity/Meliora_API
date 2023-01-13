@@ -1,5 +1,6 @@
 const { pool } = require('../../config/database');
 
+
 module.exports = {
     employeeinsert: (data, callBack) => {
         pool.query(

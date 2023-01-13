@@ -151,7 +151,7 @@ module.exports = {
              left join ora_bed on ora_roommaster.rm_code = ora_bed.rm_code
              left join ora_roomtype on ora_bed.rt_code = ora_roomtype.rt_code
              left join room_type on ora_roomtype.rt_code =room_type.rt_code 
-             where rmc_type = ?`,
+             where rmc_type = ? order by rmc_desc asc`,
             [id],
             (error, results, feilds) => {
                 if (error) {

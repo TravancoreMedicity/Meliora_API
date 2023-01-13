@@ -2,8 +2,7 @@ const { pool } = require('../../config/database')
 module.exports = {
     getcomplaintAssign: (id, callBack) => {
         pool.query(
-            `  
-            select complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
+            `select complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
                         complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
                         S.sec_name as sec_name, 
                         IFNULL( L.sec_name,"Nil" ) location,co_employee_master.em_name as comp_reg_emp,cm_complaint_mast.create_user,co_employee_master.em_department,
@@ -23,6 +22,7 @@ module.exports = {
                      left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
                        where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
                        where department_slno=?) AND compalint_status=0 ORDER BY complaint_slno DESC`,
+
             [
                 id
             ],

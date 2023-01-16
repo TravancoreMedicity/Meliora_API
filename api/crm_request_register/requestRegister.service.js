@@ -38,6 +38,7 @@ module.exports = {
         );
     },
     requestRegistInsertDetl: (data, callback) => {
+        console.log(data);
         pool.query(
             `INSERT INTO rm_request_mast_detail (
                 req_slno,

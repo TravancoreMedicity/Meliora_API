@@ -88,7 +88,7 @@ const TimeescalationToplvlRouter = require('./api/time_escalationToplvl/time_esc
 const highantibiotic = require('./api/HighAntiBioticMaster/HighAntiBiotic.router')
 const WeEmpMapping = require('./api/WeEmpMapping/WeEmpMapping.router')
 const dietDashboard = require('./api/diet_dashboard/diet_dashboard.router')
-const requsetRegister = require('./api/crm_request_register/requestRegister.router')
+const requestRegister = require('./api/crm_request_register/requestRegister.router')
 
 
 app.use(express.json());
@@ -162,7 +162,7 @@ app.use('/api/timeescalationtoplvl', TimeescalationToplvlRouter)
 app.use('/api/highBioticMast', highantibiotic)
 app.use('/api/weEmpMap', WeEmpMapping)
 app.use('/api/dietDashboard', dietDashboard)
-app.use('/api/requestRegister', requsetRegister)
+app.use('/api/requestRegister', requestRegister)
 
 app.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

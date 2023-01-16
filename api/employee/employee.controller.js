@@ -181,6 +181,7 @@ module.exports = {
                     emp_id: results.em_id,
                     emp_name: results.em_name,
                     emp_sec: results.sec_name,
+                    emp_secid: results.em_dept_section,
                     app_token: results.app_token,
                     emp_dept: results.em_department,
                     logintime: new Date()

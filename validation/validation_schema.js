@@ -557,7 +557,12 @@ const validateRequestRegister = Joi.object({
     request_deptsec_slno: Joi.number().required(),
     location: Joi.string().required(),
     create_user: Joi.number().optional(),
-    remarks: Joi.string().required(),
+    remarks: Joi.string().optional(),
+    total_approx_cost: Joi.number().optional(),
+    expected_date: Joi.date().optional(),
+    user_deptsec: Joi.number().optional(),
+    req_slno: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
 })
 
 

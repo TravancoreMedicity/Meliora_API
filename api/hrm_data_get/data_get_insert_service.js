@@ -19,11 +19,7 @@ module.exports = {
             (dept_id,
                 dept_name,
             dept_alias,
-            dept_status,
-            create_user,
-            edit_user,
-            create_date,
-            update_date
+            dept_status            
             )
             VALUES ?`,
             [
@@ -83,11 +79,7 @@ module.exports = {
                 sec_name,
                 dept_id,
                 dept_sub_sect,
-                sec_status,
-                create_user,
-                edit_user,
-            create_date,
-            update_date
+                sec_status                
             )
             VALUES ?`,
             [
@@ -143,13 +135,7 @@ module.exports = {
                 em_department,
                 em_dept_section,
                 em_designation,
-                em_status,
-                create_user,
-                edit_user,
-                create_date,
-                update_date,
-                hod,
-                incharge            
+                em_status                       
             )
             VALUES ?`,
             [
@@ -200,9 +186,7 @@ module.exports = {
                 em_id,
                 emp_no,
                 emp_created,
-                emp_updated,
-                create_user,
-                edit_user            
+                emp_updated          
             )
             VALUES ?`,
             [
@@ -247,9 +231,8 @@ module.exports = {
                 dept_section,
                 auth_post,
                 dept_section_post,
-                emp_id,
-                create_user,
-                create_date        
+                emp_id
+                      
             )
             VALUES ?`,
             [

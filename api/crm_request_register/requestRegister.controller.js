@@ -32,7 +32,6 @@ module.exports = {
 
     requestRegistInsertDetl: (req, res) => {
         const body = req.body;
-        // console.log(body);
         //validate  insertion function
         // const body_result = validateRequestRegisterDetl.validate(body);
         // if (body_result.error) {

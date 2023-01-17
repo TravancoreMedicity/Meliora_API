@@ -2,7 +2,7 @@ const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { sign } = require("jsonwebtoken");
 const { employeeinsert, employeeupdate, getemplpyee, employeeGetById, checkUpdateVal, checkInsertVal, employeedelete,
     getEmployeeByUserName, empInsert, updateserialnum, employeeGetAll, updateEmployee, updateEmployeeCo,
-    checkEmployeeExist, employeemoduleGroup, updatemodulegroup
+    checkEmployeeExist, employeemoduleGroup, updatemodulegroup, updateserialnumempDetl
 } = require('../employee/employee.service');
 const { validateuserCreation, validateEmployee } = require('../../validation/validation_schema')
 const logger = require('../../logger/logger')
@@ -259,12 +259,30 @@ module.exports = {
                                         message: "Record Not Found"
                                     });
                                 }
+                                updateserialnumempDetl((err, results) => {
+                                    if (err) {
+                                        //logger.errorLogger(err)
+                                        return res.status(400).json({
+                                            success: 0,
+                                            message: res.err
+                                        });
+                                    }
 
-                                return res.status(200).json({
-                                    success: 1,
-                                    message: "Data Created Successfully"
+                                    if (!results) {
+                                        return res.status(400).json({
+                                            success: 1,
+                                            message: "Record Not Found"
+                                        });
+                                    }
+
+                                    return res.status(200).json({
+                                        success: 1,
+                                        message: "Data Created Successfully"
+                                    });
                                 });
+
                             });
+
                         })
 
 

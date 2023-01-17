@@ -1,7 +1,6 @@
 const { pool } = require('../../config/database')
 module.exports = {
     requestRegistInsert: (data, callback) => {
-        console.log(data);
         pool.query(
             `INSERT INTO rm_request_master (
                 actual_requirement,
@@ -38,7 +37,6 @@ module.exports = {
         );
     },
     requestRegistInsertDetl: (data, callback) => {
-        console.log(data);
         pool.query(
             `INSERT INTO rm_request_mast_detail (
                 req_slno,

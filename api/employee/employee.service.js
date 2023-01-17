@@ -258,7 +258,6 @@ module.exports = {
     },
 
     updateEmployee: (data, callBack) => {
-
         pool.query(
             `UPDATE co_employee_master
             SET  em_no=?,

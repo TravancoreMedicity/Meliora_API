@@ -321,6 +321,9 @@ module.exports = {
     },
     updateEmployee: (req, res) => {
         const body = req.body;
+        const salt = genSaltSync(10);
+        let new_password = body.emp_password;
+        body.emp_password = hashSync(new_password, salt);
         updateEmployee(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
@@ -336,6 +339,7 @@ module.exports = {
                     message: "Record Not Found"
                 });
             }
+
             updateEmployeeCo(body, (err, results) => {
                 if (err) {
                     logger.logwindow(err)

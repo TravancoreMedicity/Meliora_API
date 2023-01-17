@@ -132,25 +132,28 @@ module.exports = {
     },
     getcomplaintAssignbyEmployee: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno,complaint_desc,assigned_date,complaint_dept_name,
-            req_type_name,complaint_type_name,
-            S.sec_name as sec_name, 
-            IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,assigned_date,
-            (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
-                 date(assigned_date) as date,TIME_FORMAT(assigned_date,"%r") AS Time,
-                 if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
-        if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
-        compalint_status
-         from meliora.cm_complaint_detail
-         left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
-         left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
-         left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
-         left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
-         left join cm_hic_policy on cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno
-        left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
-        left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
-        left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
-        where assigned_emp=? AND assist_flag =0 ORDER BY complaint_slno DESC`,
+            `select cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,
+            compalint_priority,cm_complaint_mast.create_user,R.em_name as comp_reg_emp,
+            R.em_department,  RD.dept_name as empdept,
+              complaint_dept_name, req_type_name,complaint_type_name,S.sec_name as sec_name, 
+             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,assigned_date,
+             (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,A.em_name as assign_emp,
+              date(assigned_date) as date,TIME_FORMAT(assigned_date,"%r") AS Time,
+              if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
+                 if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
+                 compalint_status
+                  from meliora.cm_complaint_detail
+                  left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
+                  left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
+                  left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
+                  left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
+                  left join cm_hic_policy on cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno
+                 left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
+                 left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
+                 left join co_employee_master R on R.em_id=cm_complaint_mast.create_user
+                left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
+                  left join co_department_mast RD on RD.dept_id=R.em_department                  
+                 where assigned_emp=? AND assist_flag =0 ORDER BY complaint_slno DESC`,
             [
                 id
             ],
@@ -246,7 +249,7 @@ module.exports = {
             `select cm_complaint_mast.complaint_slno,complaint_desc,assigned_date,complaint_dept_name,
             compalint_date,req_type_name,complaint_type_name,S.sec_name as sec_name, 
              IFNULL( L.sec_name,"Nil" ) location,
-            assigned_emp,
+             assigned_emp,compalint_priority,compalint_status,cm_rectify_status,
             if(em_name is null ,'Not Assigned',em_name) as em_name,
              if(assigned_date is null,'Not Assigned',assigned_date) as assigned_date,
                        (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,

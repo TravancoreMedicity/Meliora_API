@@ -395,6 +395,20 @@ where module_slno = ?`,
                 return callBack(null, results);
             }
         )
-    }
+    },
+
+    getSerialnoEmpDetl: (callBack) => {
+        pool.query(
+            `SELECT * FROM serial_nos where serial_slno=4`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+
+    },
 
 }

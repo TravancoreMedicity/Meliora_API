@@ -2,7 +2,7 @@ const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { sign } = require("jsonwebtoken");
 const { employeeinsert, employeeupdate, getemplpyee, employeeGetById, checkUpdateVal, checkInsertVal, employeedelete,
     getEmployeeByUserName, empInsert, updateserialnum, employeeGetAll, updateEmployee, updateEmployeeCo,
-    checkEmployeeExist, employeemoduleGroup, updatemodulegroup
+    checkEmployeeExist, employeemoduleGroup, updatemodulegroup, updateserialnumempDetl
 } = require('../employee/employee.service');
 const { validateuserCreation, validateEmployee } = require('../../validation/validation_schema')
 const logger = require('../../logger/logger')
@@ -181,6 +181,7 @@ module.exports = {
                     emp_id: results.em_id,
                     emp_name: results.em_name,
                     emp_sec: results.sec_name,
+                    emp_secid: results.em_dept_section,
                     app_token: results.app_token,
                     emp_dept: results.em_department,
                     logintime: new Date()
@@ -258,12 +259,30 @@ module.exports = {
                                         message: "Record Not Found"
                                     });
                                 }
+                                updateserialnumempDetl((err, results) => {
+                                    if (err) {
+                                        //logger.errorLogger(err)
+                                        return res.status(400).json({
+                                            success: 0,
+                                            message: res.err
+                                        });
+                                    }
 
-                                return res.status(200).json({
-                                    success: 1,
-                                    message: "Data Created Successfully"
+                                    if (!results) {
+                                        return res.status(400).json({
+                                            success: 1,
+                                            message: "Record Not Found"
+                                        });
+                                    }
+
+                                    return res.status(200).json({
+                                        success: 1,
+                                        message: "Data Created Successfully"
+                                    });
                                 });
+
                             });
+
                         })
 
 
@@ -302,6 +321,9 @@ module.exports = {
     },
     updateEmployee: (req, res) => {
         const body = req.body;
+        const salt = genSaltSync(10);
+        let new_password = body.emp_password;
+        body.emp_password = hashSync(new_password, salt);
         updateEmployee(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
@@ -317,6 +339,7 @@ module.exports = {
                     message: "Record Not Found"
                 });
             }
+
             updateEmployeeCo(body, (err, results) => {
                 if (err) {
                     logger.logwindow(err)

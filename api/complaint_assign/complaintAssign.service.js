@@ -324,4 +324,23 @@ module.exports = {
             }
         );
     },
+    TransferDept: (data, callBack) => {
+        pool.query(
+            `UPDATE cm_complaint_mast
+            SET complaint_deptslno=?
+            WHERE complaint_slno=? `,
+            [
+                data.complaint_deptslno,
+                data.complaint_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+
 }

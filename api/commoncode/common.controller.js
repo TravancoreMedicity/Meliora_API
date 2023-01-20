@@ -3,7 +3,8 @@ const logger = require('../../logger/logger')
 const { getEmployeeID, getMenuBasedRights, getSubModuleRights, getModuleMasterByID, getSelectMenu, getEmpName,
     getModuleGroup, getUserModuleRights, getempId, inpatientList, getBranch, getDesignation, getSalutation,
     getSerialno, getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
-    getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor } = require('../commoncode/common.service');
+    getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor, getSerialnoEmpDetl
+} = require('../commoncode/common.service');
 module.exports = {
     getEmployeeID: (req, res) => {
         const id = req.params.id;
@@ -566,7 +567,33 @@ module.exports = {
                 data: results
             });
         });
-    }
+    },
+
+    getSerialnoEmpDetl: (req, res) => {
+
+        getSerialnoEmpDetl((err, results) => {
+            if (err) {
+                logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                logger.infoLogger("No Records Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
 
 
 }

@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign,
     getcomplaintAssignbyEmployee, getassistantEmployee, insertAssistemp, AssignRemark,
-    getALLcomplaintbyEmployee, getIndividualassitemployee, AssistantRecieved } = require('../complaint_assign/complaintAssign.controller');
+    getALLcomplaintbyEmployee, getIndividualassitemployee, AssistantRecieved, TransferDept } = require('../complaint_assign/complaintAssign.controller');
 
 router.get("/:id", checkToken, getcomplaintAssign);
 router.post("/", checkToken, quickAssign); // quick assign
@@ -15,6 +15,8 @@ router.patch("/remark", checkToken, AssignRemark);
 router.get("/allcomplaint/:id", checkToken, getALLcomplaintbyEmployee);
 router.get("/individual/assist/:id", checkToken, getIndividualassitemployee)
 router.patch("/assistant/recieved", checkToken, AssistantRecieved);
+router.patch("/complaint/transfer", checkToken, TransferDept); // transfer complaint departement
+
 
 
 module.exports = router;

@@ -133,7 +133,7 @@ module.exports = {
     getcomplaintAssignbyEmployee: (id, callBack) => {
         pool.query(
             `select cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,
-            compalint_priority,cm_complaint_mast.create_user,R.em_name as comp_reg_emp,
+            compalint_priority,cm_complaint_mast.create_user,R.em_name as comp_reg_emp,verify_remarks,rectify_pending_hold_remarks,
             R.em_department,  RD.dept_name as empdept,
               complaint_dept_name, req_type_name,complaint_type_name,S.sec_name as sec_name, 
              IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,assigned_date,
@@ -153,7 +153,7 @@ module.exports = {
                  left join co_employee_master R on R.em_id=cm_complaint_mast.create_user
                 left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
                   left join co_department_mast RD on RD.dept_id=R.em_department                  
-                 where assigned_emp=? AND assist_flag =0 ORDER BY complaint_slno DESC`,
+                 where assigned_emp=4516 AND assist_flag =0 ORDER BY complaint_slno DESC`,
             [
                 id
             ],

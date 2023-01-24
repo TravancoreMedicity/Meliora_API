@@ -1,10 +1,11 @@
 const { pool } = require('../../config/database');
 
+
 module.exports = {
     employeeinsert: (data, callBack) => {
         pool.query(
             `INSERT INTO co_employee
-        (    
+        (    empdtl_slno,
             emp_username,
             emp_password,
             emp_status ,
@@ -12,8 +13,9 @@ module.exports = {
             emp_no,
             emp_email
        )
-        VALUES(?,?,?,?,?,?)`,
+        VALUES(?,?,?,?,?,?,?)`,
             [
+                data.empdtl_slno,
                 data.emp_username,
                 data.emp_password,
                 data.emp_status,
@@ -121,6 +123,7 @@ module.exports = {
     getEmployeeByUserName: (userName, callBack) => {
         pool.query(
             `SELECT co_employee_master.em_name,emp_username,emp_password,app_token,
+            co_employee_master.em_department,
             co_employee_master.em_id,co_employee.emp_no,co_employee_master.em_dept_section,sec_name
              FROM meliora.co_employee
             LEFT JOIN co_employee_master ON co_employee_master.em_no=co_employee.emp_no
@@ -219,12 +222,26 @@ module.exports = {
         )
 
     },
+    updateserialnumempDetl: (callBack) => {
+        pool.query(
+            `update serial_nos set serial_current=serial_current+1 where serial_slno=4`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+
+    },
     employeeGetAll: (callBack) => {
         pool.query(
             `select co_employee.emp_no,em_name,emp_username,em_designation,em_dept_section,sec_name ,
             em_no,co_employee_master.em_id,em_salutation,em_doj,em_dob,em_gender,em_branch,em_department,
             em_dept_section, em_status ,em_mobile,em_email,module_group_user_rights.mod_grp_slno,
-            module_group_user_rights.user_group_slno,module_group_user_rights.mod_grp_user_slno
+            module_group_user_rights.user_group_slno,module_group_user_rights.mod_grp_user_slno,
+            co_employee.empdtl_slno
             from co_employee
              left join co_employee_master on co_employee.em_id=co_employee_master.em_id
              left join co_deptsec_mast on co_employee_master.em_dept_section=co_deptsec_mast.sec_id
@@ -241,7 +258,6 @@ module.exports = {
     },
 
     updateEmployee: (data, callBack) => {
-
         pool.query(
             `UPDATE co_employee_master
             SET  em_no=?,

@@ -1,7 +1,7 @@
 const { validateComplaintRegist } = require('../../validation/validation_schema');
 const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign, getcomplaintAssignbyEmployee, quickAssigncompstatus,
-    detailedAssigncompstatus, getassistantEmployee, insertAssistemp, AssignRemark, getALLcomplaintbyEmployee, getIndividualassitemployee,
-    AssistantRecieved, checkInsertVal } = require('../complaint_assign/complaintAssign.service');
+    detailedAssigncompstatus, getassistantEmployee, insertAssistemp, getALLcomplaintbyEmployee, getIndividualassitemployee,
+    AssistantRecieved, checkInsertVal, TransferDept } = require('../complaint_assign/complaintAssign.service');
 const logger = require('../../logger/logger');
 
 module.exports = {
@@ -10,7 +10,7 @@ module.exports = {
         getcomplaintAssign(id, (err, results) => {
             if (err) {
                 logger.logwindow(err)
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 2,
                     message: err
                 });
@@ -34,8 +34,6 @@ module.exports = {
         checkInsertVal(body, (err, results) => {
             const value = JSON.parse(JSON.stringify(results));
             if (Object.keys(value).length === 0) {
-
-
                 quickAssign(body, (err, results) => {
                     if (err) {
                         logger.logwindow(err)
@@ -103,7 +101,7 @@ module.exports = {
                     message: err
                 });
             }
-            detailedAssigncompstatus(body[0].complaint_slno, (err, results) => {
+            detailedAssigncompstatus(body[0], (err, results) => {
                 if (err) {
                     logger.logwindow(err)
                     return res.status(400).json({
@@ -189,22 +187,6 @@ module.exports = {
             })
         });
     },
-    AssignRemark: (req, res) => {
-        const body = req.body
-        AssignRemark(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(400).json({
-                    success: 2,
-                    message: err
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "Complaint Assigned Successfully"
-            });
-        });
-    },
     getALLcomplaintbyEmployee: (req, res) => {
         const id = req.params.id
         getALLcomplaintbyEmployee(id, (err, results) => {
@@ -264,6 +246,29 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 message: "Assisted Successfully"
+            });
+        });
+    },
+    TransferDept: (req, res) => {
+        const body = req.body
+        TransferDept(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Complaint Transfer Successfully"
             });
         });
     },

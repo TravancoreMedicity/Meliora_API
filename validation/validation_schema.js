@@ -312,6 +312,33 @@ const validateSubroomcreation = Joi.object({
     em_id: Joi.number().optional(),
 })
 
+//Escalation Time Master
+const validateEscalationtime = Joi.object({
+    esc_activity: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Activity Name  is Required',
+            'string.min': 'Activity Name must be at least 3 characters long',
+            'string.max': 'Activity Name  length must be less tahn or equal to 45 characters long'
+        }),
+    esc_responsibility: Joi.string().trim().uppercase().min(2).max(45).required()
+        .messages({
+            'string.empty': 'Responsibility Name  is Required',
+            'string.min': 'Responsibility Name must be at least 3 characters long',
+            'string.max': 'Responsibility Name  length must be less tahn or equal to 45 characters long'
+        }),
+    esc_slno: Joi.optional(),
+    esc_time_limit: Joi.optional(),
+    esc_lvl1: Joi.optional(),
+    esc_lvl2: Joi.optional(),
+    esc_lvl3: Joi.optional(),
+    esc_lvl4: Joi.optional(),
+    esc_top_lvl: Joi.optional(),
+    esc_top_lvl: Joi.optional(),
+    esc_status: Joi.number().optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+})
+
 
 //User Group rights validation
 const validateUserGroupRights = Joi.object({
@@ -422,6 +449,7 @@ const validateuserCreation = Joi.object({
     emp_slno: Joi.number().optional(),
     dept_slno: Joi.number().optional(),
     deptsec_slno: Joi.number().optional(),
+    empdtl_slno: Joi.number().optional(),
 })
 
 validationsurvLog = Joi.object({
@@ -526,6 +554,7 @@ validateBedTransfer = Joi.object({
 
 })
 
+
 validatedischargeEvent = Joi.object({
     // dis_slno: Joi.number().optional(),
     surv_slno: Joi.number().required(),
@@ -549,6 +578,34 @@ validatedischargeEvent = Joi.object({
     disc_date: Joi.optional(),
     act_disc_date: Joi.optional(),
     act_disc_status: Joi.number().optional(),
+})
+
+const validateRequestRegister = Joi.object({
+    actual_requirement: Joi.string().required(),
+    needed: Joi.string().required(),
+    request_dept_slno: Joi.number().required(),
+    request_deptsec_slno: Joi.number().required(),
+    location: Joi.string().required(),
+    create_user: Joi.number().optional(),
+    remarks: Joi.string().optional(),
+    total_approx_cost: Joi.number().optional(),
+    expected_date: Joi.date().optional(),
+    user_deptsec: Joi.number().optional(),
+    req_slno: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+})
+
+
+const validateRequestRegisterDetl = Joi.object({
+    req_slno: Joi.number().required(),
+    item_slno: Joi.number().required(),
+    item_desc: Joi.string().required(),
+    item_unit: Joi.number().required(),
+    item_qnty: Joi.number().required(),
+    item_specification: Joi.string().required(),
+    aprox_cost: Joi.number().required(),
+    item_status: Joi.number().required(),
+    create_user: Joi.number().optional(),
 
 })
 
@@ -586,9 +643,12 @@ module.exports = {
     validationsurvLog,
     validationpatientIntraction,
     validationdailyactivity,
+    validateEscalationtime,
     validationhighbiotic,
     ValidationEmpMappingNurStation,
     validateBedTransfer,
-    validatedischargeEvent
+    validatedischargeEven,
+    validateRequestRegister,
+    validateRequestRegisterDetl
 
 }

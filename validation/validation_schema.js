@@ -483,34 +483,37 @@ validationsurvLog = Joi.object({
 })
 
 validationdailyactivity = Joi.object({
-    srv_slno: Joi.number().optional(),
-    visit_time: Joi.date().required(),
+    srv_slno: Joi.number().required(),
     activity_date: Joi.date().required(),
+    activity_time: Joi.date().required(),
     room_clean: Joi.number().optional(),
     sheet_change: Joi.number().optional(),
     dr_round: Joi.number().optional(),
-    imortant_note: Joi.string().optional(),
+    imortant_note: Joi.optional(),
     dietian_round: Joi.number().optional(),
     bill_audit: Joi.number().optional(),
     patient_board_update: Joi.number().optional(),
     insurance_status: Joi.number().optional(),
     create_empid: Joi.number().optional(),
     update_date: Joi.number().optional(),
-    ip_no: Joi.string().optional(),
+    ip_no: Joi.string().required(),
     diet_status: Joi.optional(),
     asset_usage: Joi.optional(),
+    dr_visit_time: Joi.optional()
 
 })
 
 validationpatientIntraction = Joi.object({
     surv_slno: Joi.number().required(),
     remark_date: Joi.date().required(),
-    particular: Joi.string().optional(),
-    status: Joi.string().optional(),
-    remarks: Joi.string().optional(),
+    particular: Joi.string().required(),
+    status: Joi.string().required(),
+    remarks: Joi.optional(),
     submit_time: Joi.date().optional(),
     edit_time: Joi.string().optional(),
-    submit_employee: Joi.number().optional()
+    submit_employee: Joi.number().optional(),
+    remark_time: Joi.date().required()
+
 })
 
 validationhighbiotic = Joi.object({
@@ -551,6 +554,32 @@ validateBedTransfer = Joi.object({
 
 })
 
+
+validatedischargeEvent = Joi.object({
+    // dis_slno: Joi.number().optional(),
+    surv_slno: Joi.number().required(),
+    ip_no: Joi.string().required(),
+    discharge_type: Joi.optional(),
+    cros_consult: Joi.optional(),
+    summary_time: Joi.optional(),
+    disc_medicine_indent: Joi.optional(),
+    disc_medicine_recive: Joi.optional(),
+    feed_back_collected: Joi.number().optional(),
+    room_clear_time: Joi.optional(),
+    disc_key: Joi.number().optional(),
+    disc_callbell: Joi.number().optional(),
+    disc_tv_ac_remot: Joi.optional(),
+    disc_report_date: Joi.optional(),
+    act_dis_report_date: Joi.optional(),
+    dis_entry_time: Joi.optional(),
+    act_dis_entry_time: Joi.optional(),
+    dmd_date: Joi.optional(),
+    act_dmd_date: Joi.optional(),
+    disc_date: Joi.optional(),
+    act_disc_date: Joi.optional(),
+    act_disc_status: Joi.number().optional(),
+})
+
 const validateRequestRegister = Joi.object({
     actual_requirement: Joi.string().required(),
     needed: Joi.string().required(),
@@ -577,6 +606,7 @@ const validateRequestRegisterDetl = Joi.object({
     aprox_cost: Joi.number().required(),
     item_status: Joi.number().required(),
     create_user: Joi.number().optional(),
+
 })
 
 
@@ -617,6 +647,7 @@ module.exports = {
     validationhighbiotic,
     ValidationEmpMappingNurStation,
     validateBedTransfer,
+    validatedischargeEvent,
     validateRequestRegister,
     validateRequestRegisterDetl
 

@@ -3,7 +3,7 @@ const logger = require('../../logger/logger')
 const { getEmployeeID, getMenuBasedRights, getSubModuleRights, getModuleMasterByID, getSelectMenu, getEmpName,
     getModuleGroup, getUserModuleRights, getempId, inpatientList, getBranch, getDesignation, getSalutation,
     getSerialno, getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
-    getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor, getSerialnoEmpDetl
+    getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor, getSerialnoEmpDetl, updateEmpMobileApp
 } = require('../commoncode/common.service');
 module.exports = {
     getEmployeeID: (req, res) => {
@@ -595,5 +595,27 @@ module.exports = {
         });
     },
 
-
+    updateEmpMobileApp: (req, res) => {
+        const body = req.body
+        updateEmpMobileApp(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Update Employee master Successfully"
+            });
+        });
+    },
 }

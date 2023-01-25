@@ -1,4 +1,4 @@
-const { log } = require('winston');
+// const { log } = require('winston');
 const { pool } = require('../../config/database');
 
 module.exports = {
@@ -41,9 +41,11 @@ module.exports = {
 
     },
     insertpatientsurv: (data, callback) => {
+        console.log(data);
         pool.query(
             `insert into we_patient_surv_log 
-            (we_surv_slno,
+            (
+            we_surv_slno,
             ip_no,
             bd_code,
             discharge_wright,
@@ -111,6 +113,7 @@ module.exports = {
                 data.dama_remarks
             ],
             (error, results, fields) => {
+
                 if (error) {
                     return callback(error);
                 }
@@ -122,7 +125,6 @@ module.exports = {
         pool.query(
             `insert into we_daily_activity
             (srv_slno,
-            visit_time,
             diet_status,
             room_clean,
             sheet_change,
@@ -136,12 +138,12 @@ module.exports = {
             ip_no,
             create_empid,
             activity_date,
+            activity_time,
             dr_visit_time
             )
             values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.srv_slno,
-                data.visit_time,
                 JSON.stringify(data.diet_status),
                 data.room_clean,
                 data.sheet_change,
@@ -155,6 +157,7 @@ module.exports = {
                 data.ip_no,
                 data.create_empid,
                 data.activity_date,
+                data.activity_time,
                 data.dr_visit_time
 
             ],
@@ -227,12 +230,13 @@ module.exports = {
     getsurvslnointraction: (data, callBack) => {
         pool.query(
             `insert into we_interaction_remarks 
-            (surv_slno,remarks,remark_date,particular,status,submit_employee)
-            values(?,?,?,?,?,?)`,
+            (surv_slno,remarks,remark_date,remark_time,particular,status,submit_employee)
+            values(?,?,?,?,?,?,?)`,
             [
                 data.surv_slno,
                 data.remarks,
                 data.remark_date,
+                data.remark_time,
                 data.particular,
                 data.status,
                 data.submit_employee
@@ -266,12 +270,16 @@ module.exports = {
     },
     getdailyactivity: (id, callBack) => {
         pool.query(
-            `select activity_slno, 
+            `select
+            ROW_NUMBER() OVER () as slno, 
+            activity_slno, 
             (case when activity_date is null  then null else activity_date end)activity_date,
-            (case when visit_time is null then null else visit_time end) visit_time,
            we_daily_activity.ip_no,
            diet_status,
            ptc_ptname,
+           dr_visit_time,
+           time(activity_time) as Time,
+           activity_time,
            (case when room_clean = "1" then 'yes' else 'no' end) as room_clean ,
            (case when sheet_change = "1" then 'yes' else 'no' end) as sheet_change ,
            (case when dr_round = "1" then 'yes' else 'no' end) as dr_round ,
@@ -298,11 +306,14 @@ module.exports = {
     },
     getintraction: (id, callBack) => {
         pool.query(
-            `select inter_remark_slno ,
+            `select 
+            ROW_NUMBER() OVER () as slno, 
+            inter_remark_slno ,
             (case when remark_date is null then null else remark_date end)remark_date,
             case when particular = '' then  'not updated' else particular end as particular,
              wework_patient.ptc_ptname,
             status,
+            remark_time,
            case when  remarks = '' then 'not updated' else remarks end as remarks
             from we_interaction_remarks
             left join we_patient_survillance on we_interaction_remarks.surv_slno = we_patient_survillance.surv_slno
@@ -324,7 +335,8 @@ module.exports = {
             `update we_daily_activity
             set 
             activity_date =?,
-            visit_time=? ,
+            activity_time = ?,
+            dr_visit_time =?,
             diet_status=?,
             room_clean=?,
             sheet_change=?,
@@ -340,7 +352,8 @@ module.exports = {
             [
 
                 data.activity_date,
-                data.visit_time,
+                data.activity_time,
+                data.dr_visit_time,
                 JSON.stringify(data.diet_status),
                 data.room_clean,
                 data.sheet_change,
@@ -368,12 +381,16 @@ module.exports = {
             `update we_interaction_remarks 
             set particular  = ?,
             status =?,
+            remark_date = ?,
+            remark_time =?,
             remarks =?,
             submit_employee=?
             where inter_remark_slno = ?`,
             [
                 data.particular,
                 data.status,
+                data.remark_date,
+                data.remark_time,
                 data.remarks,
                 data.submit_employee,
                 data.inter_remark_slno
@@ -388,7 +405,9 @@ module.exports = {
     },
     getwedetail: (data, callBack) => {
         pool.query(
-            `SELECT we_patient_surv_log.ip_no,
+            `SELECT 
+            ROW_NUMBER() OVER () as sl_no, 
+            we_patient_surv_log.ip_no,
             ptc_ptname,we_patient_surv_log.bd_code,
             (case when discharge_wright is null then null else discharge_wright end)discharge_wright,
             shift_from,
@@ -509,7 +528,7 @@ module.exports = {
     },
     selectsurvslno: (data, callBack) => {
         pool.query(
-            ` select surv_slno from we_patient_survillance
+            `select surv_slno from we_patient_survillance
             where ip_no =? and pt_no=?`,
 
             [
@@ -528,11 +547,11 @@ module.exports = {
     },
     selectsurlogslno: (data, callBack) => {
         pool.query(
-            ` select surv_log_slno from we_patient_surv_log
-            where shift_from = ? and shift_to=? and we_surv_slno=?`,
+            `select surv_log_slno from we_patient_surv_log
+            where shift_to=? and we_surv_slno=?`,
 
             [
-                data.shift_from,
+
                 data.shift_to,
                 data.we_surv_slno
 
@@ -549,9 +568,10 @@ module.exports = {
     checkInsertVal: (data, callBack) => {
         pool.query(
             `select srv_slno from we_daily_activity
-            where activity_date = ?`,
+            where activity_date = ? and srv_slno = ?`,
             [
-                data.activity_date
+                data.activity_date,
+                data.srv_slno
             ],
             (error, results, fields) => {
                 if (error) {
@@ -564,9 +584,10 @@ module.exports = {
     checkinsertintra: (data, callBack) => {
         pool.query(
             `select surv_slno from we_interaction_remarks
-            where remark_date = ?`,
+            where remark_date = ?  and surv_slno=?`,
             [
-                data.remark_date
+                data.remark_date,
+                data.surv_slno
             ],
             (error, results, fields) => {
                 if (error) {
@@ -577,6 +598,24 @@ module.exports = {
         )
 
     },
+    checkDischargeEvent: (data, callBack) => {
+        pool.query(
+            `select surv_slno from we_discharge
+             where ip_no = ? and surv_slno =?`,
+            [
+
+                data.ip_no,
+                data.surv_slno
+            ],
+            (error, results, field) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+
     getTotalAdmission: (callBack) => {
         pool.query(
             `select ip_no ,pt_no,ipd_date,ptc_ptname,ptc_sex,bdc_no,rcc_desc,doc_name,nsc_desc,ipd_disc,ptc_mobile
@@ -827,7 +866,6 @@ module.exports = {
         group by ip_no`,
             [],
             (error, results, feilds) => {
-                console.log(results);
                 if (error) {
                     return callBack(error);
                 }
@@ -899,7 +937,9 @@ module.exports = {
     },
     getdischarge: (id, callBack) => {
         pool.query(
-            `select we_discharge.ip_no,discharge_type,dis_slno,
+            `select 
+            ROW_NUMBER() OVER () as slno,
+            we_discharge.ip_no,discharge_type,dis_slno,
             ptc_ptname,
             cros_consult,
             summary_time,
@@ -1036,13 +1076,14 @@ module.exports = {
     },
     getBedTransfer: (id, callBack) => {
         pool.query(
-            `select sl_no,ora_rmall.ip_no,rmd_occupdate,rmd_relesedate,
+            `select ROW_NUMBER() OVER () as slno,
+            sl_no,ora_rmall.ip_no,pt_no,rmd_occupdate,rmd_relesedate,
             nsc_desc,ptc_ptname,bdc_no,ora_nurstation.ns_code,rm_slno,rmc_shifing_required
             from ora_rmall 
             inner join ora_bed on ora_rmall.bd_code = ora_bed.bd_code 
             inner join ora_nurstation on ora_bed.ns_code = ora_nurstation.ns_code
             inner join ora_ipadmiss on ora_rmall.ip_no = ora_ipadmiss.ip_no
-            where ora_rmall.ip_no = ? `,
+            where ora_rmall.ip_no = ?`,
             [
                 id
             ],
@@ -1060,10 +1101,13 @@ module.exports = {
             `update we_patient_bed_transfer 
             set trasfer_to = ? ,
             transfer_time = ? ,
-            counseling_status = ? ,
+            counseling_status = ?,
+            counciling_remarks =?,
+            sfa_mfa_status =?,
             sfa_mfa_clearence=?,
             room_amenties=?,
             bystander_room_retain = ?,
+            bystander_room_retain_remark =?,
             transfer_in_time=?,
             remarks = ?,
             transfer_from=? 
@@ -1072,9 +1116,12 @@ module.exports = {
                 data.trasfer_to,
                 data.transfer_time,
                 data.counseling_status,
+                data.counciling_remarks,
+                data.sfa_mfa_status,
                 data.sfa_mfa_clearence,
                 JSON.stringify(data.room_amenties),
                 data.bystander_room_retain,
+                data.bystander_room_retain_remark,
                 data.transfer_in_time,
                 data.remarks,
                 data.transfer_from,
@@ -1091,13 +1138,13 @@ module.exports = {
     },
     getbedtransSlno: (data, callBack) => {
         pool.query(
-            `select trasf_slno from we_patient_bed_transfer 
-            where transfer_from = ? and trasfer_to = ? and bed_trans_surv_slno= ?`,
+            `select trasf_slno from we_patient_bed_transfer
+            where transfer_from = ? and trasfer_to = ? and we_patient_bed_transfer.ip_no = ?`,
 
             [
                 data.transfer_from,
                 data.trasfer_to,
-                data.bed_trans_surv_slno
+                data.ip_no
 
             ],
             (error, results, feilds) => {
@@ -1127,8 +1174,28 @@ module.exports = {
                 return callback(null, results);
             }
         );
+    },
+
+
+    getpatdetailBedtrans: (data, callBack) => {
+        pool.query(`
+        SELECT transfer_from,trasfer_to,transfer_time,counseling_status,counciling_remarks,
+                sfa_mfa_status,sfa_mfa_clearence,room_amenties,bystander_room_retain,
+                remarks,ip_no,bystander_room_retain_remark,transfer_in_time
+                FROM meliora.we_patient_bed_transfer
+                where trasfer_to = ? and ip_no = ?`,
+            [
+                data.trasfer_to,
+                data.ip_no
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+
+        )
     }
-
-
-
 }

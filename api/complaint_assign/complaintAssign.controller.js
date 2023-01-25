@@ -96,7 +96,7 @@ module.exports = {
         detailedAssign(newList, (err, results) => {
             if (err) {
                 logger.logwindow(err)
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 2,
                     message: err
                 });
@@ -104,7 +104,7 @@ module.exports = {
             detailedAssigncompstatus(body[0], (err, results) => {
                 if (err) {
                     logger.logwindow(err)
-                    return res.status(400).json({
+                    return res.status(200).json({
                         success: 2,
                         message: err
                     });

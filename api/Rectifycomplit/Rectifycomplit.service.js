@@ -86,7 +86,10 @@ module.exports = {
     },
     getAssignEmps: (id, callBack) => {
         pool.query(
-            `select assigned_emp,em_name from cm_complaint_detail
+            `select 
+                assigned_emp,
+                em_name 
+            from cm_complaint_detail
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
             where complaint_slno=?`,
             [

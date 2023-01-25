@@ -1,12 +1,12 @@
 const logger = require('../../logger/logger')
 const { getinpatientList, insertpatientsurv, InsertDailyActivity, getsurvslno,
     Insertsrvtable, getsurvslnointraction, getsurvslnoonly, getAsignedStaff, getdailyactivity,
-    getintraction, updateActivity, updateIntraction, checkinsertintra, getwedetail,
+    getintraction, updateActivity, updateIntraction, checkinsertintra, checkInsertVal, getwedetail,
     updateweDetail, selectsurvslno, selectsurlogslno, getTotalAdmission, getDamalist, getBhrcList,
     getDocVisit, DischargeAfternoonList, getsruvillenceDetl, getOneSheetList, getAdmittebhrc,
     Insertdischarge, getdischarge, updateDischarge, getBedTransfer, insertBedtracking,
-    updateBedTrans, getbedtransSlno, getTotalbhrcPat, updateshiftStatus } = require('../WeWork/WeWork.service')
-const { validationsurvLog, validationdailyactivity, validationpatientIntraction } = require('../../validation/validation_schema');
+    updateBedTrans, getbedtransSlno, getTotalbhrcPat, updateshiftStatus, getpatdetailBedtrans, checkDischargeEvent } = require('../WeWork/WeWork.service')
+const { validationsurvLog, validationdailyactivity, validationpatientIntraction, validatedischargeEvent } = require('../../validation/validation_schema');
 
 
 
@@ -59,41 +59,41 @@ module.exports = {
 
     InsertDailyActivity: (req, res) => {
         const body = req.body;
-        // const body_result = validationpatientIntraction.validate(body);
-        // if (body_result.error) {
-        //     // logger.logwindow(body_result.error.details[0].message)
-        //     logger.warnlogwindow(body_result.error.details[0].message)
-        //     return res.status(200).json({
-        //         success: 2,
-        //         message: body_result.error.details[0].message
-        //     });
-        // }
-        // body.srv_slno = body_result.value.srv_slno;
-        // checkInsertVal(body, (err, results) => {
-        //     const value = JSON.parse(JSON.stringify(results))
-        //     if (Object.keys(value).length === 0) {
-        InsertDailyActivity(body, (err, results) => {
-            const id = results.insertId
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
+        const body_result = validationdailyactivity.validate(body);
+        if (body_result.error) {
+            // logger.logwindow(body_result.error.details[0].message)
+            logger.warnlogwindow(body_result.error.details[0].message)
             return res.status(200).json({
-                success: 1,
-                message: "Daily Activity inserted succesfully"
+                success: 2,
+                message: body_result.error.details[0].message
             });
-        });
-        // } else {
-        //     logger.infologwindow("daily activity in this date is all ready added")
-        //     return res.status(200).json({
-        //         success: 7,
-        //         message: "daily activity in this date is all ready added"
-        //     })
-        // }
-        // })
+        }
+        body.srv_slno = body_result.value.srv_slno;
+        checkInsertVal(body, (err, results) => {
+            const value = JSON.parse(JSON.stringify(results))
+            if (Object.keys(value).length === 0) {
+                InsertDailyActivity(body, (err, results) => {
+                    // const id = results.insertId
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Daily Activity Added succesfully"
+                    });
+                });
+            } else {
+                logger.infologwindow("daily activity in this date is already added")
+                return res.status(200).json({
+                    success: 7,
+                    message: "daily activity in this date is already added"
+                })
+            }
+        })
     },
     getsurvslno: (req, res) => {
         const id = req.params.id;
@@ -185,7 +185,7 @@ module.exports = {
             const value = JSON.parse(JSON.stringify(results))
             if (Object.keys(value).length === 0) {
                 getsurvslnointraction(body, (err, results) => {
-                    const id = results.insertId
+                    // const id = results.insertId
                     if (err) {
                         return res.status(200).json({
                             success: 0,
@@ -194,14 +194,14 @@ module.exports = {
                     }
                     return res.status(200).json({
                         success: 1,
-                        message: "patient intraction inserted successfully!"
+                        message: "patient intraction Added successfully!"
                     });
                 })
             } else {
-                logger.infologwindow("daily activity in this date is all ready added")
+                logger.infologwindow("daily activity in this date is already added")
                 return res.status(200).json({
                     success: 7,
-                    message: "Intraction in this date is all ready added"
+                    message: "Intraction in this date is already added"
                 })
             }
 
@@ -627,22 +627,45 @@ module.exports = {
             });
         });
     },
+
+
     Insertdischarge: (req, res) => {
         const body = req.body;
-        Insertdischarge(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
+        const body_result = validatedischargeEvent.validate(body);
+        if (body_result.error) {
+            // logger.logwindow(body_result.error.details[0].message)
+            logger.warnlogwindow(body_result.error.details[0].message)
             return res.status(200).json({
-                success: 1,
-                message: "Daily Activity inserted succesfully"
+                success: 2,
+                message: body_result.error.details[0].message
             });
-        });
-
+        }
+        body.dis_slno = body_result.value.dis_slno;
+        checkDischargeEvent(body, (err, results) => {
+            const value = JSON.parse(JSON.stringify(results))
+            if (Object.keys(value).length === 0) {
+                Insertdischarge(body, (err, results) => {
+                    // const id = results.insertId
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Discharge event added succesfully"
+                    });
+                });
+            } else {
+                logger.infologwindow("daily activity in this date is already added")
+                return res.status(200).json({
+                    success: 7,
+                    message: "Discharge event already added"
+                })
+            }
+        })
     },
     getdischarge: (req, res) => {
         const id = req.params.id
@@ -658,7 +681,7 @@ module.exports = {
                 // logger.infologwindow("No Record Found")
                 return res.status(200).json({
                     success: 2,
-                    message: "please dailyActivity"
+                    message: "please Add discharge Details"
                 });
             }
             return res.status(200).json({
@@ -774,7 +797,6 @@ module.exports = {
                 });
             }
             if (results.length == 0) {
-                // logger.infologwindow("No Record Found")
                 return res.status(200).json({
                     success: 2,
                     message: "result not found"
@@ -809,5 +831,28 @@ module.exports = {
             });
         });
 
+    },
+    getpatdetailBedtrans: (req, res) => {
+        const body = req.body;
+        getpatdetailBedtrans(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length == 0) {
+                // logger.infologwindow("No Record Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "result not found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
     }
 }

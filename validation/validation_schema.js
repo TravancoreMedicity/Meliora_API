@@ -647,7 +647,7 @@ module.exports = {
     validationhighbiotic,
     ValidationEmpMappingNurStation,
     validateBedTransfer,
-    validatedischargeEven,
+    validatedischargeEvent,
     validateRequestRegister,
     validateRequestRegisterDetl
 

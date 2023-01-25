@@ -643,8 +643,8 @@ module.exports = {
         });
     },
     getMobileAppStatusCredential: (req, res) => {
-        const body = req.body
-        getMobileAppStatusCredential(body, (err, results) => {
+        const id = req.params.id
+        getMobileAppStatusCredential(id, (err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({

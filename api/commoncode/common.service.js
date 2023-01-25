@@ -455,7 +455,7 @@ where module_slno = ?`,
             }
         );
     },
-    getMobileAppStatusCredential: (data, callBack) => {
+    getMobileAppStatusCredential: (id, callBack) => {
         pool.query(
             `SELECT 
                 mobile_app_registred,
@@ -463,7 +463,7 @@ where module_slno = ?`,
             FROM co_employee_master 
             WHERE em_id = ?`,
             [
-                data.em_id
+                id
             ],
             (error, results, feilds) => {
                 if (error) {

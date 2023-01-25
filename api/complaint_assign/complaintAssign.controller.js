@@ -251,10 +251,11 @@ module.exports = {
     },
     TransferDept: (req, res) => {
         const body = req.body
+        console.log(body)
         TransferDept(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 2,
                     message: err
                 });

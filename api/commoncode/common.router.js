@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { getEmployeeID, getMenuBasedRights, getModuleGroupByID, getSubModuleRights, getSelectMenu, getEmpName,
     getModuleGroup, getModuleRights, getempId, inpatientList, getBranch, getDesignation, getSalutation,
-    getSerialnumber, getSerialnoEmpDetl,
+    getSerialnumber, getSerialnoEmpDetl, updateEmpMobileApp,
     getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
     getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor } = require('../commoncode/common.controller');
 
@@ -35,5 +35,5 @@ router.get('/get/floor', checkToken, getfloor)
 router.get('/nursfloor/:id', checkToken, getnurstationbyfloor)
 router.get("/getEmpSlno", checkToken, getSerialnoEmpDetl);
 
-
+router.patch("/mobileapp/update", checkToken, updateEmpMobileApp);//Mobile app token insert Master Table
 module.exports = router;

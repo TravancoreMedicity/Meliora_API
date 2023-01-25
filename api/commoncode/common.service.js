@@ -411,4 +411,32 @@ where module_slno = ?`,
 
     },
 
+    updateEmpMobileApp: (data, callBack) => {
+        pool.query(
+            `update co_employee_master
+            set mobile_app_registred=?,
+            app_token=?,
+            mob_reg_date=?,
+            token_valid=?,
+            mobile_ip=?,
+            mob_app_required=?
+            where em_id=?`,
+            [
+                data.mobile_app_registred,
+                data.app_token,
+                data.mob_reg_date,
+                data.token_valid,
+                data.mobile_ip,
+                data.mob_app_required,
+                data.em_id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
 }

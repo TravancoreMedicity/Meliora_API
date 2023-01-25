@@ -103,23 +103,22 @@ module.exports = {
             }
         );
     },
-
     updateassignDetail: (data, callBack) => {
-        pool.query(
-            `update cm_complaint_detail
-            set assign_rect_status=1
-            where assigned_emp=? and complaint_slno=?`,
-            [
-                data.assigned_emp,
-                data.complaint_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
+        return new Promise((resolve, reject) => {
+            data.map((val) => {
+                pool.query(
+                    `update cm_complaint_detail
+                   set assign_rect_status=1
+                   where assigned_emp=? and complaint_slno=?`,
+                    [val.assigned_emp, val.complaint_slno],
+                    (error, results, fields) => {
+                        if (error) {
+                            return reject(error)
+                        }
+                        return resolve(results);
+                    }
+                )
+            })
+        })
     },
-
 }

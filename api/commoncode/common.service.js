@@ -438,5 +438,22 @@ where module_slno = ?`,
             }
         );
     },
+    updatemobapprequired: (data, callBack) => {
+        pool.query(
+            `update co_employee_master
+            set mob_app_required=?
+            where em_id=?`,
+            [
+                data.mob_app_required,
+                data.em_id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 
 }

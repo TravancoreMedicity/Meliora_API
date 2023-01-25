@@ -11,6 +11,4 @@ router.patch('/update/verify', checkToken, UpdateVerify)
 router.get('/getAssignEmps/:id', checkToken, getAssignEmps)
 
 
-
-
 module.exports = router;

@@ -455,5 +455,23 @@ where module_slno = ?`,
             }
         );
     },
+    getMobileAppStatusCredential: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                mobile_app_registred,
+                mob_app_required
+            FROM co_employee_master 
+            WHERE em_id = ?`,
+            [
+                data.em_id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 
 }

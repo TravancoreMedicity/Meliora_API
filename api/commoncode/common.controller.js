@@ -4,7 +4,7 @@ const { getEmployeeID, getMenuBasedRights, getSubModuleRights, getModuleMasterBy
     getModuleGroup, getUserModuleRights, getempId, inpatientList, getBranch, getDesignation, getSalutation,
     getSerialno, getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
     getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor, getSerialnoEmpDetl, updateEmpMobileApp,
-    updatemobapprequired
+    updatemobapprequired, getMobileAppStatusCredential
 } = require('../commoncode/common.service');
 module.exports = {
     getEmployeeID: (req, res) => {
@@ -639,6 +639,29 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 message: "Update Employee master Successfully"
+            });
+        });
+    },
+    getMobileAppStatusCredential: (req, res) => {
+        const body = req.body
+        getMobileAppStatusCredential(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Credential Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Yes ! Found "
             });
         });
     },

@@ -1,7 +1,7 @@
 const { validateComplaintRegist } = require('../../validation/validation_schema');
 const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign, getcomplaintAssignbyEmployee, quickAssigncompstatus,
     detailedAssigncompstatus, getassistantEmployee, insertAssistemp, getALLcomplaintbyEmployee, getIndividualassitemployee,
-    AssistantRecieved, checkInsertVal, TransferDept } = require('../complaint_assign/complaintAssign.service');
+    AssistantRecieved, checkInsertVal, TransferDept, assignedListNotRectifiedOnly, rectifiedListForVErify } = require('../complaint_assign/complaintAssign.service');
 const logger = require('../../logger/logger');
 
 module.exports = {
@@ -270,6 +270,52 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 message: "Complaint Transfer Successfully"
+            });
+        });
+    },
+    assignedListNotRectifiedOnly: (req, res) => {
+        const id = req.params.id
+        assignedListNotRectifiedOnly(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    rectifiedListForVErify: (req, res) => {
+        const id = req.params.id
+        rectifiedListForVErify(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
             });
         });
     },

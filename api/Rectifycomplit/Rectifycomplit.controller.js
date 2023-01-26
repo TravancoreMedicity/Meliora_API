@@ -30,7 +30,7 @@ module.exports = {
         const body = req.body;
         Updatecomplit(body[0], (err, results) => {
             if (err) {
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: err
                 });
@@ -43,7 +43,7 @@ module.exports = {
                         message: "Rectified Sucessfully"
                     });
                 }).catch((e) => {
-                    return res.status(400).json({
+                    return res.status(200).json({
                         success: 1,
                         message: e.sqlMessage
                     });

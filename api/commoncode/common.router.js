@@ -38,5 +38,5 @@ router.get("/getEmpSlno", checkToken, getSerialnoEmpDetl);
 
 router.patch("/mobileapp/update", checkToken, updateEmpMobileApp);//Mobile app token insert Master Table
 router.patch("/mobapprequired/update", checkToken, updatemobapprequired)
-router.get("/mobileapp/status", checkToken, getMobileAppStatusCredential)
+router.get("/mobileapp/status/:id", checkToken, getMobileAppStatusCredential)
 module.exports = router;

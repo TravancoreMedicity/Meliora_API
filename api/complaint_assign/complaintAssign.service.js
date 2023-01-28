@@ -153,7 +153,7 @@ module.exports = {
                  left join co_employee_master R on R.em_id=cm_complaint_mast.create_user
                 left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
                   left join co_department_mast RD on RD.dept_id=R.em_department                  
-                 where assigned_emp=? AND assist_flag =0 ORDER BY complaint_slno DESC`,
+                 where assigned_emp=? AND assist_flag =0 and compalint_status!=3 ORDER BY complaint_slno DESC`,
             [
                 id
             ],

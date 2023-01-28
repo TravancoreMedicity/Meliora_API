@@ -89,6 +89,7 @@ const highantibiotic = require('./api/HighAntiBioticMaster/HighAntiBiotic.router
 const WeEmpMapping = require('./api/WeEmpMapping/WeEmpMapping.router')
 const dietDashboard = require('./api/diet_dashboard/diet_dashboard.router')
 const requestRegister = require('./api/crm_request_register/requestRegister.router')
+const hallBookingRouter = require('./api/hall_booking/hallBooking.router');
 
 
 app.use(express.json());
@@ -163,6 +164,7 @@ app.use('/api/highBioticMast', highantibiotic)
 app.use('/api/weEmpMap', WeEmpMapping)
 app.use('/api/dietDashboard', dietDashboard)
 app.use('/api/requestRegister', requestRegister)
+app.use('/api/hallBooking', hallBookingRouter)
 
 app.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

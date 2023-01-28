@@ -141,7 +141,7 @@ module.exports = {
               date(assigned_date) as date,TIME_FORMAT(assigned_date,"%r") AS Time,
               if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
                  if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
-                 compalint_status,cm_verfy_time,cm_not_verify_time
+                 compalint_status,cm_verfy_time,cm_not_verify_time,cm_rectify_time,pending_onhold_user,pending_hold_time
                   from meliora.cm_complaint_detail
                   left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
                   left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno

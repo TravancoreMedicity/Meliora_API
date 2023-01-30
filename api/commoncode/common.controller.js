@@ -3,7 +3,6 @@ const logger = require('../../logger/logger')
 const { getEmployeeID, getMenuBasedRights, getSubModuleRights, getModuleMasterByID, getSelectMenu, getEmpName,
     getModuleGroup, getUserModuleRights, getempId, inpatientList, getBranch, getDesignation, getSalutation,
     getSerialno, getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
-
     getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor, getSerialnoEmpDetl
     , getInchargehod, updateEmpMobileApp,
     updatemobapprequired, getMobileAppStatusCredential } = require('../commoncode/common.service');

@@ -5,7 +5,7 @@ const { getItemmaster, dietmenusettingInsert, dietmenudtlSelect, updatedietmenus
 
 router.get("/item/:id", checkToken, getItemmaster)
 router.get("/item/rate/:id", checkToken, getItemRate)
-router.get("/item/extra", checkToken, getItemmasterExtra)
+router.get("/itemExtraOder", checkToken, getItemmasterExtra)
 router.get("/", checkToken, dietmenudtlSelect)
 router.post("/detailInsert", checkToken, dietmenusettingInsert)
 router.patch("/update", checkToken, updatedietmenusettingdtl)

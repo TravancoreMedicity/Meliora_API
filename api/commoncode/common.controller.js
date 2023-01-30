@@ -3,9 +3,10 @@ const logger = require('../../logger/logger')
 const { getEmployeeID, getMenuBasedRights, getSubModuleRights, getModuleMasterByID, getSelectMenu, getEmpName,
     getModuleGroup, getUserModuleRights, getempId, inpatientList, getBranch, getDesignation, getSalutation,
     getSerialno, getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
-    getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor, getSerialnoEmpDetl, updateEmpMobileApp,
-    updatemobapprequired, getMobileAppStatusCredential
-} = require('../commoncode/common.service');
+    getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor, getSerialnoEmpDetl
+    , getInchargehod, updateEmpMobileApp,
+    updatemobapprequired, getMobileAppStatusCredential } = require('../commoncode/common.service');
+
 module.exports = {
     getEmployeeID: (req, res) => {
         const id = req.params.id;
@@ -596,6 +597,27 @@ module.exports = {
         });
     },
 
+
+    getInchargehod: (req, res) => {
+        const id = req.params.id;
+        getInchargehod(id, (err, results) => {
+            if (err) {
+                // logger.logwindow(err)
+                return res.status(400).json({
+                    success: 10,
+                    message: err
+                });
+            }
+            if (results.length == 0) {
+                // logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No data"
+                })
+            }
+        })
+    },
+
     updateEmpMobileApp: (req, res) => {
         const body = req.body
         updateEmpMobileApp(body, (err, results) => {
@@ -663,6 +685,7 @@ module.exports = {
                 success: 1,
                 message: "Yes ! Found ",
                 data: results[0]
+
             });
         });
     },

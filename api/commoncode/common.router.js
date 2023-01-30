@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { getEmployeeID, getMenuBasedRights, getModuleGroupByID, getSubModuleRights, getSelectMenu, getEmpName,
     getModuleGroup, getModuleRights, getempId, inpatientList, getBranch, getDesignation, getSalutation,
-    getSerialnumber, getSerialnoEmpDetl, updateEmpMobileApp,
+    getSerialnumber, getSerialnoEmpDetl, getInchargehod, updateEmpMobileApp,
     getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
     getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor,
     updatemobapprequired, getMobileAppStatusCredential } = require('../commoncode/common.controller');
@@ -30,11 +30,11 @@ router.get("/dMenu/:id", checkToken, getDietMenu)
 router.get("/getLoginProfile/:id", checkToken, getLoginProfile)
 router.get("/dashrights/:id", checkToken, getDashboardRights) //Dashboard Rights
 
-
 router.get("/emp/deptsec/:id", checkToken, getEmployeedeptSec);
 router.get('/get/floor', checkToken, getfloor)
 router.get('/nursfloor/:id', checkToken, getnurstationbyfloor)
 router.get("/getEmpSlno", checkToken, getSerialnoEmpDetl);
+router.get("/inchargehod/:id", checkToken, getInchargehod)
 
 router.patch("/mobileapp/update", checkToken, updateEmpMobileApp);//Mobile app token insert Master Table
 router.patch("/mobapprequired/update", checkToken, updatemobapprequired)

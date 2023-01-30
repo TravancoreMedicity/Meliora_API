@@ -172,10 +172,8 @@ where module_slno = ?`,
               LEFT JOIN ora_roomcategory on diet_patient.rc_code=ora_roomcategory.rc_code
             left join ora_nurstation on  ora_bed.ns_code = ora_nurstation.ns_code
             left join ora_roomtype on ora_roomtype.rt_code=ora_bed.rt_code
-            left join ora_roommaster on ora_bed.rm_code= ora_roommaster.rm_code        
+            left join ora_roommaster on ora_bed.rm_code= ora_roommaster.rm_code     
             where  ora_nurstation.ns_code  = ? and ipd_status is null order by diet_patient.ip_no DESC`,
-
-
             [
                 id
             ],
@@ -411,6 +409,23 @@ where module_slno = ?`,
 
     },
 
+
+    getInchargehod: (id, callBack) => {
+        hrpool.query(
+            `select 
+            hod,
+            incharge
+             from hrm_emp_master  
+                 where em_no=? `,
+            [id],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
     updateEmpMobileApp: (data, callBack) => {
         pool.query(
             `update co_employee_master
@@ -472,6 +487,7 @@ where module_slno = ?`,
                 return callBack(null, results);
             }
         );
+
     },
 
 }

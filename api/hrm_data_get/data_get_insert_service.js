@@ -178,7 +178,7 @@ module.exports = {
     creategetemployeeuserPass: (data, callBack) => {
         pool.query(
             `INSERT INTO co_employee
-            (emp_slno,
+            (empdtl_slno,
                 emp_email,
                 emp_username,
                 emp_password,

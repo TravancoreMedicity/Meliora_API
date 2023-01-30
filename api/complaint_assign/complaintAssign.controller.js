@@ -251,7 +251,6 @@ module.exports = {
     },
     TransferDept: (req, res) => {
         const body = req.body
-        console.log(body)
         TransferDept(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)

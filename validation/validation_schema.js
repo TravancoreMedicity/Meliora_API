@@ -581,11 +581,21 @@ validatedischargeEvent = Joi.object({
 })
 
 const validateRequestRegister = Joi.object({
-    actual_requirement: Joi.string().required(),
-    needed: Joi.string().required(),
-    request_dept_slno: Joi.number().required(),
-    request_deptsec_slno: Joi.number().required(),
-    location: Joi.string().required(),
+    actual_requirement: Joi.string().required().messages({
+        'string.empty': 'Actual Requirement  is Required'
+    }),
+    needed: Joi.string().required().messages({
+        'string.empty': 'Needed is Required'
+    }),
+    request_dept_slno: Joi.number().required().messages({
+        'string.empty': 'Select Department'
+    }),
+    request_deptsec_slno: Joi.number().required().messages({
+        'string.empty': 'Select Department Section'
+    }),
+    location: Joi.string().required().messages({
+        'string.empty': 'Location  is Required'
+    }),
     create_user: Joi.number().optional(),
     remarks: Joi.string().optional(),
     total_approx_cost: Joi.number().optional(),

@@ -1,10 +1,14 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
-const { requestRegistInsert, requestRegistInsertDetl, getReqByDeptBase, getItemListByReqno,
-    requestRegistUpdate, requestRegistDetlUpdate, getAuthorization } = require('../crm_request_register/requestRegister.controller');
+const { requestRegistInsert, requestRegistInsertDetl, requestApprovalInsert, getReqByDeptBase,
+    getItemListByReqno, requestRegistUpdate, requestRegistDetlUpdate, getAuthorization,
+    getDeptApprovList, getApprovListOthers, updateInchargeApproval, updateHodApproval, updateOMApproval,
+    updateSOMpproval, updateCEOApproval, updateEDApproval
+} = require('../crm_request_register/requestRegister.controller');
 
 router.post("/", checkToken, requestRegistInsert);
 router.post("/postDetails", checkToken, requestRegistInsertDetl);
+router.post("/postReqApproval", checkToken, requestApprovalInsert);
 router.get("/allreqDept/:id", checkToken, getReqByDeptBase);
 router.get("/getItemList/:id", checkToken, getItemListByReqno);
 router.patch("/", checkToken, requestRegistUpdate);
@@ -12,6 +16,14 @@ router.patch("/patchDetails", checkToken, requestRegistDetlUpdate);
 
 router.get("/getAuthorization/:id", checkToken, getAuthorization);
 
+router.get("/getDeptApprovList/:id", checkToken, getDeptApprovList);
+router.get("/getApprovList/others", checkToken, getApprovListOthers);
 
+router.patch("/approval/incharge", checkToken, updateInchargeApproval);
+router.patch("/approval/hod", checkToken, updateHodApproval);
+router.patch("/approval/om", checkToken, updateOMApproval);
+router.patch("/approval/som", checkToken, updateSOMpproval);
+router.patch("/approval/ceo", checkToken, updateCEOApproval);
+router.patch("/approval/ed", checkToken, updateEDApproval);
 
 module.exports = router;

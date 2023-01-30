@@ -2,9 +2,6 @@
 const { getRectifycomplt, Updatecomplit, UpdateVerify, getAssignEmps, updateassignDetail
 } = require('../Rectifycomplit/Rectifycomplit.service')
 const logger = require('../../logger/logger');
-
-
-
 module.exports = {
     getRectifycomplt: (req, res) => {
         const id = req.params.id
@@ -29,27 +26,30 @@ module.exports = {
             });
         });
     },
-
     Updatecomplit: (req, res) => {
         const body = req.body;
-        Updatecomplit(body, (err, results) => {
+        console.log(body)
+        Updatecomplit(body[0], (err, results) => {
             if (err) {
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: err
                 });
             }
-            if (!results) {
-                // logger.infologwindow("Record Not Found")
-                return res.status(400).json({
-                    success: 1,
-                    message: "Record Not Found"
+            const result = updateassignDetail(body)
+                .then((r) => {
+                    return res.status(200).json({
+                        success: 2,
+                        data: r,
+                        message: "Rectified Sucessfully"
+                    });
+                }).catch((e) => {
+                    return res.status(200).json({
+                        success: 1,
+                        message: e.sqlMessage
+                    });
                 })
-            }
-            return res.status(200).json({
-                success: 2,
-                message: "Rectified complaint successfully"
-            })
+
         })
     },
     UpdateVerify: (req, res) => {
@@ -96,28 +96,5 @@ module.exports = {
                 data: results
             });
         });
-    },
-
-    updateassignDetail: (req, res) => {
-        const body = req.body;
-        updateassignDetail(body, (err, results) => {
-            if (err) {
-                return res.status(400).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (!results) {
-                // logger.infologwindow("Record Not Found")
-                return res.status(400).json({
-                    success: 1,
-                    message: "Record Not Found"
-                })
-            }
-            return res.status(200).json({
-                success: 2,
-                message: "Rectified complaint successfully"
-            })
-        })
-    },
+    }
 }

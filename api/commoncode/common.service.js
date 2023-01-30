@@ -173,7 +173,11 @@ where module_slno = ?`,
             left join ora_nurstation on  ora_bed.ns_code = ora_nurstation.ns_code
             left join ora_roomtype on ora_roomtype.rt_code=ora_bed.rt_code
             left join ora_roommaster on ora_bed.rm_code= ora_roommaster.rm_code        
+<<<<<<< HEAD
             where  ora_nurstation.ns_code  = ? and ipd_status is null order by diet_patient.ip_no`,
+=======
+            where  ora_nurstation.ns_code  = ? and ipd_status is null order by diet_patient.ip_no DESC`,
+>>>>>>> 325bcc548083eba822565da46c6e01a15a9b8a80
 
 
             [
@@ -411,6 +415,7 @@ where module_slno = ?`,
 
     },
 
+
     getInchargehod: (id, callBack) => {
         hrpool.query(
             `select 
@@ -423,9 +428,72 @@ where module_slno = ?`,
                 if (error) {
                     return callBack(error);
                 }
-                return callBack(null, results)
+                return callBack(null, results);
             }
         )
+    },
+    updateEmpMobileApp: (data, callBack) => {
+        pool.query(
+            `update co_employee_master
+            set mobile_app_registred=?,
+            app_token=?,
+            mob_reg_date=?,
+            token_valid=?,
+            mobile_ip=?,
+            mob_app_required=?
+            where em_id=?`,
+            [
+                data.mobile_app_registred,
+                data.app_token,
+                data.mob_reg_date,
+                data.token_valid,
+                data.mobile_ip,
+                data.mob_app_required,
+                data.em_id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    updatemobapprequired: (data, callBack) => {
+        pool.query(
+            `update co_employee_master
+            set mob_app_required=?
+            where em_id=?`,
+            [
+                data.mob_app_required,
+                data.em_id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getMobileAppStatusCredential: (id, callBack) => {
+        pool.query(
+            `SELECT 
+                mobile_app_registred,
+                mob_app_required
+            FROM co_employee_master 
+            WHERE em_id = ?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+
     },
 
 }

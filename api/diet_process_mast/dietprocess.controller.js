@@ -1,49 +1,65 @@
 const { dietProcessinsert, getdietprocess, updatedietprocess, getdietmenubyId, updateDietplan,
     getNewlyInserted, insertprocessdetl, getmenubyallprocess, processDetailInsert, getproceedcount,
-    getNewOrderCount } = require('../diet_process_mast/dietprocess.service');
+    getNewOrderCount, checkInsertVal } = require('../diet_process_mast/dietprocess.service');
 const logger = require('../../logger/logger')
 
 module.exports = {
     dietProcessinsert: (req, res) => {
         const body = req.body
-        dietProcessinsert(body, (err, results) => {
-            const id = results.insertId
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (!results) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Results Found"
-                });
-            }
-            // return res.status(200).json({
-            //     success: 1,
-            //     data: results
-            // });
-            updateDietplan(body, (err, results) => {
-                if (err) {
-                    return res.status(200).json({
-                        success: 0,
-                        message: err
+
+        checkInsertVal(body, (err, results) => {
+            const value = JSON.parse(JSON.stringify(results))
+            if (Object.keys(value).length === 0) {
+
+                dietProcessinsert(body, (err, results) => {
+                    const id = results.insertId
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    if (!results) {
+                        return res.status(200).json({
+                            success: 2,
+                            message: "No Results Found"
+                        });
+                    }
+                    // return res.status(200).json({
+                    //     success: 1,
+                    //     data: results
+                    // });
+                    updateDietplan(body, (err, results) => {
+                        if (err) {
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            return res.status(200).json({
+                                success: 2,
+                                message: "No Results Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Plan Process Successfully",
+                            insetid: id
+                        })
                     });
-                }
-                if (!results) {
-                    return res.status(200).json({
-                        success: 2,
-                        message: "No Results Found"
-                    });
-                }
+                });
+
+            }
+            else {
+                logger.infologwindow("Diet Already Proccesed")
                 return res.status(200).json({
-                    success: 1,
-                    message: "Plan Process Successfully",
-                    insetid: id
+                    success: 7,
+                    message: "Diet Already Proccesed"
                 })
-            });
-        });
+            }
+        })
+
     },
     getdietprocess: (req, res) => {
         getdietprocess((err, results) => {

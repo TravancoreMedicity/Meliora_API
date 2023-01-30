@@ -103,7 +103,9 @@ module.exports = {
                     message: err
                 });
             }
-            detailedAssigncompstatus(body[0].complaint_slno, (err, results) => {
+
+
+            detailedAssigncompstatus(body[0], (err, results) => {
                 if (err) {
                     logger.logwindow(err)
                     return res.status(400).json({

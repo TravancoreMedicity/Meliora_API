@@ -4,7 +4,7 @@ const { getEmployeeID, getMenuBasedRights, getSubModuleRights, getModuleMasterBy
     getModuleGroup, getUserModuleRights, getempId, inpatientList, getBranch, getDesignation, getSalutation,
     getSerialno, getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
     getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor, getSerialnoEmpDetl
-} = require('../commoncode/common.service');
+    , getInchargehod } = require('../commoncode/common.service');
 module.exports = {
     getEmployeeID: (req, res) => {
         const id = req.params.id;
@@ -595,5 +595,27 @@ module.exports = {
         });
     },
 
-
+    getInchargehod: (req, res) => {
+        const id = req.params.id;
+        getInchargehod(id, (err, results) => {
+            if (err) {
+                // logger.logwindow(err)
+                return res.status(400).json({
+                    success: 10,
+                    message: err
+                });
+            }
+            if (results.length == 0) {
+                // logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No data"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
 }

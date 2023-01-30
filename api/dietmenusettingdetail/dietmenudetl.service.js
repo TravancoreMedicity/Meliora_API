@@ -115,6 +115,7 @@ module.exports = {
             }
         );
     },
+
     updatedietmenusettingdtl: (data, callBack) => {
 
         pool.query(

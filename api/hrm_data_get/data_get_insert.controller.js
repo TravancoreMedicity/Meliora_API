@@ -168,7 +168,7 @@ module.exports = {
                     })
                 })
                 var a1 = newmeli.map((value, index) => {
-                    return [value.emp_slno, value.emp_email, value.emp_username, value.emp_password,
+                    return [value.empdtl_slno, value.emp_email, value.emp_username, value.emp_password,
                     value.emp_status, value.emp_id, value.emp_no, value.emp_created, value.emp_updated,
                     ]
                 })

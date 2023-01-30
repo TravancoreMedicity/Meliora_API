@@ -41,6 +41,26 @@ module.exports = {
             });
         });
     },
+    getItemmasterExtra: (req, res) => {
+        getItemmasterExtra((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            });
+        });
+    },
     getItemmaster: (req, res) => {
         const id = req.params.id;
         getItemmaster(id, (err, results) => {
@@ -87,28 +107,7 @@ module.exports = {
             });
         });
     },
-    getItemmasterExtra: (req, res) => {
-        getItemmasterExtra((err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 2,
-                    message: err
-                });
-            }
-            if (results.length === 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Results Found"
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                data: results
-            });
-        });
-    },
+
     updatedietmenusettingdtl: (req, res) => {
         const body = req.body
 

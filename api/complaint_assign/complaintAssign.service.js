@@ -164,10 +164,12 @@ module.exports = {
     detailedAssigncompstatus: (data, callBack) => {
         pool.query(
             `UPDATE cm_complaint_mast
-            SET compalint_status=1
+            SET compalint_status=1,
+            complaint_remark=?
             WHERE complaint_slno=?`,
             [
-                data
+                data.complaint_remark,
+                data.complaint_slno
             ],
             (error, results, feilds) => {
                 if (error) {

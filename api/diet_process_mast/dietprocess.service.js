@@ -1,6 +1,25 @@
 const { pool } = require('../../config/database');
 
 module.exports = {
+
+    checkInsertVal: (data, callBack) => {
+        pool.query(
+            `SELECT ip_no,
+            process_date
+            FROM diet_process_mast
+            WHERE process_date = ? and ip_no=?`,
+            [
+                data.process_date,
+                data.ip_no
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
     dietProcessinsert: (data, callBack) => {
         pool.query(
             `insert into meliora.diet_process_mast 
@@ -108,18 +127,15 @@ module.exports = {
             `SELECT diet_rate_list.type_slno , 
             diet_rate_list.hosp_rate,
             diet_rate_list.cant_rate 
-            FROM meliora.diet_plan
-            left join ora_bed on diet_plan.bd_code = ora_bed.bd_code
-            left join ora_roomtype on ora_bed.rt_code = ora_roomtype.rt_code
-            left join ora_roomcategory on ora_roomtype.rc_code = ora_roomcategory.rc_code
-            left join diet_rate_list on ora_roomcategory.rc_code = diet_rate_list.rc_code
-            left join diet_menu_setting_detl on diet_rate_list.type_slno = diet_menu_setting_detl.type_slno
-            where ora_bed.bd_code = ? and diet_menu_setting_detl.dmenu_slno = ? and diet_menu_setting_detl.days = ?
-            group by type_slno`,
+            FROM meliora.diet_plan            
+            left join ora_bed on ora_bed.bd_code =diet_plan.bd_code 
+            left join ora_roomtype on  ora_roomtype.rt_code=ora_bed.rt_code 
+            left join ora_roomcategory on  ora_roomcategory.rc_code=ora_roomtype.rc_code 
+			left join diet_rate_list on  diet_rate_list.rc_code =ora_roomcategory.rc_code 
+            where ora_bed.bd_code = ? and diet_rate_list.diet_slno=?`,
             [
                 data.bd_code,
-                data.dmenu_slno,
-                data.days
+                data.diet_slno
             ],
             (error, results, feilds) => {
                 if (error) {

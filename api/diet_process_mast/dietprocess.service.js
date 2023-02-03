@@ -7,7 +7,7 @@ module.exports = {
             `SELECT ip_no,
             process_date
             FROM diet_process_mast
-            WHERE process_date = ? and ip_no=?`,
+            WHERE date(process_date)= ? and ip_no=?`,
             [
                 data.process_date,
                 data.ip_no

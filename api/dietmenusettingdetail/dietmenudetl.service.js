@@ -75,7 +75,8 @@ module.exports = {
         pool.query(
             `SELECT item_slno,item_name                                
             FROM kot_item_master 
-            WHERE status=1 and grp_slno=? and diet_item=1`,
+            WHERE status=1 and grp_slno=? and diet_item=1
+            order by item_name ASC`,
             [
                 id
             ],
@@ -105,7 +106,7 @@ module.exports = {
     },
     getItemmasterExtra: (callback) => {
         pool.query(
-            `SELECT item_slno,item_name from kot_item_master WHERE status=1 and diet_item=0`,
+            `SELECT item_slno,item_name from kot_item_master WHERE status=1 and diet_item=0 order by item_name ASC`,
             [],
             (error, results, fields) => {
                 if (error) {

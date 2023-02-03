@@ -603,6 +603,7 @@ const validateRequestRegister = Joi.object({
     user_deptsec: Joi.number().optional(),
     req_slno: Joi.number().optional(),
     edit_user: Joi.number().optional(),
+    category: Joi.string().optional(),
 })
 
 

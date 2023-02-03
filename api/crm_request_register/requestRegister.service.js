@@ -12,9 +12,10 @@ module.exports = {
                 remarks,
                 total_approx_cost,
                 expected_date,
-                user_deptsec
+                user_deptsec,
+                category
                )
-                VALUES(?,?,?,?,?,?,?,?,?,?)`,
+                VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.actual_requirement,
                 data.needed,
@@ -25,7 +26,8 @@ module.exports = {
                 data.remarks,
                 data.total_approx_cost,
                 data.expected_date,
-                data.user_deptsec
+                data.user_deptsec,
+                data.category
             ],
             (error, results, fields) => {
 
@@ -105,7 +107,7 @@ module.exports = {
     getReqByDeptBase: (id, callBack) => {
         pool.query(
             `select rm_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
-            request_deptsec_slno,location,remarks,expected_date,rm_ndrf,
+            request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,
             total_approx_cost,user_deptsec,incharge_req,incharge_approve,
             hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,
              (case when incharge_req=1 and incharge_approve is null then  "not updated" when incharge_req=0 then "Not Required" when incharge_approve='1' then "Approved" else "Reject" end ) as approve_incharge ,
@@ -245,10 +247,18 @@ module.exports = {
             request_deptsec_slno,location,remarks,expected_date,rm_ndrf,
             total_approx_cost,user_deptsec,incharge_req,incharge_approve,
             hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,
-             (case when incharge_req=1 and incharge_approve is null then  "not updated" when incharge_req=0 then "Not Required" when incharge_approve='1' then "Approved" else "Reject" end ) as approve_incharge ,
-              (case when incharge_req=1 and  incharge_remarks is null then  "not updated" when incharge_req=0 then "Not Required" else incharge_remarks end) as incharge_remarks ,
-             (case when hod_approve is null then  "not updated"  when hod_approve='1' then "Approved" else "Reject" end ) as approve_hod,
-             (case when hod_remarks is null then  "not updated"  else hod_remarks end) as hod_remarks 
+            (case when incharge_approve is null then  "not updated" when incharge_approve='1' then "Approved" else "Reject" end ) as approve_incharge ,
+            (case when incharge_remarks is null then  "not updated" else incharge_remarks end) as incharge_remarks ,
+           (case when hod_approve is null then  "not updated"  when hod_approve='1' then "Approved" else "Reject" end ) as approve_hod,
+           (case when hod_remarks is null then  "not updated"  else hod_remarks end) as hod_remarks,manag_operation_approv, senior_manage_approv,cao_approve,ed_approve,
+            (case when manag_operation_approv is null then  "not updated" when manag_operation_approv='1' then "Approved" else "Reject" end ) as manag_operation_approvs ,
+            (case when  manag_operation_remarks is null then  "not updated" else manag_operation_remarks end) as manag_operation_remarks ,
+             (case when senior_manage_approv is null then  "not updated" when senior_manage_approv='1' then "Approved" else "Reject" end ) as senior_manage_approvs ,
+            (case when  senior_manage_remarks is null then  "not updated" else senior_manage_remarks end) as senior_manage_remarks ,
+            (case when cao_approve is null then  "not updated" when cao_approve='1' then "Approved" else "Reject" end ) as cao_approves ,
+            (case when  cao_approve_remarks is null then  "not updated" else cao_approve_remarks end) as cao_approve_remarks ,
+             (case when ed_approve is null then  "not updated" when ed_approve='1' then "Approved" else "Reject" end ) as ed_approves ,
+            (case when  ed_approve_remarks is null then  "not updated" else ed_approve_remarks end) as ed_approve_remarks 
             from rm_request_master
             left join rm_request_approval on rm_request_approval.req_slno=rm_request_master.req_slno
             where user_deptsec=?`,
@@ -266,11 +276,11 @@ module.exports = {
     getApprovListOthers: (callback) => {
         pool.query(
             ` select rm_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
-            request_deptsec_slno,location,remarks,expected_date,rm_ndrf,
+            request_deptsec_slno,location,remarks,expected_date,rm_ndrf,ed_approve_req,
             total_approx_cost,user_deptsec,incharge_req,incharge_approve,
             hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,
-             (case when incharge_req=1 and incharge_approve is null then  "not updated" when incharge_req=0 then "Not Required" when incharge_approve='1' then "Approved" else "Reject" end ) as approve_incharge ,
-              (case when incharge_req=1 and  incharge_remarks is null then  "not updated" when incharge_req=0 then "Not Required" else incharge_remarks end) as incharge_remarks ,
+             (case when incharge_approve is null then  "not updated" when incharge_approve='1' then "Approved" else "Reject" end ) as approve_incharge ,
+              (case when incharge_remarks is null then  "not updated" else incharge_remarks end) as incharge_remarks ,
              (case when hod_approve is null then  "not updated"  when hod_approve='1' then "Approved" else "Reject" end ) as approve_hod,
              (case when hod_remarks is null then  "not updated"  else hod_remarks end) as hod_remarks,manag_operation_approv, senior_manage_approv,cao_approve,ed_approve,
               (case when manag_operation_approv is null then  "not updated" when manag_operation_approv='1' then "Approved" else "Reject" end ) as manag_operation_approvs ,
@@ -283,7 +293,7 @@ module.exports = {
               (case when  ed_approve_remarks is null then  "not updated" else ed_approve_remarks end) as ed_approve_remarks 
             from rm_request_master
             left join rm_request_approval on rm_request_approval.req_slno=rm_request_master.req_slno
-            where hod_approve=1 and hod_req=1`,
+            where hod_approve=1`,
             [],
             (error, results, fields) => {
                 if (error) {
@@ -390,12 +400,14 @@ module.exports = {
             `UPDATE rm_request_approval 
             SET cao_approve = ?,
             cao_approve_remarks = ?,
-            cao_approv_date = ?                              
+            cao_approv_date = ?,
+            ed_approve_req=?                            
             WHERE req_approv_slno =?`,
             [
                 data.cao_approve,
                 data.cao_approve_remarks,
                 data.cao_approv_date,
+                data.ed_approve_req,
                 data.req_approv_slno
 
             ],

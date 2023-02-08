@@ -128,7 +128,7 @@ module.exports = {
         pool.query(
             `select co_ora_nurse,
             co_nurse_desc 
-        from co_nursestation`,
+        from co_nursestation order by co_nurse_desc ASC`,
             [],
             (error, results, feilds) => {
                 if (error) {

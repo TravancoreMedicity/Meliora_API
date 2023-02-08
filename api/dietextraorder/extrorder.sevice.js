@@ -85,13 +85,12 @@ module.exports = {
         )
     },
     getDietType: (data, callBack) => {
-
         pool.query(
             ` select diet_type.type_slno,type_desc
             FROM diet_process_detl
             LEFT JOIN diet_process_mast ON diet_process_mast.proc_slno=diet_process_detl.proc_slno
            LEFT JOIN diet_type ON diet_type.type_slno=diet_process_detl.type_slno
-            WHERE diet_process_detl.proc_slno=? AND DATE(diet_process_mast.process_date)=?`,
+            WHERE diet_process_detl.proc_slno=? AND DATE(diet_process_mast.process_date)=? group by type_slno`,
             [
                 data.proc_slno,
                 data.process_date

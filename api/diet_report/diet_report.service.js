@@ -4,7 +4,7 @@ module.exports = {
         pool.query(
             `select diet_process_mast.ip_no,diet_process_mast.pt_no,diet_process_mast.diet_slno ,
             diet_master.diet_name, diet_patient.ptc_ptname,diet_process_mast.proc_slno,process_date,
-            ora_roommaster.rmc_desc,
+            ora_roommaster.rmc_desc,ora_nurstation.nsc_desc,
             date(diet_patient.ipd_date) as ipd_date,plan_remark,ROW_NUMBER() OVER () as slno
             from diet_process_mast
             left join ora_patient on diet_process_mast.pt_no = ora_patient.pt_no
@@ -12,7 +12,8 @@ module.exports = {
              left join ora_bed on diet_process_mast.bd_code =ora_bed.bd_code
               left join ora_roommaster on ora_bed.rm_code= ora_roommaster.rm_code    
               left join diet_patient on diet_patient.ip_no=diet_process_mast.ip_no
-              left join diet_plan on diet_plan.ip_no=diet_process_mast.ip_no        
+              left join diet_plan on diet_plan.ip_no=diet_process_mast.ip_no  
+              left join ora_nurstation on ora_nurstation.ns_code=ora_bed.ns_code       
            where diet_process_mast.diet_slno IN (?)  and date(process_date)=?`,
             [
                 data.diet_slno,
@@ -29,7 +30,8 @@ module.exports = {
     getNurStatnReport: (data, callBack) => {
         pool.query(
             `select diet_process_mast.ip_no,diet_process_mast.pt_no,diet_process_mast.diet_slno ,
-            diet_master.diet_name, diet_patient.ptc_ptname,diet_process_mast.proc_slno,process_date,ora_roommaster.rmc_desc,
+            diet_master.diet_name, diet_patient.ptc_ptname,diet_process_mast.proc_slno,process_date,
+            ora_roommaster.rmc_desc,ora_nurstation.nsc_desc,
             date(diet_patient.ipd_date) as ipd_date,plan_remark,ROW_NUMBER() OVER () as slno
             from diet_process_mast
             left join ora_patient on diet_process_mast.pt_no = ora_patient.pt_no
@@ -37,7 +39,8 @@ module.exports = {
              left join ora_bed on diet_process_mast.bd_code =ora_bed.bd_code
               left join ora_roommaster on ora_bed.rm_code= ora_roommaster.rm_code    
               left join diet_patient on diet_patient.ip_no=diet_process_mast.ip_no
-              left join diet_plan on diet_plan.ip_no=diet_process_mast.ip_no    
+              left join diet_plan on diet_plan.ip_no=diet_process_mast.ip_no   
+              left join ora_nurstation on ora_nurstation.ns_code=ora_bed.ns_code    
              where ora_bed.ns_code IN (?)  and date(process_date)=?`,
             [
                 data.ns_code,

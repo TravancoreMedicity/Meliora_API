@@ -587,10 +587,10 @@ const validateRequestRegister = Joi.object({
     needed: Joi.string().required().messages({
         'string.empty': 'Needed is Required'
     }),
-    request_dept_slno: Joi.number().required().messages({
+    request_dept_slno: Joi.number().min(1).required().messages({
         'string.empty': 'Select Department'
     }),
-    request_deptsec_slno: Joi.number().required().messages({
+    request_deptsec_slno: Joi.number().min(1).required().messages({
         'string.empty': 'Select Department Section'
     }),
     location: Joi.string().required().messages({

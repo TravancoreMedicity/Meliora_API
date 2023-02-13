@@ -62,37 +62,24 @@ module.exports = {
         )
     },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     getdietplan: (callBack) => {
         pool.query(
             ` SELECT 
             plan_slno,
-            dietpt_slno,
+            diet_patient.dietpt_slno,
             diet_plan.pt_no,
-            ptc_ptname,
+            diet_patient.ptc_ptname,
             diet_name,
             bdc_no,
             diet_master.diet_slno,
             plan_date,
             plan_remark,
             if(discharge = 'N','No','yes') as discharge
-             FROM meliora.diet_plan
-             left join ora_patient on diet_plan.pt_no = ora_patient.pt_no
+             FROM meliora.diet_plan             
              left join diet_master on diet_plan.diet_slno=diet_master.diet_slno
-             left join ora_bed on diet_plan.bd_code = ora_bed.bd_code WHERE plan_status=0`,
+             left join ora_bed on diet_plan.bd_code = ora_bed.bd_code 
+             left join diet_patient on diet_patient.dietpt_slno=diet_plan.dietpt_slno
+             WHERE plan_status=0`,
             [],
             function (err, results) {
 
@@ -145,9 +132,9 @@ module.exports = {
             plan_date,
             discharge
             from diet_plan
-            left join ora_patient on diet_plan.pt_no = ora_patient.pt_no
             left join diet_master on diet_plan.diet_slno = diet_master.diet_slno
             left join ora_bed on  diet_plan.bd_code = ora_bed.bd_code
+            left join diet_patient on diet_patient.dietpt_slno=diet_plan.dietpt_slno
             where plan_slno not in (select plan_slno
             from diet_process_mast
             where date(process_date)=curdate() and diet_plan.diet_slno=diet_process_mast.diet_slno)
@@ -165,23 +152,23 @@ module.exports = {
     getdietplanProcess: (callBack) => {
         pool.query(
             `select 
-                proc_slno,
-                dmenu_slno,
-                diet_process_mast.plan_slno,
-                diet_master.diet_name,
-                diet_process_mast.pt_no,
-                ptc_ptname,
-                bdc_no,
-                diet_process_mast.bd_code,
-                DATE(diet_process_mast.process_date) AS plan_date,
-                plan_remark
-                from diet_process_mast 
-                left join ora_patient on diet_process_mast.pt_no = ora_patient.pt_no
-                left join diet_master on diet_process_mast.diet_slno=diet_master.diet_slno
-                left join diet_plan on diet_process_mast.plan_slno= diet_plan.plan_slno
-                left join ora_bed on diet_process_mast.bd_code = ora_bed.bd_code
-                where process_status=1 and discharge_status=1 and  DATE(diet_process_mast.process_date)=curdate()
-                group by pt_no`,
+            proc_slno,
+            dmenu_slno,
+            diet_process_mast.plan_slno,
+            diet_master.diet_name,
+            diet_process_mast.pt_no,
+            ptc_ptname,
+            bdc_no,
+            diet_process_mast.bd_code,
+            DATE(diet_process_mast.process_date) AS plan_date,
+            plan_remark
+            from diet_process_mast 
+            left join diet_master on diet_process_mast.diet_slno=diet_master.diet_slno
+            left join diet_plan on diet_process_mast.plan_slno= diet_plan.plan_slno
+            left join diet_patient on diet_patient.dietpt_slno=diet_plan.dietpt_slno
+            left join ora_bed on diet_process_mast.bd_code = ora_bed.bd_code
+            where process_status=1 and discharge_status=1 and  DATE(diet_process_mast.process_date)=curdate()
+            group by pt_no`,
             [],
             function (err, results) {
 
@@ -217,8 +204,8 @@ module.exports = {
     },
     getDietPlanList: (callBack) => {
         pool.query(
-            `  SELECT plan_slno,dietpt_slno,
-            ora_patient.pt_no,
+            `SELECT plan_slno,diet_patient.dietpt_slno,
+            diet_patient.pt_no,
             ptc_ptname,
             ora_bed.bd_code,
 			bdc_no,
@@ -227,8 +214,8 @@ module.exports = {
             diet_name,
             case when plan_status = 1 then 'approved' else 'approval pending'  end "plan status"
              FROM meliora.diet_plan
-            left join ora_patient on diet_plan.pt_no = ora_patient.pt_no
-            left join diet_master on diet_plan.diet_slno = diet_master.diet_slno
+             left join diet_master on diet_plan.diet_slno = diet_master.diet_slno
+              left join diet_patient on diet_patient.dietpt_slno=diet_plan.dietpt_slno
             left join ora_bed on  diet_plan.bd_code=ora_bed.bd_code`,
             [],
             function (err, results) {
@@ -255,9 +242,9 @@ module.exports = {
             plan_date,
             discharge
             from diet_plan
-            left join ora_patient on diet_plan.pt_no = ora_patient.pt_no
             left join diet_master on diet_plan.diet_slno = diet_master.diet_slno
             left join ora_bed on  diet_plan.bd_code = ora_bed.bd_code
+            left join diet_patient on diet_patient.dietpt_slno=diet_plan.dietpt_slno
             where plan_slno not in (select plan_slno
             from diet_process_mast
             where date(process_date)=? )
@@ -289,9 +276,9 @@ module.exports = {
             plan_date,
             discharge
             from diet_plan
-            left join ora_patient on diet_plan.pt_no = ora_patient.pt_no
             left join diet_master on diet_plan.diet_slno = diet_master.diet_slno
             left join ora_bed on  diet_plan.bd_code = ora_bed.bd_code
+            left join diet_patient on diet_patient.dietpt_slno=diet_plan.dietpt_slno
             where plan_slno not in (select plan_slno
             from diet_process_mast
             where date(process_date)=? )
@@ -324,9 +311,9 @@ module.exports = {
             plan_date,
             discharge
             from diet_plan
-            left join ora_patient on diet_plan.pt_no = ora_patient.pt_no
             left join diet_master on diet_plan.diet_slno = diet_master.diet_slno
             left join ora_bed on  diet_plan.bd_code = ora_bed.bd_code
+            left join diet_patient on diet_patient.dietpt_slno=diet_plan.dietpt_slno
             where plan_slno not in (select plan_slno
             from diet_process_mast
             where date(process_date)=?)
@@ -417,7 +404,7 @@ module.exports = {
           left join ora_roomtype on ora_roomtype.rt_code=ora_bed.rt_code
           left join ora_roommaster on ora_bed.rm_code= ora_roommaster.rm_code    
           left join diet_master on diet_plan.diet_slno=diet_master.diet_slno 
-          where  ora_nurstation.ns_code  = ?;`,
+          where  ora_nurstation.ns_code  = ?`,
             [
                 id
             ],

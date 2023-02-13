@@ -56,7 +56,7 @@ module.exports = {
             left join ora_roommaster on ora_roommaster.rm_code=room_master.rm_code            
             left join ora_bed on ora_bed.rm_code=room_master.rm_code
             left join diet_plan on diet_plan.bd_code=ora_bed.bd_code
-            where ora_roommaster.ns_code=? and diet_plan.diet_slno=?`,
+            where ora_roommaster.ns_code=? and diet_plan.diet_slno=? and diet_plan.discharge='N'`,
             [
                 data.ns_code,
                 data.diet_slno
@@ -75,7 +75,7 @@ module.exports = {
             left join ora_roommaster on ora_roommaster.rm_code=room_master.rm_code            
             left join ora_bed on ora_bed.rm_code=room_master.rm_code
             left join diet_plan on diet_plan.bd_code=ora_bed.bd_code
-            where ora_roommaster.ns_code=? `,
+            where ora_roommaster.ns_code=? and diet_plan.discharge='N'`,
             [
                 data.ns_code
 
@@ -95,7 +95,7 @@ module.exports = {
             left join ora_roommaster on ora_roommaster.rm_code=room_master.rm_code            
             left join ora_bed on ora_bed.rm_code=room_master.rm_code
             left join diet_plan on diet_plan.bd_code=ora_bed.bd_code
-            where  diet_plan.diet_slno=?`,
+            where  diet_plan.diet_slno=? and diet_plan.discharge='N'`,
             [
                 data.diet_slno
             ],

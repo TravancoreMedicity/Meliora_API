@@ -11,7 +11,7 @@ module.exports = {
         //validate diet master insertion function
         const body_result = validateRequestRegister.validate(body);
         if (body_result.error) {
-            logger.warnlogwindow(body_result.error.details[0].message)
+            //  logger.warnlogwindow(body_result.error.details[0].message)
             return res.status(200).json({
                 success: 2,
                 message: body_result.error.details[0].message
@@ -24,6 +24,7 @@ module.exports = {
                     message: err
                 });
             }
+
             return res.status(200).json({
                 success: 1,
                 message: "Request Registred Successfully",

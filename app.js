@@ -90,6 +90,7 @@ const WeEmpMapping = require('./api/WeEmpMapping/WeEmpMapping.router')
 const dietDashboard = require('./api/diet_dashboard/diet_dashboard.router')
 const requestRegister = require('./api/crm_request_register/requestRegister.router')
 const hallBookingRouter = require('./api/hall_booking/hallBooking.router');
+const hallmaster = require('./api/HallMaster/Hallmaster.router')
 const ndrfgRouter = require('./api/ndrf_request/ndrfrequest.router')
 
 app.use(express.json());
@@ -165,6 +166,7 @@ app.use('/api/weEmpMap', WeEmpMapping)
 app.use('/api/dietDashboard', dietDashboard)
 app.use('/api/requestRegister', requestRegister)
 app.use('/api/hallBooking', hallBookingRouter)
+app.use('/api/hallmaster', hallmaster)
 app.use('/api/ndrf', ndrfgRouter)
 
 app.listen(process.env.APP_PORT, () =>

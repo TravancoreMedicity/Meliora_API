@@ -111,13 +111,15 @@ module.exports = {
         (            h_booking_slno,
             is_incharge_req,
             is_hod_req,
+            is_ceo_req,
             is_ceo_approved        
         )
-        values(?,?,?,?)`,
+        values(?,?,?,?,?)`,
             [
                 data.h_booking_slno,
                 data.is_incharge_req,
                 data.is_hod_req,
+                data.is_ceo_req,
                 data.is_ceo_approved
             ],
             (error, results, fields) => {
@@ -131,7 +133,7 @@ module.exports = {
     getHallBookingApproval: (callBack) => {
         pool.query(
             `select h_approval_slno,h_book_slno,h_book_attendees,h_booking_reason,h_book_event,is_hod_req,is_incharge_req,h_book_startdatetime,h_book_enddatetime,
-            case when is_icharge_approve = 1 then 'yes'  when is_icharge_approve = 0 then 'no' else 'not require' end as is_icharge_approves, 
+            case when is_icharge_approve = 1 then 'yes'  when is_icharge_approve = 0 then 'no' else 'not updated' end as is_icharge_approves, 
             hall_name,
             case when h_incharge_remark = '' then 'not updated' else h_incharge_remark end as h_incharge_remark,
             incharge_approved_date,h_booking_slno,
@@ -158,12 +160,14 @@ module.exports = {
             set 
             is_ceo_approved=?,
             ceo_remark =?,
-            ceo_approved_date =?
+            ceo_approved_date =?,
+            ceo_user =?
             where h_approval_slno=?`,
             [
                 data.is_ceo_approved,
                 data.ceo_remark,
                 data.ceo_approved_date,
+                data.ceo_user,
                 data.h_approval_slno
             ],
             (error, results, fields) => {

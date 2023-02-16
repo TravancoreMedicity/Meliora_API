@@ -4,8 +4,6 @@ const { updateNdrfConvert, InsertNdrf, getNdrfList, checkInsertVal, updateEDAppr
 module.exports = {
     InsertNdrf: (req, res) => {
         const body = req.body;
-        console.log(body);
-
         checkInsertVal(body, (err, results) => {
             const value = JSON.parse(JSON.stringify(results))
             if (Object.keys(value).length === 0) {
@@ -97,7 +95,6 @@ module.exports = {
     ndrfApprovalInsert: (req, res) => {
         const body = req.body;
         ndrfApprovalInsert(body, (err, results) => {
-            console.log(results);
             if (err) {
                 return res.status(200).json({
                     success: 0,

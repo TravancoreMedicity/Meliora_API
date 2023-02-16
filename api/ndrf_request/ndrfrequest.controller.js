@@ -1,4 +1,5 @@
-const { updateNdrfConvert, InsertNdrf, getNdrfList, checkInsertVal } = require('../ndrf_request/ndrfrequest.service')
+const { updateNdrfConvert, InsertNdrf, getNdrfList, checkInsertVal, updateEDApproval, ndrfApprovalInsert
+} = require('../ndrf_request/ndrfrequest.service')
 
 module.exports = {
     InsertNdrf: (req, res) => {
@@ -30,10 +31,11 @@ module.exports = {
                                 message: "Record Not Found"
                             })
                         }
-                        return res.status(200).json({
-                            success: 1,
-                            message: "NDRF Created Successfully"
-                        });
+                    });
+                    return res.status(200).json({
+                        success: 1,
+                        message: "NDRF Created Successfully",
+                        insetid: results.insertId
                     });
                 });
 
@@ -68,5 +70,44 @@ module.exports = {
             });
         });
     },
+    updateEDApproval: (req, res) => {
+        const body = req.body;
 
+        updateEDApproval(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Approved Successfully"
+            });
+        });
+    },
+    ndrfApprovalInsert: (req, res) => {
+        const body = req.body;
+        ndrfApprovalInsert(body, (err, results) => {
+            console.log(results);
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Request Registred Successfully",
+            });
+        });
+    },
 }

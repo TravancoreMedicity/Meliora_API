@@ -75,12 +75,14 @@ module.exports = {
                 senior_manage_req,
                 cao_approve_req,
                 ed_approve_req,
+                incharge_user,
+                hod_user,
                 incharge_approve,
                 hod_approve,
                 incharge_apprv_date,
                 hod_approve_date         
                )
-                VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.req_slno,
                 data.incharge_req,
@@ -89,6 +91,8 @@ module.exports = {
                 data.senior_manage_req,
                 data.cao_approve_req,
                 data.ed_approve_req,
+                data.incharge_user,
+                data.hod_user,
                 data.incharge_approve,
                 data.hod_approve,
                 data.incharge_apprv_date,
@@ -244,9 +248,9 @@ module.exports = {
     getDeptApprovList: (id, callBack) => {
         pool.query(
             `select rm_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
-            request_deptsec_slno,location,remarks,expected_date,rm_ndrf,
-            total_approx_cost,user_deptsec,incharge_req,incharge_approve,
-            hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,
+            request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,sec_name,
+            total_approx_cost,user_deptsec,incharge_req,incharge_approve,incharge_apprv_date,
+            hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,I.em_name as inch_user,
             (case when incharge_approve is null then  "not updated" when incharge_approve='1' then "Approved" else "Reject" end ) as approve_incharge ,
             (case when incharge_remarks is null then  "not updated" else incharge_remarks end) as incharge_remarks ,
            (case when hod_approve is null then  "not updated"  when hod_approve='1' then "Approved" else "Reject" end ) as approve_hod,
@@ -261,6 +265,8 @@ module.exports = {
             (case when  ed_approve_remarks is null then  "not updated" else ed_approve_remarks end) as ed_approve_remarks 
             from rm_request_master
             left join rm_request_approval on rm_request_approval.req_slno=rm_request_master.req_slno
+            left join co_employee_master I on I.em_id=rm_request_approval.incharge_user
+            left join co_deptsec_mast on co_deptsec_mast.sec_id=rm_request_master.request_deptsec_slno
             where user_deptsec=?`,
             [
                 id
@@ -276,7 +282,7 @@ module.exports = {
     getApprovListOthers: (callback) => {
         pool.query(
             `select rm_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
-            request_deptsec_slno,location,remarks,expected_date,rm_ndrf,ed_approve_req,
+            request_deptsec_slno,location,remarks,expected_date,rm_ndrf,ed_approve_req,sec_name,
             total_approx_cost,user_deptsec,incharge_req,incharge_approve,category,
             incharge_apprv_date,hod_approve_date,om_approv_date,som_aprrov_date,
             cao_approv_date,ed_approve_date,I.em_name as inch_user,H.em_name as hod_user,
@@ -301,6 +307,7 @@ module.exports = {
                   left join co_employee_master O on O.em_id=rm_request_approval.manag_operation_user  
                   left join co_employee_master S on S.em_id=rm_request_approval.senior_manage_user
                     left join co_employee_master C on C.em_id=rm_request_approval.senior_manage_user
+                    left join co_deptsec_mast on co_deptsec_mast.sec_id=rm_request_master.request_deptsec_slno
             where hod_approve=1`,
             [],
             (error, results, fields) => {

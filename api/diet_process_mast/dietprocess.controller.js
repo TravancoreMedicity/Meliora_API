@@ -120,7 +120,7 @@ module.exports = {
                 // logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 2,
-                    messagee: "No menus in selected day under planed diet"
+                    messagee: "Rate List Not Added So Diet can't Proocess"
                 });
             }
             return res.status(200).json({

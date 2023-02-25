@@ -9,7 +9,7 @@ module.exports = {
             diet_process_mast.diet_slno ,
             diet_process_mast.pt_no,
             diet_type.type_desc,
-            ora_patient.ptc_ptname,
+            diet_patient.ptc_ptname,
                         diet_process_detl.prod_slno,
                         diet_process_detl.type_slno
                         FROM diet_process_mast
@@ -17,7 +17,7 @@ module.exports = {
                         LEFT JOIN diet_process_detl ON diet_process_detl.proc_slno=diet_process_mast.proc_slno
                         LEFT JOIN diet_master ON diet_master.diet_slno=diet_process_mast.diet_slno
                         LEFT JOIN diet_type ON diet_type.type_slno=diet_process_detl.type_slno
-                        LEFT JOIN ora_patient ON ora_patient.pt_no=diet_process_mast.pt_no
+                        LEFT JOIN diet_patient ON diet_patient.pt_no=diet_process_mast.pt_no
              WHERE  rm_code=? and  date(diet_process_mast.process_date)=current_date() and supply_stat = 0`,
             [id],
             (error, results, feilds) => {

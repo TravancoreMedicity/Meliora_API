@@ -1,4 +1,5 @@
-const { updateNdrfConvert, InsertNdrf, getNdrfList, checkInsertVal, updateEDApproval, ndrfApprovalInsert
+const { updateNdrfConvert, InsertNdrf, getNdrfList, checkInsertVal, updateEDApproval, ndrfApprovalInsert,
+    updateOMApproval, updateSMOApproval, updateCAOApproval
 } = require('../ndrf_request/ndrfrequest.service')
 
 module.exports = {
@@ -68,6 +69,95 @@ module.exports = {
             });
         });
     },
+
+    ndrfApprovalInsert: (req, res) => {
+        const body = req.body;
+        ndrfApprovalInsert(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Request Registred Successfully",
+            });
+        });
+    },
+    updateOMApproval: (req, res) => {
+        const body = req.body;
+
+        updateOMApproval(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Approved Successfully"
+            });
+        });
+    },
+
+    updateSMOApproval: (req, res) => {
+        const body = req.body;
+
+        updateSMOApproval(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Approved Successfully"
+            });
+        });
+    },
+    updateCAOApproval: (req, res) => {
+        const body = req.body;
+
+        updateCAOApproval(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Approved Successfully"
+            });
+        });
+    },
     updateEDApproval: (req, res) => {
         const body = req.body;
 
@@ -89,21 +179,6 @@ module.exports = {
             return res.status(200).json({
                 success: 2,
                 message: "Approved Successfully"
-            });
-        });
-    },
-    ndrfApprovalInsert: (req, res) => {
-        const body = req.body;
-        ndrfApprovalInsert(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "Request Registred Successfully",
             });
         });
     },

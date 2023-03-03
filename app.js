@@ -92,6 +92,8 @@ const requestRegister = require('./api/crm_request_register/requestRegister.rout
 const hallBookingRouter = require('./api/hall_booking/hallBooking.router');
 const hallmaster = require('./api/HallMaster/Hallmaster.router')
 const ndrfgRouter = require('./api/ndrf_request/ndrfrequest.router')
+const fileUpload = require('./api/fileupload/fileupload.router')
+
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -168,6 +170,10 @@ app.use('/api/requestRegister', requestRegister)
 app.use('/api/hallBooking', hallBookingRouter)
 app.use('/api/hallmaster', hallmaster)
 app.use('/api/ndrf', ndrfgRouter)
+app.use('/api/fileupload', fileUpload)
+
+
+
 
 app.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

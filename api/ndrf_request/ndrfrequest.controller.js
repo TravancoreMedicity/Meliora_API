@@ -1,5 +1,5 @@
 const { updateNdrfConvert, InsertNdrf, getNdrfList, checkInsertVal, updateEDApproval, ndrfApprovalInsert,
-    updateOMApproval, updateSMOApproval, updateCAOApproval
+    updateOMApproval, updateSMOApproval, updateCAOApproval, getNdrfPdf
 } = require('../ndrf_request/ndrfrequest.service')
 
 module.exports = {
@@ -179,6 +179,28 @@ module.exports = {
             return res.status(200).json({
                 success: 2,
                 message: "Approved Successfully"
+            });
+        });
+    },
+
+    getNdrfPdf: (req, res) => {
+        getNdrfPdf((err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
             });
         });
     },

@@ -406,9 +406,7 @@ where module_slno = ?`,
                 return callBack(null, results);
             }
         )
-
     },
-
 
     getInchargehod: (id, callBack) => {
         hrpool.query(
@@ -417,6 +415,20 @@ where module_slno = ?`,
             incharge
              from hrm_emp_master  
                  where em_no=? `,
+            [id],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getdeptSecInchhod: (id, callBack) => {
+        hrpool.query(
+            `select auth_post,emp_id from hrm_authorization_assign
+            where dept_section=? `,
             [id],
             (error, results, feilds) => {
                 if (error) {

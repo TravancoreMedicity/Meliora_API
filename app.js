@@ -2,9 +2,26 @@
 require("dotenv").config();
 
 const express = require("express");
-const app = express();
+const cors = require('cors')
 const logger = require('./logger/logger');
+const http = require("http");
+const socketUtils = require('./socketio/socketUltil')
+
+const app = express();
 const fs = require('fs');
+
+//sockect io configuration
+app.use(cors());
+
+const server = http.createServer(app);
+const io = socketUtils.WSIO(server)
+socketUtils.connection(io);
+
+const socketIOMiddlewre = (req, res, next) => {
+    req.io = io;
+    next();
+}
+
 
 // ----- logger display For Info ----
 app.get('/info', (req, res) => {
@@ -129,7 +146,7 @@ app.use("/api/hicpolicy", hicpolicyRouter)
 app.use("/api/assettype", assettypeRouter)
 app.use("/api/requesttype", requesttypeRouter)
 app.use("/api/common", commonRouter)
-app.use("/api/complaintreg", complaintregRouter)
+app.use("/api/complaintreg", socketIOMiddlewre, complaintregRouter)
 app.use("/api/building", buildingRouter)
 app.use("/api/roomtype", roomtypeRouter)
 app.use("/api/roomcreation", roomcreationRouter)
@@ -175,7 +192,7 @@ app.use('/api/fileupload', fileUpload)
 
 
 
-app.listen(process.env.APP_PORT, () =>
+server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),
     logger.productionLogger.log('info', `Server Up and Running ${process.env.APP_PORT}`, { meta1: 'meta1' })
 );

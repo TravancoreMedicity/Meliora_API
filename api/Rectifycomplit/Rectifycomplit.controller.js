@@ -28,7 +28,6 @@ module.exports = {
     },
     Updatecomplit: (req, res) => {
         const body = req.body;
-        console.log(body)
         Updatecomplit(body[0], (err, results) => {
             if (err) {
                 return res.status(200).json({

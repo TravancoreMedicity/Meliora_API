@@ -72,8 +72,7 @@ module.exports = {
 
     getcomplaintRegistByID: (data, callBack) => {
         pool.query(
-            `
-            SELECT 
+            `SELECT 
             complaint_slno,
             complaint_desc,
             cm_dept_sec,

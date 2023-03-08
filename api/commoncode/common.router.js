@@ -5,7 +5,8 @@ const { getEmployeeID, getMenuBasedRights, getModuleGroupByID, getSubModuleRight
     getSerialnumber, getSerialnoEmpDetl, getInchargehod, updateEmpMobileApp,
     getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
     getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor,
-    updatemobapprequired, getMobileAppStatusCredential } = require('../commoncode/common.controller');
+    updatemobapprequired, getMobileAppStatusCredential, getdeptSecInchhod
+} = require('../commoncode/common.controller');
 
 router.get("/getempid/:id", checkToken, getEmployeeID)
 router.get("/getMenu/:id", checkToken, getMenuBasedRights)
@@ -34,8 +35,8 @@ router.get("/emp/deptsec/:id", checkToken, getEmployeedeptSec);
 router.get('/get/floor', checkToken, getfloor)
 router.get('/nursfloor/:id', checkToken, getnurstationbyfloor)
 router.get("/getEmpSlno", checkToken, getSerialnoEmpDetl);
-router.get("/inchargehod/:id", checkToken, getInchargehod)
-
+router.get("/inchargehod/:id", checkToken, getInchargehod)//Login user Incharge or Hod
+router.get("/deptSec/InchHod/:id", checkToken, getdeptSecInchhod)//Login user Dept Sec have incharge or Hod
 router.patch("/mobileapp/update", checkToken, updateEmpMobileApp);//Mobile app token insert Master Table
 router.patch("/mobapprequired/update", checkToken, updatemobapprequired)
 router.get("/mobileapp/status/:id", checkToken, getMobileAppStatusCredential)

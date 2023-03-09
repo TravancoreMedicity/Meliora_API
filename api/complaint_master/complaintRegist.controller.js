@@ -34,55 +34,74 @@ module.exports = {
             // body.priority
 
             if (results) {
-                let messages = [];
 
-                let somePushTokens = ['ExponentPushToken[NgerQTHl58UcvOhwGMLRxM]', 'ExponentPushToken[LXFpCTJXs6oEPMFg0S0m0Q]'];
-
-                for (let pushToken of somePushTokens) {
-
-                    if (!Expo.isExpoPushToken(pushToken)) {
-                        console.error(`Push token ${pushToken} is not a valid Expo push token`);
-                        continue;
+                getapptokenbydept(body.complaint_deptslno, (err, result) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        })
                     }
+                    const data = JSON.parse(JSON.stringify(result));
+                    if (data.length > 0) {
 
-                    messages.push({
-                        to: pushToken,
-                        title: `Ticket :${results.insertId} / Location: ${body.locationName} `,
-                        subtitle: `New Ticket Registerd`,
-                        body: `Priority : ${body.priority} | ${body.complaint_desc}`,
-                        data: { withSome: body.complaint_desc },
-                        color: '#d5fc5c'
-                    })
-                }
+                        let emppushTokens = data?.map(val => val.app_token)
 
-                let chunks = expo.chunkPushNotifications(messages);
+                        // let somePushTokens = ['ExponentPushToken[9JbCJvDTrQ1DggVszGG6zk]'];
 
-                let tickets = [];
-                (async () => {
-                    // Send the chunks to the Expo push notification service. There are
-                    // different strategies you could use. A simple one is to send one chunk at a
-                    // time, which nicely spreads the load out over time:
-                    for (let chunk of chunks) {
-                        try {
-                            let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-                            console.log(ticketChunk);
-                            tickets.push(...ticketChunk);
-                            // NOTE: If a ticket contains an error code in ticket.details.error, you
-                            // must handle it appropriately. The error codes are listed in the Expo
-                            // documentation:
-                            // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
-                        } catch (error) {
-                            console.error(error);
+                        if (Object.keys(emppushTokens).length > 0) {
+
+                            let messages = [];
+                            for (let pushToken of emppushTokens) {
+
+                                if (!Expo.isExpoPushToken(pushToken)) {
+                                    console.error(`Push token ${pushToken} is not a valid Expo push token`);
+                                    continue;
+                                }
+
+                                messages.push({
+                                    to: pushToken,
+                                    title: `Ticket :${results.insertId} / Location: ${body.locationName} `,
+                                    subtitle: `New Ticket Registerd`,
+                                    body: `Priority : ${body.priority} | ${body.complaint_desc}`,
+                                    data: { withSome: body.complaint_desc },
+                                    color: '#d5fc5c'
+                                })
+                            }
+
+                            let chunks = expo.chunkPushNotifications(messages);
+
+                            let tickets = [];
+                            (async () => {
+                                // Send the chunks to the Expo push notification service. There are
+                                // different strategies you could use. A simple one is to send one chunk at a
+                                // time, which nicely spreads the load out over time:
+                                for (let chunk of chunks) {
+                                    try {
+                                        let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+                                        console.log(ticketChunk);
+                                        tickets.push(...ticketChunk);
+                                        // NOTE: If a ticket contains an error code in ticket.details.error, you
+                                        // must handle it appropriately. The error codes are listed in the Expo
+                                        // documentation:
+                                        // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
+                                    } catch (error) {
+                                        console.error(error);
+                                    }
+                                }
+                            })()
                         }
+
                     }
-                })()
+                })
 
                 // let pushTicket = expo.sendPushNotificationsAsync()
 
                 return res.status(200).json({
                     success: 1,
                     message: "Complaint  Inserted Successfully",
-                    // insetid: results.insertId
+
                 });
             }
 

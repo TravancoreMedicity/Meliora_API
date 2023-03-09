@@ -375,7 +375,9 @@ const validateComplaintRegist = Joi.object({
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
     complaint_remark: Joi.number().optional(),
-    cm_location: Joi.number().optional()
+    cm_location: Joi.number().optional(),
+    locationName: Joi.string().optional(),
+    priority: Joi.string().optional(),
 })
 
 

@@ -28,6 +28,7 @@ module.exports = {
     },
     Updatecomplit: (req, res) => {
         const body = req.body;
+        req.io.emit("message", `New Complaint Registed ! Please Check`)
         Updatecomplit(body[0], (err, results) => {
             if (err) {
                 return res.status(200).json({
@@ -53,6 +54,7 @@ module.exports = {
     },
     UpdateVerify: (req, res) => {
         const body = req.body;
+        req.io.emit("message", `New Complaint Registed ! Please Check`)
         UpdateVerify(body, (err, results) => {
             if (err) {
                 return res.status(400).json({
@@ -71,7 +73,10 @@ module.exports = {
                 success: 2,
                 message: "Verified complaint successfully"
             })
+
         })
+
+
     },
     getAssignEmps: (req, res) => {
         const id = req.params.id

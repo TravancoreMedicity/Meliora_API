@@ -221,5 +221,23 @@ module.exports = {
             }
         );
     },
+    getapptokenbydept: (id, callBack) => {
+        pool.query(
+            `select 
+                em_no,em_id,app_token
+            from co_employee_master
+            where em_department=(select department_slno from cm_complaint_dept
+            where complaint_dept_slno=?) and co_employee_master.app_token is not null`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
 
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 }

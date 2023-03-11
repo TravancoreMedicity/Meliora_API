@@ -41,7 +41,6 @@ module.exports = {
 
     },
     insertpatientsurv: (data, callback) => {
-        console.log(data);
         pool.query(
             `insert into we_patient_surv_log 
             (
@@ -623,7 +622,8 @@ module.exports = {
             left join ora_bed on wework_patient.bd_code = ora_bed.bd_code
             left join ora_nurstation on ora_bed.ns_code = ora_nurstation.ns_code
             left join ora_roomcategory on wework_patient.rc_code = ora_roomcategory.rc_code
-            left join ora_doctor on wework_patient.do_code = ora_doctor.do_code`,
+            left join ora_doctor on wework_patient.do_code = ora_doctor.do_code
+            where ipd_status is null`,
             [],
             (error, results, fields) => {
                 if (error) {
@@ -1198,4 +1198,5 @@ module.exports = {
 
         )
     }
+
 }

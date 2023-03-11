@@ -3,7 +3,8 @@ const { pool } = require('../../config/database');
 module.exports = {
     totaladmissioncount: (callBack) => {
         pool.query(
-            `select count(ip_no) as total_admission from wework_patient`,
+            `select count(ip_no) as total_admission from wework_patient
+            where ipd_status is null`,
             [],
             (error, results, feilds) => {
                 if (error) {

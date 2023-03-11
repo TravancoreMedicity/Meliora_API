@@ -108,6 +108,7 @@ module.exports = {
     getfloorbyEmp: (req, res) => {
         const id = req.params.id
         getfloorbyEmp(id, (err, results) => {
+
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({

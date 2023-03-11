@@ -30,7 +30,7 @@ module.exports = {
     },
     quickAssign: (req, res) => {
         const body = req.body;
-
+        req.io.emit("message", `New Complaint Registed ! Please Check`)
         checkInsertVal(body, (err, results) => {
             const value = JSON.parse(JSON.stringify(results));
             if (Object.keys(value).length === 0) {
@@ -89,6 +89,8 @@ module.exports = {
         });
     },
     detailedAssign: (req, res) => {
+
+        req.io.emit("message", `New Complaint Registed ! Please Check`)
         const body = req.body;
         var newList = body.map((val, index) => {
             return [val.complaint_slno, val.assigned_emp, val.assigned_date, val.assign_rect_status, val.assigned_user]
@@ -155,6 +157,7 @@ module.exports = {
         });
     },
     getassistantEmployee: (req, res) => {
+        req.io.emit("message", `New Complaint Registed ! Please Check`)
         const body = req.body
         getassistantEmployee(body, (err, results) => {
             if (err) {
@@ -178,6 +181,7 @@ module.exports = {
         });
     },
     insertAssistemp: (req, res) => {
+        req.io.emit("message", `New Complaint Registed ! Please Check`)
         const body = req.body
         checkInsertVal(body, (err, results) => {
             const value = JSON.parse(JSON.stringify(results));
@@ -265,6 +269,7 @@ module.exports = {
         });
     },
     AssistantRecieved: (req, res) => {
+        res.io.emit("message", `New Complaint Registed ! Please Check`)
         const body = req.body
         AssistantRecieved(body, (err, results) => {
             if (err) {
@@ -281,6 +286,8 @@ module.exports = {
         });
     },
     TransferDept: (req, res) => {
+
+        req.io.emit("message", `New Complaint Registed ! Please Check`)
         const body = req.body
         TransferDept(body, (err, results) => {
             if (err) {

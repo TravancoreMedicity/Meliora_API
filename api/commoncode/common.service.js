@@ -414,7 +414,7 @@ where module_slno = ?`,
             hod,
             incharge
              from hrm_emp_master  
-                 where em_no=? `,
+                 where em_id=? `,
             [id],
             (error, results, feilds) => {
                 if (error) {

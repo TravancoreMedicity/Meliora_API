@@ -114,8 +114,11 @@ module.exports = {
     },
     getRequestTypeStatus: (callBack) => {
         pool.query(
-            `  SELECT req_type_slno,
-            req_type_name FROM co_request_type where  req_type_status=1`,
+            `SELECT 
+                req_type_slno,
+                req_type_name 
+            FROM co_request_type 
+            where  req_type_status=1`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -125,18 +128,6 @@ module.exports = {
             }
         );
     },
-
-
-
-
-
-
-
-
-
-
-
-
 
     deleteRequestType: (data, callBack) => {
         pool.query(

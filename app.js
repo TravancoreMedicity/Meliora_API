@@ -110,6 +110,7 @@ const hallBookingRouter = require('./api/hall_booking/hallBooking.router');
 const hallmaster = require('./api/HallMaster/Hallmaster.router')
 const ndrfgRouter = require('./api/ndrf_request/ndrfrequest.router')
 const fileUpload = require('./api/fileupload/fileupload.router')
+const HicComplaint = require('./api/complaint_hic/complaintHic.router')
 
 
 app.use(express.json());
@@ -188,6 +189,7 @@ app.use('/api/hallBooking', hallBookingRouter)
 app.use('/api/hallmaster', hallmaster)
 app.use('/api/ndrf', ndrfgRouter)
 app.use('/api/fileupload', fileUpload)
+app.use('/api/Hic', HicComplaint)
 
 
 

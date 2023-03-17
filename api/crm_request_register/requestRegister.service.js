@@ -112,7 +112,7 @@ module.exports = {
         pool.query(
             `select rm_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
             request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,
-            total_approx_cost,user_deptsec,incharge_req,incharge_approve,
+            total_approx_cost,user_deptsec,incharge_req,incharge_approve,req_status,
             hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,
              (case when incharge_req=1 and incharge_approve is null then  "not updated" when incharge_req=0 then "Not Required" when incharge_approve='1' then "Approved" else "Reject" end ) as approve_incharge ,
               (case when incharge_req=1 and  incharge_remarks is null then  "not updated" when incharge_req=0 then "Not Required" else incharge_remarks end) as incharge_remarks ,

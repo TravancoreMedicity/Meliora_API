@@ -111,7 +111,8 @@ const hallmaster = require('./api/HallMaster/Hallmaster.router')
 const ndrfgRouter = require('./api/ndrf_request/ndrfrequest.router')
 const fileUpload = require('./api/fileupload/fileupload.router')
 const HicComplaint = require('./api/complaint_hic/complaintHic.router')
-
+const omtableMast = require('./api/om_table_mast/omTableMast.router')
+const omEmpMapping = require('./api/om_emp_mapping/omEmpMap.router')
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -190,6 +191,8 @@ app.use('/api/hallmaster', hallmaster)
 app.use('/api/ndrf', ndrfgRouter)
 app.use('/api/fileupload', fileUpload)
 app.use('/api/Hic', HicComplaint)
+app.use('/api/omtableMast', omtableMast)
+app.use('/api/omempmapping', omEmpMapping)
 
 
 

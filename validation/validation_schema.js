@@ -622,6 +622,29 @@ const validateRequestRegisterDetl = Joi.object({
 
 })
 
+const validateOmTableMast = Joi.object({
+    omtable_name: Joi.string().required(),
+    om_dept_slno: Joi.number().required(),
+    om_dept_sec_slno: Joi.number().required(),
+    omtable_emp_id: Joi.number().required(),
+    omtable_status: Joi.number().required(),
+    omtable_no: Joi.number().optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+
+})
+
+const validateOmEmpmapping = Joi.object({
+    om_table_slno: Joi.number().required(),
+    om_emp_deptno: Joi.number().required(),
+    om_emp_deptsec_no: Joi.number().required(),
+    om_emp_id: Joi.number().required(),
+    om_emp_status: Joi.number().required(),
+    om_emp_slno: Joi.number().optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+
+})
 
 module.exports = {
     validateEmployee,
@@ -662,6 +685,8 @@ module.exports = {
     validateBedTransfer,
     validatedischargeEvent,
     validateRequestRegister,
-    validateRequestRegisterDetl
+    validateRequestRegisterDetl,
+    validateOmTableMast,
+    validateOmEmpmapping
 
 }

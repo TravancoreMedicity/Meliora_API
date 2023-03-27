@@ -89,7 +89,6 @@ module.exports = {
 
 
     omEmpUpdate: (data, callback) => {
-        console.log(data);
         pool.query(
             `UPDATE om_emp_mapping 
                 SET om_table_slno = ?,

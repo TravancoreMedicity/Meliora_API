@@ -72,8 +72,9 @@ module.exports = {
             `select rm_request_master.req_slno,ndrf_date,rm_request_master.actual_requirement,
             rm_request_master.needed,rm_request_master.location,ed_approve_req,
             rm_request_master.request_dept_slno,rm_request_master.request_deptsec_slno ,
-            co_department_mast.dept_name as req_dept,total_approx_cost,
-            co_deptsec_mast.sec_name as req_deptsec,rm_request_master.remarks,category,
+            co_department_mast.dept_name as req_dept,total_approx_cost,incharge_req,incharge_approve,
+            co_deptsec_mast.sec_name as req_deptsec,rm_request_master.remarks,category,inch_detial_analysis,
+            hod_detial_analysis,om_detial_analysis,smo_detial_analysis,ceo_detial_analysis,ed_detial_analysis,
             rm_request_master.create_date as reqdate,rm_request_master.expected_date as expdate,
             incharge_apprv_date,hod_approve_date,om_approv_date,som_aprrov_date,ed_approve_date,
             cao_approv_date,ed_approve_date,I.em_name as inch_user,H.em_name as hoduser,
@@ -93,8 +94,9 @@ module.exports = {
               (case when cao_approve is null then  "not updated" when cao_approve='1' then "Approved" else "Reject" end ) as cao_approves ,
               (case when  cao_approve_remarks is null then  "not updated" else cao_approve_remarks end) as cao_approve_remarks ,
                (case when ed_approve is null then  "not updated" when ed_approve='1' then "Approved" else "Reject" end ) as ed_approves ,
-              (case when  ed_approve_remarks is null then  "not updated" else ed_approve_remarks end) as ed_approve_remarks 
-               from rm_ndrf_mast                       
+              (case when  ed_approve_remarks is null then  "not updated" else ed_approve_remarks end) as ed_approve_remarks, 
+               NO.em_name as ndrf_om,  NS.em_name as ndrf_smo, NC.em_name as ndrf_cao, NE.em_name as ndrf_ed
+              from rm_ndrf_mast                       
                left join co_department_mast on co_department_mast.dept_id= rm_ndrf_mast.request_dept_slno 
                left join co_deptsec_mast on co_deptsec_mast.sec_id= rm_ndrf_mast.request_deptsec_slno       
                left join rm_request_master on rm_request_master.req_slno=rm_ndrf_mast.req_slno
@@ -104,10 +106,14 @@ module.exports = {
                 left join co_employee_master H on H.em_id=rm_request_approval.hod_user
                   left join co_employee_master O on O.em_id=rm_request_approval.manag_operation_user  
                   left join co_employee_master S on S.em_id=rm_request_approval.senior_manage_user
-                    left join co_employee_master C on C.em_id=rm_request_approval.senior_manage_user
+                    left join co_employee_master C on C.em_id=rm_request_approval.cao_user
                     left join co_employee_master R on R.em_id=rm_request_master.create_user
                     left join co_employee_master E on E.em_id=rm_request_approval.ed_user
                     left join co_employee_master N on N.em_id=rm_ndrf_mast.create_user
+                    left join co_employee_master NO on NO.em_id=rm_ndrf_approval.ndrf_om_user  
+                    left join co_employee_master NS on NS.em_id=rm_ndrf_approval.ndrf_smo_user 
+                    left join co_employee_master NC on NC.em_id=rm_ndrf_approval.ndrf_cao_user 
+                    left join co_employee_master NE on NE.em_id=rm_ndrf_approval.ndrf_ed_user 
                `,
             [],
             (error, results, fields) => {
@@ -232,12 +238,12 @@ module.exports = {
 
     getNdrfPdf: (callback) => {
         pool.query(
-            `select rm_ndrf_mast.ndrf_mast_slno,rm_request_master.req_slno,ndrf_date,rm_request_master.actual_requirement,
-            rm_request_master.needed,rm_request_master.location,category,
-            rm_ndrf_mast.request_dept_slno,rm_ndrf_mast.request_deptsec_slno, co_department_mast.dept_name as req_dept,
-            co_deptsec_mast.sec_name as req_deptsec,incharge_approve,incharge_remarks,incharge_apprv_date,incharge_user,
-            hod_approve,hod_remarks,hod_approve_date,hod_user,expected_date,rm_request_master.remarks,
-            rm_request_master.create_date as reqdate,
+            `select rm_ndrf_mast.ndrf_mast_slno,rm_request_master.req_slno,ndrf_date,
+            rm_request_master.actual_requirement,rm_request_master.needed,rm_request_master.location,
+            category,rm_ndrf_mast.request_dept_slno,rm_ndrf_mast.request_deptsec_slno,
+             co_department_mast.dept_name as req_dept,co_deptsec_mast.sec_name as req_deptsec,
+             incharge_approve,incharge_remarks,incharge_apprv_date,incharge_user,hod_approve,hod_remarks,
+             hod_approve_date,hod_user,expected_date,rm_request_master.remarks,rm_request_master.create_date as reqdate,
             ndrf_approv_slno, ndrf_om_approv, ndrf_om_remarks, ndrfom_approv_date,
              ndrf_om_user, ndrf_smo_approv, ndrf_smo_remarks, ndrf_som_aprrov_date, ndrf_smo_user,
              ndrf_cao_approve, ndrf_cao_approve_remarks, ndrf_cao_approv_date, ndrf_cao_user, ndrf_ed_approve,

@@ -501,5 +501,17 @@ where module_slno = ?`,
         );
 
     },
-
+    manualEmpList: (callBack) => {
+        pool.query(
+            `select manual_view_slno, emp_id_inch
+            from manual_view_list`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results)
+            }
+        )
+    },
 }

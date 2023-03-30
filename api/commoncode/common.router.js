@@ -5,7 +5,7 @@ const { getEmployeeID, getMenuBasedRights, getModuleGroupByID, getSubModuleRight
     getSerialnumber, getSerialnoEmpDetl, getInchargehod, updateEmpMobileApp,
     getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
     getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor,
-    updatemobapprequired, getMobileAppStatusCredential, getdeptSecInchhod
+    updatemobapprequired, getMobileAppStatusCredential, getdeptSecInchhod, manualEmpList
 } = require('../commoncode/common.controller');
 
 router.get("/getempid/:id", checkToken, getEmployeeID)
@@ -40,4 +40,5 @@ router.get("/deptSec/InchHod/:id", checkToken, getdeptSecInchhod)//Login user De
 router.patch("/mobileapp/update", checkToken, updateEmpMobileApp);//Mobile app token insert Master Table
 router.patch("/mobapprequired/update", checkToken, updatemobapprequired)
 router.get("/mobileapp/status/:id", checkToken, getMobileAppStatusCredential)
+router.get('/manualEmpList', checkToken, manualEmpList)
 module.exports = router;

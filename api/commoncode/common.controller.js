@@ -4,7 +4,7 @@ const { getEmployeeID, getMenuBasedRights, getSubModuleRights, getModuleMasterBy
     getModuleGroup, getUserModuleRights, getempId, inpatientList, getBranch, getDesignation, getSalutation,
     getSerialno, getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
     getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor, getSerialnoEmpDetl
-    , getInchargehod, updateEmpMobileApp, getdeptSecInchhod,
+    , getInchargehod, updateEmpMobileApp, getdeptSecInchhod, manualEmpList,
     updatemobapprequired, getMobileAppStatusCredential } = require('../commoncode/common.service');
 
 module.exports = {
@@ -713,6 +713,28 @@ module.exports = {
                 message: "Yes ! Found ",
                 data: results[0]
 
+            });
+        });
+    },
+    manualEmpList: (req, res) => {
+        manualEmpList((err, results) => {
+            if (err) {
+                // logger.logwindow(err)
+                return res.status(400).json({
+                    success: 10,
+                    message: err
+                });
+            }
+            if (!results) {
+                // logger.infologwindow("No Results Found")
+                return res.status(400).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
             });
         });
     },

@@ -49,7 +49,7 @@ module.exports = {
                             for (let pushToken of emppushTokens) {
 
                                 if (!Expo.isExpoPushToken(pushToken)) {
-                                    console.error(`Push token ${pushToken} is not a valid Expo push token`);
+                                    // console.error(`Push token ${pushToken} is not a valid Expo push token`);
                                     continue;
                                 }
 
@@ -73,14 +73,14 @@ module.exports = {
                                 for (let chunk of chunks) {
                                     try {
                                         let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-                                        console.log(ticketChunk);
+
                                         tickets.push(...ticketChunk);
                                         // NOTE: If a ticket contains an error code in ticket.details.error, you
                                         // must handle it appropriately. The error codes are listed in the Expo
                                         // documentation:
                                         // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
                                     } catch (error) {
-                                        console.error(error);
+                                        // console.error(error);
                                     }
                                 }
                             })()

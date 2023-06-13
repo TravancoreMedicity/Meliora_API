@@ -113,6 +113,8 @@ const fileUpload = require('./api/fileupload/fileupload.router')
 const HicComplaint = require('./api/complaint_hic/complaintHic.router')
 const omtableMast = require('./api/om_table_mast/omTableMast.router')
 const omEmpMapping = require('./api/om_emp_mapping/omEmpMap.router')
+const comEmpMapping = require('./api/com_emp_mapping/com_emp_mapping.router')
+const compriority = require('./api/cm_prority_mst/cm_priority.router')
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -193,7 +195,8 @@ app.use('/api/fileupload', fileUpload)
 app.use('/api/Hic', HicComplaint)
 app.use('/api/omtableMast', omtableMast)
 app.use('/api/omempmapping', omEmpMapping)
-
+app.use('/api/comempmapping', comEmpMapping)
+app.use('/api/compriority', compriority)
 
 
 

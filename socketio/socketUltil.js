@@ -12,14 +12,14 @@ exports.WSIO = server => {
 
 exports.connection = io => {
     io.on("connection", socket => {
-        console.log(`A user is connected ${socket.id}`);
+        // console.log(`A user is connected ${socket.id}`);
 
         socket.on("message", (message) => {
-            console.log(`message from ${socket.id} : ${message}`)
+            // console.log(`message from ${socket.id} : ${message}`)
         })
 
         socket.on("disconnect", () => {
-            console.log(`message from ${socket.id} disconnected`)
+            // console.log(`message from ${socket.id} disconnected`)
         })
 
     })

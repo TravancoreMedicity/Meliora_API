@@ -161,7 +161,7 @@ module.exports = {
                  left join co_employee_master R on R.em_id=cm_complaint_mast.create_user
                 left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
                   left join co_department_mast RD on RD.dept_id=R.em_department                  
-                 where assigned_emp=? AND assist_flag =0 and compalint_status!=3 ORDER BY complaint_slno DESC`,
+                 where assigned_emp=? AND assist_flag =0 and compalint_status!=3 and assign_status=1 ORDER BY complaint_slno DESC`,
             [
                 id
             ],
@@ -269,7 +269,7 @@ module.exports = {
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
             where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
-                      where department_slno=?) and assist_receive=1 or assign_status=1 or compalint_status=0
+                      where department_slno=?) and (assign_status=1 or compalint_status=0)
                       ORDER BY complaint_slno DESC`,
             [
                 id
@@ -330,7 +330,8 @@ module.exports = {
         pool.query(
             `UPDATE cm_complaint_detail
             SET assigned_date=?,
-            assist_receive=?
+            assist_receive=?,
+            assign_status=1
             WHERE complaint_slno=? AND assigned_emp=? `,
             [
                 data.assigned_date,
@@ -511,23 +512,6 @@ module.exports = {
         );
     },
 
-    TransferEmployee: (data, callBack) => {
-        pool.query(
-            `UPDATE cm_complaint_mast
-            SET complaint_deptslno=?
-            WHERE complaint_slno=? `,
-            [
-                data.complaint_deptslno,
-                data.complaint_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
 
     EmployeeInactive: (data, callBack) => {
         pool.query(
@@ -569,7 +553,7 @@ module.exports = {
             }
         );
     },
-    updatePunchMastDuty: (body) => {
+    empTransInactive: (body) => {
         return Promise.all(body.map((data) => {
             return new Promise((resolve, reject) => {
                 pool.query(

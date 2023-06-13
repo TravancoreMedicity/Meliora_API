@@ -95,7 +95,7 @@ module.exports = {
                 em_name 
             from cm_complaint_detail
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
-            where complaint_slno=?`,
+            where complaint_slno=? and assign_status=1`,
             [
                 id
             ],

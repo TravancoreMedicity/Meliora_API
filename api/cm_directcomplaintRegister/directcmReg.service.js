@@ -7,25 +7,27 @@ module.exports = {
                 complaint_typeslno,
                 complaint_request_slno,
                 complaint_deptslno,
-                compalint_priority,
+                priority_check,
                 compalint_status,
                 complaint_hicslno,
                 complaint_dept_secslno,
                 cm_location,
-                create_user
+                create_user,
+                priority_reason
                )
-                VALUES(?,?,?,?,?,?,?,?,?,?)`,
+                VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.complaint_desc,
                 data.complaint_typeslno,
                 data.complaint_request_slno,
                 data.complaint_deptslno,
-                data.compalint_priority,
+                data.priority_check,
                 data.compalint_status,
                 data.complaint_hicslno,
                 data.complaint_dept_secslno,
                 data.cm_location,
-                data.create_user
+                data.create_user,
+                data.priority_reason
             ],
             (error, results, fields) => {
                 if (error) {
@@ -52,8 +54,8 @@ module.exports = {
             cm_complaint_mast.create_user,
             S.sec_name as sec_name, 
             IFNULL( L.sec_name,"Nil" ) location,
-            compalint_status,
-            hic_policy_status,
+            compalint_status,priority_check,
+            hic_policy_status,priority_reason,
             cm_rectify_status,
             rectify_pending_hold_remarks,
             (case when rectify_pending_hold_remarks is null then "not updated" else rectify_pending_hold_remarks end ) as rectify_pending_hold_remarks1,
@@ -92,10 +94,11 @@ module.exports = {
                 complaint_request_slno = ?,
                 complaint_deptslno = ?,
                 complaint_typeslno = ?,
-                compalint_priority = ?,
+                priority_check = ?,
                 complaint_hicslno = ?, 
                 cm_location=?,
-                edit_user=?          
+                edit_user=?,
+                priority_reason=?          
                 WHERE complaint_slno = ?`,
             [
                 data.complaint_desc,
@@ -103,10 +106,11 @@ module.exports = {
                 data.complaint_request_slno,
                 data.complaint_deptslno,
                 data.complaint_typeslno,
-                data.compalint_priority,
+                data.priority_check,
                 data.complaint_hicslno,
                 data.cm_location,
                 data.edit_user,
+                data.priority_reason,
                 data.complaint_slno
             ],
             (error, results, feilds) => {

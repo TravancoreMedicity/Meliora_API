@@ -2,7 +2,7 @@ const { validateComplaintRegist } = require('../../validation/validation_schema'
 const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign, getcomplaintAssignbyEmployee, quickAssigncompstatus,
     detailedAssigncompstatus, getassistantEmployee, insertAssistemp, getALLcomplaintbyEmployee, getIndividualassitemployee,
     AssistantRecieved, checkInsertVal, TransferDept, assignedListNotRectifiedOnly, rectifiedListForVErify,
-    AssistMultiple, getALLAssignedComList, TransferEmployee, EmployeeInactive, beforAssignHold, updatePunchMastDuty
+    AssistMultiple, getALLAssignedComList, EmployeeInactive, beforAssignHold, empTransInactive
 } = require('../complaint_assign/complaintAssign.service');
 const logger = require('../../logger/logger');
 const { default: Expo } = require('expo-server-sdk');
@@ -24,7 +24,7 @@ module.exports = {
                 logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,
-                    message: "No Results Found"
+                    message: "No Complaints"
                 });
             }
             return res.status(200).json({
@@ -153,7 +153,7 @@ module.exports = {
                 logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,
-                    message: "No Results Found"
+                    message: "No Assigned Complaints"
                 });
             }
             return res.status(200).json({
@@ -242,7 +242,7 @@ module.exports = {
                 logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,
-                    message: "No Results Found"
+                    message: "No Complaints"
                 });
             }
             return res.status(200).json({
@@ -265,7 +265,7 @@ module.exports = {
                 logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,
-                    message: "No Results Found"
+                    message: "No Complaints"
                 });
             }
             return res.status(200).json({
@@ -308,7 +308,7 @@ module.exports = {
                 logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,
-                    message: "No Results Found"
+                    message: "No Complaints"
                 });
             }
             return res.status(200).json({
@@ -331,7 +331,7 @@ module.exports = {
                 logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,
-                    message: "No Results Found"
+                    message: "No Complaints"
                 });
             }
             return res.status(200).json({
@@ -354,7 +354,7 @@ module.exports = {
                 logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,
-                    message: "No Results Found"
+                    message: "No Complaints"
                 });
             }
             return res.status(200).json({
@@ -405,7 +405,7 @@ module.exports = {
                 logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,
-                    message: "No Results Found"
+                    message: "No Complaints"
                 });
             }
             return res.status(200).json({
@@ -413,37 +413,6 @@ module.exports = {
                 data: results
             });
         });
-    },
-
-    TransferEmployee: (req, res) => {
-
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
-        const body = req.body
-
-        var newList = body.map((val, index) => {
-            return [val.complaint_slno, val.assigned_emp]
-        })
-
-        // TransferEmployee(body, (err, results) => {
-        //     if (err) {
-        //         logger.logwindow(err)
-        //         return res.status(200).json({
-        //             success: 2,
-        //             message: err
-        //         });
-        //     }
-        //     if (results.length === 0) {
-        //         logger.infologwindow("No Results Found")
-        //         return res.status(200).json({
-        //             success: 0,
-        //             message: "No Results Found"
-        //         });
-        //     }
-        //     return res.status(200).json({
-        //         success: 1,
-        //         message: "Complaint Transfer Successfully"
-        //     });
-        // });
     },
 
     transferInsert: (req, res) => {
@@ -517,9 +486,9 @@ module.exports = {
 
         });
     },
-    updatePunchMastDuty: async (req, res) => {
+    empTransInactive: async (req, res) => {
         const body = req.body;
-        updatePunchMastDuty(body).then(results => {
+        empTransInactive(body).then(results => {
             return res.status(200).json({
                 succes: 1,
                 messagee: 'Update Successfully'

@@ -4,8 +4,8 @@ const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign,
     getcomplaintAssignbyEmployee, getassistantEmployee, insertAssistemp,
     getALLcomplaintbyEmployee, getIndividualassitemployee, AssistantRecieved, TransferDept,
     assignedListNotRectifiedOnly, rectifiedListForVErify, AssistMultiple,
-    getALLAssignedComList, TransferEmployee, transferInsert, EmployeeInactive,
-    beforAssignHold, updatePunchMastDuty } = require('../complaint_assign/complaintAssign.controller');
+    getALLAssignedComList, transferInsert, EmployeeInactive,
+    beforAssignHold, empTransInactive } = require('../complaint_assign/complaintAssign.controller');
 
 router.get("/:id", checkToken, getcomplaintAssign);
 router.post("/", checkToken, quickAssign); // quick assign
@@ -24,13 +24,9 @@ router.get("/forVerifyList/:id", checkToken, rectifiedListForVErify); // Rectifi
 
 
 router.post("/assist/multiple", checkToken, AssistMultiple); //Assist Needed Multiple employee
-
 router.get("/AssignedComList/:id", checkToken, getALLAssignedComList);
-
-router.patch("/complaint/transfer/employee", checkToken, TransferEmployee);
 router.post("/transfer/insert", checkToken, transferInsert);
 router.patch("/employee/inactive", checkToken, EmployeeInactive);
-
 router.post("/hold/beforAssign", checkToken, beforAssignHold);
-router.post("/updatePunchMastDuty", checkToken, updatePunchMastDuty);
+router.post("/employeeTrans/Inactive", checkToken, empTransInactive);
 module.exports = router;

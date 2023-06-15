@@ -3,8 +3,8 @@ const sockectIO = require("socket.io");
 exports.WSIO = server => {
     return sockectIO(server, {
         cors: {
-            // origin: "http://192.168.11.42:3000",
-            origin: ['http://localhost:3000', 'http://192.168.11.42:3000', 'http://192.168.10.106:3000'],
+            origin: ['http://localhost:3000', 'http://192.168.11.42:3000', 'http://192.168.22.2:3000',
+                'http://tm.medicity.co.in:8888'],
             methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
         }
     })

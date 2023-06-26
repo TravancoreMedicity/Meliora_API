@@ -124,7 +124,8 @@ module.exports = {
         pool.query(
             `SELECT co_employee_master.em_name,emp_username,emp_password,app_token,
             co_employee_master.em_department,
-            co_employee_master.em_id,co_employee.emp_no,co_employee_master.em_dept_section,sec_name
+            co_employee_master.em_id,co_employee.emp_no,co_employee_master.em_dept_section,sec_name,
+            current_timestamp() as login
              FROM meliora.co_employee
             LEFT JOIN co_employee_master ON co_employee_master.em_no=co_employee.emp_no
             LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id=co_employee_master.em_dept_section
@@ -181,6 +182,7 @@ module.exports = {
         pool.query(
             `INSERT INTO co_employee_master (em_id,em_no,em_salutation,em_name,em_gender,em_dob,em_doj,
                 em_mobile, em_email, em_branch ,em_department,em_dept_section,em_designation,em_status,
+                supervisor,comp_type_map,
                 create_user)
             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
@@ -198,6 +200,8 @@ module.exports = {
                 data.em_dept_section,
                 data.em_designation,
                 data.em_status,
+                data.supervisor,
+                data.comp_type_map,
                 data.create_user
 
             ],
@@ -241,6 +245,7 @@ module.exports = {
             em_no,co_employee_master.em_id,em_salutation,em_doj,em_dob,em_gender,em_branch,em_department,
             em_dept_section, em_status ,em_mobile,em_email,module_group_user_rights.mod_grp_slno,
             module_group_user_rights.user_group_slno,module_group_user_rights.mod_grp_user_slno,
+            supervisor,comp_type_map,
             co_employee.empdtl_slno
             from co_employee
              left join co_employee_master on co_employee.em_id=co_employee_master.em_id
@@ -273,6 +278,8 @@ module.exports = {
              em_dept_section=?,
              em_designation=?,
              em_status=?,
+             supervisor=?,
+             comp_type_map=?,
              edit_user=?   
             where em_id=?           
             `, [
@@ -289,6 +296,8 @@ module.exports = {
             data.em_dept_section,
             data.em_designation,
             data.em_status,
+            data.supervisor,
+            data.comp_type_map,
             data.edit_user,
             data.em_id
         ],

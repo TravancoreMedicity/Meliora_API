@@ -5,7 +5,8 @@ const { employeeinsert, employeeupdate, getemplpyee, employeeGetById, checkUpdat
     checkEmployeeExist, employeemoduleGroup, updatemodulegroup, updateserialnumempDetl
 } = require('../employee/employee.service');
 const { validateuserCreation, validateEmployee } = require('../../validation/validation_schema')
-const logger = require('../../logger/logger')
+const logger = require('../../logger/logger');
+const { addHours, format } = require("date-fns");
 
 module.exports = {
     employeeinsert: (req, res) => {
@@ -156,6 +157,7 @@ module.exports = {
     login: (req, res) => {
         const body = req.body;
         getEmployeeByUserName(body.emp_username, (err, results) => {
+            const logout_time = 1
             if (err) {
             }
             if (!results) {
@@ -172,6 +174,7 @@ module.exports = {
                 const jsontoken = sign({ result: results }, "@dhj$&$(*)dndkm76$%#jdn(^$6GH%^#73*#*", {
                     expiresIn: "5h"
                 });
+
                 return res.json({
                     success: 1,
                     message: "login successfully",
@@ -184,7 +187,9 @@ module.exports = {
                     emp_secid: results.em_dept_section,
                     app_token: results.app_token,
                     emp_dept: results.em_department,
-                    logintime: new Date()
+                    logintime: results.login,
+                    logOutTime: format(addHours(new Date(results.login), logout_time), 'yyyy-MM-dd HH:mm:ss')
+
                 });
             } else {
                 return res.json({

@@ -362,12 +362,13 @@ const validateModuleGroupRight = Joi.object({
 })
 
 const validateComplaintRegist = Joi.object({
+    complaint_slno: Joi.number().required(),
     complaint_desc: Joi.string().required(),
     complaint_dept_secslno: Joi.number().required(),
     complaint_request_slno: Joi.number().required(),
     complaint_deptslno: Joi.number().required(),
     complaint_typeslno: Joi.number().required(),
-    compalint_priority: Joi.number().required(),
+    compalint_priority: Joi.number().optional(),
     compalint_status: Joi.number().required(),
     complaint_hicslno: Joi.optional(),
     complaint_slno: Joi.number().optional(),
@@ -378,6 +379,8 @@ const validateComplaintRegist = Joi.object({
     cm_location: Joi.number().optional(),
     locationName: Joi.string().optional(),
     priority: Joi.string().optional(),
+    priority_reason: Joi.optional(),
+    priority_check: Joi.number().optional(),
 })
 
 
@@ -452,6 +455,8 @@ const validateuserCreation = Joi.object({
     dept_slno: Joi.number().optional(),
     deptsec_slno: Joi.number().optional(),
     empdtl_slno: Joi.number().optional(),
+    supervisor: Joi.number().optional(),
+    comp_type_map: Joi.number().optional()
 })
 
 validationsurvLog = Joi.object({
@@ -646,6 +651,29 @@ const validateOmEmpmapping = Joi.object({
 
 })
 
+const validateComEmpmapping = Joi.object({
+    map_section_name: Joi.string().required(),
+    co_emp_dept: Joi.number().required(),
+    co_emp_deptsec: Joi.number().required(),
+    co_emp_empid: Joi.required(),
+    co_emp_status: Joi.number().required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+    emp_map_slno: Joi.number().optional(),
+    com_dept: Joi.number().required(),
+
+})
+
+
+const ValidatePrority = Joi.object({
+    cm_priority_desc: Joi.string().required(),
+    cm_priority_status: Joi.number().required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+    cm_priority_slno: Joi.number().optional(),
+
+})
+
 module.exports = {
     validateEmployee,
     validateUserGroup,
@@ -687,6 +715,8 @@ module.exports = {
     validateRequestRegister,
     validateRequestRegisterDetl,
     validateOmTableMast,
-    validateOmEmpmapping
+    validateOmEmpmapping,
+    validateComEmpmapping,
+    ValidatePrority
 
 }

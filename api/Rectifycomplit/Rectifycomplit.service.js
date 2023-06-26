@@ -22,7 +22,7 @@ module.exports = {
                              left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
                        left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
                       left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
-          where assigned_emp=? ORDER BY compalint_date DESC `,
+          where assigned_emp=? and assign_status=1 ORDER BY compalint_date DESC `,
             [
                 id
             ],
@@ -95,7 +95,7 @@ module.exports = {
                 em_name 
             from cm_complaint_detail
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
-            where complaint_slno=?`,
+            where complaint_slno=? and assign_status=1`,
             [
                 id
             ],

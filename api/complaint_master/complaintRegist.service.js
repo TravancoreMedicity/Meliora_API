@@ -3,29 +3,33 @@ module.exports = {
     complaintRegistInsert: (data, callback) => {
         pool.query(
             `INSERT INTO cm_complaint_mast (
+                complaint_slno,
                 complaint_desc,
                 complaint_typeslno,
                 complaint_request_slno,
                 complaint_deptslno,
-                compalint_priority,
+                priority_check,
                 compalint_status,
                 complaint_hicslno,
                 complaint_dept_secslno,
                 cm_location,
-                create_user
+                create_user,
+                priority_reason
                )
-                VALUES(?,?,?,?,?,?,?,?,?,?)`,
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
+                data.complaint_slno,
                 data.complaint_desc,
                 data.complaint_typeslno,
                 data.complaint_request_slno,
                 data.complaint_deptslno,
-                data.compalint_priority,
+                data.priority_check,
                 data.compalint_status,
                 data.complaint_hicslno,
                 data.complaint_dept_secslno,
                 data.cm_location,
-                data.create_user
+                data.create_user,
+                data.priority_reason
             ],
             (error, results, fields) => {
 
@@ -44,10 +48,11 @@ module.exports = {
                 complaint_request_slno = ?,
                 complaint_deptslno = ?,
                 complaint_typeslno = ?,
-                compalint_priority = ?,
+                priority_check = ?,
                 complaint_hicslno = ?, 
                 cm_location=?,
-                edit_user=?          
+                edit_user=?,    
+                priority_reason=?     
                 WHERE complaint_slno = ?`,
             [
                 data.complaint_desc,
@@ -55,10 +60,11 @@ module.exports = {
                 data.complaint_request_slno,
                 data.complaint_deptslno,
                 data.complaint_typeslno,
-                data.compalint_priority,
+                data.priority_check,
                 data.complaint_hicslno,
                 data.cm_location,
                 data.edit_user,
+                data.priority_reason,
                 data.complaint_slno
             ],
             (error, results, feilds) => {
@@ -111,13 +117,13 @@ module.exports = {
                         complaint_typeslno,
                         complaint_type_name,
                         cm_complaint_mast.create_user,
-                        cm_location,
-                        compalint_status,
+                        cm_location,priority_check,
+                        compalint_status,priority_reason,
                         hic_policy_status,
                         cm_rectify_status,
                         rectify_pending_hold_remarks,
                         (case when rectify_pending_hold_remarks is null then "not updated" else rectify_pending_hold_remarks end ) as rectify_pending_hold_remarks1,
-                        (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High" else "Medium" end ) as priority ,
+                        (case when priority_check='1' then "Yes"  else "No" end ) as priority ,
                         (case when hic_policy_name is not null then hic_policy_name else 'Not Suggested' end )as hic_policy_name,
                         (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"  when compalint_status = '3' then "Verified"  else "Not" end ) as compalint_status1,
                                      (case when cm_rectify_status = 'R' then "Rectified" when cm_rectify_status = 'P' then "Pending" when cm_rectify_status = 'O' then "On Hold" else "Not" end ) as cm_rectify_status1,
@@ -155,7 +161,7 @@ module.exports = {
             complaint_deptslno,
             complaint_typeslno,
             compalint_priority,
-            complaint_hicslno,
+            complaint_hicslno,priority_reason,compalint_priority,
             req_type_name,
             complaint_dept_name,
             complaint_type_name,
@@ -195,7 +201,7 @@ module.exports = {
               IFNULL( L.sec_name,"Nil" ) location,
                 complaint_dept_secslno,
                 complaint_request_slno,
-                compalint_priority,
+                compalint_priority,complaint_hicslno,
                 req_type_name,
                 complaint_dept_name,
                 complaint_type_name,compalint_status,
@@ -239,5 +245,17 @@ module.exports = {
                 return callBack(null, results);
             }
         );
+    },
+    updateserialnum: (callBack) => {
+        pool.query(
+            `update serial_nos set serial_current=serial_current+1 where serial_slno=5`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
     },
 }

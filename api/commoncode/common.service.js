@@ -514,4 +514,17 @@ where module_slno = ?`,
             }
         )
     },
+    getCompSerialno: (callBack) => {
+        pool.query(
+            `SELECT * FROM serial_nos where serial_slno=5`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+
+    },
 }

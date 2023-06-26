@@ -1,7 +1,8 @@
 const logger = require('../../logger/logger')
 const { getdepartment, createDept, getdepartmentMeli, getdepartmentSection, getdepartmentSecMeli,
     createDeptSec, getemployeemasterHrm, getemployeemasterMeli, creategetemployeemaster, creategetemployeeuserPass,
-    getemployeeuserPassHrm, getemployeeuserPassMeli, getauthorization, getauthorizationMeli, createAuthorization
+    getemployeeuserPassHrm, getemployeeuserPassMeli, getauthorization, getauthorizationMeli, createAuthorization,
+    updateEmpMaster
 } = require("../hrm_data_get/data_get_insert_service")
 module.exports = {
 
@@ -231,6 +232,51 @@ module.exports = {
                         message: "Authorization Inserted Successfully"
                     });
                 });
+            })
+        });
+    },
+
+    empMasterUpdate: (req, res) => {
+        getemployeemasterHrm((err, results) => {
+            const employeeHr = [...results]
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            getemployeemasterMeli((err, results) => {
+                const meliemployee = [...results]
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 2,
+                        message: err
+                    });
+                }
+                let newmeli = employeeHr.filter(value => {
+                    return !meliemployee.find(values => {
+                        return values.em_id === value.em_id &&
+                            values.em_department === value.em_department &&
+                            values.em_dept_section === value.em_dept_section &&
+                            values.em_no === value.em_no
+                    })
+                })
+
+                const result = updateEmpMaster(newmeli)
+                    .then((r) => {
+
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Update Successfully"
+                        });
+                    }).catch((e) => {
+                        return res.status(200).json({
+                            success: 0,
+                            message: e.sqlMessage
+                        });
+                    })
             })
         });
     },

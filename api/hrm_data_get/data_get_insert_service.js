@@ -246,4 +246,34 @@ module.exports = {
             }
         );
     },
+
+    updateEmpMaster: (data) => {
+        return new Promise((resolve, reject) => {
+            data.map((val) => {
+                pool.query(
+                    `update meliora.co_employee_master
+                    set em_department=?,
+                    em_dept_section=?,
+                    em_no=?
+                    where em_id=? `,
+                    [
+                        val.em_department,
+                        val.em_dept_section,
+                        val.em_no,
+                        val.em_id
+                    ],
+                    (error, results, fields) => {
+
+
+                        if (error) {
+                            return reject(error)
+                        }
+                        return resolve(results)
+                    }
+                )
+            })
+        })
+    },
+
+
 }

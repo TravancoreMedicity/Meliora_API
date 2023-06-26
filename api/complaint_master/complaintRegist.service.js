@@ -3,6 +3,7 @@ module.exports = {
     complaintRegistInsert: (data, callback) => {
         pool.query(
             `INSERT INTO cm_complaint_mast (
+                complaint_slno,
                 complaint_desc,
                 complaint_typeslno,
                 complaint_request_slno,
@@ -15,8 +16,9 @@ module.exports = {
                 create_user,
                 priority_reason
                )
-                VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
+                data.complaint_slno,
                 data.complaint_desc,
                 data.complaint_typeslno,
                 data.complaint_request_slno,
@@ -243,5 +245,17 @@ module.exports = {
                 return callBack(null, results);
             }
         );
+    },
+    updateserialnum: (callBack) => {
+        pool.query(
+            `update serial_nos set serial_current=serial_current+1 where serial_slno=5`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
     },
 }

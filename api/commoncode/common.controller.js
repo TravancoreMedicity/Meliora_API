@@ -5,7 +5,8 @@ const { getEmployeeID, getMenuBasedRights, getSubModuleRights, getModuleMasterBy
     getSerialno, getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
     getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor, getSerialnoEmpDetl
     , getInchargehod, updateEmpMobileApp, getdeptSecInchhod, manualEmpList,
-    updatemobapprequired, getMobileAppStatusCredential } = require('../commoncode/common.service');
+    updatemobapprequired, getMobileAppStatusCredential, getCompSerialno
+} = require('../commoncode/common.service');
 
 module.exports = {
     getEmployeeID: (req, res) => {
@@ -732,6 +733,31 @@ module.exports = {
                     message: "No Results Found"
                 });
             }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getCompSerialno: (req, res) => {
+
+        getCompSerialno((err, results) => {
+            if (err) {
+                logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                logger.infoLogger("No Records Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result Found"
+                });
+            }
+
             return res.status(200).json({
                 success: 1,
                 data: results

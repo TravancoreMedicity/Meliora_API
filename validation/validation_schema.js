@@ -362,6 +362,7 @@ const validateModuleGroupRight = Joi.object({
 })
 
 const validateComplaintRegist = Joi.object({
+    complaint_slno: Joi.number().required(),
     complaint_desc: Joi.string().required(),
     complaint_dept_secslno: Joi.number().required(),
     complaint_request_slno: Joi.number().required(),

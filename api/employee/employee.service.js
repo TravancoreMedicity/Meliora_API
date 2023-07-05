@@ -184,7 +184,7 @@ module.exports = {
                 em_mobile, em_email, em_branch ,em_department,em_dept_section,em_designation,em_status,
                 supervisor,comp_type_map,
                 create_user)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.em_id,
                 data.em_no,

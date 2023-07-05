@@ -249,6 +249,8 @@ module.exports = {
              priority_check,priority_reason,compalint_priority
              assigned_emp,compalint_priority,compalint_status,cm_rectify_status,
             if(em_name is null ,'Not Assigned',em_name) as em_name,
+            if(cm_rectify_time is null ,'Not Update',cm_rectify_time) as cm_rectify_time,
+            if(cm_verfy_time is null ,'Not Update',cm_verfy_time) as cm_verfy_time,            
             (case when compalint_priority='1' then "Level 1" when compalint_priority='2' then "Level 2"
                            when compalint_priority='3' then "Level 3" when compalint_priority='4' then "Level 4"
                             else  "Not Updated" end ) as priority,   
@@ -578,4 +580,224 @@ module.exports = {
         })
         )
     },
+
+    sendMeassageUser: (data, callBack) => {
+        pool.query(
+            `UPDATE cm_complaint_mast
+            SET compdept_message=?,
+            compdept_message_flag=?,
+            message_send_emp=?
+            WHERE complaint_slno=? `,
+            [
+                data.compdept_message,
+                data.compdept_message_flag,
+                data.message_send_emp,
+                data.complaint_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    ReadMeassageUser: (data, callBack) => {
+        pool.query(
+            `UPDATE cm_complaint_mast
+            SET 
+            compdept_message_flag=?,
+            message_read_emp=?
+            WHERE complaint_slno=? `,
+            [
+                data.compdept_message_flag,
+                data.message_read_emp,
+                data.complaint_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    AssistReqListAll: (id, callBack) => {
+        pool.query(
+            `select cm_complaint_mast.complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
+            complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
+            S.sec_name as sec_name, priority_reason,complaint_hicslno,
+            IFNULL( L.sec_name,"Nil" ) location,C.em_name as comp_reg_emp,
+            cm_complaint_mast.create_user,C.em_department,
+            co_department_mast.dept_name as empdept,compalint_priority,
+            (case when compalint_priority='1' then "Level 1" when compalint_priority='2' then "Level 2"
+            when compalint_priority='3' then "Level 3" when compalint_priority='4' then "Level 4"
+             else  "Not Updated" end ) as priority, 
+            date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,
+            if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
+            (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
+            (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1,
+            A.em_name as assist_emp
+             from cm_complaint_mast
+                      left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
+                      left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
+                      left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
+                      left join cm_hic_policy on cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno
+                      left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
+                      left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
+                      left join co_department_mast on co_department_mast.dept_id=C.em_department
+                       left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+                         left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
+                         left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
+         left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
+           where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
+           where department_slno=?) AND cm_complaint_detail.assist_flag=1 AND assist_receive=0
+           GROUP BY complaint_slno ORDER BY complaint_slno DESC`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    getAssistRequestEmps: (id, callBack) => {
+        pool.query(
+            `select 
+            assigned_emp,
+            em_name 
+        from cm_complaint_detail
+        left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+        where complaint_slno=? and assist_flag=1 and assist_receive=0`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    assistTransInactive: (body) => {
+        return Promise.all(body.map((data) => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    `UPDATE cm_complaint_detail
+                                SET 
+                                assist_flag = 0                                                            
+                                WHERE complaint_slno = ? and assigned_emp=?`,
+                    [
+                        data.complaint_slno,
+                        data.assigned_emp
+                    ],
+                    (error, results, fields) => {
+                        if (error) {
+                            return reject(error)
+                        }
+                        return resolve(results)
+                    }
+                )
+            })
+        })
+        )
+    },
+
+    AssisttransferInsert: (data, callBack) => {
+        pool.query(
+            `INSERT INTO cm_complaint_detail
+            (
+                complaint_slno,
+                assigned_emp,
+                assign_rect_status,
+                assigned_date,
+                assigned_user,
+                assist_flag,
+                assist_assign_date,
+                assist_receive,
+                assist_requested_emp,
+                assign_status
+            ) 
+            VALUES ?`,
+            [
+                data
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    SupervsrVerifyPending: (id, callBack) => {
+        pool.query(
+            `select complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
+            complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
+            S.sec_name as sec_name, priority_reason,complaint_hicslno,
+            IFNULL( L.sec_name,"Nil" ) location,co_employee_master.em_name as comp_reg_emp,
+            cm_complaint_mast.create_user,co_employee_master.em_department,
+            co_department_mast.dept_name as empdept,compalint_priority,
+            (case when compalint_priority='1' then "Level 1" when compalint_priority='2' then "Level 2"
+            when compalint_priority='3' then "Level 3" when compalint_priority='4' then "Level 4"
+             else  "Not Updated" end ) as priority, rectify_pending_hold_remarks,
+            date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,
+            if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
+            (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
+            (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1
+             from cm_complaint_mast
+                      left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
+                      left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
+                      left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
+                      left join cm_hic_policy on cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno
+                      left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
+                      left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
+                      left join co_department_mast on co_department_mast.dept_id=co_employee_master.em_department
+                       left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+         left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
+           where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
+           where department_slno=?) AND compalint_status=2 AND verify_spervsr=0 ORDER BY complaint_slno DESC`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    SupervsrVerify: (data, callBack) => {
+        pool.query(
+            `UPDATE cm_complaint_mast
+            SET verify_spervsr=?,
+            verify_spervsr_remarks=?,
+            verify_spervsr_user=?
+            WHERE complaint_slno=? `,
+            [
+                data.verify_spervsr,
+                data.verify_spervsr_remarks,
+                data.verify_spervsr_user,
+                data.complaint_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
 }

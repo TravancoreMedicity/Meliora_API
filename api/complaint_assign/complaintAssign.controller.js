@@ -2,7 +2,9 @@ const { validateComplaintRegist } = require('../../validation/validation_schema'
 const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign, getcomplaintAssignbyEmployee, quickAssigncompstatus,
     detailedAssigncompstatus, getassistantEmployee, insertAssistemp, getALLcomplaintbyEmployee, getIndividualassitemployee,
     AssistantRecieved, checkInsertVal, TransferDept, assignedListNotRectifiedOnly, rectifiedListForVErify,
-    AssistMultiple, getALLAssignedComList, EmployeeInactive, beforAssignHold, empTransInactive
+    AssistMultiple, getALLAssignedComList, EmployeeInactive, beforAssignHold, empTransInactive,
+    sendMeassageUser, ReadMeassageUser, AssistReqListAll, getAssistRequestEmps, assistTransInactive,
+    AssisttransferInsert, SupervsrVerifyPending, SupervsrVerify
 } = require('../complaint_assign/complaintAssign.service');
 const logger = require('../../logger/logger');
 const { default: Expo } = require('expo-server-sdk');
@@ -441,7 +443,7 @@ module.exports = {
 
     EmployeeInactive: (req, res) => {
 
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
+        req.io.emit("message", `One Complaint in your Assigned List is Transfer to another Employee`)
         const body = req.body
         var newList = body.map((val, index) => {
             return [val.complaint_slno, val.assigned_emp]
@@ -499,5 +501,190 @@ module.exports = {
                 messagee: "Error Occured , Please Contact HRD / IT"
             });
         })
+    },
+    sendMeassageUser: (req, res) => {
+
+        req.io.emit("message", `New Complaint Registed ! Please Check`)
+        const body = req.body
+        sendMeassageUser(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Complaints"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Complaint Transfer Successfully"
+            });
+        });
+    },
+    ReadMeassageUser: (req, res) => {
+
+        req.io.emit("message", `New Complaint Registed ! Please Check`)
+        const body = req.body
+        ReadMeassageUser(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Complaints"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Complaint Transfer Successfully"
+            });
+        });
+    },
+
+
+    AssistReqListAll: (req, res) => {
+        const id = req.params.id
+        AssistReqListAll(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Complaints"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    getAssistRequestEmps: (req, res) => {
+        const id = req.params.id
+        getAssistRequestEmps(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    assistTransInactive: async (req, res) => {
+        const body = req.body;
+        assistTransInactive(body).then(results => {
+            return res.status(200).json({
+                succes: 1,
+                messagee: 'Update Successfully'
+            });
+        }).catch(err => {
+            return res.status(200).json({
+                succes: 0,
+                messagee: "Error Occured , Please Contact HRD / IT"
+            });
+        })
+    },
+    AssisttransferInsert: (req, res) => {
+
+        req.io.emit("message", `New Complaint Registed ! Please Check`)
+        const body = req.body;
+        var newList = body.map((val, index) => {
+            return [val.complaint_slno, val.assigned_emp, val.assign_rect_status, val.assigned_date,
+            val.assigned_userid, val.assist_flag, val.assist_assign_date, val.assist_receive,
+            val.assist_requested_empid, val.assign_status]
+        })
+        AssisttransferInsert(newList, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                message: "Complaint Assigned Successfully"
+            });
+        });
+    },
+    SupervsrVerifyPending: (req, res) => {
+        const id = req.params.id
+        SupervsrVerifyPending(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Complaints"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    SupervsrVerify: (req, res) => {
+
+        req.io.emit("message", `New Complaint Registed ! Please Check`)
+        const body = req.body
+        SupervsrVerify(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Complaints"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Complaint Transfer Successfully"
+            });
+        });
     },
 }

@@ -114,4 +114,19 @@ module.exports = {
             }
         );
     },
+    getSelectBox: (callback) => {
+        pool.query(
+            ` select emp_map_slno,
+           map_section_name
+           from complaint_emp_map
+              where co_emp_status=1`,
+            [],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
 }

@@ -13,7 +13,7 @@ module.exports = {
                         date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,
                         (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
                         (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1,
-                        cm_priority_mast.cm_priority_desc as priority_remark
+                        cm_priority_mast.cm_priority_desc as priority_remark,verify_spervsr
                       from cm_complaint_mast
                       left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
                        left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
@@ -147,7 +147,7 @@ module.exports = {
                            when compalint_priority='3' then "Level 3" when compalint_priority='4' then "Level 4"
                             else  "Not Updated" end ) as priority,  A.em_name as assign_emp,
               date(assigned_date) as date,TIME_FORMAT(assigned_date,"%r") AS Time,
-              if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
+              if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,verify_spervsr,
                  if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
                  compalint_status,cm_verfy_time,cm_not_verify_time,cm_rectify_time,pending_onhold_user,pending_onhold_time
                   from meliora.cm_complaint_detail
@@ -253,7 +253,7 @@ module.exports = {
             if(cm_verfy_time is null ,'Not Update',cm_verfy_time) as cm_verfy_time,            
             (case when compalint_priority='1' then "Level 1" when compalint_priority='2' then "Level 2"
                            when compalint_priority='3' then "Level 3" when compalint_priority='4' then "Level 4"
-                            else  "Not Updated" end ) as priority,   
+                            else  "Not Updated" end ) as priority,   verify_spervsr,
              if(assigned_date is null,'Not Assigned',assigned_date) as assigned_date,
            (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
       when compalint_status = '3' then "Verified" end ) as compalint_status1,
@@ -303,7 +303,7 @@ module.exports = {
                     date(assigned_date) as date,TIME_FORMAT(assigned_date,"%r") AS Time,
                     if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
                     co_employee_master.em_name as comp_reg_emp,
-                    RD.dept_name as empdept,
+                    RD.dept_name as empdept,verify_spervsr,
                     compalint_date,
                     compalint_priority
             from meliora.cm_complaint_detail
@@ -381,7 +381,7 @@ module.exports = {
                     date(assigned_date) as date,TIME_FORMAT(assigned_date,"%r") AS Time,
                     if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
                     if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
-                    compalint_status
+                    compalint_status,verify_spervsr
                 from meliora.cm_complaint_detail
                     left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
                     left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
@@ -421,7 +421,7 @@ module.exports = {
                     date(assigned_date) as date,TIME_FORMAT(assigned_date,"%r") AS Time,
                     if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
                     if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
-                    compalint_status
+                    compalint_status,verify_spervsr
                 from meliora.cm_complaint_detail
                     left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
                     left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
@@ -485,7 +485,7 @@ module.exports = {
             co_department_mast.dept_name as empdept,compalint_priority,
             (case when compalint_priority='1' then "Level 1" when compalint_priority='2' then "Level 2"
             when compalint_priority='3' then "Level 3" when compalint_priority='4' then "Level 4"
-             else  "Not Updated" end ) as priority, 
+             else  "Not Updated" end ) as priority, verify_spervsr,
             date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,
             if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
             (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
@@ -639,7 +639,7 @@ module.exports = {
             if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
             (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
             (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1,
-            A.em_name as assist_emp
+            A.em_name as assist_emp,verify_spervsr
              from cm_complaint_mast
                       left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
                       left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
@@ -750,7 +750,7 @@ module.exports = {
             (case when compalint_priority='1' then "Level 1" when compalint_priority='2' then "Level 2"
             when compalint_priority='3' then "Level 3" when compalint_priority='4' then "Level 4"
              else  "Not Updated" end ) as priority, rectify_pending_hold_remarks,
-            date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,
+            date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,verify_spervsr,
             if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
             (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
             (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1

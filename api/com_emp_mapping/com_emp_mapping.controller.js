@@ -1,6 +1,7 @@
 const logger = require('../../logger/logger')
 const { validateComEmpmapping } = require('../../validation/validation_schema');
-const { inserEmpmap, getEmpMapping, updateEmpMap, CheckinsertVal, selectallEmpMapping } = require('../com_emp_mapping/com_emp_mapping.service')
+const { inserEmpmap, getEmpMapping, updateEmpMap, CheckinsertVal, selectallEmpMapping, getSelectBox
+} = require('../com_emp_mapping/com_emp_mapping.service')
 
 module.exports = {
     inserEmpmap: (req, res) => {
@@ -107,6 +108,30 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 data: results
+            });
+        });
+    },
+    getSelectBox: (req, res) => {
+        getSelectBox((err, results) => {
+            if (err) {
+                // logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+
+            if (results.length == 0) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Result Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results,
+
             });
         });
     },

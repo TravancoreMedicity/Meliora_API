@@ -209,7 +209,7 @@ module.exports = {
                 data.em_designation,
                 data.em_status,
                 data.supervisor,
-                data.comp_type_map,
+                JSON.stringify(data.comp_type_map),
                 data.create_user
 
             ],

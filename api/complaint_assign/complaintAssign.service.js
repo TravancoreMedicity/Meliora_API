@@ -3,27 +3,32 @@ module.exports = {
     getcomplaintAssign: (id, callBack) => {
         pool.query(
             `select complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
-                        complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
-                        S.sec_name as sec_name, priority_reason,complaint_hicslno,
-                        IFNULL( L.sec_name,"Nil" ) location,co_employee_master.em_name as comp_reg_emp,cm_complaint_mast.create_user,co_employee_master.em_department,
-                        co_department_mast.dept_name as empdept,compalint_priority,
-                        (case when compalint_priority='1' then "Level 1" when compalint_priority='2' then "Level 2"
-                           when compalint_priority='3' then "Level 3" when compalint_priority='4' then "Level 4"
-                            else  "Not Updated" end ) as priority, 
-                        date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,
-                        (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
-                        (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1,
-                        cm_priority_mast.cm_priority_desc as priority_remark,verify_spervsr
-                      from cm_complaint_mast
-                      left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
-                       left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
-                        left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
-                       left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
-                        left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
-                         left join co_department_mast on co_department_mast.dept_id=co_employee_master.em_department
-                         left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
-                     left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
-                       where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
+            complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
+            S.sec_name as sec_name, priority_reason,complaint_hicslno,
+            IFNULL( L.sec_name,"Nil" ) location,C.em_name as comp_reg_emp,
+            cm_complaint_mast.create_user,C.em_department,
+            co_department_mast.dept_name as empdept,compalint_priority,
+            (case when compalint_priority='1' then "Level 1" when compalint_priority='2' then "Level 2"
+               when compalint_priority='3' then "Level 3" when compalint_priority='4' then "Level 4"
+                else  "Not Updated" end ) as priority, 
+            date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,
+            (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
+            (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1,
+            cm_priority_mast.cm_priority_desc as priority_remark,verify_spervsr,
+            compdept_message,compdept_message_flag,message_reply_emp,
+            M.em_name as msg_send_emp,R.em_name as msg_read_emp
+          from cm_complaint_mast
+          left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
+           left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
+            left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
+           left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
+            left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
+            left join co_employee_master M on M.em_id=cm_complaint_mast.message_send_emp
+            left join co_employee_master R on R.em_id=cm_complaint_mast.message_read_emp
+             left join co_department_mast on co_department_mast.dept_id=C.em_department
+             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+         left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
+           where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
                        where department_slno=?) AND compalint_status=0 ORDER BY complaint_slno DESC`,
 
             [
@@ -149,7 +154,8 @@ module.exports = {
               date(assigned_date) as date,TIME_FORMAT(assigned_date,"%r") AS Time,
               if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,verify_spervsr,
                  if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
-                 compalint_status,cm_verfy_time,cm_not_verify_time,cm_rectify_time,pending_onhold_user,pending_onhold_time
+                 compalint_status,cm_verfy_time,cm_not_verify_time,cm_rectify_time,pending_onhold_user,
+                 pending_onhold_time,verify_spervsr
                   from meliora.cm_complaint_detail
                   left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
                   left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
@@ -259,7 +265,8 @@ module.exports = {
       when compalint_status = '3' then "Verified" end ) as compalint_status1,
           (case when cm_rectify_status = 'R' then "Rectified" when cm_rectify_status = 'P' then "Pending" when cm_rectify_status = 'O' then "On Hold"  when cm_rectify_status='Z' then" Not Verified" when cm_rectify_status='V' then"Verified" else "Not Updated" end ) as cm_rectify_status1,
                date(assigned_date) as date,TIME_FORMAT(assigned_date,"%r") AS Time,cm_rectify_status,
-            if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name
+            if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
+            compdept_message,compdept_message_flag,message_reply_emp
            from cm_complaint_mast   
            left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
            left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
@@ -269,6 +276,8 @@ module.exports = {
            left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
            left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+
+
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
             where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
                       where department_slno=?) and (assign_status=1 or compalint_status=0)
@@ -480,8 +489,8 @@ module.exports = {
             `select complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
             complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
             S.sec_name as sec_name, priority_reason,complaint_hicslno,
-            IFNULL( L.sec_name,"Nil" ) location,co_employee_master.em_name as comp_reg_emp,
-            cm_complaint_mast.create_user,co_employee_master.em_department,
+            IFNULL( L.sec_name,"Nil" ) location,C.em_name as comp_reg_emp,
+            cm_complaint_mast.create_user,C.em_department,
             co_department_mast.dept_name as empdept,compalint_priority,
             (case when compalint_priority='1' then "Level 1" when compalint_priority='2' then "Level 2"
             when compalint_priority='3' then "Level 3" when compalint_priority='4' then "Level 4"
@@ -489,15 +498,19 @@ module.exports = {
             date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,
             if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
             (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
-            (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1
+            (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1,
+            compdept_message,compdept_message_flag,message_reply_emp,
+            M.em_name as msg_send_emp,R.em_name as msg_read_emp
              from cm_complaint_mast
                       left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
                       left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
                       left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
                       left join cm_hic_policy on cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno
                       left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
-                      left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
-                      left join co_department_mast on co_department_mast.dept_id=co_employee_master.em_department
+                      left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
+                      left join co_employee_master M on M.em_id=cm_complaint_mast.message_send_emp
+                      left join co_employee_master R on R.em_id=cm_complaint_mast.message_read_emp
+                         left join co_department_mast on co_department_mast.dept_id=C.em_department
                        left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
          left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
            where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
@@ -608,11 +621,13 @@ module.exports = {
             `UPDATE cm_complaint_mast
             SET 
             compdept_message_flag=?,
-            message_read_emp=?
+            message_read_emp=?,
+            message_reply_emp=?
             WHERE complaint_slno=? `,
             [
                 data.compdept_message_flag,
                 data.message_read_emp,
+                data.message_reply_emp,
                 data.complaint_slno
             ],
             (error, results, feilds) => {
@@ -741,11 +756,12 @@ module.exports = {
 
     SupervsrVerifyPending: (id, callBack) => {
         pool.query(
-            `select complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
+            `select cm_complaint_mast.complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
             complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
             S.sec_name as sec_name, priority_reason,complaint_hicslno,
-            IFNULL( L.sec_name,"Nil" ) location,co_employee_master.em_name as comp_reg_emp,
-            cm_complaint_mast.create_user,co_employee_master.em_department,
+            IFNULL( L.sec_name,"Nil" ) location,C.em_name as comp_reg_emp,
+            cm_complaint_mast.create_user,C.em_department,cm_complaint_detail.assigned_date,
+            cm_complaint_mast.cm_rectify_time,
             co_department_mast.dept_name as empdept,compalint_priority,
             (case when compalint_priority='1' then "Level 1" when compalint_priority='2' then "Level 2"
             when compalint_priority='3' then "Level 3" when compalint_priority='4' then "Level 4"
@@ -753,19 +769,24 @@ module.exports = {
             date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,verify_spervsr,
             if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
             (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
-            (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1
+            (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1,
+            compdept_message,compdept_message_flag,message_reply_emp,
+            M.em_name as msg_send_emp,R.em_name as msg_read_emp
              from cm_complaint_mast
                       left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
                       left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
                       left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
                       left join cm_hic_policy on cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno
                       left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
-                      left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
-                      left join co_department_mast on co_department_mast.dept_id=co_employee_master.em_department
+                      left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
+                      left join co_employee_master M on M.em_id=cm_complaint_mast.message_send_emp
+                   left join co_employee_master R on R.em_id=cm_complaint_mast.message_read_emp
+                    left join co_department_mast on co_department_mast.dept_id=C.em_department
                        left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
-         left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
+         left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location 
+         left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
            where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
-           where department_slno=?) AND compalint_status=2 AND verify_spervsr=0 ORDER BY complaint_slno DESC`,
+           where department_slno=?) AND compalint_status=2 AND verify_spervsr=0  GROUP BY complaint_slno ORDER BY complaint_slno DESC`,
             [
                 id
             ],
@@ -783,12 +804,14 @@ module.exports = {
             `UPDATE cm_complaint_mast
             SET verify_spervsr=?,
             verify_spervsr_remarks=?,
-            verify_spervsr_user=?
+            verify_spervsr_user=?,
+            compalint_status=?
             WHERE complaint_slno=? `,
             [
                 data.verify_spervsr,
                 data.verify_spervsr_remarks,
                 data.verify_spervsr_user,
+                data.compalint_status,
                 data.complaint_slno
             ],
             (error, results, feilds) => {

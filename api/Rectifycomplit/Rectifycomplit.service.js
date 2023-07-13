@@ -43,7 +43,8 @@ module.exports = {
             cm_rectify_status=?,
             rectify_pending_hold_remarks=?,
             pending_onhold_time=?,
-            pending_onhold_user=?
+            pending_onhold_user=?,
+            verify_spervsr=?
             where complaint_slno = ?`,
             [
                 data.compalint_status,
@@ -52,6 +53,7 @@ module.exports = {
                 data.rectify_pending_hold_remarks,
                 data.pending_onhold_time,
                 data.pending_onhold_user,
+                data.verify_spervsr,
                 data.complaint_slno
             ],
             (error, results, feilds) => {

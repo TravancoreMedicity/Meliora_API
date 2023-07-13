@@ -121,14 +121,14 @@ module.exports = {
                         compalint_status,priority_reason,
                         hic_policy_status,
                         cm_rectify_status,compdept_message,compdept_message_flag,
-                        rectify_pending_hold_remarks,
+                        rectify_pending_hold_remarks,message_reply_emp,
                         (case when rectify_pending_hold_remarks is null then "not updated" else rectify_pending_hold_remarks end ) as rectify_pending_hold_remarks1,
                         (case when priority_check='1' then "Yes"  else "No" end ) as priority ,
                         (case when hic_policy_name is not null then hic_policy_name else 'Not Suggested' end )as hic_policy_name,
                         (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"  when compalint_status = '3' then "Verified"  else "Not" end ) as compalint_status1,
                                      (case when cm_rectify_status = 'R' then "Rectified" when cm_rectify_status = 'P' then "Pending" when cm_rectify_status = 'O' then "On Hold" else "Not" end ) as cm_rectify_status1,
-                        compalint_date,compalint_status,cm_rectify_status,
-M.em_name as send_user,R.em_name as read_user
+                                     verify_spervsr,compalint_date,compalint_status,cm_rectify_status,
+                        M.em_name as send_user,R.em_name as read_user
 
 
                         from 

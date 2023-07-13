@@ -456,7 +456,7 @@ const validateuserCreation = Joi.object({
     deptsec_slno: Joi.number().optional(),
     empdtl_slno: Joi.number().optional(),
     supervisor: Joi.number().optional(),
-    comp_type_map: Joi.number().optional()
+    comp_type_map: Joi.optional()
 })
 
 validationsurvLog = Joi.object({

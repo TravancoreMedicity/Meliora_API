@@ -189,6 +189,7 @@ module.exports = {
                     app_token: results.app_token,
                     emp_dept: results.em_department,
                     logintime: results.login,
+                    supervisor: results.supervisor,
                     logOutTime: format(addHours(new Date(results.login), logout_time), 'yyyy-MM-dd HH:mm:ss')
 
                 });

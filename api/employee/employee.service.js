@@ -122,13 +122,21 @@ module.exports = {
     },
     getEmployeeByUserName: (userName, callBack) => {
         pool.query(
-            `SELECT co_employee_master.em_name,emp_username,emp_password,app_token,
-            co_employee_master.em_department,
-            co_employee_master.em_id,co_employee.emp_no,co_employee_master.em_dept_section,sec_name,
-            current_timestamp() as login
+            `SELECT 
+                co_employee_master.em_name,
+                emp_username,
+                emp_password,
+                app_token,
+                co_employee_master.em_department,
+                co_employee_master.em_id,
+                co_employee.emp_no,
+                co_employee_master.em_dept_section,
+                sec_name,
+                current_timestamp() as login,
+                co_employee_master.supervisor
              FROM meliora.co_employee
-            LEFT JOIN co_employee_master ON co_employee_master.em_no=co_employee.emp_no
-            LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id=co_employee_master.em_dept_section
+                LEFT JOIN co_employee_master ON co_employee_master.em_no=co_employee.emp_no
+                LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id=co_employee_master.em_dept_section
              WHERE emp_username = ? AND emp_status = '1'`,
             [userName],
             (error, results, fields) => {
@@ -201,7 +209,7 @@ module.exports = {
                 data.em_designation,
                 data.em_status,
                 data.supervisor,
-                JSON.stringify(data.comp_type_map),
+                data.comp_type_map,
                 data.create_user
 
             ],

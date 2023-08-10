@@ -7,13 +7,15 @@ module.exports = {
                 dept_name,
             dept_alias,
             dept_status,
+            dept_type,
             create_user)
-            VALUES(?,?,?,?,?)`,
+            VALUES(?,?,?,?,?,?)`,
             [
                 data.dept_id,
                 data.dept_name,
                 data.dept_alias,
                 data.dept_status,
+                data.dept_type,
                 data.create_user
             ],
             (error, results, feilds) => {
@@ -82,12 +84,14 @@ module.exports = {
                 SET dept_name = ?,
                     dept_alias = ?,
                     dept_status = ?,
+                    dept_type=?,
                     edit_user = ?
                 WHERE dept_id = ?`,
             [
                 data.dept_name,
                 data.dept_alias,
                 data.dept_status,
+                data.dept_type,
                 data.edit_user,
                 data.dept_id
             ],
@@ -117,7 +121,10 @@ module.exports = {
         pool.query(
             `SELECT dept_id,
                 dept_name,
-                dept_alias,
+                dept_alias,dept_type,
+                (case when dept_type = '1' then "Clinical" 
+                when dept_type = '2' then "Non Clinical"
+                 when dept_type = '3' then "Academic"  else "Not Updated" end ) as depttype,
                 if(dept_status = 1 ,'Yes','No') status
             FROM co_department_mast`,
             [],
@@ -134,6 +141,7 @@ module.exports = {
             `SELECT dept_id,
                 dept_name,
                 dept_alias,
+                dept_type,
                 dept_status
             FROM co_department_mast
             WHERE dept_id IN (?)`,

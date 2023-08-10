@@ -527,4 +527,42 @@ where module_slno = ?`,
         )
 
     },
+
+    getCrfDept: (id, callBack) => {
+        pool.query(
+            `SELECT 
+            crf_dept_slno,
+            dept_slno
+            FROM crf_dept_map 
+            WHERE dept_slno = ?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+
+    },
+    getDeptType: (id, callBack) => {
+        pool.query(
+            `SELECT 
+            dept_type
+             FROM co_department_mast 
+             WHERE dept_id = ?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+
+    },
 }

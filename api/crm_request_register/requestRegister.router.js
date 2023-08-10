@@ -3,7 +3,9 @@ const { checkToken } = require("../../authentication/token_validation");
 const { requestRegistInsert, requestRegistInsertDetl, requestApprovalInsert, getReqByDeptBase,
     getItemListByReqno, requestRegistUpdate, requestRegistDetlUpdate, getAuthorization,
     getDeptApprovList, getApprovListOthers, updateInchargeApproval, updateHodApproval, updateOMApproval,
-    updateSOMpproval, updateCEOApproval, updateEDApproval
+    updateSOMpproval, updateCEOApproval, updateEDApproval, getApprovListDMS, deleteItemListByReqno,
+    getCrfDeptDataCollect, CrfDeptDataCollectInsert, EditItemListByReqno,
+    getDataCollectList, CrfDataCollactnSave
 } = require('../crm_request_register/requestRegister.controller');
 
 router.post("/", checkToken, requestRegistInsert);
@@ -25,5 +27,20 @@ router.patch("/approval/om", checkToken, updateOMApproval);
 router.patch("/approval/som", checkToken, updateSOMpproval);
 router.patch("/approval/ceo", checkToken, updateCEOApproval);
 router.patch("/approval/ed", checkToken, updateEDApproval);
+
+router.get("/getApprovList/DMS", checkToken, getApprovListDMS);//getDMS approval List
+
+
+router.patch("/DeleteItemList", checkToken, deleteItemListByReqno);
+router.patch("/EditItemList", checkToken, EditItemListByReqno);
+
+router.get("/getCRFDept/DataCollect", checkToken, getCrfDeptDataCollect)
+
+router.post("/dataCollect/Insert", checkToken, CrfDeptDataCollectInsert);
+
+
+router.get("/getDataCollectList/:id", checkToken, getDataCollectList);
+
+router.patch("/CrfDataCollactnSave", checkToken, CrfDataCollactnSave);
 
 module.exports = router;

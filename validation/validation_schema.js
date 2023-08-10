@@ -80,6 +80,7 @@ const validateDepartment = Joi.object({
             'string.max': 'Alias Name length must be less than or equal to 5 characters long',
         }),
     dept_id: Joi.optional(),
+    dept_type: Joi.number().optional(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
 });
@@ -794,26 +795,23 @@ const validateRequestRegister = Joi.object({
     actual_requirement: Joi.string().required().messages({
         'string.empty': 'Actual Requirement  is Required'
     }),
-    needed: Joi.string().required().messages({
-        'string.empty': 'Needed is Required'
-    }),
+    needed: Joi.optional(),
     request_dept_slno: Joi.number().min(1).required().messages({
         'string.empty': 'Select Department'
     }),
     request_deptsec_slno: Joi.number().min(1).required().messages({
         'string.empty': 'Select Department Section'
     }),
-    location: Joi.string().required().messages({
-        'string.empty': 'Location  is Required'
-    }),
+    location: Joi.optional(),
     create_user: Joi.number().optional(),
-    remarks: Joi.string().optional(),
+    remarks: Joi.optional(),
     total_approx_cost: Joi.number().optional(),
     expected_date: Joi.date().optional(),
     user_deptsec: Joi.number().optional(),
     req_slno: Joi.number().optional(),
     edit_user: Joi.number().optional(),
-    category: Joi.string().optional(),
+    category: Joi.optional(),
+    emergency: Joi.number().optional(),
 })
 
 

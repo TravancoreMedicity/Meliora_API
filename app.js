@@ -115,6 +115,26 @@ const omtableMast = require('./api/om_table_mast/omTableMast.router')
 const omEmpMapping = require('./api/om_emp_mapping/omEmpMap.router')
 const comEmpMapping = require('./api/com_emp_mapping/com_emp_mapping.router')
 const compriority = require('./api/cm_prority_mst/cm_priority.router')
+const campus = require('./api/rm_campus_master/campus_mast.router')
+const building = require('./api/rm_building_master/building_mast.router')
+const buildblock = require('./api/rm_buildblock_master/buildblock.router')
+const insidebuildblock = require('./api/rm_insidebuilblock_master/insidebuildblock.router')
+const floormaster = require('./api/rm_floor_master/floor_mast.router')
+const roomcategory = require('./api/rm_room_category_master/room_category.router')
+const roomtype = require('./api/rm_room_type_master/room_type.router')
+const selectComponent = require('./api/rm_selectCompnents/select.router')
+const floorcreation = require('./api/rm_floor_creation/rm_floor.router')
+const roomnewcreation = require('./api/rm_roomnew_creation/rm_newroom.router')
+const assettypee = require('./api/am_asset_type/am_asset_type.router')
+const itemtype = require('./api/am_item_type/item_type.router')
+const amcategory = require('./api/am_category/am_category.router')
+const subcategory = require('./api/am_subcategory/am_subcategory.router')
+const group = require('./api/am_group/am_group.router')
+const subgroup = require('./api/am_sub_group/sub_group.router')
+const manufacture = require('./api/am_manufacture/manufacture.router')
+
+
+
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -197,7 +217,23 @@ app.use('/api/omtableMast', omtableMast)
 app.use('/api/omempmapping', omEmpMapping)
 app.use('/api/comempmapping', comEmpMapping)
 app.use('/api/compriority', compriority)
-
+app.use('/api/campus', campus)
+app.use('/api/building', building)
+app.use('/api/buildblock', buildblock)
+app.use('/api/insidebuildblock', insidebuildblock)
+app.use('/api/floormaster', floormaster)
+app.use('/api/roomcategory', roomcategory)
+app.use('/api/roomtype', roomtype)
+app.use('/api/selectComponent', selectComponent)
+app.use('/api/floorcreation', floorcreation)
+app.use('/api/roomnewcreation', roomnewcreation)
+app.use('/api/assettypee', assettypee)
+app.use('/api/itemType', itemtype)
+app.use('/api/amcategory', amcategory)
+app.use('/api/subcategory', subcategory)
+app.use('/api/amgroup/', group)
+app.use('/api/subgroup', subgroup)
+app.use('/api/manufacture', manufacture)
 
 
 server.listen(process.env.APP_PORT, () =>

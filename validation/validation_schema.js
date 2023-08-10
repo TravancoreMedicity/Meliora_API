@@ -83,6 +83,209 @@ const validateDepartment = Joi.object({
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
 });
+
+// campus master validation Room Management
+const validateCampus = Joi.object({
+    rm_campus_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Campus Name is Required',
+            'string.min': 'Campus Name length must be at least 3 characters long',
+            'string.max': 'Campus Name length must be less than or equal to 45 characters long'
+        }),
+    rm_campus_status: Joi.number().min(0).max(1).required(),
+    rm_campus_alias: Joi.string().optional()
+        .messages({
+            'string.empty': 'Alias is Required',
+            'string.min': 'Campus Alias Name length must be at least 3 characters long',
+            // 'string.max': 'Department Section Name length must be less than or equal to 45 characters long'
+        }),
+    rm_campus_no: Joi.string().required()
+        .messages({
+            'string.empty': 'Campus Number is Required',
+            'string.min': 'Campus Number length must be at least 3 characters long',
+
+        }),
+    rm_campus_slno: Joi.optional(),
+
+});
+
+// Room Category master validation Room Management
+const validateRoomCategory = Joi.object({
+    rm_roomcategory_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Room Category Name is Required',
+            'string.min': 'Room Category Name length must be at least 3 characters long',
+            'string.max': 'Room Category Name length must be less than or equal to 45 characters long'
+        }),
+    rm_roomcategory_status: Joi.number().min(0).max(1).required(),
+    rm_roomcategory_alias: Joi.string().optional()
+        .messages({
+            'string.empty': 'Alias is Required',
+            'string.min': 'Room Category Alias Name length must be at least 3 characters long',
+            // 'string.max': 'Department Section Name length must be less than or equal to 45 characters long'
+        }),
+    rm_roomcategory_no: Joi.string().required()
+        .messages({
+            'string.empty': 'Room Category Number is Required',
+            'string.min': 'Room Category Number length must be at least 3 characters long',
+
+        }),
+    rm_roomcategory_slno: Joi.optional(),
+
+});
+//building master validation Room management
+const validateBuildingMast = Joi.object({
+    rm_building_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Building Name is Required',
+            'string.min': 'Building Name length must be at least 3 characters long',
+            'string.max': 'Building Name length must be less than or equal to 45 characters long'
+        }),
+    rm_building_status: Joi.number().min(0).max(1).required(),
+    rm_building_alias: Joi.string().optional()
+        .messages({
+            'string.empty': 'Alias is Required',
+            'string.min': 'Building Alias Name length must be at least 3 characters long',
+            // 'string.max': 'Department Section Name length must be less than or equal to 45 characters long'
+        }),
+    rm_building_no: Joi.string().required()
+        .messages({
+            'string.empty': 'Building Number is Required',
+            'string.min': 'Building Number length must be at least 3 characters long',
+
+        }),
+    rm_building_slno: Joi.optional(),
+
+});
+
+//building block master validation Room management
+const validateBuildBlock = Joi.object({
+    rm_buildblock_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Building block Name is Required',
+            'string.min': 'Building block Name length must be at least 3 characters long',
+            'string.max': 'Building block Name length must be less than or equal to 45 characters long'
+        }),
+    rm_buildblock_status: Joi.number().min(0).max(1).required(),
+    rm_buildblock_alias: Joi.string().optional()
+        .messages({
+            'string.empty': 'Alias is Required',
+            'string.min': 'Building block Alias Name length must be at least 3 characters long',
+            // 'string.max': 'Department Section Name length must be less than or equal to 45 characters long'
+        }),
+    rm_buildblock_no: Joi.string().required()
+        .messages({
+            'string.empty': 'Building block Number is Required',
+            'string.min': 'Building block Number length must be at least 3 characters long',
+
+        }),
+    rm_buildblock_slno: Joi.optional(),
+
+});
+// Inside building block master validation Room management
+const validateInsideBuildingBlock = Joi.object({
+    rm_insidebuildblock_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Inside Building block Name is Required',
+            'string.min': 'Inside Building block Name length must be at least 3 characters long',
+            'string.max': 'Inside Building block Name length must be less than or equal to 45 characters long'
+        }),
+    rm_insidebuildblock_status: Joi.number().min(0).max(1).required(),
+    rm_insidebuildblock_alias: Joi.string().optional()
+        .messages({
+            'string.empty': 'Alias is Required',
+            'string.min': 'Inside Building block Alias Name length must be at least 3 characters long',
+            // 'string.max': 'Department Section Name length must be less than or equal to 45 characters long'
+        }),
+    rm_insidebuildblock_no: Joi.string().required()
+        .messages({
+            'string.empty': 'Inside Building block Number is Required',
+            'string.min': 'Inside Building block Number length must be at least 3 characters long',
+
+        }),
+    rm_insidebuildblock_slno: Joi.number().optional()
+
+});
+//Floor master validation Room management
+const validateFloor = Joi.object({
+    rm_roomcategory_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Room Category Name is Required',
+            'string.min': 'Room Category Name length must be at least 3 characters long',
+            'string.max': 'Room Category Name length must be less than or equal to 45 characters long'
+        }),
+    rm_roomcategory_status: Joi.number().min(0).max(1).required(),
+    rm_roomcategory_alias: Joi.string().optional()
+        .messages({
+            'string.empty': 'Alias is Required',
+            'string.min': 'Room Category Alias Name length must be at least 3 characters long',
+            // 'string.max': 'Department Section Name length must be less than or equal to 45 characters long'
+        }),
+    rm_roomcategory_no: Joi.string().required()
+        .messages({
+            'string.empty': 'Room Category Number is Required',
+            'string.min': 'Room Category Number length must be at least 3 characters long',
+
+        }),
+    rm_roomcategory_slno: Joi.optional(),
+
+});
+
+
+
+//Room Type master validation Room management
+const validateRoomTypeMast = Joi.object({
+    rm_roomtype_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Room type Name is Required',
+            'string.min': 'Room type Name length must be at least 3 characters long',
+            'string.max': 'Room type Name length must be less than or equal to 45 characters long'
+        }),
+    rm_roomtype_status: Joi.number().min(0).max(1).required(),
+    rm_roomtype_alias: Joi.string().optional()
+        .messages({
+            'string.empty': 'Alias is Required',
+            'string.min': 'Room type Alias Name length must be at least 3 characters long',
+            // 'string.max': 'Department Section Name length must be less than or equal to 45 characters long'
+        }),
+    rm_roomtype_no: Joi.string().required()
+        .messages({
+            'string.empty': 'Room type Number is Required',
+            'string.min': 'Room type Number length must be at least 3 characters long',
+
+        }),
+    rm_roomtype_slno: Joi.optional(),
+
+});
+
+//Floor creation validation room management 
+const validateFloors = Joi.object({
+    rm_floor_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Room type Name is Required',
+            'string.min': 'Room type Name length must be at least 3 characters long',
+            'string.max': 'Room type Name length must be less than or equal to 45 characters long'
+        }),
+    rm_floor_status: Joi.number().min(0).max(1).required(),
+    rm_floor_alias: Joi.string().optional()
+        .messages({
+            'string.empty': 'Alias is Required',
+            'string.min': 'Room type Alias Name length must be at least 3 characters long',
+            // 'string.max': 'Department Section Name length must be less than or equal to 45 characters long'
+        }),
+    rm_floor_no: Joi.string().required()
+        .messages({
+            'string.empty': 'Room type Number is Required',
+            'string.min': 'Room type Number length must be at least 3 characters long',
+
+        }),
+    rm_floor_slno: Joi.optional(),
+
+});
+
+
+
+
 // Department Section  validation
 const validateDeptSec = Joi.object({
     sec_name: Joi.string().trim().uppercase().min(3).max(45).required()
@@ -228,7 +431,7 @@ const validateBuilding = Joi.object({
     em_id: Joi.number().optional(),
 });
 //Floor Master
-const validateFloor = Joi.object({
+const validateFloorCreations = Joi.object({
     floor_desc: Joi.string().trim().uppercase().min(3).max(45).required()
         .messages({
             'string.empty': 'Floor Description is Required',
@@ -675,6 +878,13 @@ const ValidatePrority = Joi.object({
 })
 
 module.exports = {
+    validateFloors,
+    validateRoomCategory,
+    validateInsideBuildingBlock,
+    validateRoomTypeMast,
+    validateBuildBlock,
+    validateBuildingMast,
+    validateCampus,
     validateEmployee,
     validateUserGroup,
     validateDepartment,
@@ -717,6 +927,6 @@ module.exports = {
     validateOmTableMast,
     validateOmEmpmapping,
     validateComEmpmapping,
-    ValidatePrority
+    ValidatePrority,
 
 }

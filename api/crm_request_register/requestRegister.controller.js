@@ -1,7 +1,9 @@
 const { requestRegistInsert, requestRegistInsertDetl, requestApprovalInsert, getReqByDeptBase, getItemListByReqno,
     requestRegistUpdate, requestRegistDetlUpdate, getAuthorization, getDeptApprovList, updateInchargeApproval,
     updateHodApproval, getApprovListOthers, updateOMApproval, updateSOMpproval, updateCEOApproval,
-    updateEDApproval, updateReqMst } = require('../crm_request_register/requestRegister.service');
+    updateEDApproval, updateReqMst, getApprovListDMS, deleteItemListByReqno, getCrfDeptDataCollect,
+    CrfDeptDataCollectInsert, getDataCollectList, EditItemListByReqno, CrfDataCollactnSave
+} = require('../crm_request_register/requestRegister.service');
 const { validateRequestRegister, validateRequestRegisterDetl, validateUserGroup } = require('../../validation/validation_schema');
 const logger = require('../../logger/logger');
 
@@ -567,6 +569,216 @@ module.exports = {
             }
         });
     },
+    getApprovListDMS: (req, res) => {
+        getApprovListDMS((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "No results found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+
+    deleteItemListByReqno: (req, res) => {
+        const body = req.body;
+        // const body_result = validateComplaintRegist.validate(body);
+        // if (body_result.error) {
+        //     logger.logwindow(body_result.error.details[0].message)
+        //     return res.status(200).json({
+        //         success: 3,
+        //         message: body_result.error.details[0].message
+        //     });
+        // }
+        deleteItemListByReqno(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Item Removed successfully"
+            });
+        });
+    },
+
+    EditItemListByReqno: (req, res) => {
+        const body = req.body;
+        // const body_result = validateComplaintRegist.validate(body);
+        // if (body_result.error) {
+        //     logger.logwindow(body_result.error.details[0].message)
+        //     return res.status(200).json({
+        //         success: 3,
+        //         message: body_result.error.details[0].message
+        //     });
+        // }
+        EditItemListByReqno(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Data Edited successfully"
+            });
+        });
+    },
+
+    getCrfDeptDataCollect: (req, res) => {
+        getCrfDeptDataCollect((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "No results found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    CrfDeptDataCollectInsert: (req, res) => {
+
+        const body = req.body;
+        var newList = body.map((val, index) => {
+            return [val.crf_requst_slno, val.crf_req_collect_dept, val.req_user]
+        })
+
+        // checkInsertVal(newList, (err, results) => {
+        //     const value = JSON.parse(JSON.stringify(results));
+        //     if (Object.keys(value).length === 0) {
+        CrfDeptDataCollectInsert(newList, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            // detailedAssigncompstatus(body[0], (err, results) => {
+            //     if (err) {
+            //         logger.logwindow(err)
+            //         return res.status(200).json({
+            //             success: 2,
+            //             message: err
+            //         });
+            //     }
+            return res.status(200).json({
+                success: 1,
+                message: "Request Send for Data collection Successfully"
+            });
+            // })
+        });
+
+        //     }
+        //     else {
+        //         return res.status(200).json({
+        //             success: 3,
+        //             message: "Complaint Already Assigned "
+        //         });
+
+        //     }
+
+        // })
+    },
+
+
+    getDataCollectList: (req, res) => {
+        const id = req.params.id
+        getDataCollectList(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    CrfDataCollactnSave: (req, res) => {
+        const body = req.body;
+        // const body_result = validateComplaintRegist.validate(body);
+        // if (body_result.error) {
+        //     logger.logwindow(body_result.error.details[0].message)
+        //     return res.status(200).json({
+        //         success: 3,
+        //         message: body_result.error.details[0].message
+        //     });
+        // }
+        CrfDataCollactnSave(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Data Edited successfully"
+            });
+        });
+    },
+
+
 
 }
 

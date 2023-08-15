@@ -132,12 +132,8 @@ const subcategory = require('./api/am_subcategory/am_subcategory.router')
 const group = require('./api/am_group/am_group.router')
 const subgroup = require('./api/am_sub_group/sub_group.router')
 const manufacture = require('./api/am_manufacture/manufacture.router')
-<<<<<<< HEAD
 const complaintMobileapp = require('./api/cm_complaint_mobapp/cmmobapp.router')
-
-=======
 const dashBoardData = require('./api/rm_dashboard/dashboard.router')
->>>>>>> e48edd3be4ea907e8cff2fc4073ab8fc29fc37e3
 
 
 app.use(express.json());

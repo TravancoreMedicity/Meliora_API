@@ -132,8 +132,7 @@ const subcategory = require('./api/am_subcategory/am_subcategory.router')
 const group = require('./api/am_group/am_group.router')
 const subgroup = require('./api/am_sub_group/sub_group.router')
 const manufacture = require('./api/am_manufacture/manufacture.router')
-
-
+const dashBoardData = require('./api/rm_dashboard/dashboard.router')
 
 
 app.use(express.json());
@@ -234,6 +233,7 @@ app.use('/api/subcategory', subcategory)
 app.use('/api/amgroup/', group)
 app.use('/api/subgroup', subgroup)
 app.use('/api/manufacture', manufacture)
+app.use('/api/getDashboardData', dashBoardData)
 
 
 server.listen(process.env.APP_PORT, () =>

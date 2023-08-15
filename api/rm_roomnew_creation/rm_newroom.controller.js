@@ -12,7 +12,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Room data inserted successfully"
+                insetid: result.insertId
             })
         })
     },

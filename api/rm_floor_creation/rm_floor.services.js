@@ -7,20 +7,18 @@ module.exports = {
            rm_floor_campus_slno,
            rm_floor_building_slno,
            rm_floor_build_block_slno,
-           rm_floor_inside_build_slno,
-           rm_floor_name,
+                     rm_floor_name,
            rm_floor_alias,
            rm_floor_no,
            rm_floor_room_starts,
            rm_floor_room_ends,
            rm_floor_status
           )
-          VALUES(?,?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?)`,
             [
                 data.rm_floor_campus_slno,
                 data.rm_floor_building_slno,
                 data.rm_floor_build_block_slno,
-                data.rm_floor_inside_build_slno,
                 data.rm_floor_name,
                 data.rm_floor_alias,
                 data.rm_floor_no,
@@ -43,15 +41,14 @@ module.exports = {
             `SELECT
             rm_floor_slno, rm_floor_campus_slno,rm_campus_mast.rm_campus_name,
             rm_floor_building_slno,rm_building_mast.rm_building_name,
-            rm_floor_build_block_slno, rm_buildblock_mast.rm_buildblock_name,
-            rm_floor_inside_build_slno,rm_insidebuildblock_mast.rm_insidebuildblock_name,
+            rm_floor_build_block_slno, rm_buildblock_mast.rm_buildblock_name,          
             rm_floor_name, rm_floor_alias,rm_floor_no,rm_floor_room_starts,rm_floor_room_ends, rm_floor_status,
             if(rm_floor_creation.rm_floor_status = 1 ,'Yes','No') status
             from rm_floor_creation
             left join rm_campus_mast on rm_campus_mast.rm_campus_slno=rm_floor_creation.rm_floor_campus_slno
             left join rm_building_mast on rm_building_mast.rm_building_slno=rm_floor_creation.rm_floor_building_slno
             left join rm_buildblock_mast on rm_buildblock_mast.rm_buildblock_slno=rm_floor_creation.rm_floor_build_block_slno
-            left join rm_insidebuildblock_mast on rm_insidebuildblock_mast.rm_insidebuildblock_slno=rm_floor_creation.rm_floor_inside_build_slno`, [],
+            `, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -70,8 +67,7 @@ module.exports = {
             rm_floor_campus_slno=?,
             rm_floor_building_slno=?,
             rm_floor_build_block_slno=?,
-            rm_floor_inside_build_slno=?,
-            rm_floor_name=?,
+                       rm_floor_name=?,
             rm_floor_alias=?,
             rm_floor_no=?,
             rm_floor_room_starts=?,
@@ -84,7 +80,6 @@ module.exports = {
                 data.rm_floor_campus_slno,
                 data.rm_floor_building_slno,
                 data.rm_floor_build_block_slno,
-                data.rm_floor_inside_build_slno,
                 data.rm_floor_name,
                 data.rm_floor_alias,
                 data.rm_floor_no,

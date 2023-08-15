@@ -132,7 +132,7 @@ const subcategory = require('./api/am_subcategory/am_subcategory.router')
 const group = require('./api/am_group/am_group.router')
 const subgroup = require('./api/am_sub_group/sub_group.router')
 const manufacture = require('./api/am_manufacture/manufacture.router')
-
+const complaintMobileapp = require('./api/cm_complaint_mobapp/cmmobapp.router')
 
 
 
@@ -234,6 +234,7 @@ app.use('/api/subcategory', subcategory)
 app.use('/api/amgroup/', group)
 app.use('/api/subgroup', subgroup)
 app.use('/api/manufacture', manufacture)
+app.use('/api/mobileapp', complaintMobileapp)
 
 
 server.listen(process.env.APP_PORT, () =>

@@ -1,11 +1,22 @@
 const router = require("express").Router();
-const { getTotalNotAssigncomplaints, getComDetlcountEmp, getAssignListEmp, getAssistListEmp,
-    getOnHoldListEmp, getOnProgressListEmp, getforVerifyListEmp, getCompleteListEmp,
-    getAssignListDeptWise, getAssistListDeptWise, getOnHoldListDeptWise, getOnHoldBeforeAssigntDeptWise,
-    getOnProgressListDeptWise, getforVerifyListDeptWise, getCompleteListDeptWiseToday
+const {
+    getTotalNotAssigncomplaints,
+    getComDetlcountEmp,
+    getAssignListEmp,
+    getAssistListEmp,
+    getOnHoldListEmp,
+    getOnProgressListEmp,
+    getforVerifyListEmp,
+    getCompleteListEmp,
+    getAssignListDeptWise,
+    getAssistListDeptWise,
+    getOnHoldListDeptWise,
+    getOnHoldBeforeAssigntDeptWise,
+    getOnProgressListDeptWise,
+    getforVerifyListDeptWise,
+    getCompleteListDeptWiseToday
 } = require('../cm_complaint_mobapp/cmmobapp.controller')
 const { checkToken } = require("../../authentication/token_validation");
-
 
 router.get("/notassigncomplaints/:id", checkToken, getTotalNotAssigncomplaints);// Total Complaint List For Assign Pending based on Dept
 router.get("/getComDetlcountEmp/:id", checkToken, getComDetlcountEmp)//employee based count

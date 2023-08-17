@@ -1,4 +1,4 @@
-const { FloorInsert, FloorView, FloorUpdate } = require('../rm_floor_creation/rm_floor.services')
+const { FloorInsert, FloorView, FloorUpdate, FloorLastRoom } = require('../rm_floor_creation/rm_floor.services')
 module.exports = {
     FloorInsert: (req, res) => {
         const body = req.body;
@@ -10,10 +10,25 @@ module.exports = {
                     message: err
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                message: "Floor creation data inserted successfully"
-            })
+            else {
+                const datas = {
+                    last_room_slno: body.rm_floor_room_starts,
+                    floor_slno: result.insertId
+                }
+                FloorLastRoom(datas, (err, result) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Floor creation data inserted successfully"
+                    })
+                })
+
+            }
         })
     },
 

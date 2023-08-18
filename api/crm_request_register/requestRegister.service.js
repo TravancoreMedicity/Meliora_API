@@ -824,5 +824,26 @@ module.exports = {
         );
     },
 
+    DataCollectComplete: (id, callBack) => {
+        pool.query(
+            `select crf_req_collect_dept,
+            co_department_mast.dept_name,
+            crf_data_collection.crf_dept_status
+             from crf_data_collection
+            left join crf_dept_map on crf_dept_map.crf_dept_slno =crf_data_collection.crf_req_collect_dept
+            left join co_department_mast on co_department_mast.dept_id=crf_dept_map.dept_slno
+            where crf_requst_slno=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
 
 }

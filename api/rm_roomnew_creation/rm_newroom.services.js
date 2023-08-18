@@ -13,9 +13,9 @@ module.exports = {
             rm_insidebuilldblock_slno,
             rm_roomtype_slno,
             rm_category_slno,
-            rm_room_status
+            rm_room_status,actual_rm_no
           )
-          VALUES(?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.rm_room_name,
                 data.rm_room_no,
@@ -25,7 +25,8 @@ module.exports = {
                 data.rm_insidebuilldblock_slno,
                 data.rm_roomtype_slno,
                 data.rm_category_slno,
-                data.rm_room_status
+                data.rm_room_status,
+                data.actual_rm_no
 
 
             ],
@@ -111,4 +112,31 @@ module.exports = {
             }
         )
     },
+    roomgetById: (id, callback) => {
+        pool.query(
+            `SELECT rm_floor_room_starts,rm_floor_room_ends FROM rm_floor_creation WHERE rm_floor_slno=?`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    lastUpdatedRoomgetById: (id, callback) => {
+        pool.query(
+            `select last_room_slno from rm_floor_room_connect where floor_slno=?`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+
 }

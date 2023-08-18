@@ -1,4 +1,4 @@
-const { RoomInsert, RoomView, RoomUpdate } = require('../rm_roomnew_creation/rm_newroom.services')
+const { RoomInsert, RoomView, RoomUpdate, roomgetById, lastUpdatedRoomgetById } = require('../rm_roomnew_creation/rm_newroom.services')
 module.exports = {
     RoomInsert: (req, res) => {
         const body = req.body;
@@ -57,8 +57,56 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "floor creation data Updated successfully"
+                message: "Room Updated successfully"
             })
+        })
+    },
+    roomgetById: (req, res) => {
+
+        const id = req.params.id;
+
+        roomgetById(id, (err, results) => {
+
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(400).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+    lastUpdatedRoomgetById: (req, res) => {
+
+        const id = req.params.id;
+
+        lastUpdatedRoomgetById(id, (err, results) => {
+
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(400).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
         })
     },
 }

@@ -112,6 +112,28 @@ module.exports = {
             }
         )
     },
+
+    RoomLastUpdate: (data, callback) => {
+
+        pool.query(
+
+            `UPDATE rm_floor_room_connect SET 
+            last_room_slno=?                      
+            WHERE 
+            floor_slno=?`,
+            [
+                data.last_room_slno,
+                data.floor_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
     roomgetById: (id, callback) => {
         pool.query(
             `SELECT rm_floor_room_starts,rm_floor_room_ends FROM rm_floor_creation WHERE rm_floor_slno=?`,

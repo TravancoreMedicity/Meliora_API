@@ -35,8 +35,8 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
-                return res.status(400).json({
+            if (results.length == 0) {
+                return res.status(200).json({
                     success: 1,
                     message: "No Data"
                 });
@@ -58,8 +58,8 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
-                return res.status(400).json({
+            if (results.length == 0) {
+                return res.status(200).json({
                     success: 1,
                     message: "No Data"
                 });

@@ -6,11 +6,13 @@ module.exports = {
             `INSERT INTO am_subcategory
           ( 
             subcategory_name,
+            category_slno,
             subcategory_status
           )
-          VALUES(?,?)`,
+          VALUES(?,?,?)`,
             [
                 data.subcategory_name,
+                data.category_slno,
                 data.subcategory_status,
             ],
 
@@ -27,10 +29,12 @@ module.exports = {
             `SELECT 
             subcategory_slno,
             subcategory_name, 
-            subcategory_status,
+            am_category.category_name,
+            subcategory_status,am_category.category_slno,
             if(subcategory_status=1,'Yes','No')status
             FROM
-            am_subcategory`, [],
+            am_subcategory
+            left join am_category on am_category.category_slno=am_subcategory.category_slno`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -46,14 +50,14 @@ module.exports = {
 
             `UPDATE am_subcategory SET 
             subcategory_name=?,
+            category_slno=?,
             subcategory_status=?
             WHERE 
             subcategory_slno=?`,
 
             [
-
-
                 data.subcategory_name,
+                data.category_slno,
                 data.subcategory_status,
                 data.subcategory_slno
             ],

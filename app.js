@@ -133,7 +133,10 @@ const group = require('./api/am_group/am_group.router')
 const subgroup = require('./api/am_sub_group/sub_group.router')
 const manufacture = require('./api/am_manufacture/manufacture.router')
 const dashBoardData = require('./api/rm_dashboard/dashboard.router')
-
+const amSelectComponent = require('./api/am_selectcomponents/select.router')
+const primaryCustodian = require('./api/am_primary_custodian/primary.router')
+const secondaryCustodian = require('./api/am_secondary_custodian/secondary.router')
+const itemNameCreation = require('./api/am_item_name_creation/item.router')
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -234,7 +237,10 @@ app.use('/api/amgroup/', group)
 app.use('/api/subgroup', subgroup)
 app.use('/api/manufacture', manufacture)
 app.use('/api/getDashboardData', dashBoardData)
-
+app.use('/api/amSelectComponent', amSelectComponent)
+app.use('/api/primaryCustodian', primaryCustodian)
+app.use('/api/secondaryCustodian', secondaryCustodian)
+app.use('/api/itemNameCreation', itemNameCreation)
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

@@ -9,18 +9,21 @@ module.exports = {
             rm_room_no,
             rm_room_alias,
             rm_build_slno,
+            rm_building_block_slno,
             rm_room_floor_slno,
             rm_insidebuilldblock_slno,
             rm_roomtype_slno,
             rm_category_slno,
-            rm_room_status,actual_rm_no
+            rm_room_status,
+            actual_rm_no
           )
-          VALUES(?,?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.rm_room_name,
                 data.rm_room_no,
                 data.rm_room_alias,
                 data.rm_build_slno,
+                data.rm_building_block_slno,
                 data.rm_room_floor_slno,
                 data.rm_insidebuilldblock_slno,
                 data.rm_roomtype_slno,
@@ -44,20 +47,23 @@ module.exports = {
             ` SELECT 
             rm_room_slno, rm_room_name,rm_room_no, rm_room_alias,
             rm_newroom_creation.rm_build_slno,
+            rm_newroom_creation.rm_building_block_slno,
             rm_newroom_creation.rm_room_floor_slno,
             rm_newroom_creation.rm_insidebuilldblock_slno, 
             rm_newroom_creation.rm_roomtype_slno,
             rm_newroom_creation.rm_category_slno, 
             rm_room_status,
             if(rm_room_status = 1 ,'Yes','No') status,
-            rm_building_mast.rm_building_name,			
+            rm_building_mast.rm_building_name,	
+            rm_buildblock_mast.rm_buildblock_name,
             rm_floor_creation.rm_floor_name,
             rm_insidebuildblock_mast.rm_insidebuildblock_name,
             rm_room_type_master.rm_roomtype_name,
             rm_room_category_master.rm_roomcategory_name 
             from 
             rm_newroom_creation
-            LEFT JOIN rm_building_mast ON rm_building_mast.rm_building_slno=rm_newroom_creation.rm_build_slno    
+            LEFT JOIN rm_building_mast ON rm_building_mast.rm_building_slno=rm_newroom_creation.rm_build_slno 
+            LEFT JOIN rm_buildblock_mast ON rm_buildblock_mast.rm_buildblock_slno=rm_newroom_creation.rm_building_block_slno 
             LEFT JOIN rm_floor_creation ON rm_floor_creation.rm_floor_slno=rm_newroom_creation.rm_room_floor_slno          
             LEFT JOIN rm_insidebuildblock_mast ON rm_insidebuildblock_mast.rm_insidebuildblock_slno=rm_newroom_creation.rm_insidebuilldblock_slno
             LEFT JOIN rm_room_type_master ON rm_room_type_master.rm_roomtype_slno=rm_newroom_creation.rm_roomtype_slno
@@ -82,6 +88,7 @@ module.exports = {
             rm_room_alias=?,
             rm_room_no=?,
             rm_build_slno=?,
+            rm_building_block_slno=?,
             rm_room_floor_slno=?,
             rm_insidebuilldblock_slno=?,
             rm_roomtype_slno=?,
@@ -97,6 +104,7 @@ module.exports = {
                 data.rm_room_no,
                 data.rm_room_alias,
                 data.rm_build_slno,
+                data.rm_building_block_slno,
                 data.rm_room_floor_slno,
                 data.rm_insidebuilldblock_slno,
                 data.rm_roomtype_slno,

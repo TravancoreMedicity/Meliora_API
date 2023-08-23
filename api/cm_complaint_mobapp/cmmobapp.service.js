@@ -41,7 +41,8 @@ module.exports = {
 
     getComDetlcountEmp: (id, callBack) => {
         pool.query(
-            `call meliora.GET_COMPLAINT_COUNT(?)`,
+            // `call meliora.GET_COMPLAINT_COUNT(?)`,
+            `call meliora.GET_COMPLAINT_ASSIGN_COUNT_EMP(?)`,
             [id],
             (error, results, fields) => {
                 if (error) {

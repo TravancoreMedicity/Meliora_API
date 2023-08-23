@@ -86,20 +86,24 @@ module.exports = {
         );
     },
 
-    getFloorBasedOnBuild: (id, callBack) => {
+    getFloorBasedOnBuild: (data, callBack) => {
         pool.query(
             `select rm_floor_slno,rm_floor_name,rm_floor_alias
             from rm_floor_creation            
-            where rm_floor_building_slno=?`,
-            [id],
-            (error, results, fields) => {
+            where rm_floor_building_slno=?  and rm_floor_build_block_slno=?`,
+            [
+                data.rm_floor_building_slno,
+                data.rm_floor_build_block_slno
+            ],
+            (error, results, feilds) => {
                 if (error) {
-                    callBack(error)
+                    return callBack(error);
                 }
-                return callBack(null, results)
+                return callBack(null, results);
             }
         );
     },
+
 
     getRoomTypedropDown: (callback) => {
         pool.query(
@@ -135,4 +139,22 @@ module.exports = {
             }
         );
     },
+    getFloorBasedOnBuildAndBuildBlock: (callback) => {
+        pool.query(
+            `SELECT 
+            rm_floor_slno,
+            rm_floor_name
+            FROM
+            rm_floor_creation
+            WHERE rm_floor_building_slno=? and rm_floor_build_block_slno=?`, [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
+
 }

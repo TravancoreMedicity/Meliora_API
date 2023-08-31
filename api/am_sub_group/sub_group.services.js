@@ -6,11 +6,13 @@ module.exports = {
             `INSERT INTO am_sub_group
           ( 
             sub_group_name,
+            group_slno,
             sub_group_status
           )
-          VALUES(?,?)`,
+          VALUES(?,?,?)`,
             [
                 data.sub_group_name,
+                data.group_slno,
                 data.sub_group_status,
             ],
 
@@ -27,10 +29,12 @@ module.exports = {
             `SELECT 
             subgroup_slno,
             sub_group_name, 
-            sub_group_status,
+            am_group.group_name,
+            sub_group_status,am_group.group_slno,
             if(sub_group_status=1,'Yes','No')status
             FROM
-            am_sub_group`, [],
+            am_sub_group
+            left join am_group on am_group.group_slno=am_sub_group.group_slno`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -46,6 +50,7 @@ module.exports = {
 
             `UPDATE am_sub_group SET 
             sub_group_name=?,
+            group_slno=?,
             sub_group_status=?
             WHERE 
             subgroup_slno=?`,
@@ -54,6 +59,7 @@ module.exports = {
 
 
                 data.sub_group_name,
+                data.group_slno,
                 data.sub_group_status,
                 data.subgroup_slno
             ],

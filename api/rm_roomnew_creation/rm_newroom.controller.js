@@ -1,18 +1,36 @@
-const { RoomInsert, RoomView, RoomUpdate, roomgetById, lastUpdatedRoomgetById } = require('../rm_roomnew_creation/rm_newroom.services')
+const { RoomInsert, RoomView, RoomUpdate, roomgetById, lastUpdatedRoomgetById, RoomLastUpdate } = require('../rm_roomnew_creation/rm_newroom.services')
 module.exports = {
     RoomInsert: (req, res) => {
         const body = req.body;
         RoomInsert(body, (err, result) => {
-
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                insetid: result.insertId
+            const data = {
+                floor_slno: body.rm_room_floor_slno,
+                last_room_slno: body.actual_rm_no
+            }
+            RoomLastUpdate(data, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    })
+                }
+                if (results === 0) {
+                    return res.status(200).json({
+                        success: 1,
+                        message: "No record found"
+
+                    })
+                }
+                return res.status(200).json({
+                    success: 1,
+                    insetid: result.insertId
+                })
             })
         })
     },
@@ -64,7 +82,6 @@ module.exports = {
     roomgetById: (req, res) => {
 
         const id = req.params.id;
-
         roomgetById(id, (err, results) => {
 
             if (err) {

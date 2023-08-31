@@ -2,9 +2,10 @@ const { pool } = require('../../config/database')
 module.exports = {
     floorDashgetById: (id, callback) => {
         pool.query(
-            `select rm_floor_slno,rm_floor_name
-            from rm_floor_creation            
-            where rm_floor_building_slno=?`,
+            `select rm_floor_slno,rm_floor_name,floor_order,rm_floor_build_block_slno,rm_buildblock_name
+            from rm_floor_creation     
+            left join rm_buildblock_mast on rm_buildblock_mast.rm_buildblock_slno=  rm_floor_creation.     rm_floor_build_block_slno
+            where rm_floor_building_slno=? ORDER BY floor_order DESC`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -18,7 +19,8 @@ module.exports = {
     RoomDashgetById: (id, callback) => {
         pool.query(
             `select rm_room_slno,rm_room_name
-            from rm_newroom_creation            
+            from rm_newroom_creation 
+                     
             where rm_room_floor_slno=?`,
             [id],
             (error, results, fields) => {

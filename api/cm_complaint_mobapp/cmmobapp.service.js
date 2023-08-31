@@ -6,8 +6,8 @@ module.exports = {
             complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
             compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
             rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
-            req_type_name,complaint_dept_name, assigned_emp, 
-            IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
+            req_type_name,complaint_dept_name, C.em_name as create_user, 
+            IFNULL(A.em_name,"Not Assign")as assigned_emp,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
              (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
              IFNULL( l.sec_name,"Nil" ) location, cm_complaint_type.complaint_type_name,
@@ -21,7 +21,8 @@ module.exports = {
             left join co_deptsec_mast l on l.sec_id=cm_complaint_mast.cm_location
             left join co_deptsec_mast s on s.sec_id=cm_complaint_mast.complaint_dept_secslno  
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno= cm_complaint_mast.complaint_slno
-            left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
+              left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
              WHERE 
             complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
             and compalint_status=0 group by complaint_slno`,

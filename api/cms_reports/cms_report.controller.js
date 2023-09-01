@@ -243,6 +243,7 @@ module.exports = {
         });
     },
 
+
     getCompCategory: (req, res) => {
 
         getCompCategory((err, results) => {

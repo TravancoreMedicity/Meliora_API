@@ -209,16 +209,20 @@ module.exports = {
             `select cm_complaint_mast.complaint_slno,compalint_date,cm_location,complaint_desc,
             cm_complaint_type.complaint_type_name,cm_priority_desc,
             assigned_date,co_deptsec_mast.sec_name as location,cm_rectify_time,cm_verfy_time,
-            TIMEDIFF(assigned_date, compalint_date) as tat
+            TIMEDIFF(assigned_date, compalint_date) as tat,
+            co_employee_master.em_name as assign
             from cm_complaint_mast
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
             left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
             left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
-            where compalint_date between ? and ?`,
+            left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            where compalint_date between ? and ? and
+            complaint_deptslno=?`,
             [
                 data.start_date,
-                data.end_date
+                data.end_date,
+                data.complaint_deptslno
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -234,16 +238,22 @@ module.exports = {
             `select cm_complaint_mast.complaint_slno,compalint_date,cm_location,complaint_desc,
             cm_complaint_type.complaint_type_name,cm_priority_desc,
             assigned_date,co_deptsec_mast.sec_name as location,cm_rectify_time,cm_verfy_time,
-            TIMEDIFF(assigned_date, compalint_date) as tat
+            TIMEDIFF(assigned_date, compalint_date) as tat_assign,
+            TIMEDIFF(cm_rectify_time, assigned_date) as tat_rect,
+            TIMEDIFF(cm_verfy_time, cm_rectify_time) as tat_very,
+            co_employee_master.em_name as assign
             from cm_complaint_mast
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
             left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
             left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
-            where compalint_date between ? and ?`,
+            left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            where compalint_date between ? and ? and
+            complaint_deptslno=?`,
             [
                 data.start_date,
-                data.end_date
+                data.end_date,
+                data.complaint_deptslno
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -253,6 +263,8 @@ module.exports = {
             }
         );
     },
+
+
 
     getCompCategory: (callBack) => {
         pool.query(

@@ -870,6 +870,8 @@ const ValidatePrority = Joi.object({
     cm_priority_desc: Joi.string().required(),
     cm_priority_status: Joi.number().required(),
     create_user: Joi.number().optional(),
+    escalation_min: Joi.number().optional(),
+    escalation_max: Joi.number().optional(),
     edit_user: Joi.number().optional(),
     cm_priority_slno: Joi.number().optional(),
 

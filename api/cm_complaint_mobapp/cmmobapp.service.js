@@ -6,9 +6,10 @@ module.exports = {
             complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
             compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
             rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
-            req_type_name,complaint_dept_name, C.em_name as create_user, 
+            req_type_name,complaint_dept_name, C.em_name as create_employee, 
             IFNULL(A.em_name,"Not Assign")as assigned_emp,
-             IFNULL(assigned_date,"Not Assign") as assigned_date,
+             IFNULL(assigned_date,"Not Assign") as assigned_date,priority_check,
+              IFNULL(priority_reason,"Not Given")as priority_reason,
              (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
              IFNULL( l.sec_name,"Nil" ) location, cm_complaint_type.complaint_type_name,
               (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"

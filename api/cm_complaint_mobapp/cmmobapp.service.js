@@ -6,8 +6,8 @@ module.exports = {
             complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
             compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
             rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
-            req_type_name,complaint_dept_name, assigned_emp, 
-            IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
+            req_type_name,complaint_dept_name,  C.em_name as create_user, 
+            IFNULL(A.em_name,"Not Assign")as assigned_emp,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
              compalint_priority,IFNULL(priority_reason,"Not Given")as priority_reason,priority_check,
              IFNULL(escalation_min,"Not Given")as escalation_min,
@@ -24,7 +24,8 @@ module.exports = {
             left join co_deptsec_mast l on l.sec_id=cm_complaint_mast.cm_location
             left join co_deptsec_mast s on s.sec_id=cm_complaint_mast.complaint_dept_secslno  
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno= cm_complaint_mast.complaint_slno
-            left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
+            left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
              WHERE 
             complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
@@ -64,7 +65,8 @@ module.exports = {
             req_type_name,complaint_type_name,
             S.sec_name as sec_name, cm_rectify_time,cm_verfy_time,
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
-            IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
+         C.em_name as create_user, 
+            IFNULL(A.em_name,"Not Assign")as assigned_emp,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
              compalint_priority,IFNULL(priority_reason,"Not Given")as priority_reason,priority_check,
              IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
@@ -85,6 +87,8 @@ module.exports = {
         left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
         left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
         left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+        left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
+        left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
         where assigned_emp=? and assign_status=1 `,
 
             [
@@ -105,7 +109,8 @@ module.exports = {
             req_type_name,complaint_type_name,
             S.sec_name as sec_name, cm_rectify_time,cm_verfy_time,
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
-            IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
+            C.em_name as create_user, 
+            IFNULL(A.em_name,"Not Assign")as assigned_emp,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
              compalint_priority,
              IFNULL(escalation_min,"Not Given")as escalation_min,
@@ -126,6 +131,8 @@ module.exports = {
         left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
         left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
         left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+        left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
+        left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
         where assigned_emp=? and assist_receive=1 and assign_status=1`,
 
             [

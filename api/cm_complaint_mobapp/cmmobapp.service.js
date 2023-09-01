@@ -6,10 +6,14 @@ module.exports = {
             complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
             compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
             rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
-            req_type_name,complaint_dept_name, C.em_name as create_user, 
+            req_type_name,complaint_dept_name, C.em_name as create_employee, 
             IFNULL(A.em_name,"Not Assign")as assigned_emp,
-             IFNULL(assigned_date,"Not Assign") as assigned_date,
-             (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
+             IFNULL(assigned_date,"Not Assign") as assigned_date,priority_check,
+              IFNULL(priority_reason,"Not Given")as priority_reason,
+              compalint_priority,
+              IFNULL(escalation_min,"Not Given")as escalation_min,
+              IFNULL(escalation_max,"Not Given")as escalation_max,
+              IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
              IFNULL( l.sec_name,"Nil" ) location, cm_complaint_type.complaint_type_name,
               (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
@@ -23,6 +27,7 @@ module.exports = {
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno= cm_complaint_mast.complaint_slno
             left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
               left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
+              left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
              WHERE 
             complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
             and compalint_status=0 group by complaint_slno`,
@@ -61,7 +66,10 @@ module.exports = {
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
             IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
-            (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
+             compalint_priority,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
                                 if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
                  (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
@@ -76,6 +84,7 @@ module.exports = {
         left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
         left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
         left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+        left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
         where assigned_emp=? and assign_status=1 `,
 
             [
@@ -98,7 +107,10 @@ module.exports = {
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
             IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
-            (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
                                 if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
                  (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
@@ -113,6 +125,7 @@ module.exports = {
         left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
         left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
         left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+        left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
         where assigned_emp=? and assist_receive=1 and assign_status=1`,
 
             [
@@ -134,7 +147,10 @@ module.exports = {
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
             IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
-            (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
                                 if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
                  (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
@@ -149,6 +165,7 @@ module.exports = {
         left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
         left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
         left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+        left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
         where assigned_emp=? and cm_rectify_status='O' and assign_status=1`,
 
             [
@@ -170,7 +187,10 @@ module.exports = {
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
             IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
-            (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
                                 if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
                  (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
@@ -185,6 +205,7 @@ module.exports = {
         left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
         left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
         left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+        left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
         where assigned_emp=? and cm_rectify_status='P' and assign_status=1`,
 
             [
@@ -206,7 +227,10 @@ module.exports = {
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
             IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
-            (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
                                 if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
                  (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
@@ -221,6 +245,7 @@ module.exports = {
         left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
         left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
         left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+        left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
         where assign_status=1 and assigned_emp=? and compalint_status=2`,
 
             [
@@ -242,7 +267,10 @@ module.exports = {
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
             IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
-            (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
                                 if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
                  (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
@@ -257,6 +285,7 @@ module.exports = {
         left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
         left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
         left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+        left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
         where assign_status=1 and assigned_emp=? and compalint_status=3`,
 
             [
@@ -280,7 +309,10 @@ module.exports = {
             req_type_name,complaint_dept_name, assigned_emp, 
             IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
-             (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
              IFNULL( l.sec_name,"Nil" ) location, cm_complaint_type.complaint_type_name,
               (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
@@ -293,6 +325,7 @@ module.exports = {
             left join co_deptsec_mast s on s.sec_id=cm_complaint_mast.complaint_dept_secslno  
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno= cm_complaint_mast.complaint_slno
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
              WHERE 
             complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
              and compalint_status=1
@@ -319,7 +352,10 @@ module.exports = {
             req_type_name,complaint_dept_name, assigned_emp, 
             IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
-             (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
              IFNULL( l.sec_name,"Nil" ) location, cm_complaint_type.complaint_type_name,
               (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
@@ -332,6 +368,7 @@ module.exports = {
             left join co_deptsec_mast s on s.sec_id=cm_complaint_mast.complaint_dept_secslno  
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno= cm_complaint_mast.complaint_slno
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
              WHERE 
             complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
              and assist_receive=1 and assign_status=1
@@ -358,7 +395,10 @@ module.exports = {
             req_type_name,complaint_dept_name, assigned_emp, 
             IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
-             (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
              IFNULL( l.sec_name,"Nil" ) location, cm_complaint_type.complaint_type_name,
               (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
@@ -371,6 +411,7 @@ module.exports = {
             left join co_deptsec_mast s on s.sec_id=cm_complaint_mast.complaint_dept_secslno  
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno= cm_complaint_mast.complaint_slno
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
              WHERE 
             complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
              and cm_rectify_status='O' 
@@ -397,7 +438,10 @@ module.exports = {
             req_type_name,complaint_dept_name, assigned_emp, 
             IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
-             (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
              IFNULL( l.sec_name,"Nil" ) location, cm_complaint_type.complaint_type_name,
               (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
@@ -410,6 +454,7 @@ module.exports = {
             left join co_deptsec_mast s on s.sec_id=cm_complaint_mast.complaint_dept_secslno  
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno= cm_complaint_mast.complaint_slno
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
              WHERE 
             complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
              and cm_rectify_status='O' and cm_rectify_time is NULL
@@ -437,7 +482,10 @@ module.exports = {
             req_type_name,complaint_dept_name, assigned_emp, 
             IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
-             (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
              IFNULL( l.sec_name,"Nil" ) location, cm_complaint_type.complaint_type_name,
               (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
@@ -450,6 +498,7 @@ module.exports = {
             left join co_deptsec_mast s on s.sec_id=cm_complaint_mast.complaint_dept_secslno  
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno= cm_complaint_mast.complaint_slno
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
              WHERE 
             complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
              and cm_rectify_status='P'
@@ -476,7 +525,10 @@ module.exports = {
             req_type_name,complaint_dept_name, assigned_emp, 
             IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
-             (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
              IFNULL( l.sec_name,"Nil" ) location, cm_complaint_type.complaint_type_name,
               (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
@@ -489,6 +541,7 @@ module.exports = {
             left join co_deptsec_mast s on s.sec_id=cm_complaint_mast.complaint_dept_secslno  
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno= cm_complaint_mast.complaint_slno
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
              WHERE 
             complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
              and compalint_status=2
@@ -514,8 +567,11 @@ module.exports = {
             req_type_name,complaint_dept_name, assigned_emp, 
             IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
-             (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High"  else "Medium" end ) as priority ,
-             IFNULL( l.sec_name,"Nil" ) location, cm_complaint_type.complaint_type_name,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+              IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
+                          IFNULL( l.sec_name,"Nil" ) location, cm_complaint_type.complaint_type_name,
               (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
             s.sec_name as dept_sec
@@ -527,6 +583,7 @@ module.exports = {
             left join co_deptsec_mast s on s.sec_id=cm_complaint_mast.complaint_dept_secslno  
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno= cm_complaint_mast.complaint_slno
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
              WHERE 
             complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
             and date(cm_rectify_time)=current_date()

@@ -6,12 +6,16 @@ module.exports = {
             (
                 cm_priority_desc,
                 cm_priority_status,
+                escalation_min,
+                escalation_max,
                 create_user
                ) 
                 VALUES(?,?,?)`,
             [
                 data.cm_priority_desc,
                 data.cm_priority_status,
+                data.escalation_min,
+                data.escalation_max,
                 data.create_user
             ],
             (error, results, fields) => {
@@ -61,11 +65,15 @@ module.exports = {
             `UPDATE cm_priority_mast 
             SET cm_priority_desc=?,
             cm_priority_status=?,
+            escalation_min=?,
+                escalation_max=?,
             edit_user=?        
           WHERE cm_priority_slno=? `,
             [
                 data.cm_priority_desc,
                 data.cm_priority_status,
+                data.escalation_min,
+                data.escalation_max,
                 data.edit_user,
                 data.cm_priority_slno
             ],
@@ -80,8 +88,10 @@ module.exports = {
     PrioritySelectData: (callback) => {
         pool.query(
             ` SELECT cm_priority_slno, cm_priority_desc, 
-            cm_priority_status,
-             if(cm_priority_status = 1 ,'Yes','No')status
+            cm_priority_status,escalation_min,escalation_max,
+            IFNULL(escalation_min,"Not Given")as escalation_min_dis,
+            IFNULL(escalation_max,"Not Given")as escalation_max_dis,
+                         if(cm_priority_status = 1 ,'Yes','No')status
             FROM cm_priority_mast`,
             [],
             (error, results, fields) => {

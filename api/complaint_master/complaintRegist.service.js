@@ -129,8 +129,6 @@ module.exports = {
                                      (case when cm_rectify_status = 'R' then "Rectified" when cm_rectify_status = 'P' then "Pending" when cm_rectify_status = 'O' then "On Hold" else "Not" end ) as cm_rectify_status1,
                                      verify_spervsr,compalint_date,compalint_status,cm_rectify_status,
                         M.em_name as send_user,R.em_name as read_user
-
-
                         from 
                         cm_complaint_mast
                         left join co_employee_master C on cm_complaint_mast.create_user = C.em_id

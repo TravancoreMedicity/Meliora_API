@@ -30,10 +30,10 @@ module.exports = {
                     });
                 });
             } else {
-                logger.infologwindow("Diet Name Already Exist")
+                logger.infologwindow("Complaint Priority Already Exist")
                 return res.status(200).json({
                     success: 7,
-                    message: "Diet Name Already Exist"
+                    message: "Complaint Priority Already Exist"
                 })
             }
         })
@@ -69,14 +69,14 @@ module.exports = {
                     }
                     return res.status(200).json({
                         success: 2,
-                        message: "Diet Name Updated Successfully"
+                        message: "Complaint Priority Updated Successfully"
                     })
                 })
             } else {
-                logger.infologwindow("Diet Name  Already Exist")
+                logger.infologwindow("Complaint Priority  Already Exist")
                 return res.status(200).json({
                     success: 7,
-                    message: "Diet Name Already Exist"
+                    message: "Complaint Priority Already Exist"
                 })
             }
         })

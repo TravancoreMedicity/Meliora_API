@@ -15,6 +15,5 @@ router.post("/ReqComCategorty", checkToken, ReqComCategorty);
 router.post("/ReqAreaWise", checkToken, ReqAreaWise);
 router.post("/ReqComPerAssigne", checkToken, ReqComPerAssigne);
 router.post("/ReqTatPerComAssignee", checkToken, ReqTatPerComAssignee);
-
 router.get("/getCompCategory", checkToken, getCompCategory);
 module.exports = router;

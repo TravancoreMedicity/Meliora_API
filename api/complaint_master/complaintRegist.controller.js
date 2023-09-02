@@ -11,7 +11,7 @@ module.exports = {
     complaintRegistInsert: (req, res) => {
 
         // console.log(req.io)
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
+
         const body = req.body;
         //validate complaintdept Insert function
         const body_result = validateComplaintRegist.validate(body);
@@ -51,6 +51,7 @@ module.exports = {
                         })
                     }
                     if (results) {
+                        req.io.emit("message", `New Complaint Registed ! Please Check`)
                         getapptokenbydept(body.complaint_deptslno, (err, result) => {
                             if (err) {
                                 logger.logwindow(err)

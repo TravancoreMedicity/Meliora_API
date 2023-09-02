@@ -37,7 +37,7 @@ module.exports = {
     },
     quickAssign: (req, res) => {
         const body = req.body;
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
+
         checkInsertVal(body, (err, results) => {
             const value = JSON.parse(JSON.stringify(results));
             if (Object.keys(value).length === 0) {
@@ -57,6 +57,7 @@ module.exports = {
                                 message: err
                             });
                         }
+                        req.io.emit("message", `New Complaint Registed ! Please Check`)
                         return res.status(200).json({
                             success: 1,
                             message: "Complaint Assigned Successfully"
@@ -97,7 +98,7 @@ module.exports = {
     },
     detailedAssign: (req, res) => {
 
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
+
         const body = req.body;
         var newList = body.map((val, index) => {
             return [val.complaint_slno, val.assigned_emp, val.assigned_date, val.assign_rect_status,
@@ -123,6 +124,7 @@ module.exports = {
                                 message: err
                             });
                         }
+                        req.io.emit("message", `New Complaint Registed ! Please Check`)
                         return res.status(200).json({
                             success: 1,
                             message: "Complaint Assigned Successfully"
@@ -165,7 +167,7 @@ module.exports = {
         });
     },
     getassistantEmployee: (req, res) => {
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
+
         const body = req.body
         getassistantEmployee(body, (err, results) => {
             if (err) {
@@ -182,6 +184,7 @@ module.exports = {
                     message: "No Results Found"
                 });
             }
+            req.io.emit("message", `New Complaint Registed ! Please Check`)
             return res.status(200).json({
                 success: 1,
                 data: results
@@ -189,7 +192,7 @@ module.exports = {
         });
     },
     insertAssistemp: (req, res) => {
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
+
         const body = req.body
         checkInsertVal(body, (err, results) => {
             const value = JSON.parse(JSON.stringify(results));
@@ -211,6 +214,7 @@ module.exports = {
                                 message: err
                             });
                         }
+                        req.io.emit("message", `New Complaint Registed ! Please Check`)
                         return res.status(200).json({
                             success: 1,
                             message: "Complaint Assisted Successfully"
@@ -278,7 +282,7 @@ module.exports = {
     },
     AssistantRecieved: (req, res) => {
 
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
+
         const body = req.body
         AssistantRecieved(body, (err, results) => {
             if (err) {
@@ -288,6 +292,7 @@ module.exports = {
                     message: err
                 });
             }
+            req.io.emit("message", `New Complaint Registed ! Please Check`)
             return res.status(200).json({
                 success: 1,
                 message: "Assisted Successfully"
@@ -296,7 +301,7 @@ module.exports = {
     },
     TransferDept: (req, res) => {
 
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
+
         const body = req.body
         TransferDept(body, (err, results) => {
             if (err) {
@@ -313,6 +318,7 @@ module.exports = {
                     message: "No Complaints"
                 });
             }
+            req.io.emit("message", `New Complaint Registed ! Please Check`)
             return res.status(200).json({
                 success: 1,
                 message: "Complaint Transfer Successfully"
@@ -368,7 +374,7 @@ module.exports = {
 
     AssistMultiple: (req, res) => {
 
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
+
         const body = req.body;
         var newList = body.map((val, index) => {
             return [val.complaint_slno, val.assigned_emp, val.assist_assign_date, val.assist_flag,
@@ -384,6 +390,7 @@ module.exports = {
                 });
             }
             else {
+                req.io.emit("message", `New Complaint Registed ! Please Check`)
                 return res.status(200).json({
                     success: 1,
                     message: "Complaint Assist Requested Successfullt"
@@ -419,7 +426,7 @@ module.exports = {
 
     transferInsert: (req, res) => {
 
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
+
         const body = req.body;
         var newList = body.map((val, index) => {
             return [val.complaint_slno, val.assigned_emp, val.assigned_date, val.assign_rect_status,
@@ -433,7 +440,7 @@ module.exports = {
                     message: err
                 });
             }
-
+            req.io.emit("message", `New Complaint Registed ! Please Check`)
             return res.status(200).json({
                 success: 1,
                 message: "Complaint Assigned Successfully"
@@ -443,7 +450,7 @@ module.exports = {
 
     EmployeeInactive: (req, res) => {
 
-        req.io.emit("message", `One Complaint in your Assigned List is Transfer to another Employee`)
+
         const body = req.body
         var newList = body.map((val, index) => {
             return [val.complaint_slno, val.assigned_emp]
@@ -456,6 +463,7 @@ module.exports = {
                     message: err
                 });
             }
+            req.io.emit("message", `One Complaint in your Assigned List is Transfer to another Employee`)
             return res.status(200).json({
                 success: 1,
                 message: "Assisted Successfully"
@@ -504,7 +512,7 @@ module.exports = {
     },
     sendMeassageUser: (req, res) => {
 
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
+
         const body = req.body
         sendMeassageUser(body, (err, results) => {
             if (err) {
@@ -521,6 +529,7 @@ module.exports = {
                     message: "No Complaints"
                 });
             }
+            req.io.emit("message", `New Complaint Registed ! Please Check`)
             return res.status(200).json({
                 success: 1,
                 message: "Complaint Transfer Successfully"
@@ -529,7 +538,7 @@ module.exports = {
     },
     ReadMeassageUser: (req, res) => {
 
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
+
         const body = req.body
         ReadMeassageUser(body, (err, results) => {
             if (err) {
@@ -546,6 +555,7 @@ module.exports = {
                     message: "No Complaints"
                 });
             }
+            req.io.emit("message", `New Complaint Registed ! Please Check`)
             return res.status(200).json({
                 success: 1,
                 message: "Complaint Transfer Successfully"
@@ -617,7 +627,7 @@ module.exports = {
     },
     AssisttransferInsert: (req, res) => {
 
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
+
         const body = req.body;
         var newList = body.map((val, index) => {
             return [val.complaint_slno, val.assigned_emp, val.assign_rect_status, val.assigned_date,
@@ -632,7 +642,7 @@ module.exports = {
                     message: err
                 });
             }
-
+            req.io.emit("message", `New Complaint Registed ! Please Check`)
             return res.status(200).json({
                 success: 1,
                 message: "Complaint Assigned Successfully"
@@ -664,7 +674,7 @@ module.exports = {
     },
     SupervsrVerify: (req, res) => {
 
-        req.io.emit("message", `New Complaint Registed ! Please Check`)
+
         const body = req.body
         SupervsrVerify(body, (err, results) => {
             if (err) {
@@ -681,6 +691,7 @@ module.exports = {
                     message: "No Complaints"
                 });
             }
+            req.io.emit("message", `New Complaint Registed ! Please Check`)
             return res.status(200).json({
                 success: 1,
                 message: "Complaint Transfer Successfully"

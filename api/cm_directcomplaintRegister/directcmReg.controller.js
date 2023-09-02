@@ -1,11 +1,14 @@
-const logger = require('../../logger/logger');
+
 const { directcomplaintRegistInsert, getdirectcomplaintList, directcomplaintUpdate } = require('../cm_directcomplaintRegister/directcmReg.service');
 const { getapptokenbydept, updateserialnum } = require('../complaint_master/complaintRegist.service');
 const { validateComplaintRegist } = require('../../validation/validation_schema');
+const logger = require('../../logger/logger');
 const { default: Expo } = require('expo-server-sdk');
 const { getCompSerialno } = require('../commoncode/common.service');
-
 const expo = new Expo()
+
+
+
 module.exports = {
     directcomplaintRegistInsert: (req, res) => {
         const body = req.body;
@@ -45,7 +48,7 @@ module.exports = {
                         })
                     }
                     if (results) {
-                        req.io.emit("message", `New Complaint Registed ! Please Check`)
+                        // req.io.emit("message", `New Complaint Registed ! Please Check`)
                         getapptokenbydept(body.complaint_deptslno, (err, result) => {
                             if (err) {
                                 logger.logwindow(err)
@@ -122,6 +125,7 @@ module.exports = {
                                     message: "Record Not Found"
                                 });
                             }
+
                             return res.status(200).json({
                                 success: 1,
                                 message: "Complaint Registered Successfully"

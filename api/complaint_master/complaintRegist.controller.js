@@ -51,7 +51,7 @@ module.exports = {
                         })
                     }
                     if (results) {
-                        req.io.emit("message", `New Complaint Registed ! Please Check`)
+
                         getapptokenbydept(body.complaint_deptslno, (err, result) => {
                             if (err) {
                                 logger.logwindow(err)
@@ -129,6 +129,7 @@ module.exports = {
                                     message: "Record Not Found"
                                 });
                             }
+                            req.io.emit("message", `New Complaint Registed ! Please Check`)
                             return res.status(200).json({
                                 success: 1,
                                 message: "Complaint Registered Successfully"

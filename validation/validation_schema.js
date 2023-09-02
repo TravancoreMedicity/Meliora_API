@@ -566,14 +566,16 @@ const validateModuleGroupRight = Joi.object({
 })
 
 const validateComplaintRegist = Joi.object({
-    complaint_slno: Joi.number().required(),
-    complaint_desc: Joi.string().required(),
+
     complaint_dept_secslno: Joi.number().required(),
     complaint_request_slno: Joi.number().required(),
-    complaint_deptslno: Joi.number().required(),
+    complaint_deptslno: Joi.number().optional(),
     complaint_typeslno: Joi.number().required(),
+    complaint_desc: Joi.string().required().messages({
+        'string.empty': 'Complaint Description is Required'
+    }),
     compalint_priority: Joi.number().optional(),
-    compalint_status: Joi.number().required(),
+    compalint_status: Joi.number().optional(),
     complaint_hicslno: Joi.optional(),
     complaint_slno: Joi.number().optional(),
     compalint_date: Joi.number().optional(),

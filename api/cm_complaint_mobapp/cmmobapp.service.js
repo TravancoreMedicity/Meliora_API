@@ -29,7 +29,7 @@ module.exports = {
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
              WHERE 
             complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
-             and compalint_status=2
+             and compalint_status=0
             group by complaint_slno`,
 
             [

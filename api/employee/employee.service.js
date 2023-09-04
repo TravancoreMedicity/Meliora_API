@@ -389,6 +389,26 @@ module.exports = {
             }
         );
     },
+    changepasword: (data, callBack) => {
+        pool.query(
+            `UPDATE co_employee
+            SET emp_password=?,
+            edit_user=?                      
+            where emp_no=? and emp_status=1
+            `, [
+            data.emp_password,
+            data.edit_user,
+            data.emp_no
+        ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+
+                return callBack(null, results);
+            }
+        );
+    },
 
 }
 

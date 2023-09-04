@@ -1,5 +1,6 @@
 const { pool } = require('../../config/database')
 module.exports = {
+
     getCategory: (callback) => {
         pool.query(
             `SELECT 
@@ -112,6 +113,57 @@ module.exports = {
             FROM
             meliora.am_manufacture
             WHERE manufacture_status=1`, [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
+    getAmModel: (callback) => {
+        pool.query(
+            `SELECT 
+            model_slno,
+            model_name
+            FROM
+            meliora.am_model
+            WHERE model_status=1`, [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
+    getUOM: (callback) => {
+        pool.query(
+            `SELECT 
+            uom_slno,
+            uom_name
+            FROM
+            meliora.am_uom
+            WHERE uom_status=1`, [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
+    getSubmodel: (id, callback) => {
+        pool.query(
+            `SELECT 
+            submodel_slno,
+            submodel_name
+            FROM
+            meliora.am_submodel
+            WHERE submodel_status=1 and model_slno=? `, [id],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);

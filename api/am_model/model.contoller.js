@@ -1,9 +1,8 @@
-const { ItemNameInsert, ItemNameview, ItemNameUpdate } = require('../am_item_name_creation/item.services')
+const { ModelInsert, ModelView, ModelUpdate } = require('../am_model/model.services')
 module.exports = {
-    ItemNameInsert: (req, res) => {
+    ModelInsert: (req, res) => {
         const body = req.body;
-        ItemNameInsert(body, (err, result) => {
-
+        ModelInsert(body, (err, result) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -12,13 +11,13 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Item creation data inserted successfully"
+                message: "Model inserted successfully"
             })
         })
     },
-    ItemNameview: (req, res) => {
+    ModelView: (req, res) => {
 
-        ItemNameview((err, results) => {
+        ModelView((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -38,9 +37,9 @@ module.exports = {
 
         })
     },
-    ItemNameUpdate: (req, res) => {
+    ModelUpdate: (req, res) => {
         const body = req.body;
-        ItemNameUpdate(body, (err, results) => {
+        ModelUpdate(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -56,7 +55,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Item creation data Updated successfully"
+                message: "Model Updated successfully"
             })
         })
     },

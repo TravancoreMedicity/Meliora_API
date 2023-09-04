@@ -2,7 +2,7 @@ const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { sign } = require("jsonwebtoken");
 const { employeeinsert, employeeupdate, getemplpyee, employeeGetById, checkUpdateVal, checkInsertVal, employeedelete,
     getEmployeeByUserName, empInsert, updateserialnum, employeeGetAll, updateEmployee, updateEmployeeCo,
-    checkEmployeeExist, employeemoduleGroup, updatemodulegroup, updateserialnumempDetl
+    checkEmployeeExist, employeemoduleGroup, updatemodulegroup, updateserialnumempDetl, changepasword
 } = require('../employee/employee.service');
 const { validateuserCreation, validateEmployee } = require('../../validation/validation_schema')
 const logger = require('../../logger/logger');
@@ -375,7 +375,35 @@ module.exports = {
         });
     },
 
+    changepasword: (req, res) => {
+        const body = req.body;
+        const salt = genSaltSync(10);
+        let new_password = body.emp_password;
+        body.emp_password = hashSync(new_password, salt);
+        changepasword(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: res.err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 6,
+                    message: "Record Not Found"
+                });
+            }
 
+            return res.status(200).json({
+                success: 2,
+                message: "Updated Successfully"
+            });
+
+
+        });
+    },
 
 
 }

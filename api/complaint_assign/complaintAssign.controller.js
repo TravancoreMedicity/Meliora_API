@@ -29,6 +29,7 @@ module.exports = {
                     message: "No Complaints"
                 });
             }
+            req.io.emit("message", `New Complaint Registed ! Please Check`)
             return res.status(200).json({
                 success: 1,
                 data: results

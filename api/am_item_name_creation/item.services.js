@@ -20,10 +20,10 @@ module.exports = {
             item_model_num,
             item_specific_one,
             item_specific_two,
-            item_specific_three,
+            
             item_creation_status
           )
-          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.item_asset_type_slno,
                 data.item_type_slno,
@@ -40,7 +40,6 @@ module.exports = {
                 data.item_model_num,
                 data.item_specific_one,
                 data.item_specific_two,
-                data.item_specific_three,
                 data.item_creation_status,
             ],
 
@@ -51,7 +50,9 @@ module.exports = {
                 return callback(null, results);
             }
         );
+
     },
+
     ItemNameview: (callback) => {
         pool.query(
             `SELECT

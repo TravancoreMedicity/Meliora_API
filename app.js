@@ -139,6 +139,11 @@ const amSelectComponent = require('./api/am_selectcomponents/select.router')
 const primaryCustodian = require('./api/am_primary_custodian/primary.router')
 const secondaryCustodian = require('./api/am_secondary_custodian/secondary.router')
 const itemNameCreation = require('./api/am_item_name_creation/item.router')
+const unitOfMeasurement = require('./api/am_uom/uom.router')
+const model = require('./api/am_model/model.router')
+const submodel = require('./api/am_submodel/sumodel.router')
+
+
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -235,7 +240,7 @@ app.use('/api/assettypee', assettypee)
 app.use('/api/itemType', itemtype)
 app.use('/api/amcategory', amcategory)
 app.use('/api/subcategory', subcategory)
-app.use('/api/amgroup/', group)
+app.use('/api/amgroup', group)
 app.use('/api/subgroup', subgroup)
 app.use('/api/manufacture', manufacture)
 app.use('/api/mobileapp', complaintMobileapp)
@@ -245,6 +250,12 @@ app.use('/api/amSelectComponent', amSelectComponent)
 app.use('/api/primaryCustodian', primaryCustodian)
 app.use('/api/secondaryCustodian', secondaryCustodian)
 app.use('/api/itemNameCreation', itemNameCreation)
+app.use('/api/uom', unitOfMeasurement)
+app.use('/api/model', model)
+app.use('/api/submodel', submodel)
+
+
+
 
 
 server.listen(process.env.APP_PORT, () =>

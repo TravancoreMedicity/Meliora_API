@@ -385,19 +385,7 @@ const validateHicPolicy = Joi.object({
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
 });
-//Asset Type Validation
-const validateAssetType = Joi.object({
-    asset_type_name: Joi.string().trim().uppercase().min(3).max(45).required()
-        .messages({
-            'string.empty': 'Asset Name  Required',
-            'string.min': 'Asset Name length must be at least 3 characters long',
-            'string.max': 'Asset Name length must be less tahn or equal to 45 characters long'
-        }),
-    asset_type_slno: Joi.number().optional(),
-    asset_type_status: Joi.number().min(0).max(1).required(),
-    create_user: Joi.number().optional(),
-    edit_user: Joi.number().optional(),
-});
+
 //Request Type Validation
 const validateRequestType = Joi.object({
     req_type_name: Joi.string().trim().uppercase().min(3).max(45).required()
@@ -879,6 +867,22 @@ const ValidatePrority = Joi.object({
 
 })
 
+
+//Asset Type Validation
+const validateAssetType = Joi.object({
+    asset_type_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Asset Name  Required',
+            'string.min': 'Asset Name length must be at least 3 characters long',
+            'string.max': 'Asset Name length must be less tahn or equal to 45 characters long'
+        }),
+    asset_type_slno: Joi.number().optional(),
+    asset_type_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+
+
 module.exports = {
     validateFloors,
     validateRoomCategory,
@@ -896,7 +900,6 @@ module.exports = {
     validateComplaintDept,
     validateComplaintType,
     validateHicPolicy,
-    validateAssetType,
     validateRequestType,
     validateModuleGroup,
     validateUserRights,
@@ -930,5 +933,6 @@ module.exports = {
     validateOmEmpmapping,
     validateComEmpmapping,
     ValidatePrority,
+    validateAssetType
 
 }

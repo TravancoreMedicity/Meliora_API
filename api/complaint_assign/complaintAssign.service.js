@@ -325,7 +325,7 @@ module.exports = {
                     left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
                     left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assist_requested_emp
                     left join co_department_mast RD on RD.dept_id=co_employee_master.em_department 
-            where assigned_emp=? AND assist_flag=1 and compalint_status = 1`,
+            where assigned_emp=? AND assist_flag=1 and compalint_status = 1 group by complaint_slno`,
             [
                 id
             ],

@@ -6,12 +6,14 @@ module.exports = {
             `INSERT INTO am_asset_type
           ( 
             asset_type_name,
-            asset_type_status
+            asset_type_status,
+            create_user
           )
-          VALUES(?,?)`,
+          VALUES(?,?,?)`,
             [
                 data.asset_type_name,
                 data.asset_type_status,
+                data.create_user
             ],
 
             (error, results, fields) => {
@@ -44,13 +46,15 @@ module.exports = {
 
             `UPDATE am_asset_type SET 
             asset_type_name=?,
-            asset_type_status=?
+            asset_type_status=?,
+            edit_user =?
             WHERE 
             asset_type_slno=?`,
 
             [
                 data.asset_type_name,
                 data.asset_type_status,
+                data.edit_user,
                 data.asset_type_slno
             ],
             (error, results, feilds) => {

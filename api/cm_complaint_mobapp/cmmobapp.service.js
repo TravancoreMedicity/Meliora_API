@@ -89,7 +89,7 @@ module.exports = {
         left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
         left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
         left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
-        where assigned_emp=? and assign_status=1 `,
+        where assigned_emp=? and assign_status=1 and compalint_status=1 and cm_rectify_status is null `,
 
             [
                 id
@@ -110,6 +110,8 @@ module.exports = {
             S.sec_name as sec_name, cm_rectify_time,cm_verfy_time,
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
             C.em_name as create_employee, 
+             IFNULL(R.em_name,"Not Given")as assist_requested_emp,
+             assigned_date as requsted_date,
             IFNULL(A.em_name,"Not Assign")as assigned_emp,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
              compalint_priority,
@@ -133,7 +135,8 @@ module.exports = {
         left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
         left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
         left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
-        where assigned_emp=? and assist_receive=1 and assign_status=1`,
+        left join  co_employee_master R on R.em_id=cm_complaint_detail.assist_requested_emp
+        where assigned_emp=? and assist_flag=1 and assist_receive=0 GROUP BY complaint_slno`,
 
             [
                 id

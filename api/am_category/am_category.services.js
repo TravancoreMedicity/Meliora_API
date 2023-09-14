@@ -6,12 +6,14 @@ module.exports = {
             `INSERT INTO am_category
           ( 
             category_name,
-            category_status
+            category_status,
+            create_user
           )
-          VALUES(?,?)`,
+          VALUES(?,?,?)`,
             [
                 data.category_name,
                 data.category_status,
+                data.create_user
             ],
 
             (error, results, fields) => {
@@ -46,7 +48,8 @@ module.exports = {
 
             `UPDATE am_category SET 
             category_name=?,
-            category_status=?
+            category_status=?,
+            edit_user=?
             WHERE 
             category_slno=?`,
 
@@ -55,7 +58,9 @@ module.exports = {
 
                 data.category_name,
                 data.category_status,
-                data.category_slno
+                data.edit_user,
+                data.category_slno,
+
             ],
             (error, results, feilds) => {
                 if (error) {

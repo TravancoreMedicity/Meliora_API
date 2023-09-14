@@ -7,13 +7,15 @@ module.exports = {
           ( 
             sub_group_name,
             group_slno,
-            sub_group_status
+            sub_group_status,
+            create_user
           )
-          VALUES(?,?,?)`,
+          VALUES(?,?,?,?)`,
             [
                 data.sub_group_name,
                 data.group_slno,
                 data.sub_group_status,
+                data.create_user
             ],
 
             (error, results, fields) => {
@@ -51,7 +53,8 @@ module.exports = {
             `UPDATE am_sub_group SET 
             sub_group_name=?,
             group_slno=?,
-            sub_group_status=?
+            sub_group_status=?,
+            edit_user=?
             WHERE 
             subgroup_slno=?`,
 
@@ -61,7 +64,9 @@ module.exports = {
                 data.sub_group_name,
                 data.group_slno,
                 data.sub_group_status,
-                data.subgroup_slno
+                data.edit_user,
+                data.subgroup_slno,
+
             ],
             (error, results, feilds) => {
                 if (error) {

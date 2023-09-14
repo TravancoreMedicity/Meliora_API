@@ -1,4 +1,4 @@
-const { GroupInsert, GroupView,GroupUpdate } = require('../am_group/am_group.services')
+const { GroupInsert, GroupView, GroupUpdate } = require('../am_group/am_group.services')
 module.exports = {
     GroupInsert: (req, res) => {
         const body = req.body;
@@ -11,6 +11,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
+                insertid: result.insertId,
                 message: "Group inserted successfully"
             })
         })

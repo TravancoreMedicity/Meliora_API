@@ -12,6 +12,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
+                insertid: result.insertId,
                 message: "Item creation data inserted successfully"
             })
         })

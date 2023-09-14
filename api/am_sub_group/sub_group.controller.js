@@ -1,4 +1,4 @@
-const { SubGroupInsert,SubGroupView,SubGroupUpdate } = require('../am_sub_group/sub_group.services')
+const { SubGroupInsert, SubGroupView, SubGroupUpdate } = require('../am_sub_group/sub_group.services')
 module.exports = {
     SubGroupInsert: (req, res) => {
         const body = req.body;
@@ -11,13 +11,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
+                insertid: result.insertId,
                 message: "Group inserted successfully"
             })
         })
     },
-   SubGroupView: (req, res) => {
+    SubGroupView: (req, res) => {
 
-    SubGroupView((err, results) => {
+        SubGroupView((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,

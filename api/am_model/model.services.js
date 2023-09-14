@@ -5,12 +5,14 @@ module.exports = {
             `INSERT INTO am_model
           ( 
             model_name,
-            model_status
+            model_status,
+            create_user
           )
-          VALUES(?,?)`,
+          VALUES(?,?,?)`,
             [
                 data.model_name,
                 data.model_status,
+                data.create_user,
             ],
 
             (error, results, fields) => {
@@ -41,20 +43,20 @@ module.exports = {
         );
     },
     ModelUpdate: (data, callback) => {
-
         pool.query(
 
             `UPDATE am_model SET 
             model_name=?,
-            model_status=?
+            model_status=?,
+            edit_user=?
             WHERE 
             model_slno=?`,
 
             [
 
-
                 data.model_name,
                 data.model_status,
+                data.edit_user,
                 data.model_slno
             ],
             (error, results, feilds) => {

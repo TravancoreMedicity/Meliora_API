@@ -47,16 +47,15 @@ module.exports = {
             `UPDATE am_asset_type SET 
             asset_type_name=?,
             asset_type_status=?,
-            create_user=?
+            edit_user =?
             WHERE 
             asset_type_slno=?`,
 
             [
                 data.asset_type_name,
                 data.asset_type_status,
-                data.create_user,
-                data.asset_type_slno,
-
+                data.edit_user,
+                data.asset_type_slno
             ],
             (error, results, feilds) => {
                 if (error) {

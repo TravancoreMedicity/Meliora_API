@@ -1,7 +1,18 @@
+const { validateAssetType } = require('../../validation/validation_schema');
 const { AssetTypeInsert, AssetTypeView, AssetTypeUpdate } = require('../am_asset_type/am_assetType.services')
 module.exports = {
     AssetTypeInsert: (req, res) => {
         const body = req.body;
+        //validate department Instert function
+        const body_result = validateAssetType.validate(body);
+        if (body_result.error) {
+            logger.warnlogwindow(body_result.error.details[0].message)
+            return res.status(200).json({
+                success: 2,
+                message: body_result.error.details[0].message
+            });
+        }
+        body.asset_type_name = body_result.value.asset_type_name;
         AssetTypeInsert(body, (err, result) => {
 
             if (err) {

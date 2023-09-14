@@ -1,7 +1,6 @@
 const { pool } = require('../../config/database')
 module.exports = {
     GroupInsert: (data, callback) => {
-        console.log(data);
         pool.query(
             `INSERT INTO am_group
           ( 

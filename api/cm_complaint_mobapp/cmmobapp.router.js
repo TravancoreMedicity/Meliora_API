@@ -14,7 +14,8 @@ const {
     getOnHoldBeforeAssigntDeptWise,
     getOnProgressListDeptWise,
     getforVerifyListDeptWise,
-    getCompleteListDeptWiseToday
+    getCompleteListDeptWiseToday,
+    getforSuperVerifyListEmp
 } = require('../cm_complaint_mobapp/cmmobapp.controller')
 const { checkToken } = require("../../authentication/token_validation");
 
@@ -27,6 +28,7 @@ router.get("/assistList/empwise/:id", checkToken, getAssistListEmp);//Assist Lis
 router.get("/onHoldList/empwise/:id", checkToken, getOnHoldListEmp);//On-Hold List
 router.get("/onProgressList/empwise/:id", checkToken, getOnProgressListEmp);//On Progress List
 router.get("/forVerifyList/empwise/:id", checkToken, getforVerifyListEmp);//Fo Verify List
+router.get("/forSuperVerifyList/empwise/:id", checkToken, getforSuperVerifyListEmp);//Fo Supervisor Verify List
 router.get("/completeList/empwise/:id", checkToken, getCompleteListEmp);//Completed List
 
 //Department Wise List

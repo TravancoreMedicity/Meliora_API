@@ -2,7 +2,7 @@ const logger = require('../../logger/logger');
 const { getTotalNotAssigncomplaints, getComDetlcountEmp, getAssignListEmp, getAssistListEmp,
     getOnHoldListEmp, getOnProgressListEmp, getforVerifyListEmp, getCompleteListEmp,
     getAssignListDeptWise, getAssistListDeptWise, getOnHoldListDeptWise, getOnHoldBeforeAssigntDeptWise,
-    getOnProgressListDeptWise,
+    getOnProgressListDeptWise, getforSuperVerifyListEmp,
     getforVerifyListDeptWise, getCompleteListDeptWiseToday
 
 } = require('../cm_complaint_mobapp/cmmobapp.service');
@@ -167,6 +167,32 @@ module.exports = {
         const id = req.params.id
 
         getforVerifyListEmp(id, (err, results) => {
+            if (err) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+
+    },
+    getforSuperVerifyListEmp: (req, res) => {
+        const id = req.params.id
+
+        getforSuperVerifyListEmp(id, (err, results) => {
             if (err) {
 
                 return res.status(200).json({

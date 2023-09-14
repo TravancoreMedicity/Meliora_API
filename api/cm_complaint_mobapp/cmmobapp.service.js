@@ -157,7 +157,7 @@ module.exports = {
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
             IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
              IFNULL(assigned_date,"Not Assign") as assigned_date,
-             compalint_priority,
+             compalint_priority,rectify_pending_hold_remarks,
              IFNULL(escalation_min,"Not Given")as escalation_min,
              IFNULL(escalation_max,"Not Given")as escalation_max,
              IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
@@ -257,6 +257,46 @@ module.exports = {
         left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
         left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
         where assign_status=1 and assigned_emp=? and compalint_status=2`,
+
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getforSuperVerifyListEmp: (id, callBack) => {
+        pool.query(
+            `select cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,complaint_dept_name,
+            req_type_name,complaint_type_name,
+            S.sec_name as sec_name, cm_rectify_time,cm_verfy_time,
+            IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
+            IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
+             IFNULL(assigned_date,"Not Assign") as assigned_date,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
+                                if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
+                 (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
+                           when compalint_status = '3' then "Verified" end ) as compalint_status1,
+        if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
+        compalint_status
+         from meliora.cm_complaint_detail
+         left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
+         left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
+         left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
+         left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
+         left join cm_hic_policy on cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno
+        left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
+        left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
+        left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+        left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+        where assign_status=1 and assigned_emp=? and compalint_status=2 and verify_spervsr=0`,
 
             [
                 id

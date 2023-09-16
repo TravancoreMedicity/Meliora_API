@@ -3,8 +3,8 @@ const { getTotalNotAssigncomplaints, getComDetlcountEmp, getAssignListEmp, getAs
     getOnHoldListEmp, getOnProgressListEmp, getforVerifyListEmp, getCompleteListEmp,
     getAssignListDeptWise, getAssistListDeptWise, getOnHoldListDeptWise, getOnHoldBeforeAssigntDeptWise,
     getOnProgressListDeptWise, getforSuperVerifyListEmp,
-    getforVerifyListDeptWise, getCompleteListDeptWiseToday
-
+    getforVerifyListDeptWise, getCompleteListDeptWiseToday, getforSuperVerifyListDeptWise,
+    getAssignListAllDetailDeptWise
 } = require('../cm_complaint_mobapp/cmmobapp.service');
 module.exports = {
     getTotalNotAssigncomplaints: (req, res) => {
@@ -429,4 +429,59 @@ module.exports = {
         })
 
     },
+
+    getforSuperVerifyListDeptWise: (req, res) => {
+        const id = req.params.id
+
+        getforSuperVerifyListDeptWise(id, (err, results) => {
+            if (err) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+
+    },
+
+    getAssignListAllDetailDeptWise: (req, res) => {
+        const id = req.params.id
+
+        getAssignListAllDetailDeptWise(id, (err, results) => {
+            if (err) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+
+    },
+
 }

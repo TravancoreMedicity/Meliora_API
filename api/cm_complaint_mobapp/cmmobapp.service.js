@@ -76,6 +76,7 @@ module.exports = {
                  (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
         if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
+        verify_spervsr,verify_spervsr_remarks,verify_spervsr_user,V.em_name as supervise_employee, 
         compalint_status
          from meliora.cm_complaint_detail
          left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
@@ -89,7 +90,8 @@ module.exports = {
         left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
         left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
         left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
-        where assigned_emp=? and assign_status=1 and compalint_status=1 and cm_rectify_status is null `,
+        left join co_employee_master V on V.em_id=cm_complaint_mast.verify_spervsr_user
+        where assigned_emp=? and assign_status=1 and compalint_status=1 and cm_rectify_status is null or verify_spervsr=2 group by complaint_slno `,
 
             [
                 id
@@ -638,6 +640,93 @@ module.exports = {
             complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
             and date(cm_rectify_time)=current_date()
             group by complaint_slno`,
+
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+
+    getforSuperVerifyListDeptWise: (id, callBack) => {
+        pool.query(
+            `select cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
+            complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
+            compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
+            rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
+            req_type_name,complaint_dept_name, assigned_emp, 
+            IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
+             IFNULL(assigned_date,"Not Assign") as assigned_date,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
+             IFNULL( l.sec_name,"Nil" ) location, cm_complaint_type.complaint_type_name,
+              (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
+                           when compalint_status = '3' then "Verified" end ) as compalint_status1,
+            s.sec_name as dept_sec
+            from cm_complaint_mast            
+            left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
+            left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno =cm_complaint_mast.complaint_deptslno
+            left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
+            left join co_deptsec_mast l on l.sec_id=cm_complaint_mast.cm_location
+            left join co_deptsec_mast s on s.sec_id=cm_complaint_mast.complaint_dept_secslno  
+            left join cm_complaint_detail on cm_complaint_detail.complaint_slno= cm_complaint_mast.complaint_slno
+            left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+             WHERE 
+            complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
+             and compalint_status=2 and verify_spervsr=0
+            group by complaint_slno`,
+
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    getAssignListAllDetailDeptWise: (id, callBack) => {
+        pool.query(
+            `select cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
+            complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
+            compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
+            rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
+            req_type_name,complaint_dept_name, assigned_emp, 
+            IFNULL(co_employee_master.em_name,"Not Assign")as em_name,
+             IFNULL(assigned_date,"Not Assign") as assigned_date,
+             compalint_priority,
+             IFNULL(escalation_min,"Not Given")as escalation_min,
+             IFNULL(escalation_max,"Not Given")as escalation_max,
+             IFNULL( cm_priority_mast.cm_priority_desc,"Not Given")as priority,
+             IFNULL( l.sec_name,"Nil" ) location, cm_complaint_type.complaint_type_name,
+              (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"
+                           when compalint_status = '3' then "Verified" end ) as compalint_status1,
+            s.sec_name as dept_sec
+            from cm_complaint_mast            
+            left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
+            left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno =cm_complaint_mast.complaint_deptslno
+            left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
+            left join co_deptsec_mast l on l.sec_id=cm_complaint_mast.cm_location
+            left join co_deptsec_mast s on s.sec_id=cm_complaint_mast.complaint_dept_secslno  
+            left join cm_complaint_detail on cm_complaint_detail.complaint_slno= cm_complaint_mast.complaint_slno
+            left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+             WHERE 
+            complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
+             and compalint_status=1
+            `,
 
             [
                 id

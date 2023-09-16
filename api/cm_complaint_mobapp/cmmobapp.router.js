@@ -15,7 +15,9 @@ const {
     getOnProgressListDeptWise,
     getforVerifyListDeptWise,
     getCompleteListDeptWiseToday,
-    getforSuperVerifyListEmp
+    getforSuperVerifyListEmp,
+    getforSuperVerifyListDeptWise,
+    getAssignListAllDetailDeptWise
 } = require('../cm_complaint_mobapp/cmmobapp.controller')
 const { checkToken } = require("../../authentication/token_validation");
 
@@ -39,6 +41,8 @@ router.get("/onHoldList/deptwise/:id", checkToken, getOnHoldListDeptWise);//On-H
 router.get("/onHoldBeforeAssignList/deptwise/:id", checkToken, getOnHoldBeforeAssigntDeptWise);//On-Hold List Depatment
 router.get("/onProgressList/deptwise/:id", checkToken, getOnProgressListDeptWise);//On Progress List Depatment
 router.get("/forVerifyList/deptwise/:id", checkToken, getforVerifyListDeptWise);//Fo Verify List Depatment
+router.get("/forSuperVerifyList/deptwise/:id", checkToken, getforSuperVerifyListDeptWise);//Fo Supervisor Verify List
 router.get("/completeList/deptwise/:id", checkToken, getCompleteListDeptWiseToday);//Completed Depatment List Today
+router.get("/assignListAllDetail/deptwise/:id", checkToken, getAssignListAllDetailDeptWise);//Assign List Depatment avoid group by complaint slno
 
 module.exports = router;

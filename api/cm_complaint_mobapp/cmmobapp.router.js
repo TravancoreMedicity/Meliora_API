@@ -17,7 +17,8 @@ const {
     getCompleteListDeptWiseToday,
     getforSuperVerifyListEmp,
     getforSuperVerifyListDeptWise,
-    getAssignListAllDetailDeptWise
+    getAssignListAllDetailDeptWise,
+    getcomplaintType
 } = require('../cm_complaint_mobapp/cmmobapp.controller')
 const { checkToken } = require("../../authentication/token_validation");
 
@@ -44,5 +45,7 @@ router.get("/forVerifyList/deptwise/:id", checkToken, getforVerifyListDeptWise);
 router.get("/forSuperVerifyList/deptwise/:id", checkToken, getforSuperVerifyListDeptWise);//Fo Supervisor Verify List
 router.get("/completeList/deptwise/:id", checkToken, getCompleteListDeptWiseToday);//Completed Depatment List Today
 router.get("/assignListAllDetail/deptwise/:id", checkToken, getAssignListAllDetailDeptWise);//Assign List Depatment avoid group by complaint slno
+
+router.get("/Type", checkToken, getcomplaintType);// Get All Complaint Type
 
 module.exports = router;

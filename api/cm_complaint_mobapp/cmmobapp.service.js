@@ -740,4 +740,21 @@ module.exports = {
         );
     },
 
+
+    getcomplaintType: (callBack) => {
+        pool.query(
+            `SELECT complaint_type_slno,complaint_type_name,cm_complaint_type.complaint_dept_slno,complaint_type_status
+            FROM cm_complaint_type
+            where complaint_type_status=1
+       `,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
 }

@@ -10,7 +10,7 @@ module.exports = {
                 escalation_max,
                 create_user
                ) 
-                VALUES(?,?,?)`,
+                VALUES(?,?,?,?,?)`,
             [
                 data.cm_priority_desc,
                 data.cm_priority_status,

@@ -173,7 +173,7 @@ module.exports = {
             if (result) {
                 results.emp_password = undefined;
                 const jsontoken = sign({ result: results }, "@dhj$&$(*)dndkm76$%#jdn(^$6GH%^#73*#*", {
-                    expiresIn: "5h"
+                    expiresIn: "10h"
                 });
 
                 return res.json({

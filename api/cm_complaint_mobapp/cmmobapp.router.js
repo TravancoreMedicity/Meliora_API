@@ -18,7 +18,10 @@ const {
     getforSuperVerifyListEmp,
     getforSuperVerifyListDeptWise,
     getAssignListAllDetailDeptWise,
-    getcomplaintType
+    getcomplaintType,
+    getapkDownloadDetails,
+    getComDetlcountDeptwise,
+    getCountCompEmpBasedDept
 } = require('../cm_complaint_mobapp/cmmobapp.controller')
 const { checkToken } = require("../../authentication/token_validation");
 
@@ -47,5 +50,11 @@ router.get("/completeList/deptwise/:id", checkToken, getCompleteListDeptWiseToda
 router.get("/assignListAllDetail/deptwise/:id", checkToken, getAssignListAllDetailDeptWise);//Assign List Depatment avoid group by complaint slno
 
 router.get("/Type", checkToken, getcomplaintType);// Get All Complaint Type
+router.get("/apkDownloadDetails/:id", checkToken, getapkDownloadDetails);//geting mobile app apk details
+router.get("/getComDetlcountdeptwise/:id", checkToken, getComDetlcountDeptwise)//employee based count
+router.get("/getCountCompEmpBasedDept/:id", checkToken, getCountCompEmpBasedDept)//Get complaint assigned and complete count of emp detail based on dept
+
+
+
 
 module.exports = router;

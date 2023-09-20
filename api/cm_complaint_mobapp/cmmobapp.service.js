@@ -757,4 +757,76 @@ module.exports = {
         );
     },
 
+    getapkDownloadDetails: (id, callBack) => {
+        pool.query(
+            `select apk_app_code,apk_app_name,apk_app_filename,apk_app_link,apk_app_version,apk_app_release
+            from cm_apk_download_app
+            where apk_app_code=?
+            `,
+
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    getComDetlcountDeptwise: (id, callBack) => {
+        pool.query(
+            `call meliora.GET_COMPLAINT_COUNT_DEPTWISE(?)`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    callBack(error)
+                }
+                return callBack(null, results)
+            }
+        );
+    },
+
+    getCountCompEmpBasedDept: (id, callBack) => {
+        pool.query(
+            `SELECT emp,empname,SUM(AA) AA ,SUM(CC) CC
+            FROM (
+            SELECT 
+                D.assigned_emp emp,
+                E.em_name empname,
+                COUNT(D.complaint_slno) AA,
+                0 CC
+            FROM cm_complaint_detail D 
+            LEFT JOIN cm_complaint_mast M ON M.complaint_slno = D.complaint_slno 
+            LEFT JOIN co_employee_master E ON E.em_id = D.assigned_emp 
+            WHERE D.assign_status=1 AND M.compalint_status = 1
+            GROUP BY D.assigned_emp,M.complaint_deptslno
+            UNION ALL
+            SELECT 
+                D.assigned_emp emp,
+                   E.em_name empname,
+                0 AA,
+                COUNT(D.complaint_slno) CC
+            FROM cm_complaint_detail D 
+            LEFT JOIN cm_complaint_mast M ON M.complaint_slno = D.complaint_slno
+            LEFT JOIN co_employee_master E ON E.em_id = D.assigned_emp  
+            WHERE D.assign_status=1  AND (M.compalint_status = 2 OR M.compalint_status = 3)  and date(M.cm_rectify_time)=current_date()
+            GROUP BY D.assigned_emp,M.complaint_deptslno) BB 
+            WHERE BB.emp in(select em_id from co_employee_master where em_department=?)
+            GROUP BY emp`,
+
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
 }

@@ -4,7 +4,8 @@ const { getTotalNotAssigncomplaints, getComDetlcountEmp, getAssignListEmp, getAs
     getAssignListDeptWise, getAssistListDeptWise, getOnHoldListDeptWise, getOnHoldBeforeAssigntDeptWise,
     getOnProgressListDeptWise, getforSuperVerifyListEmp,
     getforVerifyListDeptWise, getCompleteListDeptWiseToday, getforSuperVerifyListDeptWise,
-    getAssignListAllDetailDeptWise, getcomplaintType
+    getAssignListAllDetailDeptWise, getcomplaintType, getapkDownloadDetails, getComDetlcountDeptwise,
+    getCountCompEmpBasedDept
 } = require('../cm_complaint_mobapp/cmmobapp.service');
 module.exports = {
     getTotalNotAssigncomplaints: (req, res) => {
@@ -507,5 +508,84 @@ module.exports = {
         });
     },
 
+    getapkDownloadDetails: (req, res) => {
+        const id = req.params.id
 
+        getapkDownloadDetails(id, (err, results) => {
+            if (err) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+
+    },
+
+    getComDetlcountDeptwise: (req, res) => {
+        const id = req.params.id
+
+        getComDetlcountDeptwise(id, (err, results) => {
+            if (err) {
+
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+
+    },
+
+    getCountCompEmpBasedDept: (req, res) => {
+        const id = req.params.id
+
+        getCountCompEmpBasedDept(id, (err, results) => {
+            if (err) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+
+    },
 }

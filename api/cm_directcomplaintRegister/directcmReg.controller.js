@@ -76,7 +76,7 @@ module.exports = {
 
                                         messages.push({
                                             to: pushToken,
-                                            title: `Ticket :${results.insertId} / Location: ${body.locationName} `,
+                                            title: `New ticket :${body.complaint_slno} / Location: ${body.locationName} `,
                                             subtitle: `New Ticket Registerd`,
                                             body: `Priority : ${body.priority} | ${body.complaint_desc}`,
                                             data: { withSome: body.complaint_desc },
@@ -183,7 +183,7 @@ module.exports = {
 
                                         messages.push({
                                             to: pushToken,
-                                            title: `Ticket :${results.insertId} / Location: ${body.locationName} `,
+                                            title: `New ticket :${body.complaint_slno} / Location: ${body.locationName} `,
                                             subtitle: `New Ticket Registerd`,
                                             body: `Priority : ${body.priority} | ${body.complaint_desc}`,
                                             data: { withSome: body.complaint_desc },

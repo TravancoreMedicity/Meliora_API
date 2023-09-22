@@ -815,7 +815,7 @@ module.exports = {
             WHERE D.assign_status=1  AND (M.compalint_status = 2 OR M.compalint_status = 3)  and date(M.cm_rectify_time)=current_date()
             GROUP BY D.assigned_emp,M.complaint_deptslno) BB 
             WHERE BB.emp in(select em_id from co_employee_master where em_department=?)
-            GROUP BY emp`,
+            GROUP BY emp order By empname asc`,
 
             [
                 id

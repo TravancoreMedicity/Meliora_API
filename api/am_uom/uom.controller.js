@@ -1,7 +1,18 @@
+const { validateUOMCreate } = require('../../validation/validation_schema');
 const { UomInsert, Uomview, UomUpdate } = require('../am_uom/uom.services')
 module.exports = {
     UomInsert: (req, res) => {
         const body = req.body;
+        //validate uom Instert function
+        const body_result = validateUOMCreate.validate(body);
+        if (body_result.error) {
+
+            return res.status(200).json({
+                success: 2,
+                message: body_result.error.details[0].message
+            });
+        }
+        body.uom_name = body_result.value.uom_name;
         UomInsert(body, (err, result) => {
             if (err) {
                 return res.status(200).json({
@@ -39,6 +50,15 @@ module.exports = {
     },
     UomUpdate: (req, res) => {
         const body = req.body;
+        //validate uom Instert function
+        const body_result = validateUOMCreate.validate(body);
+        if (body_result.error) {
+            return res.status(200).json({
+                success: 2,
+                message: body_result.error.details[0].message
+            });
+        }
+        body.uom_name = body_result.value.uom_name;
         UomUpdate(body, (err, results) => {
             if (err) {
                 return res.status(200).json({

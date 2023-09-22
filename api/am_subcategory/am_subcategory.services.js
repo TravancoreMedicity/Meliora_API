@@ -7,13 +7,15 @@ module.exports = {
           ( 
             subcategory_name,
             category_slno,
-            subcategory_status
+            subcategory_status,
+            create_user
           )
-          VALUES(?,?,?)`,
+          VALUES(?,?,?,?)`,
             [
                 data.subcategory_name,
                 data.category_slno,
                 data.subcategory_status,
+                data.create_user
             ],
 
             (error, results, fields) => {
@@ -51,7 +53,8 @@ module.exports = {
             `UPDATE am_subcategory SET 
             subcategory_name=?,
             category_slno=?,
-            subcategory_status=?
+            subcategory_status=?,
+            edit_user=?
             WHERE 
             subcategory_slno=?`,
 
@@ -59,7 +62,9 @@ module.exports = {
                 data.subcategory_name,
                 data.category_slno,
                 data.subcategory_status,
-                data.subcategory_slno
+                data.edit_user,
+                data.subcategory_slno,
+
             ],
             (error, results, feilds) => {
                 if (error) {

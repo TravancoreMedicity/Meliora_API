@@ -2,9 +2,10 @@ const logger = require('../../logger/logger');
 const { getTotalNotAssigncomplaints, getComDetlcountEmp, getAssignListEmp, getAssistListEmp,
     getOnHoldListEmp, getOnProgressListEmp, getforVerifyListEmp, getCompleteListEmp,
     getAssignListDeptWise, getAssistListDeptWise, getOnHoldListDeptWise, getOnHoldBeforeAssigntDeptWise,
-    getOnProgressListDeptWise,
-    getforVerifyListDeptWise, getCompleteListDeptWiseToday
-
+    getOnProgressListDeptWise, getforSuperVerifyListEmp,
+    getforVerifyListDeptWise, getCompleteListDeptWiseToday, getforSuperVerifyListDeptWise,
+    getAssignListAllDetailDeptWise, getcomplaintType, getapkDownloadDetails, getComDetlcountDeptwise,
+    getCountCompEmpBasedDept
 } = require('../cm_complaint_mobapp/cmmobapp.service');
 module.exports = {
     getTotalNotAssigncomplaints: (req, res) => {
@@ -167,6 +168,32 @@ module.exports = {
         const id = req.params.id
 
         getforVerifyListEmp(id, (err, results) => {
+            if (err) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+
+    },
+    getforSuperVerifyListEmp: (req, res) => {
+        const id = req.params.id
+
+        getforSuperVerifyListEmp(id, (err, results) => {
             if (err) {
 
                 return res.status(200).json({
@@ -381,6 +408,164 @@ module.exports = {
         const id = req.params.id
 
         getCompleteListDeptWiseToday(id, (err, results) => {
+            if (err) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+
+    },
+
+    getforSuperVerifyListDeptWise: (req, res) => {
+        const id = req.params.id
+
+        getforSuperVerifyListDeptWise(id, (err, results) => {
+            if (err) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+
+    },
+
+    getAssignListAllDetailDeptWise: (req, res) => {
+        const id = req.params.id
+
+        getAssignListAllDetailDeptWise(id, (err, results) => {
+            if (err) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+
+    },
+
+    getcomplaintType: (req, res) => {
+        getcomplaintType((err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    getapkDownloadDetails: (req, res) => {
+        const id = req.params.id
+
+        getapkDownloadDetails(id, (err, results) => {
+            if (err) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+
+    },
+
+    getComDetlcountDeptwise: (req, res) => {
+        const id = req.params.id
+
+        getComDetlcountDeptwise(id, (err, results) => {
+            if (err) {
+
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+
+    },
+
+    getCountCompEmpBasedDept: (req, res) => {
+        const id = req.params.id
+
+        getCountCompEmpBasedDept(id, (err, results) => {
             if (err) {
 
                 return res.status(200).json({

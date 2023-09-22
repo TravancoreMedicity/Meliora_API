@@ -325,7 +325,7 @@ module.exports = {
                     left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
                     left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assist_requested_emp
                     left join co_department_mast RD on RD.dept_id=co_employee_master.em_department 
-            where assigned_emp=? AND assist_flag=1 and compalint_status = 1 group by complaint_slno`,
+            where assigned_emp=? AND assist_flag=1 and compalint_status = 1 and compalint_status=1 group by complaint_slno`,
             [
                 id
             ],
@@ -654,7 +654,8 @@ module.exports = {
             if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
             (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
             (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1,
-            A.em_name as assist_emp,verify_spervsr
+            A.em_name as assist_emp,verify_spervsr,
+            R.em_name as assist_request_emp,assigned_date
              from cm_complaint_mast
                       left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
                       left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
@@ -666,9 +667,10 @@ module.exports = {
                        left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
                          left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
                          left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
+                         left join co_employee_master R on R.em_id=cm_complaint_detail.assigned_user
          left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
            where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
-           where department_slno=?) AND cm_complaint_detail.assist_flag=1 AND assist_receive=0
+           where department_slno=?) AND cm_complaint_detail.assist_flag=1 AND assist_receive=0 AND compalint_status=1 
            GROUP BY complaint_slno ORDER BY complaint_slno DESC`,
             [
                 id
@@ -759,7 +761,7 @@ module.exports = {
             `select cm_complaint_mast.complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
             complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
             S.sec_name as sec_name, priority_reason,complaint_hicslno,
-            IFNULL( L.sec_name,"Nil" ) location,C.em_name as comp_reg_emp,
+            IFNULL( L.sec_name,"Nil" ) location,C.em_name as comp_reg_emp,A.em_name as assigned_employee,
             cm_complaint_mast.create_user,C.em_department,cm_complaint_detail.assigned_date,
             cm_complaint_mast.cm_rectify_time,
             co_department_mast.dept_name as empdept,compalint_priority,
@@ -773,19 +775,20 @@ module.exports = {
             compdept_message,compdept_message_flag,message_reply_emp,
             M.em_name as msg_send_emp,R.em_name as msg_read_emp
              from cm_complaint_mast
+                left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
                       left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
                       left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
                       left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
                       left join cm_hic_policy on cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno
                       left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
                       left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
-                      left join co_employee_master M on M.em_id=cm_complaint_mast.message_send_emp
-                   left join co_employee_master R on R.em_id=cm_complaint_mast.message_read_emp
+                      left join co_employee_master M on M.em_id=cm_complaint_mast.message_send_emp                   
+                        left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
+                   left join co_employee_master R on R.em_id=cm_complaint_mast.message_read_emp                   
                     left join co_department_mast on co_department_mast.dept_id=C.em_department
                        left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
          left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location 
-         left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
-           where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
+                 where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
            where department_slno=?) AND compalint_status=2 AND verify_spervsr=0  GROUP BY complaint_slno ORDER BY complaint_slno DESC`,
             [
                 id

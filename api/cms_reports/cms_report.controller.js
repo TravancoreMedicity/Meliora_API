@@ -1,6 +1,6 @@
 const { RequstToAssignList, RequstToRectifyList, RequstToVerifyList, AssignToRectify,
     AssignToVerify, RectifyToVerify, ReqComCategorty, ReqAreaWise, ReqComPerAssigne,
-    ReqTatPerComAssignee, getCompCategory
+    ReqTatPerComAssignee, getCompCategory, getAllCopmDeptWise
 } = require('../cms_reports/cms_report.service');
 const logger = require('../../logger/logger');
 
@@ -17,9 +17,9 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: "No Record Found"
                 });
@@ -41,9 +41,9 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: "No Record Found"
                 });
@@ -65,9 +65,9 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: "No Record Found"
                 });
@@ -89,9 +89,9 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: "No Record Found"
                 });
@@ -112,9 +112,9 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: "No Record Found"
                 });
@@ -135,9 +135,9 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: "No Record Found"
                 });
@@ -158,9 +158,9 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: "No Record Found"
                 });
@@ -182,9 +182,9 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: "No Record Found"
                 });
@@ -206,9 +206,9 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: "No Record Found"
                 });
@@ -229,9 +229,9 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: "No Record Found"
                 });
@@ -255,7 +255,7 @@ module.exports = {
                 });
             }
 
-            if (!results) {
+            if (results.length === 0) {
                 logger.infoLogger("No Records Found")
                 return res.status(200).json({
                     success: 2,
@@ -263,6 +263,30 @@ module.exports = {
                 });
             }
 
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    getAllCopmDeptWise: (req, res) => {
+        const body = req.body
+        getAllCopmDeptWise(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Record Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Record Found"
+                });
+            }
             return res.status(200).json({
                 success: 1,
                 data: results

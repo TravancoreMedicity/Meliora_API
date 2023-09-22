@@ -190,9 +190,9 @@ module.exports = {
         pool.query(
             `INSERT INTO co_employee_master (em_id,em_no,em_salutation,em_name,em_gender,em_dob,em_doj,
                 em_mobile, em_email, em_branch ,em_department,em_dept_section,em_designation,em_status,
-                supervisor,comp_type_map,
+                supervisor,
                 create_user)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.em_id,
                 data.em_no,
@@ -209,7 +209,6 @@ module.exports = {
                 data.em_designation,
                 data.em_status,
                 data.supervisor,
-                JSON.stringify(data.comp_type_map),
                 data.create_user
 
             ],
@@ -287,7 +286,6 @@ module.exports = {
              em_designation=?,
              em_status=?,
              supervisor=?,
-             comp_type_map=?,
              edit_user=?   
             where em_id=?           
             `, [
@@ -305,7 +303,6 @@ module.exports = {
             data.em_designation,
             data.em_status,
             data.supervisor,
-            data.comp_type_map,
             data.edit_user,
             data.em_id
         ],

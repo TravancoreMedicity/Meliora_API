@@ -58,7 +58,7 @@ module.exports = {
                                 message: err
                             });
                         }
-                        req.io.emit("message", `New Complaint Registed ! Please Check`)
+                        req.io.emit("message", `New Complaint Assigned For you ! Please Check`)
                         return res.status(200).json({
                             success: 1,
                             message: "Complaint Assigned Successfully"
@@ -125,7 +125,7 @@ module.exports = {
                                 message: err
                             });
                         }
-                        req.io.emit("message", `New Complaint Registed ! Please Check`)
+                        req.io.emit("message", `New Complaint Assigned For You ! Please Check`)
                         return res.status(200).json({
                             success: 1,
                             message: "Complaint Assigned Successfully"
@@ -606,6 +606,7 @@ module.exports = {
                     message: "No Results Found"
                 });
             }
+            req.io.emit("message", `Some One Requested You For Assist ! Please Check`)
             return res.status(200).json({
                 success: 1,
                 data: results
@@ -643,7 +644,7 @@ module.exports = {
                     message: err
                 });
             }
-            req.io.emit("message", `New Complaint Registed ! Please Check`)
+            req.io.emit("message", `New Complaint Transfer For you ! Please Check`)
             return res.status(200).json({
                 success: 1,
                 message: "Complaint Assigned Successfully"
@@ -692,10 +693,10 @@ module.exports = {
                     message: "No Complaints"
                 });
             }
-            req.io.emit("message", `New Complaint Registed ! Please Check`)
+            req.io.emit("message", `New Complaint For Supervisor Verification Pending ! Please Check`)
             return res.status(200).json({
                 success: 1,
-                message: "Complaint Transfer Successfully"
+                message: "Supervisor Verify Update Successfully"
             });
         });
     },

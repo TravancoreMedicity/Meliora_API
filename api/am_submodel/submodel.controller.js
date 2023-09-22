@@ -1,7 +1,17 @@
+const { validateSubModelCreate } = require('../../validation/validation_schema');
 const { SubmodelInsert, Submodelview, SubmodelUpdate } = require('../am_submodel/submodel.services')
 module.exports = {
     SubmodelInsert: (req, res) => {
         const body = req.body;
+        //validate model Instert function
+        const body_result = validateSubModelCreate.validate(body);
+        if (body_result.error) {
+            return res.status(200).json({
+                success: 2,
+                message: body_result.error.details[0].message
+            });
+        }
+        body.submodel_name = body_result.value.submodel_name;
         SubmodelInsert(body, (err, result) => {
             if (err) {
                 return res.status(200).json({
@@ -40,6 +50,15 @@ module.exports = {
     },
     SubmodelUpdate: (req, res) => {
         const body = req.body;
+        //validate model Instert function
+        const body_result = validateSubModelCreate.validate(body);
+        if (body_result.error) {
+            return res.status(200).json({
+                success: 2,
+                message: body_result.error.details[0].message
+            });
+        }
+        body.submodel_name = body_result.value.submodel_name;
         SubmodelUpdate(body, (err, results) => {
             if (err) {
                 return res.status(200).json({

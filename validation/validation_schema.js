@@ -868,13 +868,13 @@ const ValidatePrority = Joi.object({
 })
 
 
-//Asset Type Validation
+//Asset Type Validation in item creation
 const validateAssetType = Joi.object({
     asset_type_name: Joi.string().trim().uppercase().min(3).max(45).required()
         .messages({
             'string.empty': 'Asset Name  Required',
             'string.min': 'Asset Name length must be at least 3 characters long',
-            'string.max': 'Asset Name length must be less tahn or equal to 45 characters long'
+            'string.max': 'Asset Name length must be less than or equal to 45 characters long'
         }),
     asset_type_slno: Joi.number().optional(),
     asset_type_status: Joi.number().min(0).max(1).required(),
@@ -882,6 +882,152 @@ const validateAssetType = Joi.object({
     edit_user: Joi.number().optional(),
 });
 
+//Item Type Validation in item creation
+const validateItemType = Joi.object({
+    item_type_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Item Name  Required',
+            'string.min': 'Item Name length must be at least 3 characters long',
+            'string.max': 'Item Name length must be less than or equal to 45 characters long'
+        }),
+    item_type_slno: Joi.number().optional(),
+    item_type_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+
+//Category Validation in item creation
+const validateCategoryCreate = Joi.object({
+    category_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Category  Required',
+            'string.min': 'Category length must be at least 3 characters long',
+            'string.max': 'Category length must be less than or equal to 45 characters long'
+        }),
+    category_slno: Joi.number().optional(),
+    category_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+
+
+//SubCategory Validation in item creation
+const validateSubcategoryCreate = Joi.object({
+    subcategory_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Subcategory  Required',
+            'string.min': 'Subcategory length must be at least 3 characters long',
+            'string.max': 'Subcategory length must be less than or equal to 45 characters long'
+        }),
+    subcategory_slno: Joi.number().optional(),
+    subcategory_status: Joi.number().min(0).max(1).required(),
+    category_slno: Joi.required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+
+//group Validation in item creation
+const validateGroupCreate = Joi.object({
+    group_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Group  Required',
+            'string.min': 'Group length must be at least 3 characters long',
+            'string.max': 'Group length must be less than or equal to 45 characters long'
+        }),
+    group_slno: Joi.number().optional(),
+    group_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+
+//subgroup Validation in item creation
+const validateSubGroupCreate = Joi.object({
+    sub_group_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Subgroup  Required',
+            'string.min': 'Subgroup length must be at least 3 characters long',
+            'string.max': 'Subgroup length must be less than or equal to 45 characters long'
+        }),
+    subgroup_slno: Joi.number().optional(),
+    sub_group_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+    group_slno: Joi.required(),
+});
+
+//model Validation in item creation
+const validateModelCreate = Joi.object({
+    model_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Model  Required',
+            'string.min': 'Model length must be at least 3 characters long',
+            'string.max': 'Model length must be less than or equal to 45 characters long'
+        }),
+    model_slno: Joi.number().optional(),
+    model_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+//Manufacture Validation in item creation
+const validateManufactureCreate = Joi.object({
+    manufacture_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Manufacture  Required',
+            'string.min': 'Manufacture length must be at least 3 characters long',
+            'string.max': 'Manufacture length must be less than or equal to 45 characters long'
+        }),
+    manufacture_slno: Joi.number().optional(),
+    manufacture_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+//uom Validation in item creation
+const validateUOMCreate = Joi.object({
+    uom_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Unit of Measurement  Required',
+            'string.min': 'Unit of Measurement length must be at least 3 characters long',
+            'string.max': 'Unit of Measurement length must be less than or equal to 45 characters long'
+        }),
+    uom_slno: Joi.number().optional(),
+    uom_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+//sumodel Validation in item creation
+const validateSubModelCreate = Joi.object({
+    submodel_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Submodel  Required',
+            'string.min': 'Submodel length must be at least 3 characters long',
+            'string.max': 'Submodel length must be less than or equal to 45 characters long'
+        }),
+    submodel_slno: Joi.number().optional(),
+    submodel_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+    model_slno: Joi.required()
+});
+
+//item creation Validation in item creation
+const validateItemCreate = Joi.object({
+    item_name: Joi.string().required(),
+    item_asset_type_slno: Joi.number().required(),
+    item_type_slno: Joi.number().required(),
+    item_category_slno: Joi.number().optional(),
+    item_subcategory_slno: Joi.number().optional(),
+    item_group_slno: Joi.number().optional(),
+    item_subgroup_slno: Joi.number().optional(),
+    item_model_slno: Joi.number().optional(),
+    item_submodel_slno: Joi.number().optional(),
+    item_uom_slno: Joi.number().optional(),
+    item_manufactures_slno: Joi.number().optional(),
+    item_base_name: Joi.optional(),
+    item_model_num: Joi.optional(),
+    item_specific_one: Joi.optional(),
+    item_specific_two: Joi.optional(),
+    item_creation_status: Joi.number().min(0).max(1).required(),
+});
 
 module.exports = {
     validateFloors,
@@ -933,6 +1079,16 @@ module.exports = {
     validateOmEmpmapping,
     validateComEmpmapping,
     ValidatePrority,
-    validateAssetType
+    validateAssetType,
+    validateItemType,
+    validateCategoryCreate,
+    validateSubcategoryCreate,
+    validateGroupCreate,
+    validateSubGroupCreate,
+    validateModelCreate,
+    validateManufactureCreate,
+    validateUOMCreate,
+    validateSubModelCreate,
+    validateItemCreate,
 
 }

@@ -1,7 +1,17 @@
+const { validateGroupCreate } = require('../../validation/validation_schema');
 const { GroupInsert, GroupView, GroupUpdate } = require('../am_group/am_group.services')
 module.exports = {
     GroupInsert: (req, res) => {
         const body = req.body;
+        //validate group Instert function
+        const body_result = validateGroupCreate.validate(body);
+        if (body_result.error) {
+            return res.status(200).json({
+                success: 2,
+                message: body_result.error.details[0].message
+            });
+        }
+        body.group_name = body_result.value.group_name;
         GroupInsert(body, (err, result) => {
             if (err) {
                 return res.status(200).json({
@@ -40,6 +50,16 @@ module.exports = {
     },
     GroupUpdate: (req, res) => {
         const body = req.body;
+        //validate group update function
+        const body_result = validateGroupCreate.validate(body);
+        if (body_result.error) {
+            logger.warnlogwindow(body_result.error.details[0].message)
+            return res.status(200).json({
+                success: 2,
+                message: body_result.error.details[0].message
+            });
+        }
+        body.group_name = body_result.value.group_name;
         GroupUpdate(body, (err, results) => {
             if (err) {
                 return res.status(200).json({

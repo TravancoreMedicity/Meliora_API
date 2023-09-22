@@ -6,12 +6,14 @@ module.exports = {
             `INSERT INTO am_manufacture
           ( 
             manufacture_name,
-            manufacture_status
+            manufacture_status,
+            create_user
           )
-          VALUES(?,?)`,
+          VALUES(?,?,?)`,
             [
                 data.manufacture_name,
                 data.manufacture_status,
+                data.create_user
             ],
 
             (error, results, fields) => {
@@ -46,7 +48,8 @@ module.exports = {
 
             `UPDATE am_manufacture SET 
             manufacture_name=?,
-            manufacture_status=?
+            manufacture_status=?,
+            edit_user=?
             WHERE 
             manufacture_slno=?`,
 
@@ -55,7 +58,9 @@ module.exports = {
 
                 data.manufacture_name,
                 data.manufacture_status,
-                data.manufacture_slno
+                data.edit_user,
+                data.manufacture_slno,
+
             ],
             (error, results, feilds) => {
                 if (error) {

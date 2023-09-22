@@ -6,12 +6,14 @@ module.exports = {
             `INSERT INTO am_item_type
           ( 
             item_type_name,
-            item_type_status
+            item_type_status,
+            create_user
           )
-          VALUES(?,?)`,
+          VALUES(?,?,?)`,
             [
                 data.item_type_name,
                 data.item_type_status,
+                data.create_user
             ],
 
             (error, results, fields) => {
@@ -44,13 +46,15 @@ module.exports = {
 
             `UPDATE am_item_type SET 
             item_type_name=?,
-            item_type_status=?
+            item_type_status=?,
+            edit_user=?
             WHERE 
             item_type_slno=?`,
 
             [
                 data.item_type_name,
                 data.item_type_status,
+                data.edit_user,
                 data.item_type_slno
             ],
             (error, results, feilds) => {

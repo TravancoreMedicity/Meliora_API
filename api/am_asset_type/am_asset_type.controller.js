@@ -3,10 +3,10 @@ const { AssetTypeInsert, AssetTypeView, AssetTypeUpdate } = require('../am_asset
 module.exports = {
     AssetTypeInsert: (req, res) => {
         const body = req.body;
-        //validate department Instert function
+        //validate asset Instert function
         const body_result = validateAssetType.validate(body);
         if (body_result.error) {
-            logger.warnlogwindow(body_result.error.details[0].message)
+            // logger.warnlogwindow(body_result.error.details[0].message)
             return res.status(200).json({
                 success: 2,
                 message: body_result.error.details[0].message
@@ -20,6 +20,7 @@ module.exports = {
                     success: 0,
                     message: err
                 });
+
             }
             return res.status(200).json({
                 success: 1,
@@ -52,6 +53,15 @@ module.exports = {
     },
     AssetTypeUpdate: (req, res) => {
         const body = req.body;
+        const body_result = validateAssetType.validate(body);
+        if (body_result.error) {
+            logger.warnlogwindow(body_result.error.details[0].message)
+            return res.status(200).json({
+                success: 2,
+                message: body_result.error.details[0].message
+            });
+        }
+        body.asset_type_name = body_result.value.asset_type_name;
         AssetTypeUpdate(body, (err, results) => {
             if (err) {
                 return res.status(200).json({

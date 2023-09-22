@@ -5,12 +5,14 @@ module.exports = {
             `INSERT INTO am_uom
           ( 
             uom_name,
-            uom_status
+            uom_status,
+            create_user
           )
-          VALUES(?,?)`,
+          VALUES(?,?,?)`,
             [
                 data.uom_name,
                 data.uom_status,
+                data.create_user
             ],
 
             (error, results, fields) => {
@@ -46,7 +48,8 @@ module.exports = {
 
             `UPDATE am_uom SET 
             uom_name=?,
-            uom_status=?
+            uom_status=?,
+            edit_user=?
             WHERE 
             uom_slno=?`,
 
@@ -55,7 +58,9 @@ module.exports = {
 
                 data.uom_name,
                 data.uom_status,
-                data.uom_slno
+                data.edit_user,
+                data.uom_slno,
+
             ],
             (error, results, feilds) => {
                 if (error) {

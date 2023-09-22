@@ -6,12 +6,14 @@ module.exports = {
             `INSERT INTO am_secondary_custodian
           ( 
             secondary_name,
-            secondary_status
+            secondary_status,
+            create_user
           )
-          VALUES(?,?)`,
+          VALUES(?,?,?)`,
             [
                 data.secondary_name,
                 data.secondary_status,
+                data.create_user
             ],
 
             (error, results, fields) => {
@@ -48,7 +50,8 @@ module.exports = {
 
             `UPDATE am_secondary_custodian SET 
             secondary_name=?,
-            secondary_status=?
+            secondary_status=?,
+            edit_user=?
             WHERE 
             secondary_slno=?`,
 
@@ -57,7 +60,9 @@ module.exports = {
 
                 data.secondary_name,
                 data.secondary_status,
-                data.secondary_slno
+                data.edit_user,
+                data.secondary_slno,
+
             ],
             (error, results, feilds) => {
                 if (error) {

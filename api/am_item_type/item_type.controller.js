@@ -1,7 +1,17 @@
+const { validateItemType } = require('../../validation/validation_schema');
 const { ItemTypeInsert, ItemTypeView, ItemTypeUpdate } = require('../am_item_type/item_type.services')
 module.exports = {
     ItemTypeInsert: (req, res) => {
         const body = req.body;
+        //validate item Instert function
+        const body_result = validateItemType.validate(body);
+        if (body_result.error) {
+            return res.status(200).json({
+                success: 2,
+                message: body_result.error.details[0].message
+            });
+        }
+        body.item_type_name = body_result.value.item_type_name;
         ItemTypeInsert(body, (err, result) => {
 
             if (err) {
@@ -40,6 +50,16 @@ module.exports = {
     },
     ItemTypeUpdate: (req, res) => {
         const body = req.body;
+        //validate item update function
+        const body_result = validateItemType.validate(body);
+        if (body_result.error) {
+            logger.warnlogwindow(body_result.error.details[0].message)
+            return res.status(200).json({
+                success: 2,
+                message: body_result.error.details[0].message
+            });
+        }
+        body.item_type_name = body_result.value.item_type_name;
         ItemTypeUpdate(body, (err, results) => {
             if (err) {
                 return res.status(200).json({

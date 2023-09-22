@@ -1,17 +1,18 @@
 const { pool } = require('../../config/database')
 module.exports = {
     GroupInsert: (data, callback) => {
-
         pool.query(
             `INSERT INTO am_group
           ( 
             group_name,
-            group_status
+            group_status,
+            create_user
           )
-          VALUES(?,?)`,
+          VALUES(?,?,?)`,
             [
                 data.group_name,
                 data.group_status,
+                data.create_user
             ],
 
             (error, results, fields) => {
@@ -46,14 +47,18 @@ module.exports = {
 
             `UPDATE am_group SET 
             group_name=?,
-            group_status=?
+            group_status=?,
+            edit_user=?
             WHERE 
             group_slno=?`,
 
             [
                 data.group_name,
                 data.group_status,
-                data.group_slno
+                data.edit_user,
+                data.group_slno,
+
+
             ],
             (error, results, feilds) => {
                 if (error) {

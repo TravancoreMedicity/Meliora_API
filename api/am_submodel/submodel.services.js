@@ -6,13 +6,15 @@ module.exports = {
           ( 
             submodel_name,
             model_slno,
-            submodel_status
+            submodel_status,
+            create_user
           )
-          VALUES(?,?,?)`,
+          VALUES(?,?,?,?)`,
             [
                 data.submodel_name,
                 data.model_slno,
                 data.submodel_status,
+                data.create_user
             ],
 
             (error, results, fields) => {
@@ -52,7 +54,8 @@ module.exports = {
             `UPDATE am_submodel SET 
             submodel_name=?,
             model_slno=?,
-            submodel_status=?
+            submodel_status=?,
+            edit_user=?
             WHERE 
             submodel_slno=?`,
 
@@ -62,7 +65,9 @@ module.exports = {
                 data.submodel_name,
                 data.model_slno,
                 data.submodel_status,
-                data.submodel_slno
+                data.edit_user,
+                data.submodel_slno,
+
             ],
             (error, results, feilds) => {
                 if (error) {

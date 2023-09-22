@@ -17,7 +17,7 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
                 return res.status(200).json({
                     success: 0,
@@ -41,7 +41,7 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
                 return res.status(200).json({
                     success: 0,
@@ -65,7 +65,7 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
                 return res.status(200).json({
                     success: 0,
@@ -89,7 +89,7 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
                 return res.status(200).json({
                     success: 0,
@@ -112,7 +112,7 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
                 return res.status(200).json({
                     success: 0,
@@ -135,7 +135,7 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
                 return res.status(200).json({
                     success: 0,
@@ -182,7 +182,7 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
                 return res.status(200).json({
                     success: 0,
@@ -206,7 +206,7 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
                 return res.status(200).json({
                     success: 0,
@@ -229,7 +229,7 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
                 return res.status(200).json({
                     success: 0,
@@ -255,7 +255,7 @@ module.exports = {
                 });
             }
 
-            if (!results) {
+            if (results.length === 0) {
                 logger.infoLogger("No Records Found")
                 return res.status(200).json({
                     success: 2,
@@ -280,7 +280,7 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Record Found")
                 return res.status(200).json({
                     success: 0,

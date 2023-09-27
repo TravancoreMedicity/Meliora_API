@@ -142,7 +142,7 @@ const itemNameCreation = require('./api/am_item_name_creation/item.router')
 const unitOfMeasurement = require('./api/am_uom/uom.router')
 const model = require('./api/am_model/model.router')
 const submodel = require('./api/am_submodel/sumodel.router')
-
+const itemCreationDeptmap = require('./api/am_Item_creation_mast/item_creation_mast.router')
 
 
 app.use(express.json({ limit: '50mb' }));
@@ -253,7 +253,7 @@ app.use('/api/itemNameCreation', itemNameCreation)
 app.use('/api/uom', unitOfMeasurement)
 app.use('/api/model', model)
 app.use('/api/submodel', submodel)
-
+app.use('/api/itemCreationDeptmap', itemCreationDeptmap)
 
 
 

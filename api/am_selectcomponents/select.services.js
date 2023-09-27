@@ -173,4 +173,24 @@ module.exports = {
             }
         );
     },
+
+    modelNoSelect: (callback) => {
+        pool.query(
+            `SELECT 
+            item_creation_slno,  item_model_num
+              FROM
+              meliora.am_item_name_creation
+              WHERE item_creation_status=1`, [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
+
+
+
 }

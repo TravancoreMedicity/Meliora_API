@@ -9,7 +9,16 @@ const { ItemNameInsert, ItemNameview, ItemNameUpdate, itemInactive, getitemAll, 
     getitemOnlyCat, getitemCatSubCat, getitemGroupSubGrup, getitemModlSubMdl, getitemManufctrMdlNo,
     getitemCatGrup, getitemCatSubGroup, getitemCatModel, getitemCatSubModel, getitemCatManufctr,
     getitemCatModelNo, getitemSubCatGroup, getitemSubCatSubGroup, getitemSubCatModel, getitemSubCatSubModel,
-    getitemSubCatManufactr, getitemSubCatModelNo,
+    getitemSubCatManufactr, getitemSubCatModelNo, getitemGroupModel,
+    getitemGroupSubModel, getitemGroupManufctr, getitemGroupModelNo, getitemSubGroupModel,
+    getitemSubGroupSubModel, getitemSubGroupManufctr, getitemSubGroupModelNo,
+    getitemModelManufctr, getitemModelModelno, getitemSubModelManufctr, getitemSubModelModelNo,
+    getitemCatSubCatGrup, getitemCatSubCatSubGrup, getitemCatSubCatModel, getitemCatSubCatSubModel,
+    getitemCatSubCatManufctr, getitemCatSubCatModelNo, getitemCatGroupSubGrup, getitemCatGroupModel,
+    getitemCatGroupSubModel, getitemCatGroupManufctr, getitemCatGroupModelNo, getitemCatSubGroupModel,
+    getitemCatSubGroupSubModel, getitemCatSubGroupManufctr, getitemCatSubGroupModelNo, getitemCatModelSubModel,
+    getitemCatModelManufctr, getitemCatModelModelNo,
+
 
     getitemFromMaster } = require('../am_item_name_creation/item.services');
 const { log } = require('winston');
@@ -160,22 +169,6 @@ module.exports = {
         const submodel = body.item_submodel_slno
         const manufctr = body.item_manufactures_slno
         const modelno = body.item_model_num
-
-        console.log("Cat", category);
-
-        console.log("subcat", subcat);
-
-        console.log("group", group);
-
-        console.log("subgroup", subgroup);
-
-        console.log("model", model);
-
-        console.log("submodel", submodel);
-
-        console.log("manufctr", manufctr);
-        console.log("modelno", modelno);
-
 
         if (category != 0 && subcat != 0 && group != 0 && subgroup != 0 && model != 0 && submodel != 0 && manufctr != 0 && modelno != null) {
             getitemAll(body, (err, results) => {
@@ -1004,6 +997,1730 @@ module.exports = {
             })
 
         }
+        else if (category == 0 && subcat == 0 && group != 0 && subgroup == 0 && model !== 0 && submodel == 0 && manufctr == 0 && modelno == null) {
+
+            getitemGroupModel(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+        else if (category == 0 && subcat == 0 && group != 0 && subgroup == 0 && model == 0 && submodel !== 0 && manufctr == 0 && modelno == null) {
+            getitemGroupSubModel(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+
+        }
+        else if (category == 0 && subcat == 0 && group != 0 && subgroup == 0 && model == 0 && submodel == 0 && manufctr != 0 && modelno == null) {
+
+            getitemGroupManufctr(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+        else if (category == 0 && subcat == 0 && group != 0 && subgroup == 0 && model == 0 && submodel == 0 && manufctr == 0 && modelno != null) {
+
+            getitemGroupModelNo(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+        else if (category == 0 && subcat == 0 && group == 0 && subgroup != 0 && model != 0 && submodel == 0 && manufctr == 0 && modelno == null) {
+
+            getitemSubGroupModel(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+
+
+        else if (category == 0 && subcat == 0 && group == 0 && subgroup != 0 && model == 0 && submodel != 0 && manufctr == 0 && modelno == null) {
+
+            getitemSubGroupSubModel(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+
+        else if (category == 0 && subcat == 0 && group == 0 && subgroup != 0 && model == 0 && submodel == 0 && manufctr != 0 && modelno == null) {
+
+            getitemSubGroupManufctr(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+
+        else if (category == 0 && subcat == 0 && group == 0 && subgroup != 0 && model == 0 && submodel == 0 && manufctr == 0 && modelno != null) {
+
+            getitemSubGroupModelNo(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+        else if (category == 0 && subcat == 0 && group == 0 && subgroup == 0 && model != 0 && submodel == 0 && manufctr != 0 && modelno == null) {
+            getitemModelManufctr(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+        else if (category == 0 && subcat == 0 && group == 0 && subgroup == 0 && model != 0 && submodel == 0 && manufctr == 0 && modelno != null) {
+            getitemModelModelno(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+        else if (category == 0 && subcat == 0 && group == 0 && subgroup == 0 && model == 0 && submodel != 0 && manufctr != 0 && modelno == null) {
+            getitemSubModelManufctr(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+        else if (category == 0 && subcat == 0 && group == 0 && subgroup == 0 && model == 0 && submodel != 0 && manufctr == 0 && modelno != null) {
+            getitemSubModelModelNo(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+        //3 Combinations
+        else if (category != 0 && subcat != 0 && group != 0 && subgroup == 0 && model == 0 && submodel == 0 && manufctr == 0 && modelno == null) {
+
+            getitemCatSubCatGrup(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+
+        }
+
+
+        else if (category != 0 && subcat != 0 && group == 0 && subgroup != 0 && model == 0 && submodel == 0 && manufctr == 0 && modelno == null) {
+
+            getitemCatSubCatSubGrup(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+
+        else if (category != 0 && subcat != 0 && group == 0 && subgroup == 0 && model != 0 && submodel == 0 && manufctr == 0 && modelno == null) {
+
+            getitemCatSubCatModel(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+
+        }
+
+
+        else if (category != 0 && subcat != 0 && group == 0 && subgroup == 0 && model == 0 && submodel != 0 && manufctr == 0 && modelno == null) {
+
+            getitemCatSubCatSubModel(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+
+
+        }
+
+        else if (category != 0 && subcat != 0 && group == 0 && subgroup == 0 && model == 0 && submodel == 0 && manufctr != 0 && modelno == null) {
+
+            getitemCatSubCatManufctr(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+
+
+        }
+
+        else if (category != 0 && subcat != 0 && group == 0 && subgroup == 0 && model == 0 && submodel == 0 && manufctr == 0 && modelno != null) {
+
+            getitemCatSubCatModelNo(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+
+        else if (category != 0 && subcat == 0 && group != 0 && subgroup != 0 && model == 0 && submodel == 0 && manufctr == 0 && modelno == null) {
+            getitemCatGroupSubGrup(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+        else if (category != 0 && subcat == 0 && group != 0 && subgroup == 0 && model != 0 && submodel == 0 && manufctr == 0 && modelno == null) {
+            getitemCatGroupModel(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+        else if (category != 0 && subcat == 0 && group != 0 && subgroup == 0 && model == 0 && submodel != 0 && manufctr == 0 && modelno == null) {
+            getitemCatGroupSubModel(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+        else if (category != 0 && subcat == 0 && group != 0 && subgroup == 0 && model == 0 && submodel == 0 && manufctr != 0 && modelno == null) {
+            getitemCatGroupManufctr(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+        else if (category != 0 && subcat == 0 && group != 0 && subgroup == 0 && model == 0 && submodel == 0 && manufctr == 0 && modelno != null) {
+            getitemCatGroupModelNo(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+
+        else if (category != 0 && subcat == 0 && group == 0 && subgroup != 0 && model != 0 && submodel == 0 && manufctr == 0 && modelno == null) {
+            getitemCatSubGroupModel(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+        else if (category != 0 && subcat == 0 && group == 0 && subgroup != 0 && model == 0 && submodel != 0 && manufctr == 0 && modelno == null) {
+            getitemCatSubGroupSubModel(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+        else if (category != 0 && subcat == 0 && group == 0 && subgroup != 0 && model == 0 && submodel == 0 && manufctr != 0 && modelno == null) {
+            getitemCatSubGroupManufctr(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+        else if (category != 0 && subcat == 0 && group == 0 && subgroup != 0 && model == 0 && submodel == 0 && manufctr == 0 && modelno != null) {
+            getitemCatSubGroupModelNo(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+
+        else if (category != 0 && subcat == 0 && group == 0 && subgroup == 0 && model != 0 && submodel != 0 && manufctr == 0 && modelno == null) {
+            getitemCatModelSubModel(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+        else if (category != 0 && subcat == 0 && group == 0 && subgroup == 0 && model != 0 && submodel == 0 && manufctr != 0 && modelno == null) {
+            getitemCatModelManufctr(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+
+        else if (category != 0 && subcat == 0 && group == 0 && subgroup == 0 && model != 0 && submodel == 0 && manufctr == 0 && modelno != null) {
+            getitemCatModelModelNo(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
+
+        // else if (category != 0 && subcat == 0 && group == 0 && subgroup == 0 && model == 0 && submodel != 0 && manufctr != 0 && modelno == null) {
+        //     getitemCatSubModelManufctr(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+
+        // else if (category != 0 && subcat == 0 && group == 0 && subgroup == 0 && model == 0 && submodel != 0 && manufctr == 0 && modelno != null) {
+        //     getitemCatSubModelModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category != 0 && subcat == 0 && group == 0 && subgroup == 0 && model == 0 && submodel == 0 && manufctr != 0 && modelno != null) {
+        //     getitemCatManufctrModelno(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat != 0 && group != 0 && subgroup != 0 && model == 0 && submodel == 0 && manufctr == 0 && modelno == null) {
+        //     getitemSubCatGroupSubGrup(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+        // else if (category == 0 && subcat != 0 && group != 0 && subgroup == 0 && model != 0 && submodel == 0 && manufctr == 0 && modelno == null) {
+        //     getitemSubCatGroupModel(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+        // else if (category == 0 && subcat != 0 && group != 0 && subgroup == 0 && model == 0 && submodel != 0 && manufctr == 0 && modelno == null) {
+        //     getitemSubCatGroupSubModel(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+        // else if (category == 0 && subcat != 0 && group != 0 && subgroup == 0 && model == 0 && submodel == 0 && manufctr != 0 && modelno == null) {
+        //     getitemSubCatGroupManufactr(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+        // else if (category == 0 && subcat != 0 && group != 0 && subgroup == 0 && model == 0 && submodel == 0 && manufctr == 0 && modelno != null) {
+        //     getitemSubCatGroupModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat != 0 && group == 0 && subgroup != 0 && model != 0 && submodel == 0 && manufctr == 0 && modelno == null) {
+        //     getitemSubCatSubGroupModel(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+        // else if (category == 0 && subcat != 0 && group == 0 && subgroup != 0 && model == 0 && submodel != 0 && manufctr == 0 && modelno == null) {
+        //     getitemSubCatSubGroupSubModel(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+        // else if (category == 0 && subcat != 0 && group == 0 && subgroup != 0 && model == 0 && submodel == 0 && manufctr != 0 && modelno == null) {
+        //     getitemSubCatSubGroupManufactr(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+        // else if (category == 0 && subcat != 0 && group == 0 && subgroup != 0 && model == 0 && submodel == 0 && manufctr == 0 && modelno != null) {
+        //     getitemSubCatSubGroupModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat != 0 && group == 0 && subgroup == 0 && model != 0 && submodel != 0 && manufctr == 0 && modelno == null) {
+        //     getitemSubCatModelSubModel(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+        // else if (category == 0 && subcat != 0 && group == 0 && subgroup == 0 && model != 0 && submodel == 0 && manufctr != 0 && modelno == null) {
+        //     getitemSubCatModelManufctr(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat != 0 && group == 0 && subgroup == 0 && model != 0 && submodel == 0 && manufctr == 0 && modelno != null) {
+        //     getitemSubCatModelModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat != 0 && group == 0 && subgroup == 0 && model == 0 && submodel != 0 && manufctr != 0 && modelno == null) {
+        //     getitemSubCatSubModelManufactr(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+        // else if (category == 0 && subcat != 0 && group == 0 && subgroup == 0 && model == 0 && submodel != 0 && manufctr == 0 && modelno != null) {
+        //     getitemSubCatSubModelModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat != 0 && group == 0 && subgroup == 0 && model == 0 && submodel == 0 && manufctr != 0 && modelno != null) {
+        //     getitemSubCatManufactrModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+
+        // else if (category == 0 && subcat == 0 && group != 0 && subgroup != 0 && model != 0 && submodel == 0 && manufctr == 0 && modelno == null) {
+        //     getitemGroupSubGrupModel(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group != 0 && subgroup != 0 && model == 0 && submodel != 0 && manufctr == 0 && modelno == null) {
+        //     getitemGroupSubGrupSubModel(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+
+        // else if (category == 0 && subcat == 0 && group != 0 && subgroup != 0 && model == 0 && submodel == 0 && manufctr != 0 && modelno == null) {
+        //     getitemGroupSubGrupManufactr(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group != 0 && subgroup != 0 && model == 0 && submodel == 0 && manufctr == 0 && modelno != null) {
+        //     getitemGroupSubGrupModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+
+        // else if (category == 0 && subcat == 0 && group != 0 && subgroup == 0 && model != 0 && submodel != 0 && manufctr == 0 && modelno == null) {
+        //     getitemGroupModelSubModel(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group != 0 && subgroup == 0 && model != 0 && submodel == 0 && manufctr != 0 && modelno == null) {
+        //     getitemGroupModelManufactr(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group != 0 && subgroup == 0 && model != 0 && submodel == 0 && manufctr == 0 && modelno != null) {
+        //     getitemGroupModelModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group != 0 && subgroup == 0 && model == 0 && submodel != 0 && manufctr != 0 && modelno == null) {
+        //     getitemGroupSubModelManufactr(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group != 0 && subgroup == 0 && model == 0 && submodel != 0 && manufctr == 0 && modelno != null) {
+        //     getitemGroupSubModelModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group != 0 && subgroup == 0 && model == 0 && submodel == 0 && manufctr != 0 && modelno != null) {
+        //     getitemGroupManufactrModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group == 0 && subgroup != 0 && model != 0 && submodel != 0 && manufctr == 0 && modelno == null) {
+        //     getitemSubGroupModelSubModel(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group == 0 && subgroup != 0 && model != 0 && submodel == 0 && manufctr != 0 && modelno == null) {
+        //     getitemSubGroupModelManufactr(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group == 0 && subgroup != 0 && model != 0 && submodel == 0 && manufctr == 0 && modelno != null) {
+        //     getitemSubGroupModelModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group == 0 && subgroup != 0 && model == 0 && submodel != 0 && manufctr != 0 && modelno == null) {
+        //     getitemSubGroupSubModelManufactr(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group == 0 && subgroup != 0 && model == 0 && submodel != 0 && manufctr == 0 && modelno != null) {
+        //     getitemSubGroupSubModelModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group == 0 && subgroup != 0 && model == 0 && submodel == 0 && manufctr != 0 && modelno != null) {
+        //     getitemSubGroupManufactrModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+
+        // else if (category == 0 && subcat == 0 && group == 0 && subgroup == 0 && model != 0 && submodel != 0 && manufctr != 0 && modelno == null) {
+        //     getitemModelSubModelManufctr(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group == 0 && subgroup == 0 && model != 0 && submodel != 0 && manufctr == 0 && modelno != null) {
+        //     getitemModelSubModelModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group == 0 && subgroup == 0 && model != 0 && submodel == 0 && manufctr != 0 && modelno != null) {
+        //     getitemSubModelManufctrModelNo(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
+
+        // else if (category == 0 && subcat == 0 && group == 0 && subgroup == 0 && model == 0 && submodel != 0 && manufctr != 0 && modelno != null) {
+        //     getitemSubModelManufctrModelno(body, (err, results) => {
+        //         if (err) {
+        //             logger.logwindow(err)
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: err
+        //             });
+        //         }
+
+        //         if (results.length == 0) {
+        //             logger.infologwindow("No Results Found")
+        //             return res.status(200).json({
+        //                 success: 0,
+        //                 message: "No Record Found"
+        //             });
+        //         }
+
+        //         return res.status(200).json({
+        //             success: 1,
+        //             data: results
+        //         });
+        //     })
+        // }
 
 
 

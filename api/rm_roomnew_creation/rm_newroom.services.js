@@ -14,10 +14,11 @@ module.exports = {
             rm_insidebuilldblock_slno,
             rm_roomtype_slno,
             rm_category_slno,
+            rm_outlet_slno,
             rm_room_status,
             actual_rm_no
           )
-          VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.rm_room_name,
                 data.rm_room_no,
@@ -28,6 +29,7 @@ module.exports = {
                 data.rm_insidebuilldblock_slno,
                 data.rm_roomtype_slno,
                 data.rm_category_slno,
+                data.rm_outlet_slno,
                 data.rm_room_status,
                 data.actual_rm_no
 
@@ -45,7 +47,7 @@ module.exports = {
     RoomView: (callback) => {
         pool.query(
             ` SELECT 
-            rm_room_slno, rm_room_name,rm_room_no, rm_room_alias,
+            rm_room_slno, rm_room_name,rm_room_no, rm_room_alias,rm_outlet_slno,
             rm_newroom_creation.rm_build_slno,
             rm_newroom_creation.rm_building_block_slno,
             rm_newroom_creation.rm_room_floor_slno,
@@ -93,6 +95,7 @@ module.exports = {
             rm_insidebuilldblock_slno=?,
             rm_roomtype_slno=?,
             rm_category_slno=?,
+            rm_outlet_slno=?,
             rm_room_status=?
             WHERE 
             rm_room_slno=?`,
@@ -109,6 +112,7 @@ module.exports = {
                 data.rm_insidebuilldblock_slno,
                 data.rm_roomtype_slno,
                 data.rm_category_slno,
+                data.rm_outlet_slno,
                 data.rm_room_status,
                 data.rm_room_slno
             ],

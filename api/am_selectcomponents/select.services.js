@@ -191,6 +191,23 @@ module.exports = {
         );
     },
 
+    ItemBasedOnDeptSec: (id, callback) => {
+        pool.query(
+            `SELECT 
+            am_asset_item_map_master.item_creation_slno,
+            item_name
+            FROM
+           am_asset_item_map_master
+           left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
+            WHERE item_deptsec_slno=? and item_create_status=1 group by item_creation_slno`, [id],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
 
+            }
+        );
+    },
 
 }

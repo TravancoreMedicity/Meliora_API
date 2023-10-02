@@ -81,8 +81,7 @@ module.exports = {
             item_model_num,
             item_specific_one,
             item_specific_two,
-            item_specific_three,
-            item_creation_status,
+                       item_creation_status,
             if(am_item_name_creation.item_creation_status = 1 ,'Yes','No') status
             from am_item_name_creation
             left join am_asset_type on am_asset_type.asset_type_slno=am_item_name_creation.item_asset_type_slno
@@ -965,5 +964,727 @@ module.exports = {
             }
         )
     },
+
+
+
+    getitemGroupModel: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where 
+            item_group_slno=?  and 
+            item_model_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_group_slno,
+                data.item_model_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemGroupSubModel: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where 
+            item_group_slno=?  and item_submodel_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_group_slno,
+                data.item_submodel_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemGroupManufctr: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where 
+            item_group_slno=? and 
+            item_manufactures_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_group_slno,
+                data.item_manufactures_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemGroupModelNo: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where 
+            item_group_slno=?  and item_model_num=?
+            and item_creation_status=1`,
+            [
+                data.item_group_slno,
+                data.item_model_num
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemSubGroupModel: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where  item_subgroup_slno=? and 
+            item_model_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_subgroup_slno,
+                data.item_model_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemSubGroupSubModel: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_subgroup_slno=?  and item_submodel_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_subgroup_slno,
+                data.item_submodel_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemSubGroupManufctr: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where  item_subgroup_slno=? and              
+            item_manufactures_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_subgroup_slno,
+                data.item_manufactures_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemSubGroupModelNo: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where  item_subgroup_slno=? and 
+            item_model_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_subgroup_slno,
+                data.item_model_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemModelManufctr: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where 
+            item_model_slno=? and 
+            item_manufactures_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_model_slno,
+                data.item_manufactures_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemModelModelno: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where 
+            item_model_slno=?  and item_model_num=?
+            and item_creation_status=1`,
+            [
+                data.item_model_slno,
+                data.item_model_num
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemSubModelManufctr: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_submodel_slno=? and 
+            item_manufactures_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_submodel_slno,
+                data.item_manufactures_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemSubModelModelNo: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where  item_submodel_slno=? and 
+            item_model_num=?
+            and item_creation_status=1`,
+            [
+                data.item_submodel_slno,
+                data.item_model_num
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemCatSubCatGrup: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=? and item_subcategory_slno=? and
+            item_group_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_subcategory_slno,
+                data.item_group_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemCatSubCatSubGrup: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=? and item_subcategory_slno=? and
+            item_subgroup_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_subcategory_slno,
+                data.item_subgroup_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemCatSubCatModel: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=? and item_subcategory_slno=? and
+            item_model_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_subcategory_slno,
+                data.item_model_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemCatSubCatSubModel: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=? and item_subcategory_slno=? and            
+            item_submodel_slno=?
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_subcategory_slno,
+                data.item_submodel_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemCatSubCatManufctr: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=? and item_subcategory_slno=? and
+            item_manufactures_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_subcategory_slno,
+                data.item_manufactures_slno,
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemCatSubCatModelNo: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=? and item_subcategory_slno=? and
+            item_model_num=?
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_subcategory_slno,
+                data.item_model_num
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemCatGroupSubGrup: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=?  and
+            item_group_slno=? and item_subgroup_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_group_slno,
+                data.item_subgroup_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemCatGroupModel: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=? and i
+            item_group_slno=?  and 
+            item_model_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_group_slno,
+                data.item_model_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemCatGroupSubModel: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=? and 
+            item_group_slno=? and item_submodel_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_group_slno,
+                data.item_submodel_slno
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemCatGroupManufctr: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=? and 
+            item_group_slno=?  and 
+            item_manufactures_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_group_slno,
+                data.item_manufactures_slno,
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemCatGroupModelNo: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=?  and
+            item_group_slno=?  and item_model_num=?
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_group_slno,
+                data.item_model_num
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemCatSubGroupModel: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=?  and item_subgroup_slno=? and 
+            item_model_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_subgroup_slno,
+                data.item_model_slno,
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemCatSubGroupSubModel: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=?  and item_subgroup_slno=? and 
+             item_submodel_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_subgroup_slno,
+                data.item_submodel_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getitemCatSubGroupManufctr: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=?  and item_subgroup_slno=? 
+            item_manufactures_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_subgroup_slno,
+                data.item_manufactures_slno
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+
+    getitemCatSubGroupModelNo: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=?  and item_subgroup_slno=? and item_model_num=?
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_subgroup_slno,
+
+                data.item_model_num
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+
+    getitemCatModelSubModel: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=?  and 
+            item_model_slno=? and item_submodel_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_model_slno,
+                data.item_submodel_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+
+    getitemCatModelManufctr: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=?  and 
+            item_model_slno=?  and 
+            item_manufactures_slno=? 
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_model_slno,
+                data.item_manufactures_slno,
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+
+    getitemCatModelModelNo: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=?  and 
+            item_model_slno=?  and item_model_num=?
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_model_slno,
+                data.item_model_num
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+
+    getitemAll: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=? and item_subcategory_slno=? and
+            item_group_slno=? and item_subgroup_slno=? and 
+            item_model_slno=? and item_submodel_slno=? and 
+            item_manufactures_slno=? and item_model_num=?
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_subcategory_slno,
+                data.item_group_slno,
+                data.item_subgroup_slno,
+                data.item_model_slno,
+                data.item_submodel_slno,
+                data.item_manufactures_slno,
+                data.item_model_num
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+
+    getitemAll: (data, callBack) => {
+        pool.query(
+            `
+            select item_creation_slno, item_name
+            from am_item_name_creation           
+            where item_category_slno=? and item_subcategory_slno=? and
+            item_group_slno=? and item_subgroup_slno=? and 
+            item_model_slno=? and item_submodel_slno=? and 
+            item_manufactures_slno=? and item_model_num=?
+            and item_creation_status=1`,
+            [
+                data.item_category_slno,
+                data.item_subcategory_slno,
+                data.item_group_slno,
+                data.item_subgroup_slno,
+                data.item_model_slno,
+                data.item_submodel_slno,
+                data.item_manufactures_slno,
+                data.item_model_num
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
 
 }

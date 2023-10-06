@@ -37,11 +37,11 @@ module.exports = {
             item_create_status,
             item_custodian_dept,
             item_asset_no,
-            item_asset_no_first,
+            item_asset_no_only,
             create_user
             
           )
-          VALUES(?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?)`,
             [
                 data.item_creation_slno,
                 data.item_dept_slno,
@@ -49,7 +49,7 @@ module.exports = {
                 data.item_create_status,
                 data.item_custodian_dept,
                 data.item_asset_no,
-                data.item_asset_no_first,
+                data.item_asset_no_only,
                 data.create_user
 
             ],
@@ -105,11 +105,13 @@ module.exports = {
            left join am_custodian_department on am_custodian_department.am_custodian_slno=am_asset_item_map_master.item_custodian_dept
           WHERE
            item_dept_slno = ?
-           and item_deptsec_slno=?  and item_create_status=1 ORDER BY am_item_map_slno DESC`,
+           and item_deptsec_slno=?  and am_asset_item_map_master.item_creation_slno=? and item_create_status=1
+           ORDER BY am_item_map_slno DESC`,
             [
 
                 data.item_dept_slno,
-                data.item_deptsec_slno
+                data.item_deptsec_slno,
+                data.item_creation_slno
             ],
             (error, results, feilds) => {
                 if (error) {

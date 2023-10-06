@@ -144,6 +144,8 @@ const model = require('./api/am_model/model.router')
 const submodel = require('./api/am_submodel/sumodel.router')
 const itemCreationDeptmap = require('./api/am_Item_creation_mast/item_creation_mast.router')
 const CustodianDeptMast = require('./api/am_custodian_department/am_custodian_dept.router')
+const ItemMapDetails = require('./api/am_item_creation_detail/am_itemdetail.router')
+
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -255,7 +257,7 @@ app.use('/api/model', model)
 app.use('/api/submodel', submodel)
 app.use('/api/itemCreationDeptmap', itemCreationDeptmap)
 app.use('/api/CustodianDeptMast', CustodianDeptMast)
-
+app.use('/api/ItemMapDetails', ItemMapDetails)
 
 
 server.listen(process.env.APP_PORT, () =>

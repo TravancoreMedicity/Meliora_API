@@ -72,21 +72,42 @@ module.exports = {
 
     insertItemAdditional: (req, res) => {
         const body = req.body;
-
-        insertItemAdditional(body, (err, result) => {
-
+        getCustdyBasedLastAssetNo(body.item_custodian_dept, (err, results) => {
             if (err) {
+                logger.logwindow(err)
                 return res.status(200).json({
-                    success: 0,
+                    success: 2,
                     message: err
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                insertid: result.insertId,
-                message: "Item Added successfully"
-            })
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Record Found"
+                });
+            }
+            else {
+                const assetno = JSON.parse(JSON.stringify(results[0]))
+
+                let no = assetno.item_asset_no_only
+                body.item_asset_no_only = no + 1
+                insertItemAdditional(body, (err, result) => {
+
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        insertid: result.insertId,
+                        message: "Item Added successfully"
+                    })
+                })
+            }
         })
+
     },
 
     getInsertData: (req, res) => {

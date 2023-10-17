@@ -266,7 +266,8 @@ module.exports = {
           (case when cm_rectify_status = 'R' then "Rectified" when cm_rectify_status = 'P' then "Pending" when cm_rectify_status = 'O' then "On Hold"  when cm_rectify_status='Z' then" Not Verified" when cm_rectify_status='V' then"Verified" else "Not Updated" end ) as cm_rectify_status1,
                date(assigned_date) as date,TIME_FORMAT(assigned_date,"%r") AS Time,cm_rectify_status,
             if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
-            compdept_message,compdept_message_flag,message_reply_emp
+            compdept_message,compdept_message_flag,message_reply_emp, 
+            if(rectify_pending_hold_remarks is null ,'Not Updated',rectify_pending_hold_remarks) as rectify_pending_hold_remarks 
            from cm_complaint_mast   
            left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
            left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno

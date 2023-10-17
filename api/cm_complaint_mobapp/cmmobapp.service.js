@@ -91,8 +91,7 @@ module.exports = {
         left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
         left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
         left join co_employee_master V on V.em_id=cm_complaint_mast.verify_spervsr_user
-        where assigned_emp=? and assign_status=1 and compalint_status=1 and cm_rectify_status is null or verify_spervsr=2 group by complaint_slno `,
-
+        where assigned_emp=? and assign_status=1 and compalint_status=1 and (cm_rectify_status is null or verify_spervsr=2 )group by complaint_slno `,
             [
                 id
             ],
@@ -814,7 +813,7 @@ module.exports = {
             LEFT JOIN co_employee_master E ON E.em_id = D.assigned_emp  
             WHERE D.assign_status=1  AND (M.compalint_status = 2 OR M.compalint_status = 3)  and date(M.cm_rectify_time)=current_date()
             GROUP BY D.assigned_emp,M.complaint_deptslno) BB 
-            WHERE BB.emp in(select em_id from co_employee_master where em_department=?)
+            WHERE BB.emp in(select em_id from co_employee_master where em_department=? and em_status=1)
             GROUP BY emp order By empname asc`,
 
             [

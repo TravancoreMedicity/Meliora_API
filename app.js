@@ -142,8 +142,11 @@ const itemNameCreation = require('./api/am_item_name_creation/item.router')
 const unitOfMeasurement = require('./api/am_uom/uom.router')
 const model = require('./api/am_model/model.router')
 const submodel = require('./api/am_submodel/sumodel.router')
-
-
+const deviceType = require('./api/it_communication_device_type/device_type.router')
+const itSelectcomponent = require('./api/it_select_components/devicetypeSelect.router')
+const communicationDeviceDetails = require('./api/it_communication_device_details/communication.router')
+const tarrifDetails = require('./api/it_tarrif/tarriffDetails.router')
+const wifiManagement = require('./api/it_wifi_management/wifi.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -253,6 +256,11 @@ app.use('/api/itemNameCreation', itemNameCreation)
 app.use('/api/uom', unitOfMeasurement)
 app.use('/api/model', model)
 app.use('/api/submodel', submodel)
+app.use('/api/deviceType', deviceType)
+app.use('/api/itSelectcomponent', itSelectcomponent)
+app.use('/api/communicationDeviceDetails', communicationDeviceDetails)
+app.use('/api/tarrifDetails', tarrifDetails)
+app.use('/api/wifiManagement', wifiManagement)
 
 
 

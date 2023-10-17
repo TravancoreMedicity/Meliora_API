@@ -1009,6 +1009,33 @@ const validateSubModelCreate = Joi.object({
     model_slno: Joi.required()
 });
 
+// validateCommunicationCreate Validation in item creation
+
+const validateCommunicationCreate = Joi.object({
+    reciver_name: Joi.string().trim().uppercase().optional(),
+    contact_no: Joi.number().optional(),
+    ima: Joi.string().optional(),
+    sim_number: Joi.string().optional(),
+    provider: Joi.number().optional(),
+    issue_date: Joi.optional(),
+    asset_no: Joi.string().optional(),
+    tarrif: Joi.number().optional(),
+    amount: Joi.number().optional(),
+    device_type_slno: Joi.number().required(),
+    department: Joi.number().required(),
+    location: Joi.number().optional(),
+    device_ima: Joi.string().optional(),
+    device_num: Joi.string().optional(),
+    sim_mobile_num: Joi.number().min(10).max(10).optional(),
+    receiver_emp_id: Joi.string().optional(),
+    device_name: Joi.string().required(),
+    issue_status: Joi.number().min(0).max(1).required(),
+    sim_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional()
+});
+
+
 //item creation Validation in item creation
 const validateItemCreate = Joi.object({
     item_name: Joi.string().required(),
@@ -1090,5 +1117,6 @@ module.exports = {
     validateUOMCreate,
     validateSubModelCreate,
     validateItemCreate,
+    validateCommunicationCreate
 
 }

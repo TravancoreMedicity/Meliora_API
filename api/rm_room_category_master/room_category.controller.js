@@ -89,7 +89,7 @@ module.exports = {
                     }
                     return res.status(200).json({
                         success: 2,
-                        message: "Room Ctaegory Name Updated Successfully"
+                        message: "Room Category Name Updated Successfully"
                     })
                 })
             } else {

@@ -20,7 +20,7 @@ module.exports = {
             item_model_num,
             item_specific_one,
             item_specific_two,
-                       item_creation_status
+            item_creation_status
           )
           VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [

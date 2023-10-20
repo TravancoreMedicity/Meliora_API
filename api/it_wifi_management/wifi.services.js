@@ -96,7 +96,8 @@ module.exports = {
         pool.query(
             `UPDATE it_wifi_qr_code_link SET                       
             it_wifi_ipno=?,
-            it_wifi_flg=?                               
+            it_wifi_flg=?,
+            updated_date=current_date()                                  
             WHERE 
             it_wifi_qrslno=?`,
             [

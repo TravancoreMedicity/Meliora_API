@@ -113,7 +113,8 @@ module.exports = {
                     left join co_employee_master NO on NO.em_id=crf_ndrf_approval.ndrf_om_user  
                     left join co_employee_master NS on NS.em_id=crf_ndrf_approval.ndrf_smo_user 
                     left join co_employee_master NC on NC.em_id=crf_ndrf_approval.ndrf_cao_user 
-                    left join co_employee_master NE on NE.em_id=crf_ndrf_approval.ndrf_ed_user 
+                    left join co_employee_master NE on NE.em_id=crf_ndrf_approval.ndrf_ed_user
+                    ORDER BY crf_request_master.req_slno DESC
                `,
             [],
             (error, results, fields) => {

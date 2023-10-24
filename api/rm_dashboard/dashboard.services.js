@@ -54,7 +54,7 @@ module.exports = {
             LEFT JOIN rm_insidebuildblock_mast ON rm_insidebuildblock_mast.rm_insidebuildblock_slno=rm_newroom_creation.rm_insidebuilldblock_slno
             LEFT JOIN rm_room_type_master ON rm_room_type_master.rm_roomtype_slno=rm_newroom_creation.rm_roomtype_slno
             LEFT JOIN rm_room_category_master ON rm_room_category_master.rm_roomcategory_slno=rm_newroom_creation.rm_category_slno
-            where rm_room_floor_slno=?`,
+            where rm_room_floor_slno=? and rm_roomtype_type!=1`,
             [id],
 
             (error, results, fields) => {

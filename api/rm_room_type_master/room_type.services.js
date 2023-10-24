@@ -7,14 +7,16 @@ module.exports = {
             rm_roomtype_name,
             rm_roomtype_alias,
             rm_roomtype_no,
-            rm_roomtype_status
+            rm_roomtype_status,
+            rm_roomtype_type
           )
-          VALUES(?,?,?,?)`,
+          VALUES(?,?,?,?,?)`,
             [
                 data.rm_roomtype_name,
                 data.rm_roomtype_alias,
                 data.rm_roomtype_no,
-                data.rm_roomtype_status
+                data.rm_roomtype_status,
+                data.rm_roomtype_type
 
             ],
             (error, results, fields) => {
@@ -50,7 +52,9 @@ module.exports = {
             rm_roomtype_alias,
             rm_roomtype_no,
             rm_roomtype_status,
-            if( rm_roomtype_status=1,'Yes','No')status
+            rm_roomtype_type,
+            if( rm_roomtype_status=1,'Yes','No')status,
+            if(rm_roomtype_type=1,'Entrance','Not entrance')room_type
             FROM
             rm_room_type_master`, [],
             (error, results, feilds) => {
@@ -88,7 +92,8 @@ module.exports = {
             rm_roomtype_name=?,
             rm_roomtype_alias=?,
             rm_roomtype_no=?,
-            rm_roomtype_status=? 
+            rm_roomtype_status=?,
+            rm_roomtype_type=? 
             WHERE 
             rm_roomtype_slno=?`,
             [
@@ -96,6 +101,7 @@ module.exports = {
                 data.rm_roomtype_alias,
                 data.rm_roomtype_no,
                 data.rm_roomtype_status,
+                data.rm_roomtype_type,
                 data.rm_roomtype_slno,
             ],
             (error, results, feilds) => {

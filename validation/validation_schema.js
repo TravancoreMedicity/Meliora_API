@@ -256,7 +256,7 @@ const validateRoomTypeMast = Joi.object({
 
         }),
     rm_roomtype_slno: Joi.optional(),
-
+    rm_roomtype_type: Joi.number().min(0).max(1).required(),
 });
 
 //Floor creation validation room management 

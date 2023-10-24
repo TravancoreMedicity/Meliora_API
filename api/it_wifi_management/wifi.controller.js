@@ -1,6 +1,6 @@
 
 const { WifiInsert, WifiUpdate, wifiViewById, checkCodeNdGet, updateQrCode,
-    getfreeCodes
+    getfreeCodes, getAllowttedWiFi
 } = require('../it_wifi_management/wifi.services')
 module.exports = {
     WifiInsert: (req, res) => {
@@ -136,5 +136,26 @@ module.exports = {
         });
     },
 
-
+    getAllowttedWiFi: (req, res) => {
+        getAllowttedWiFi((err, results) => {
+            if (err) {
+                // logger.logwindow(err)
+                return res.status(400).json({
+                    success: 10,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                // logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    }
 }

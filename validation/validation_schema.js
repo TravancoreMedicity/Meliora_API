@@ -1054,6 +1054,7 @@ const validateItemCreate = Joi.object({
     item_specific_one: Joi.optional(),
     item_specific_two: Joi.optional(),
     item_creation_status: Joi.number().min(0).max(1).required(),
+    asset_spare: Joi.number().required(),
 });
 
 module.exports = {

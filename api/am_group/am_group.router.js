@@ -1,7 +1,8 @@
 const router = require("express").Router();
+const { checkToken } = require("../../authentication/token_validation");
 const { GroupInsert, GroupView, GroupUpdate } = require('../am_group/am_group.controller');
 
-router.post('/insert', GroupInsert)
-router.get('/view', GroupView)
-router.patch('/update', GroupUpdate)
+router.post('/insert', checkToken, GroupInsert)
+router.get('/view', checkToken, GroupView)
+router.patch('/update', checkToken, GroupUpdate)
 module.exports = router

@@ -2,7 +2,7 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require("fs")
-
+const { ItemMastUpdate } = require('../fileupload/fileupload.services')
 const itemDetailStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         const id = req.body.id;
@@ -388,10 +388,29 @@ module.exports = {
             }
             // SUCCESS
             else {
-                return res.status(200).json({
-                    success: 1,
-                    message: "File Uploaded SuccessFully"
-                });
+                const id = req.body.id;
+                const data = {
+                    item_creation_slno: id
+                }
+                ItemMastUpdate(data, (err, results) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        })
+                    }
+                    if (results === 0) {
+                        return res.status(200).json({
+                            success: 1,
+                            message: "No record found"
+
+                        })
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "File Uploaded SuccessFully"
+                    });
+                })
             }
         })
     },

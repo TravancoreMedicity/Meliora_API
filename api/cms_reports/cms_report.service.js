@@ -5,13 +5,14 @@ module.exports = {
         pool.query(
             `select cm_complaint_mast.complaint_slno,compalint_date,cm_location,complaint_desc,
             cm_complaint_type.complaint_type_name,cm_priority_desc,
-            assigned_date,co_deptsec_mast.sec_name as location,
+            assigned_date,co_deptsec_mast.sec_name as location,em_name as createuser,
             timestampdiff(minute,compalint_date,assigned_date) as tat
             from cm_complaint_mast
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
             left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
             left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+            left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
             where compalint_date between ? and ?`,
             [
                 data.start_date,
@@ -30,13 +31,14 @@ module.exports = {
         pool.query(
             `select cm_complaint_mast.complaint_slno,compalint_date,cm_location,complaint_desc,
             cm_complaint_type.complaint_type_name,cm_priority_desc,
-            co_deptsec_mast.sec_name as location,
+            co_deptsec_mast.sec_name as location,em_name as createuser,
             cm_rectify_time,
             timestampdiff(minute,compalint_date,cm_rectify_time) as tat
             from cm_complaint_mast
             left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
             left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+            left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
             where compalint_date between ? and ?`,
             [
                 data.start_date,
@@ -55,13 +57,14 @@ module.exports = {
         pool.query(
             `select cm_complaint_mast.complaint_slno,compalint_date,cm_location,complaint_desc,
             cm_complaint_type.complaint_type_name,cm_priority_desc,
-            co_deptsec_mast.sec_name as location,
+            co_deptsec_mast.sec_name as location,em_name as createuser,
             cm_verfy_time,
             timestampdiff(minute,compalint_date,cm_verfy_time) as tat
             from cm_complaint_mast
             left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
             left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+            left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
             where compalint_date between ? and ?`,
             [
                 data.start_date,
@@ -79,7 +82,7 @@ module.exports = {
     AssignToRectify: (data, callBack) => {
         pool.query(
             `select cm_complaint_mast.complaint_slno,compalint_date,cm_location,complaint_desc,
-            cm_complaint_type.complaint_type_name,cm_priority_desc,
+            cm_complaint_type.complaint_type_name,cm_priority_desc,em_name as createuser,
             assigned_date,co_deptsec_mast.sec_name as location,cm_rectify_time,
             timestampdiff(minute,assigned_date,cm_rectify_time) as tat
             from cm_complaint_mast
@@ -87,6 +90,7 @@ module.exports = {
             left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
             left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+            left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
             where compalint_date between ? and ? and compalint_status=1 group by complaint_slno`,
             [
                 data.start_date,
@@ -104,7 +108,7 @@ module.exports = {
     AssignToVerify: (data, callBack) => {
         pool.query(
             `select cm_complaint_mast.complaint_slno,compalint_date,cm_location,complaint_desc,
-            cm_complaint_type.complaint_type_name,cm_priority_desc,
+            cm_complaint_type.complaint_type_name,cm_priority_desc,em_name as createuser,
             assigned_date,co_deptsec_mast.sec_name as location,cm_verfy_time,
             timestampdiff(minute,assigned_date,cm_verfy_time) as tat
             from cm_complaint_mast
@@ -112,6 +116,7 @@ module.exports = {
             left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
             left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+            left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
             where compalint_date between ? and ? and compalint_status=1 group by complaint_slno`,
             [
                 data.start_date,
@@ -128,7 +133,7 @@ module.exports = {
     RectifyToVerify: (data, callBack) => {
         pool.query(
             `select cm_complaint_mast.complaint_slno,compalint_date,cm_location,complaint_desc,
-            cm_complaint_type.complaint_type_name,cm_priority_desc,
+            cm_complaint_type.complaint_type_name,cm_priority_desc,em_name as createuser,
             assigned_date,co_deptsec_mast.sec_name as location,cm_rectify_time,cm_verfy_time,
             timestampdiff(minute,cm_rectify_time,cm_verfy_time) as tat
             from cm_complaint_mast
@@ -136,6 +141,7 @@ module.exports = {
             left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
             left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+            left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
             where compalint_date between ? and ? and compalint_status=2 group by complaint_slno`,
             [
                 data.start_date,
@@ -153,7 +159,7 @@ module.exports = {
     ReqComCategorty: (data, callBack) => {
         pool.query(
             `select cm_complaint_mast.complaint_slno,compalint_date,cm_location,complaint_desc,
-            cm_complaint_type.complaint_type_name,cm_priority_desc,
+            cm_complaint_type.complaint_type_name,cm_priority_desc,em_name as createuser,
             assigned_date,co_deptsec_mast.sec_name as location,cm_rectify_time,cm_verfy_time,
             cm_rectify_time,cm_verfy_time,
             TIMEDIFF(assigned_date, compalint_date) as tat
@@ -162,6 +168,7 @@ module.exports = {
             left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
             left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+            left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
             where compalint_date between ? and ?  and complaint_typeslno=? group by complaint_slno`,
             [
                 data.start_date,
@@ -180,7 +187,7 @@ module.exports = {
     ReqAreaWise: (data, callBack) => {
         pool.query(
             `select cm_complaint_mast.complaint_slno,compalint_date,cm_location,complaint_desc,
-            cm_complaint_type.complaint_type_name,cm_priority_desc,
+            cm_complaint_type.complaint_type_name,cm_priority_desc,em_name as createuser,
             assigned_date,co_deptsec_mast.sec_name as location,cm_rectify_time,cm_verfy_time,
             cm_rectify_time,cm_verfy_time,
             TIMEDIFF(assigned_date, compalint_date) as tat
@@ -189,6 +196,7 @@ module.exports = {
             left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
             left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+            left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
             where compalint_date between ? and ?  and cm_location=? group by complaint_slno`,
             [
                 data.start_date,
@@ -209,14 +217,15 @@ module.exports = {
             `select cm_complaint_mast.complaint_slno,compalint_date,cm_location,complaint_desc,
             cm_complaint_type.complaint_type_name,cm_priority_desc,
             assigned_date,co_deptsec_mast.sec_name as location,cm_rectify_time,cm_verfy_time,
-            TIMEDIFF(assigned_date, compalint_date) as tat,
-            co_employee_master.em_name as assign
+            TIMEDIFF(assigned_date, compalint_date) as tat,C.em_name as createuser,
+            A.em_name as assign
             from cm_complaint_mast
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
             left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
             left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
-            left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
+            left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
             where compalint_date between ? and ? and
             complaint_deptslno=?`,
             [
@@ -241,13 +250,15 @@ module.exports = {
             TIMEDIFF(assigned_date, compalint_date) as tat_assign,
             TIMEDIFF(cm_rectify_time, assigned_date) as tat_rect,
             TIMEDIFF(cm_verfy_time, cm_rectify_time) as tat_very,
-            co_employee_master.em_name as assign
+            C.em_name as createuser,
+            A.em_name as assign
             from cm_complaint_mast
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
             left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
             left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
-            left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            left join co_employee_master A on A.em_id=cm_complaint_detail.assigned_emp
+            left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
             where compalint_date between ? and ? and
             complaint_deptslno=?`,
             [

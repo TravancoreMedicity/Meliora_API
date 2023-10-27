@@ -20,9 +20,10 @@ module.exports = {
             item_model_num,
             item_specific_one,
             item_specific_two,
-            item_creation_status
+            item_creation_status,
+            asset_spare
           )
-          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.item_asset_type_slno,
                 data.item_type_slno,
@@ -40,6 +41,7 @@ module.exports = {
                 data.item_specific_one,
                 data.item_specific_two,
                 data.item_creation_status,
+                data.asset_spare
             ],
 
             (error, results, fields) => {
@@ -78,8 +80,8 @@ module.exports = {
             item_base_name,
             item_model_num,
             item_specific_one,
-            item_specific_two,
-                       item_creation_status,
+            item_specific_two,asset_spare,
+            item_creation_status,
             if(am_item_name_creation.item_creation_status = 1 ,'Yes','No') status
             from am_item_name_creation
             left join am_asset_type on am_asset_type.asset_type_slno=am_item_name_creation.item_asset_type_slno
@@ -91,7 +93,9 @@ module.exports = {
 			left join am_model on am_model.model_slno=am_item_name_creation.item_model_slno
             left join am_submodel on am_submodel.submodel_slno=am_item_name_creation.item_submodel_slno
 			left join am_uom on am_uom.uom_slno=am_item_name_creation.item_uom_slno
-			left join am_manufacture on am_manufacture.manufacture_slno=am_item_name_creation.item_manufactures_slno  `, [],
+			left join am_manufacture on am_manufacture.manufacture_slno=am_item_name_creation.item_manufactures_slno
+            ORDER BY item_creation_slno DESC
+            `, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -105,8 +109,7 @@ module.exports = {
 
         pool.query(
 
-            `UPDATE am_item_name_creation SET 
-      
+            `UPDATE am_item_name_creation SET       
             item_asset_type_slno=?,
             item_type_slno=?,
             item_category_slno=?,
@@ -122,8 +125,8 @@ module.exports = {
             item_model_num=?,
             item_specific_one=?,
             item_specific_two=?,
-            item_specific_three=?,
-            item_creation_status=?
+            item_creation_status=?,
+            asset_spare=?
             WHERE 
             item_creation_slno=?`,
 
@@ -143,8 +146,8 @@ module.exports = {
                 data.item_model_num,
                 data.item_specific_one,
                 data.item_specific_two,
-                data.item_specific_three,
                 data.item_creation_status,
+                data.asset_spare,
                 data.item_creation_slno
             ],
             (error, results, feilds) => {
@@ -161,9 +164,7 @@ module.exports = {
         pool.query(
 
             `UPDATE am_asset_item_map_master SET 
-      
-            item_create_status=0
-          
+                  item_create_status=0          
             WHERE 
             am_item_map_slno=?`,
 
@@ -182,7 +183,7 @@ module.exports = {
 
     getitemFromMasterdemo: (data, callBack) => {
         pool.query(`
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=?  and
             item_group_slno=?  and 
@@ -207,7 +208,7 @@ module.exports = {
     getitemFromMaster: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=?  and
             item_group_slno=?  and 
@@ -234,7 +235,7 @@ module.exports = {
     getitemAll: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and item_subgroup_slno=? and 
@@ -263,7 +264,7 @@ module.exports = {
     getitemNoModelNo: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and item_subgroup_slno=? and 
@@ -291,7 +292,7 @@ module.exports = {
     getitemNoManufactr: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and item_subgroup_slno=? and 
@@ -319,7 +320,7 @@ module.exports = {
     getitemNoSubModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and item_subgroup_slno=? and 
@@ -347,7 +348,7 @@ module.exports = {
     getitemNoModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and item_subgroup_slno=? and 
@@ -375,7 +376,7 @@ module.exports = {
     getitemNoSubGroup: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and 
@@ -402,7 +403,7 @@ module.exports = {
     getitemNoGroup: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and
             item_subgroup_slno=? and 
@@ -429,7 +430,7 @@ module.exports = {
     getitemNoSubCat: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and 
             item_group_slno=? and item_subgroup_slno=? and 
@@ -457,7 +458,7 @@ module.exports = {
     getitemNoCat: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where  
             item_group_slno=? and item_subgroup_slno=? and 
@@ -484,7 +485,7 @@ module.exports = {
     getitemOnlyModelNo: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_model_num=?
             and item_creation_status=1`,
@@ -502,7 +503,7 @@ module.exports = {
     getitemOnlyManufactr: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where 
             item_manufactures_slno=?
@@ -522,7 +523,7 @@ module.exports = {
     getitemOnlySubModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where  item_submodel_slno=? 
             and item_creation_status=1`,
@@ -540,7 +541,7 @@ module.exports = {
     getitemOnlyModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where 
             item_model_slno=? 
@@ -559,7 +560,7 @@ module.exports = {
     getitemOnlySubGroup: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where  item_subgroup_slno=? 
             and item_creation_status=1`,
@@ -577,7 +578,7 @@ module.exports = {
     getitemOnlyGroup: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where 
             item_group_slno=? 
@@ -596,7 +597,7 @@ module.exports = {
     getitemOnlySubCat: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_subcategory_slno=? 
             and item_creation_status=1`,
@@ -614,7 +615,7 @@ module.exports = {
     getitemOnlyCat: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? 
             and item_creation_status=1`,
@@ -632,7 +633,7 @@ module.exports = {
     getitemCatSubCat: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? 
             and item_creation_status=1`,
@@ -652,7 +653,7 @@ module.exports = {
     getitemGroupSubGrup: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where 
             item_group_slno=? and item_subgroup_slno=? 
@@ -674,7 +675,7 @@ module.exports = {
     getitemModlSubMdl: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where  
             item_model_slno=? and item_submodel_slno=? 
@@ -695,7 +696,7 @@ module.exports = {
     getitemManufctrMdlNo: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where
             item_manufactures_slno=? and item_model_num=?
@@ -716,7 +717,7 @@ module.exports = {
     getitemCatGrup: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and 
             item_group_slno=? 
@@ -737,7 +738,7 @@ module.exports = {
     getitemCatSubGroup: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subgroup_slno=?
             and item_creation_status=1`,
@@ -756,7 +757,7 @@ module.exports = {
 
     getitemCatModel: (data, callBack) => {
         pool.query(
-            `select item_creation_slno, item_name
+            `select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and 
             item_model_slno=? 
@@ -777,7 +778,7 @@ module.exports = {
     getitemCatSubModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and  item_submodel_slno=?
             and item_creation_status=1`,
@@ -797,7 +798,7 @@ module.exports = {
     getitemCatManufctr: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and 
             item_manufactures_slno=? 
@@ -818,7 +819,7 @@ module.exports = {
     getitemCatModelNo: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_model_num=?
             and item_creation_status=1`,
@@ -839,7 +840,7 @@ module.exports = {
     getitemSubCatGroup: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where  item_subcategory_slno=? and
             item_group_slno=? 
@@ -861,7 +862,7 @@ module.exports = {
     getitemSubCatSubGroup: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where  item_subcategory_slno=?  and item_subgroup_slno=? 
             and item_creation_status=1`,
@@ -881,7 +882,7 @@ module.exports = {
     getitemSubCatModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where  item_subcategory_slno=? and             
             item_model_slno=? 
@@ -903,7 +904,7 @@ module.exports = {
     getitemSubCatSubModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_subcategory_slno=? and
             item_submodel_slno=? 
@@ -924,7 +925,7 @@ module.exports = {
     getitemSubCatManufactr: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where  item_subcategory_slno=? and            
             item_manufactures_slno=? 
@@ -945,7 +946,7 @@ module.exports = {
     getitemSubCatModelNo: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where  item_subcategory_slno=? and
              item_model_num=?
@@ -968,7 +969,7 @@ module.exports = {
     getitemGroupModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where 
             item_group_slno=?  and 
@@ -990,7 +991,7 @@ module.exports = {
     getitemGroupSubModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where 
             item_group_slno=?  and item_submodel_slno=? 
@@ -1011,7 +1012,7 @@ module.exports = {
     getitemGroupManufctr: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where 
             item_group_slno=? and 
@@ -1033,7 +1034,7 @@ module.exports = {
     getitemGroupModelNo: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where 
             item_group_slno=?  and item_model_num=?
@@ -1054,7 +1055,7 @@ module.exports = {
     getitemSubGroupModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where  item_subgroup_slno=? and 
             item_model_slno=? 
@@ -1075,7 +1076,7 @@ module.exports = {
     getitemSubGroupSubModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_subgroup_slno=?  and item_submodel_slno=? 
             and item_creation_status=1`,
@@ -1095,7 +1096,7 @@ module.exports = {
     getitemSubGroupManufctr: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where  item_subgroup_slno=? and              
             item_manufactures_slno=? 
@@ -1116,7 +1117,7 @@ module.exports = {
     getitemSubGroupModelNo: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where  item_subgroup_slno=? and 
             item_model_slno=? 
@@ -1137,7 +1138,7 @@ module.exports = {
     getitemModelManufctr: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where 
             item_model_slno=? and 
@@ -1159,7 +1160,7 @@ module.exports = {
     getitemModelModelno: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where 
             item_model_slno=?  and item_model_num=?
@@ -1180,7 +1181,7 @@ module.exports = {
     getitemSubModelManufctr: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_submodel_slno=? and 
             item_manufactures_slno=? 
@@ -1222,7 +1223,7 @@ module.exports = {
     getitemCatSubCatGrup: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? 
@@ -1244,7 +1245,7 @@ module.exports = {
     getitemCatSubCatSubGrup: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and
             item_subgroup_slno=? 
@@ -1266,7 +1267,7 @@ module.exports = {
     getitemCatSubCatModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and
             item_model_slno=? 
@@ -1288,7 +1289,7 @@ module.exports = {
     getitemCatSubCatSubModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and            
             item_submodel_slno=?
@@ -1310,7 +1311,7 @@ module.exports = {
     getitemCatSubCatManufctr: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and
             item_manufactures_slno=? 
@@ -1332,7 +1333,7 @@ module.exports = {
     getitemCatSubCatModelNo: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and
             item_model_num=?
@@ -1354,7 +1355,7 @@ module.exports = {
     getitemCatGroupSubGrup: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=?  and
             item_group_slno=? and item_subgroup_slno=? 
@@ -1376,7 +1377,7 @@ module.exports = {
     getitemCatGroupModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and i
             item_group_slno=?  and 
@@ -1399,7 +1400,7 @@ module.exports = {
     getitemCatGroupSubModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and 
             item_group_slno=? and item_submodel_slno=? 
@@ -1422,7 +1423,7 @@ module.exports = {
     getitemCatGroupManufctr: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and 
             item_group_slno=?  and 
@@ -1445,7 +1446,7 @@ module.exports = {
     getitemCatGroupModelNo: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=?  and
             item_group_slno=?  and item_model_num=?
@@ -1467,7 +1468,7 @@ module.exports = {
     getitemCatSubGroupModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=?  and item_subgroup_slno=? and 
             item_model_slno=? 
@@ -1489,7 +1490,7 @@ module.exports = {
     getitemCatSubGroupSubModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=?  and item_subgroup_slno=? and 
              item_submodel_slno=? 
@@ -1511,7 +1512,7 @@ module.exports = {
     getitemCatSubGroupManufctr: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=?  and item_subgroup_slno=? 
             item_manufactures_slno=? 
@@ -1535,7 +1536,7 @@ module.exports = {
     getitemCatSubGroupModelNo: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=?  and item_subgroup_slno=? and item_model_num=?
             and item_creation_status=1`,
@@ -1558,7 +1559,7 @@ module.exports = {
     getitemCatModelSubModel: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=?  and 
             item_model_slno=? and item_submodel_slno=? 
@@ -1581,7 +1582,7 @@ module.exports = {
     getitemCatModelManufctr: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=?  and 
             item_model_slno=?  and 
@@ -1605,7 +1606,7 @@ module.exports = {
     getitemCatModelModelNo: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=?  and 
             item_model_slno=?  and item_model_num=?
@@ -1628,7 +1629,7 @@ module.exports = {
     getitemAll: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and item_subgroup_slno=? and 
@@ -1658,7 +1659,7 @@ module.exports = {
     getitemAll: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
             where item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and item_subgroup_slno=? and 

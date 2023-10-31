@@ -92,7 +92,6 @@ module.exports = {
         left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
         left join co_employee_master V on V.em_id=cm_complaint_mast.verify_spervsr_user
         where assigned_emp=? and assign_status=1 and compalint_status=1 and (cm_rectify_status is null or verify_spervsr=2 )group by complaint_slno `,
-
             [
                 id
             ],

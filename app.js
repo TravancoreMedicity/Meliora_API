@@ -147,6 +147,15 @@ const scheduletime = require('./api/it_scheduletimemast/scheduletimemast.router'
 const backupdetails = require('./api/it_backup_detailsmast/backupDetails.router')
 const backupverify = require('./api/it_backup_verification/backupVerification.router')
 const backupdashboard = require('./api/it_backupdashboard/backupdash.router')
+const deviceType = require('./api/it_communication_device_type/device_type.router')
+const itSelectcomponent = require('./api/it_select_components/devicetypeSelect.router')
+const communicationDeviceDetails = require('./api/it_communication_device_details/communication.router')
+const tarrifDetails = require('./api/it_tarrif/tarriffDetails.router')
+const wifiManagement = require('./api/it_wifi_management/wifi.router')
+const itemCreationDeptmap = require('./api/am_Item_creation_mast/item_creation_mast.router')
+const CustodianDeptMast = require('./api/am_custodian_department/am_custodian_dept.router')
+const ItemMapDetails = require('./api/am_item_creation_detail/am_itemdetail.router')
+
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -235,7 +244,7 @@ app.use('/api/buildblock', buildblock)
 app.use('/api/insidebuildblock', insidebuildblock)
 app.use('/api/floormaster', floormaster)
 app.use('/api/roomcategory', roomcategory)
-app.use('/api/roomtype', roomtype)
+app.use('/api/roomtypeMaster', roomtype)
 app.use('/api/selectComponent', selectComponent)
 app.use('/api/floorcreation', floorcreation)
 app.use('/api/roomnewcreation', roomnewcreation)
@@ -261,6 +270,15 @@ app.use('/api/scheduletime', scheduletime)
 app.use('/api/backupdetails', backupdetails)
 app.use('/api/verification', backupverify)
 app.use('/api/backupdash', backupdashboard)
+app.use('/api/deviceType', deviceType)
+app.use('/api/itSelectcomponent', itSelectcomponent)
+app.use('/api/communicationDeviceDetails', communicationDeviceDetails)
+app.use('/api/tarrifDetails', tarrifDetails)
+app.use('/api/wifiManagement', wifiManagement)
+app.use('/api/itemCreationDeptmap', itemCreationDeptmap)
+app.use('/api/CustodianDeptMast', CustodianDeptMast)
+app.use('/api/ItemMapDetails', ItemMapDetails)
+
 
 
 server.listen(process.env.APP_PORT, () =>

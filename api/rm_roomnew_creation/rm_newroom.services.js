@@ -14,10 +14,12 @@ module.exports = {
             rm_insidebuilldblock_slno,
             rm_roomtype_slno,
             rm_category_slno,
+            rm_outlet_slno,
             rm_room_status,
-            actual_rm_no
+            actual_rm_no,
+            rm_room_no_dis
           )
-          VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.rm_room_name,
                 data.rm_room_no,
@@ -28,9 +30,10 @@ module.exports = {
                 data.rm_insidebuilldblock_slno,
                 data.rm_roomtype_slno,
                 data.rm_category_slno,
+                data.rm_outlet_slno,
                 data.rm_room_status,
-                data.actual_rm_no
-
+                data.actual_rm_no,
+                data.rm_room_no_dis
 
             ],
 
@@ -45,14 +48,14 @@ module.exports = {
     RoomView: (callback) => {
         pool.query(
             ` SELECT 
-            rm_room_slno, rm_room_name,rm_room_no, rm_room_alias,
+            rm_room_slno, rm_room_name,rm_room_no, rm_room_alias,rm_outlet_slno,
             rm_newroom_creation.rm_build_slno,
             rm_newroom_creation.rm_building_block_slno,
             rm_newroom_creation.rm_room_floor_slno,
             rm_newroom_creation.rm_insidebuilldblock_slno, 
             rm_newroom_creation.rm_roomtype_slno,
             rm_newroom_creation.rm_category_slno, 
-            rm_room_status,
+            rm_room_status,if(rm_room_no_dis is null,"Not Given",rm_room_no_dis) as rm_room_no_dis,
             if(rm_room_status = 1 ,'Yes','No') status,
             rm_building_mast.rm_building_name,	
             rm_buildblock_mast.rm_buildblock_name,
@@ -93,7 +96,9 @@ module.exports = {
             rm_insidebuilldblock_slno=?,
             rm_roomtype_slno=?,
             rm_category_slno=?,
-            rm_room_status=?
+            rm_outlet_slno=?,
+            rm_room_status=?,
+            rm_room_no_dis=?
             WHERE 
             rm_room_slno=?`,
 
@@ -109,7 +114,9 @@ module.exports = {
                 data.rm_insidebuilldblock_slno,
                 data.rm_roomtype_slno,
                 data.rm_category_slno,
+                data.rm_outlet_slno,
                 data.rm_room_status,
+                data.rm_room_no_dis,
                 data.rm_room_slno
             ],
             (error, results, feilds) => {

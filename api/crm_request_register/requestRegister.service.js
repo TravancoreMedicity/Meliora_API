@@ -331,7 +331,7 @@ module.exports = {
                     left join co_employee_master C on C.em_id=crf_request_approval.cao_user
                     left join co_employee_master E on E.em_id=crf_request_approval.ed_user
                     left join co_deptsec_mast on co_deptsec_mast.sec_id=crf_request_master.request_deptsec_slno
-            where hod_approve=1`,
+            where hod_approve=1 ORDER BY crf_request_master.req_slno DESC`,
             [],
             (error, results, fields) => {
                 if (error) {
@@ -562,7 +562,7 @@ module.exports = {
                     left join co_employee_master C on C.em_id=crf_request_approval.cao_user
                     left join co_employee_master E on E.em_id=crf_request_approval.ed_user
                     left join co_deptsec_mast on co_deptsec_mast.sec_id=crf_request_master.request_deptsec_slno
-            where dms_req=1 and hod_approve=1`,
+            where dms_req=1 and hod_approve=1 ORDER BY crf_request_master.req_slno DESC`,
             [],
             (error, results, fields) => {
                 if (error) {
@@ -813,7 +813,7 @@ module.exports = {
                     left join co_employee_master C on C.em_id=crf_request_approval.cao_user
                     left join co_employee_master E on E.em_id=crf_request_approval.ed_user
                     left join co_deptsec_mast on co_deptsec_mast.sec_id=crf_request_master.request_deptsec_slno
-            where dms_req=1 and dms_approve=1`,
+            where dms_req=1 and dms_approve=1 ORDER BY crf_request_master.req_slno DESC`,
             [],
             (error, results, fields) => {
                 if (error) {

@@ -130,7 +130,7 @@ module.exports = {
         );
     },
 
-    getDailyVerifiedDetails: (callBack) => {
+    getDailyVerifiedDetails: (data, callBack) => {
         pool.query(
             `SELECT 
                   daily_slno,
@@ -162,8 +162,11 @@ module.exports = {
                LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_daily_details.backup_schedule_time
                LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_daily_details.em_id
             WHERE 
-                  verify_status=1`,
-            [],
+                  verify_status=1 and backup_daily_date between ? and ?`,
+            [
+                data.start_date,
+                data.end_date
+            ],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -295,7 +298,7 @@ module.exports = {
         );
     },
 
-    getMonthVerified: (callBack) => {
+    getMonthVerified: (data, callBack) => {
         pool.query(
             `
         SELECT 
@@ -329,8 +332,11 @@ module.exports = {
          LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_monthly_details.backup_schedule_time
          LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_monthly_details.em_id
       WHERE 
-         verify_status=1`,
-            [],
+         verify_status=1 and backup_monthly_date between ? and ?`,
+            [
+                data.start_date,
+                data.end_date
+            ],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -464,7 +470,7 @@ module.exports = {
         );
     },
 
-    getYearVerified: (callBack) => {
+    getYearVerified: (data, callBack) => {
         pool.query(
             `
         SELECT 
@@ -498,8 +504,11 @@ module.exports = {
          LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_yearly_details.backup_schedule_time
          LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_yearly_details.em_id
       WHERE 
-           verify_status=1`,
-            [],
+           verify_status=1 and backup_yearly_date between ? and ?`,
+            [
+                data.start_date,
+                data.end_date
+            ],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -633,7 +642,7 @@ module.exports = {
         );
     },
 
-    getWeeklyVerifiedDetails: (callBack) => {
+    getWeeklyVerifiedDetails: (data, callBack) => {
         pool.query(
             `
         SELECT 
@@ -665,8 +674,12 @@ module.exports = {
          LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_details_mast.backup_schedule_type
          LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_weekly_details.backup_schedule_time
          LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_weekly_details.em_id
-      WHERE  verify_status=1`,
-            [],
+      WHERE  
+            verify_status=1 and  backup_weekly_date between ? and ?`,
+            [
+                data.start_date,
+                data.end_date
+            ],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -779,7 +792,7 @@ module.exports = {
         );
     },
 
-    getSelectedDaysVerified: (callBack) => {
+    getSelectedDaysVerified: (data, callBack) => {
         pool.query(
             ` 
       SELECT 
@@ -811,8 +824,11 @@ module.exports = {
          LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_details_mast.backup_schedule_type
          LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_selecteddays_details.em_id
       WHERE  
-           verify_status=1 `,
-            [],
+           verify_status=1 and backup_selected_date between ? and ?`,
+            [
+                data.start_date,
+                data.end_date
+            ],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);

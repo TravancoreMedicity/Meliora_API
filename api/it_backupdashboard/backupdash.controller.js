@@ -114,7 +114,8 @@ module.exports = {
     },
 
     getSelectedDaysVerified: (req, res) => {
-        getSelectedDaysVerified((err, results) => {
+        const body = req.body;
+        getSelectedDaysVerified(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -233,7 +234,8 @@ module.exports = {
     },
 
     getDailyVerifiedDetails: (req, res) => {
-        getDailyVerifiedDetails((err, results) => {
+        const body = req.body;
+        getDailyVerifiedDetails(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -243,7 +245,7 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 1,
-                    // message: "No Data Found",
+                    message: "No Data Found",
                     data: []
                 })
             }
@@ -331,7 +333,8 @@ module.exports = {
     },
 
     getMonthVerified: (req, res) => {
-        getMonthVerified((err, results) => {
+        const body = req.body;
+        getMonthVerified(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -341,7 +344,7 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 1,
-                    // message: "No Data Found",
+                    message: "No Data Found",
                     data: []
                 })
             }
@@ -429,7 +432,8 @@ module.exports = {
     },
 
     getYearVerified: (req, res) => {
-        getYearVerified((err, results) => {
+        const body = req.body;
+        getYearVerified(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -439,7 +443,7 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 1,
-                    // message: "No Data Found",
+                    message: "No Data Found",
                     data: []
                 })
             }
@@ -527,7 +531,8 @@ module.exports = {
     },
 
     getWeeklyVerifiedDetails: (req, res) => {
-        getWeeklyVerifiedDetails((err, results) => {
+        const body = req.body;
+        getWeeklyVerifiedDetails(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -537,7 +542,7 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 1,
-                    // message: "No Data Found",
+                    message: "No Data Found",
                     data: []
                 })
             }

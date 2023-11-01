@@ -1,18 +1,8 @@
-// const { validateCommunicationCreate } = require('../../validation/validation_schema');
-const { CommunicationDeviceInsert, CommunicationDeviceView, CommunicationDeviceUpdate } = require('../it_communication_device_details/communication.services')
+const { DeviceTypeInsert, DeviceTypeView, DeviceTypeUpdate } = require('../it_password_device_type/password_devicetype.service')
 module.exports = {
-    CommunicationDeviceInsert: (req, res) => {
+    DeviceTypeInsert: (req, res) => {
         const body = req.body;
-        // validate model Instert function
-        // const body_result = validateCommunicationCreate.validate(body);
-        // if (body_result.error) {
-        //     return res.status(200).json({
-        //         success: 2,
-        //         message: body_result.error.details[0].message
-        //     });
-        // }
-        // body.reciver_name = body_result.value.reciver_name;
-        CommunicationDeviceInsert(body, (err, result) => {
+        DeviceTypeInsert(body, (err, result) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -21,13 +11,13 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Data inserted successfully"
+                message: "Device type inserted successfully"
             })
         })
     },
-    CommunicationDeviceView: (req, res) => {
+    DeviceTypeView: (req, res) => {
 
-        CommunicationDeviceView((err, results) => {
+        DeviceTypeView((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -47,10 +37,10 @@ module.exports = {
 
         })
     },
-    CommunicationDeviceUpdate: (req, res) => {
+    DeviceTypeUpdate: (req, res) => {
         const body = req.body;
 
-        CommunicationDeviceUpdate(body, (err, results) => {
+        DeviceTypeUpdate(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -66,7 +56,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: " Details Updated successfully"
+                message: "Device type Updated successfully"
             })
         })
     },

@@ -1057,6 +1057,145 @@ const validateItemCreate = Joi.object({
     asset_spare: Joi.number().required(),
 });
 
+//Backup ScheduleType Validation
+const validateScheduleTypeCreate = Joi.object({
+    schedule_type_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Schedule Type Required',
+            'string.min': 'Schedule Type length must be at least 3 characters long',
+            'string.max': 'Schedule Type length must be less than or equal to 45 characters long'
+        }),
+    schedule_type_id: Joi.number().optional(),
+    schedule_type_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+
+
+//Backup ScheduleTime Validation 
+const validateScheduleTimeCreate = Joi.object({
+    schedule_time_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Schedule Time Required',
+            'string.min': 'Schedule Time length must be at least 3 characters long',
+            'string.max': 'Schedule Time length must be less than or equal to 45 characters long'
+        }),
+    schedule_time_id: Joi.number().optional(),
+    schedule_time_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+
+//Backup PhysicalLocation Validation 
+const validatePhysicalLocationcreate = Joi.object({
+    location_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Location Name Required',
+            'string.min': 'Location Name length must be at least 3 characters long',
+            'string.max': 'Location Namelength must be less than or equal to 45 characters long'
+        }),
+    location_id: Joi.number().optional(),
+    location_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+
+
+//Backup Selected Days Validation 
+const validateSelectedDayscreate = Joi.object({
+    selected_days: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Number Of Days Required',
+            'string.min': 'Number Of Days length must be at least 3 characters long',
+            'string.max': 'Number Of Days must be less than or equal to 45 characters long'
+        }),
+    selected_days_value: Joi.number().optional(),
+    selected_days_id: Joi.number().optional(),
+    days_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+
+
+//BAckup Details Validation
+const validateBackupDetails = Joi.object({
+    backup_slno: Joi.number().optional(),
+    backup_type: Joi.required(),
+    backup_name: Joi.required(),
+    backup_location: Joi.required(),
+    backup_device_ip: Joi.required(),
+    backup_device_name: Joi.required(),
+    backup_device_location: Joi.required(),
+    transferred_device_ip: Joi.optional(),
+    transferred_device_name: Joi.optional(),
+    transferred_device_location: Joi.optional(),
+    backup_schedule_type: Joi.required(),
+    backup_schedule_time: Joi.optional(),
+    selected_days: Joi.optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+
+// Backup Verification
+const validateBackupVerification = Joi.object({
+    daily_slno: Joi.number().optional(),
+    backup_date_time: Joi.date().required(),
+    backup_size_before: Joi.number().optional(),
+    backup_size_after: Joi.number().optional(),
+    em_id: Joi.number().required(),
+    remarks: Joi.optional(),
+    verify_status: Joi.number().optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+
+const validateMonthBackupVerification = Joi.object({
+    monthly_slno: Joi.number().optional(),
+    backup_date_time: Joi.date().required(),
+    backup_size_before: Joi.number().optional(),
+    backup_size_after: Joi.number().optional(),
+    em_id: Joi.number().required(),
+    remarks: Joi.optional(),
+    verify_status: Joi.number().optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+
+const validateWeekBackupVerification = Joi.object({
+    weekly_slno: Joi.number().optional(),
+    backup_date_time: Joi.date().required(),
+    backup_size_before: Joi.number().optional(),
+    backup_size_after: Joi.number().optional(),
+    em_id: Joi.number().required(),
+    remarks: Joi.optional(),
+    verify_status: Joi.number().optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+
+const validateYearBackupVerification = Joi.object({
+    yearly_slno: Joi.number().optional(),
+    backup_date_time: Joi.date().required(),
+    backup_size_before: Joi.number().optional(),
+    backup_size_after: Joi.number().optional(),
+    em_id: Joi.number().required(),
+    remarks: Joi.optional(),
+    verify_status: Joi.number().optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
+
+const validateSelectedDaysBackupVerification = Joi.object({
+    days_slno: Joi.number().optional(),
+    backup_date_time: Joi.date().required(),
+    backup_size_before: Joi.number().optional(),
+    backup_size_after: Joi.number().optional(),
+    em_id: Joi.number().required(),
+    remarks: Joi.optional(),
+    verify_status: Joi.number().optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
 module.exports = {
     validateFloors,
     validateRoomCategory,
@@ -1118,6 +1257,17 @@ module.exports = {
     validateUOMCreate,
     validateSubModelCreate,
     validateItemCreate,
+    validateScheduleTypeCreate,
+    validateScheduleTimeCreate,
+    validateBackupDetails,
+    validatePhysicalLocationcreate,
+    validateBackupVerification,
+    validateSelectedDayscreate,
+    validateMonthBackupVerification,
+    validateWeekBackupVerification,
+    validateYearBackupVerification,
+    validateSelectedDaysBackupVerification,
     validateCommunicationCreate
+
 
 }

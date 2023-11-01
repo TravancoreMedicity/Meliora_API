@@ -1,7 +1,7 @@
-
 const multer = require('multer');
 const path = require('path');
 const fs = require("fs")
+
 
 const itemDetailStorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -23,6 +23,8 @@ const itemDetailStorage = multer.diskStorage({
         cb(null, 'profilePic' + path.extname(file.originalname))
     },
 })
+
+
 
 const itemStorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -171,6 +173,7 @@ const storageSubGroup = multer.diskStorage({
 })
 
 
+
 const maxSize = 2 * 1024 * 1024
 
 const uploadItemDetail = multer({
@@ -190,6 +193,11 @@ const uploadItemDetail = multer({
     },
     limits: { fileSize: maxSize }
 }).single('file');
+
+
+
+
+
 
 //Model Files
 const uploadItem = multer({
@@ -603,5 +611,8 @@ module.exports = {
             }
         })
     },
+
+
+
 
 }

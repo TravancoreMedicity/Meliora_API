@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
-const { DeviceTypeInsert, DeviceTypeView, DeviceTypeUpdate } = require('../it_communication_device_type/device_type.controller');
+const { DeviceTypeInsert, DeviceTypeView, DeviceTypeUpdate } = require('../it_password_device_type/password_devicetype.controller');
 
 router.post('/insert', checkToken, DeviceTypeInsert)
 router.get('/view', checkToken, DeviceTypeView)

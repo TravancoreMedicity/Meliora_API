@@ -15,14 +15,14 @@ module.exports = {
                 transferred_device_ip, 
                 transferred_device_name, 
                 transferred_device_location,
-                it_schedule_type_mast.schedule_type_name,
+                it_backup_schedule_type.schedule_type_name,
                 it_backup_time_details.backup_schedule_time,
-                it_schedule_time_mast.schedule_time_name
+                it_backup_schedule_time.schedule_time_name
            FROM 
                it_backup_time_details
             LEFT JOIN it_backup_details_mast ON it_backup_details_mast.backup_slno=it_backup_time_details.backup_slno
-            LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_time_details.backup_schedule_type
-            LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_time_details.backup_schedule_time
+            LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_time_details.backup_schedule_type
+            LEFT JOIN it_backup_schedule_time ON it_backup_schedule_time.schedule_time_id=it_backup_time_details.backup_schedule_time
            WHERE 
                it_backup_time_details.backup_schedule_type=1 AND status=1`,
             [],
@@ -105,9 +105,9 @@ module.exports = {
                   transferred_device_ip, 
                   transferred_device_name, 
                   transferred_device_location,
-                  it_schedule_type_mast.schedule_type_name,
+                  it_backup_schedule_type.schedule_type_name,
                   it_backup_daily_details.backup_schedule_time,
-                  it_schedule_time_mast.schedule_time_name,
+                  it_backup_schedule_time.schedule_time_name,
                   backup_date_time,
                   backup_size_before,
                   backup_size_after,
@@ -117,8 +117,8 @@ module.exports = {
             FROM   
                   it_backup_daily_details
                LEFT JOIN it_backup_details_mast ON it_backup_details_mast.backup_slno=it_backup_daily_details.backup_slno
-               LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_details_mast.backup_schedule_type
-               LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_daily_details.backup_schedule_time
+               LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_details_mast.backup_schedule_type
+               LEFT JOIN it_backup_schedule_time ON it_backup_schedule_time.schedule_time_id=it_backup_daily_details.backup_schedule_time
                LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_daily_details.em_id`,
             [],
             (error, results, feilds) => {
@@ -146,9 +146,9 @@ module.exports = {
                   transferred_device_ip, 
                   transferred_device_name, 
                   transferred_device_location,
-                  it_schedule_type_mast.schedule_type_name,
+                  it_backup_schedule_type.schedule_type_name,
                   it_backup_daily_details.backup_schedule_time,
-                  it_schedule_time_mast.schedule_time_name,
+                  it_backup_schedule_time.schedule_time_name,
                   backup_date_time,
                   backup_size_before,
                   backup_size_after,
@@ -158,8 +158,8 @@ module.exports = {
             FROM   
                   it_backup_daily_details
                LEFT JOIN it_backup_details_mast ON it_backup_details_mast.backup_slno=it_backup_daily_details.backup_slno
-               LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_details_mast.backup_schedule_type
-               LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_daily_details.backup_schedule_time
+               LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_details_mast.backup_schedule_type
+               LEFT JOIN it_backup_schedule_time ON it_backup_schedule_time.schedule_time_id=it_backup_daily_details.backup_schedule_time
                LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_daily_details.em_id
             WHERE 
                   verify_status=1 and backup_daily_date between ? and ?`,
@@ -191,14 +191,14 @@ module.exports = {
                     transferred_device_ip, 
                     transferred_device_name, 
                     transferred_device_location,
-                    it_schedule_type_mast.schedule_type_name,
+                    it_backup_schedule_type.schedule_type_name,
                     it_backup_time_details.backup_schedule_time,
-                    it_schedule_time_mast.schedule_time_name
+                    it_backup_schedule_time.schedule_time_name
                FROM 
                    it_backup_time_details
                 LEFT JOIN it_backup_details_mast ON it_backup_details_mast.backup_slno=it_backup_time_details.backup_slno
-                LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_time_details.backup_schedule_type
-                LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_time_details.backup_schedule_time
+                LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_time_details.backup_schedule_type
+                LEFT JOIN it_backup_schedule_time ON it_backup_schedule_time.schedule_time_id=it_backup_time_details.backup_schedule_time
                WHERE 
                    it_backup_time_details.backup_schedule_type=2 AND status=1`, [],
             (error, results, feilds) => {
@@ -273,9 +273,9 @@ module.exports = {
             transferred_device_name, 
             transferred_device_location,
             it_backup_details_mast.backup_schedule_type,
-            it_schedule_type_mast.schedule_type_name,
+            it_backup_schedule_type.schedule_type_name,
             it_backup_monthly_details.backup_schedule_time,
-            it_schedule_time_mast.schedule_time_name,
+            it_backup_schedule_time.schedule_time_name,
             backup_date_time,
             backup_size_before,
             backup_size_after,
@@ -285,8 +285,8 @@ module.exports = {
       FROM   
             it_backup_monthly_details
          LEFT JOIN it_backup_details_mast ON it_backup_details_mast.backup_slno=it_backup_monthly_details.backup_slno
-         LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_details_mast.backup_schedule_type
-         LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_monthly_details.backup_schedule_time
+         LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_details_mast.backup_schedule_type
+         LEFT JOIN it_backup_schedule_time ON it_backup_schedule_time.schedule_time_id=it_backup_monthly_details.backup_schedule_time
          LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_monthly_details.em_id`,
             [],
             (error, results, feilds) => {
@@ -316,9 +316,9 @@ module.exports = {
             transferred_device_name, 
             transferred_device_location,
             it_backup_details_mast.backup_schedule_type,
-            it_schedule_type_mast.schedule_type_name,
+            it_backup_schedule_type.schedule_type_name,
             it_backup_monthly_details.backup_schedule_time,
-            it_schedule_time_mast.schedule_time_name,
+            it_backup_schedule_time.schedule_time_name,
             backup_date_time,
             backup_size_before,
             backup_size_after,
@@ -328,8 +328,8 @@ module.exports = {
       FROM   
             it_backup_monthly_details
          LEFT JOIN it_backup_details_mast ON it_backup_details_mast.backup_slno=it_backup_monthly_details.backup_slno
-         LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_details_mast.backup_schedule_type
-         LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_monthly_details.backup_schedule_time
+         LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_details_mast.backup_schedule_type
+         LEFT JOIN it_backup_schedule_time ON it_backup_schedule_time.schedule_time_id=it_backup_monthly_details.backup_schedule_time
          LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_monthly_details.em_id
       WHERE 
          verify_status=1 and backup_monthly_date between ? and ?`,
@@ -362,14 +362,14 @@ module.exports = {
                 transferred_device_name, 
                 transferred_device_location,
                 it_backup_time_details.backup_schedule_type,
-                it_schedule_type_mast.schedule_type_name,
+                it_backup_schedule_type.schedule_type_name,
                 it_backup_time_details.backup_schedule_time,
-                it_schedule_time_mast.schedule_time_name
+                it_backup_schedule_time.schedule_time_name
            FROM 
                it_backup_time_details
             LEFT JOIN it_backup_details_mast ON it_backup_details_mast.backup_slno=it_backup_time_details.backup_slno
-            LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_time_details.backup_schedule_type
-            LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_time_details.backup_schedule_time
+            LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_time_details.backup_schedule_type
+            LEFT JOIN it_backup_schedule_time ON it_backup_schedule_time.schedule_time_id=it_backup_time_details.backup_schedule_time
            WHERE 
                it_backup_time_details.backup_schedule_type=4 AND status=1`,
             [],
@@ -445,9 +445,9 @@ module.exports = {
             transferred_device_name, 
             transferred_device_location,
             it_backup_details_mast.backup_schedule_type,
-            it_schedule_type_mast.schedule_type_name,
+            it_backup_schedule_type.schedule_type_name,
             it_backup_yearly_details.backup_schedule_time,
-            it_schedule_time_mast.schedule_time_name,
+            it_backup_schedule_time.schedule_time_name,
             backup_date_time,
             backup_size_before,
             backup_size_after,
@@ -457,8 +457,8 @@ module.exports = {
       FROM   
             it_backup_yearly_details
          LEFT JOIN it_backup_details_mast ON it_backup_details_mast.backup_slno=it_backup_yearly_details.backup_slno
-         LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_details_mast.backup_schedule_type
-         LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_yearly_details.backup_schedule_time
+         LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_details_mast.backup_schedule_type
+         LEFT JOIN it_backup_schedule_time ON it_backup_schedule_time.schedule_time_id=it_backup_yearly_details.backup_schedule_time
          LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_yearly_details.em_id`,
             [],
             (error, results, feilds) => {
@@ -488,9 +488,9 @@ module.exports = {
             transferred_device_name, 
             transferred_device_location,
             it_backup_details_mast.backup_schedule_type,
-            it_schedule_type_mast.schedule_type_name,
+            it_backup_schedule_type.schedule_type_name,
             it_backup_yearly_details.backup_schedule_time,
-            it_schedule_time_mast.schedule_time_name,
+            it_backup_schedule_time.schedule_time_name,
             backup_date_time,
             backup_size_before,
             backup_size_after,
@@ -500,8 +500,8 @@ module.exports = {
       FROM   
             it_backup_yearly_details
          LEFT JOIN it_backup_details_mast ON it_backup_details_mast.backup_slno=it_backup_yearly_details.backup_slno
-         LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_details_mast.backup_schedule_type
-         LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_yearly_details.backup_schedule_time
+         LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_details_mast.backup_schedule_type
+         LEFT JOIN it_backup_schedule_time ON it_backup_schedule_time.schedule_time_id=it_backup_yearly_details.backup_schedule_time
          LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_yearly_details.em_id
       WHERE 
            verify_status=1 and backup_yearly_date between ? and ?`,
@@ -534,14 +534,14 @@ module.exports = {
             transferred_device_name, 
             transferred_device_location,
             it_backup_time_details.backup_schedule_type,
-            it_schedule_type_mast.schedule_type_name,
+            it_backup_schedule_type.schedule_type_name,
             it_backup_time_details.backup_schedule_time,
-            it_schedule_time_mast.schedule_time_name
+            it_backup_schedule_time.schedule_time_name
        FROM 
            it_backup_time_details
         LEFT JOIN it_backup_details_mast ON it_backup_details_mast.backup_slno=it_backup_time_details.backup_slno
-        LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_time_details.backup_schedule_type
-        LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_time_details.backup_schedule_time
+        LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_time_details.backup_schedule_type
+        LEFT JOIN it_backup_schedule_time ON it_backup_schedule_time.schedule_time_id=it_backup_time_details.backup_schedule_time
        WHERE 
            it_backup_time_details.backup_schedule_type=3 AND status=1`,
             [],
@@ -617,9 +617,9 @@ module.exports = {
             transferred_device_ip, 
             transferred_device_name, 
             transferred_device_location,
-            it_schedule_type_mast.schedule_type_name,
+            it_backup_schedule_type.schedule_type_name,
             it_backup_weekly_details.backup_schedule_time,
-            it_schedule_time_mast.schedule_time_name,
+            it_backup_schedule_time.schedule_time_name,
             backup_date_time,
             backup_size_before,
             backup_size_after,
@@ -629,8 +629,8 @@ module.exports = {
       FROM   
            it_backup_weekly_details
          LEFT JOIN it_backup_details_mast ON it_backup_details_mast.backup_slno=it_backup_weekly_details.backup_slno
-         LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_details_mast.backup_schedule_type
-         LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_weekly_details.backup_schedule_time
+         LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_details_mast.backup_schedule_type
+         LEFT JOIN it_backup_schedule_time ON it_backup_schedule_time.schedule_time_id=it_backup_weekly_details.backup_schedule_time
          LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_weekly_details.em_id`,
             [],
             (error, results, feilds) => {
@@ -659,9 +659,9 @@ module.exports = {
             transferred_device_ip, 
             transferred_device_name, 
             transferred_device_location,
-            it_schedule_type_mast.schedule_type_name,
+            it_backup_schedule_type.schedule_type_name,
             it_backup_weekly_details.backup_schedule_time,
-            it_schedule_time_mast.schedule_time_name,
+            it_backup_schedule_time.schedule_time_name,
             backup_date_time,
             backup_size_before,
             backup_size_after,
@@ -671,8 +671,8 @@ module.exports = {
       FROM   
            it_backup_weekly_details
          LEFT JOIN it_backup_details_mast ON it_backup_details_mast.backup_slno=it_backup_weekly_details.backup_slno
-         LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_details_mast.backup_schedule_type
-         LEFT JOIN it_schedule_time_mast ON it_schedule_time_mast.schedule_time_id=it_backup_weekly_details.backup_schedule_time
+         LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_details_mast.backup_schedule_type
+         LEFT JOIN it_backup_schedule_time ON it_backup_schedule_time.schedule_time_id=it_backup_weekly_details.backup_schedule_time
          LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_weekly_details.em_id
       WHERE  
             verify_status=1 and  backup_weekly_date between ? and ?`,
@@ -705,7 +705,7 @@ module.exports = {
             transferred_device_name, 
             transferred_device_location,
             it_backup_details_mast.backup_schedule_type,
-            it_schedule_type_mast.schedule_type_name,
+            it_backup_schedule_type.schedule_type_name,
             it_backup_selecteddays_details.selected_days,
             backup_selected_date,
             due_date,
@@ -718,7 +718,7 @@ module.exports = {
       FROM   
             it_backup_selecteddays_details
          LEFT JOIN it_backup_details_mast ON it_backup_details_mast.backup_slno=it_backup_selecteddays_details.backup_slno
-         LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_details_mast.backup_schedule_type
+         LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_details_mast.backup_schedule_type
          LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_selecteddays_details.em_id `,
             [],
             (error, results, feilds) => {
@@ -808,7 +808,7 @@ module.exports = {
             transferred_device_name, 
             transferred_device_location,
             it_backup_details_mast.backup_schedule_type,
-            it_schedule_type_mast.schedule_type_name,
+            it_backup_schedule_type.schedule_type_name,
             it_backup_selecteddays_details.selected_days,
             backup_selected_date,
             due_date,
@@ -821,7 +821,7 @@ module.exports = {
       FROM   
             it_backup_selecteddays_details
          LEFT JOIN it_backup_details_mast ON it_backup_details_mast.backup_slno=it_backup_selecteddays_details.backup_slno
-         LEFT JOIN it_schedule_type_mast ON it_schedule_type_mast.schedule_type_id=it_backup_details_mast.backup_schedule_type
+         LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_details_mast.backup_schedule_type
          LEFT JOIN co_employee_master ON co_employee_master.em_id=it_backup_selecteddays_details.em_id
       WHERE  
            verify_status=1 and backup_selected_date between ? and ?`,

@@ -254,7 +254,7 @@ module.exports = {
         );
     },
 
-    getDeptApprovList: (id, callBack) => {
+    getDeptApprovList: (data, callBack) => {
         pool.query(
             `select crf_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
             request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,sec_name,
@@ -286,9 +286,9 @@ module.exports = {
             left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
             left join co_employee_master I on I.em_id=crf_request_approval.incharge_user
             left join co_deptsec_mast on co_deptsec_mast.sec_id=crf_request_master.request_deptsec_slno
-            where user_deptsec=? ORDER BY crf_request_master.req_slno DESC`,
+            where user_deptsec IN (?) ORDER BY crf_request_master.req_slno DESC`,
             [
-                id
+                data
             ],
             (error, results, feilds) => {
                 if (error) {

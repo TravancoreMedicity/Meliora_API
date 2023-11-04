@@ -18,8 +18,8 @@ router.patch("/", checkToken, requestRegistUpdate);
 router.patch("/patchDetails", checkToken, requestRegistDetlUpdate);
 
 router.get("/getAuthorization/:id", checkToken, getAuthorization);
+router.post('/getDeptApprovList', checkToken, getDeptApprovList);
 
-router.get("/getDeptApprovList/:id", checkToken, getDeptApprovList);
 router.get("/getApprovList/others", checkToken, getApprovListOthers);
 
 router.patch("/approval/incharge", checkToken, updateInchargeApproval);

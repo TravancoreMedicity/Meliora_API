@@ -582,4 +582,21 @@ where module_slno = ?`,
         );
 
     },
+
+    getdeptInchargedeptsec: (id, callBack) => {
+        pool.query(
+            `select dept_section from medi_hrm.hrm_authorization_assign
+            where emp_id=? and auth_post=2 `,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+
+    },
 }

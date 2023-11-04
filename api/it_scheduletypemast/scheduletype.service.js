@@ -2,7 +2,7 @@ const { pool } = require('../../config/database')
 module.exports = {
     scheduleTypeInsert: (data, callback) => {
         pool.query(
-            `INSERT INTO it_schedule_type_mast
+            `INSERT INTO it_backup_schedule_type
           ( 
             schedule_type_name, 
             schedule_type_status,
@@ -29,7 +29,7 @@ module.exports = {
                    schedule_type_name,
                    if(schedule_type_status=1,'Yes','No') status
               FROM
-                  it_schedule_type_mast`, [],
+                it_backup_schedule_type`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -41,7 +41,7 @@ module.exports = {
 
     ScheduleTypeUpdate: (data, callback) => {
         pool.query(
-            `UPDATE it_schedule_type_mast 
+            `UPDATE it_backup_schedule_type 
             SET 
                schedule_type_name=?,
                schedule_type_status=?,
@@ -69,7 +69,7 @@ module.exports = {
                  schedule_type_id,
                  schedule_type_name
             FROM
-                 it_schedule_type_mast
+               it_backup_schedule_type
             WHERE 
                  schedule_type_status=1`, [],
             (error, results, feilds) => {

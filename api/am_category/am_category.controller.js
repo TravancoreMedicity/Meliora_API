@@ -28,7 +28,6 @@ module.exports = {
     },
 
     CategoryView: (req, res) => {
-
         CategoryView((err, results) => {
             if (err) {
                 return res.status(200).json({

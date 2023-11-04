@@ -14,8 +14,7 @@ module.exports = {
     		amount,
             receiver_emp_id,
             sim_status,     
-            if(sim_status=1,'Yes','No')sim
-         
+            if(sim_status=1,'Yes','No')sim         
             FROM
             it_communication_device_mast
             left join it_communication_device_type on it_communication_device_type.device_type_slno=it_communication_device_mast.device_type_slno
@@ -28,7 +27,9 @@ module.exports = {
                 return callback(null, results);
             }
         );
+
     },
+
     MonthlyTarrifUpdate: (data, callback) => {
         pool.query(
             `UPDATE it_tarrif_monthly_details SET 
@@ -151,15 +152,18 @@ module.exports = {
     },
     MonthlyTarrifInsert: (data, callBack) => {
         pool.query(
-            `INSERT INTO it_monthly_tarrif_details
+            `
+            INSERT INTO it_monthly_tarrif_details
             (
                 device_slno,
                 tarrif_amount,
                 monthly_bill_generate
             ) 
-            VALUES ?`,
+            VALUES (?,?,?)`,
             [
-                data
+                data.device_slno,
+                data.tarrif_amount,
+                data.monthly_bill_generate,
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -202,24 +206,48 @@ module.exports = {
             }
         )
     },
-    YearlyTarrifInsert: (data, callback) => {
+    // YearlyTarrifInsert: (data, callback) => {
+    //     pool.query(
+    //         `INSERT INTO it_yearly_tarrif_details
+    //         (
+    //             device_slno,
+    //             tarrif_amount,
+    //             yearly_bill_generate
+    //         ) 
+    //         VALUES ?`,
+    //         [
+    //             data
+    //         ],
+
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callback(error);
+    //             }
+    //             return callback(null, results);
+    //         }
+    //     );
+    // },
+    YearlyTarrifInsert: (data, callBack) => {
         pool.query(
-            `INSERT INTO it_yearly_tarrif_details
+            `
+            INSERT INTO it_yearly_tarrif_details
             (
                 device_slno,
                 tarrif_amount,
                 yearly_bill_generate
             ) 
-            VALUES ?`,
+            VALUES (?,?,?)`,
             [
-                data
+                data.device_slno,
+                data.tarrif_amount,
+                data.yearly_bill_generate,
             ],
-
             (error, results, feilds) => {
+
                 if (error) {
-                    return callback(error);
+                    return callBack(error);
                 }
-                return callback(null, results);
+                return callBack(null, results);
             }
         );
     },
@@ -227,8 +255,8 @@ module.exports = {
 
         pool.query(
             `SELECT
-            monthly_slno,
-            it_monthly_tarrif_details.device_slno,
+           monthly_slno,
+           it_monthly_tarrif_details.device_slno,
            it_communication_device_mast.device_name,
            it_communication_device_mast.device_type_slno,
            it_communication_device_mast.sim_mobile_num,
@@ -242,16 +270,17 @@ module.exports = {
            it_communication_device_mast.reciver_name,
            it_communication_device_mast.amount,
            it_communication_device_mast.provider,bill_amount, bill_date,
-            bill_entered_date, file_upload_status, payed_status, bill_number, bill_due_date, bill_update_status,
-            if(payed_status=1,'Yes','No')payed
-            FROM  it_monthly_tarrif_details
+           bill_entered_date, file_upload_status, payed_status, bill_number, bill_due_date, bill_update_status,
+           if(payed_status=1,'Yes','No')payed
+           FROM  it_monthly_tarrif_details
            left join it_communication_device_mast on it_communication_device_mast.device_slno=it_monthly_tarrif_details.device_slno
            left join it_communication_device_type on it_communication_device_type.device_type_slno=it_communication_device_mast.device_type_slno
            left join co_department_mast on co_department_mast.dept_id=it_communication_device_mast.department
-          WHERE monthly_bill_generate=?`,
+           WHERE monthly_bill_generate=? AND it_monthly_tarrif_details.device_slno=? `,
             [
 
-                data.monthly_bill_generate
+                data.monthly_bill_generate,
+                data.device_slno
 
             ],
             (error, results, fields) => {
@@ -260,6 +289,7 @@ module.exports = {
                 }
                 return callback(null, results);
             }
+
         );
     },
     CheckInsetYearlyOrNot: (data, callback) => {
@@ -286,10 +316,11 @@ module.exports = {
            left join it_communication_device_mast on it_communication_device_mast.device_slno=it_yearly_tarrif_details.device_slno
            left join it_communication_device_type on it_communication_device_type.device_type_slno=it_communication_device_mast.device_type_slno
            left join co_department_mast on co_department_mast.dept_id=it_communication_device_mast.department
-          WHERE yearly_bill_generate=?`,
+          WHERE yearly_bill_generate=? AND it_yearly_tarrif_details.device_slno=?`,
             [
 
-                data.yearly_bill_generate
+                data.yearly_bill_generate,
+                data.device_slno
 
             ],
             (error, results, fields) => {
@@ -333,19 +364,25 @@ module.exports = {
         )
 
     },
+
+
     QuaterlyTarrifInsert: (data, callBack) => {
         pool.query(
-            `INSERT INTO it_quaterly_tarrif_details
+            `
+            INSERT INTO it_quaterly_tarrif_details
             (
                 device_slno,
                 tarrif_amount,
                 quaterly_bill_generate
             ) 
-            VALUES ?`,
+            VALUES (?,?,?)`,
             [
-                data
+                data.device_slno,
+                data.tarrif_amount,
+                data.quaterly_bill_generate,
             ],
             (error, results, feilds) => {
+
                 if (error) {
                     return callBack(error);
                 }
@@ -377,10 +414,11 @@ module.exports = {
            left join it_communication_device_mast on it_communication_device_mast.device_slno=it_quaterly_tarrif_details.device_slno
            left join it_communication_device_type on it_communication_device_type.device_type_slno=it_communication_device_mast.device_type_slno
            left join co_department_mast on co_department_mast.dept_id=it_communication_device_mast.department
-          WHERE quaterly_bill_generate=?`,
+          WHERE quaterly_bill_generate=? AND it_quaterly_tarrif_details.device_slno=?`,
             [
 
-                data.quaterly_bill_generate
+                data.quaterly_bill_generate,
+                data.device_slno
 
             ],
             (error, results, fields) => {
@@ -425,5 +463,154 @@ module.exports = {
             }
         )
 
+    },
+
+    getMonthData: (data, callback) => {
+        pool.query(
+            `SELECT
+            monthly_slno,
+            it_monthly_tarrif_details.device_slno,
+            it_communication_device_mast.device_name,
+            it_communication_device_mast.device_type_slno,
+            it_communication_device_mast.sim_mobile_num,
+            device_type_name,
+            department,
+            location,
+            issue_date,
+            provider,
+            sec_name,
+            bill_update_status,
+            co_department_mast.dept_name,
+            it_communication_device_mast.receiver_emp_id,
+            it_communication_device_mast.reciver_name,
+            it_communication_device_mast.amount,
+            it_communication_device_mast.provider,bill_amount, bill_date,
+            bill_entered_date, file_upload_status, payed_status, bill_number, bill_due_date, bill_update_status,
+            if(payed_status=1,'Yes','No')payed
+            FROM  it_monthly_tarrif_details
+            left join it_communication_device_mast on it_communication_device_mast.device_slno=it_monthly_tarrif_details.device_slno
+            left join it_communication_device_type on it_communication_device_type.device_type_slno=it_communication_device_mast.device_type_slno
+            left join co_department_mast on co_department_mast.dept_id=it_communication_device_mast.department
+            left join co_deptsec_mast on co_deptsec_mast.sec_id=it_communication_device_mast.location
+            ORDER BY 
+            CASE
+                WHEN payed_status IS NULL OR payed_status = 0 THEN 0
+                ELSE 1
+            END,
+            CASE
+                WHEN payed_status = 1 THEN bill_date
+                ELSE NULL
+            END DESC`,
+            [
+
+                data.monthly_bill_generate
+
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+    getQuaterlyData: (data, callback) => {
+
+        pool.query(
+            `SELECT
+            quaterly_slno,
+            it_quaterly_tarrif_details.device_slno,
+           it_communication_device_mast.device_name,
+           it_communication_device_mast.device_type_slno,
+           it_communication_device_mast.sim_mobile_num,
+           device_type_name,
+           department,
+           location,
+          sec_name,
+           issue_date,
+           provider,          
+           co_department_mast.dept_name,
+           it_communication_device_mast.receiver_emp_id,
+           it_communication_device_mast.reciver_name,
+           it_communication_device_mast.amount,
+           it_communication_device_mast.provider,bill_amount, bill_date,
+            bill_entered_date, file_upload_status, payed_status, bill_number, bill_due_date,
+            if(payed_status=1,'Yes','No')payed
+            FROM  it_quaterly_tarrif_details
+           left join it_communication_device_mast on it_communication_device_mast.device_slno=it_quaterly_tarrif_details.device_slno
+           left join it_communication_device_type on it_communication_device_type.device_type_slno=it_communication_device_mast.device_type_slno
+           left join co_department_mast on co_department_mast.dept_id=it_communication_device_mast.department
+            left join co_deptsec_mast on co_deptsec_mast.sec_id=it_communication_device_mast.location
+            ORDER BY 
+            CASE
+                WHEN payed_status IS NULL OR payed_status = 0 THEN 0
+                ELSE 1
+            END,
+            CASE
+                WHEN payed_status = 1 THEN bill_date
+                ELSE NULL
+            END DESC`,
+            [
+
+                data.quaterly_bill_generate
+
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    getYearData: (data, callback) => {
+
+        pool.query(
+            `SELECT
+            yearly_slno,
+            it_yearly_tarrif_details.device_slno,
+           it_communication_device_mast.device_name,
+           it_communication_device_mast.device_type_slno,
+           it_communication_device_mast.sim_mobile_num,
+           device_type_name,
+           department,
+            location,
+            sec_name,
+           issue_date,
+           provider,              
+           co_department_mast.dept_name,
+           it_communication_device_mast.receiver_emp_id,
+           it_communication_device_mast.reciver_name,
+           it_communication_device_mast.amount,
+           it_communication_device_mast.provider,bill_amount, bill_date,
+            bill_entered_date, file_upload_status, payed_status, bill_number, bill_due_date,
+            if(payed_status=1,'Yes','No')payed
+            FROM  it_yearly_tarrif_details
+           left join it_communication_device_mast on it_communication_device_mast.device_slno=it_yearly_tarrif_details.device_slno
+           left join it_communication_device_type on it_communication_device_type.device_type_slno=it_communication_device_mast.device_type_slno
+           left join co_department_mast on co_department_mast.dept_id=it_communication_device_mast.department
+             left join co_deptsec_mast on co_deptsec_mast.sec_id=it_communication_device_mast.location
+             ORDER BY 
+             CASE
+                 WHEN payed_status IS NULL OR payed_status = 0 THEN 0
+                 ELSE 1
+             END,
+             CASE
+                 WHEN payed_status = 1 THEN bill_date
+                 ELSE NULL
+             END DESC`,
+            [
+
+                data.yearly_bill_generate
+
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
     },
 }

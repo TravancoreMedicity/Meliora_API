@@ -1,18 +1,8 @@
-// const { validateCommunicationCreate } = require('../../validation/validation_schema');
-const { CommunicationDeviceInsert, CommunicationDeviceView, CommunicationDeviceUpdate } = require('../it_communication_device_details/communication.services')
+const { PasswordInsert, PasswordView, PasswordUpdate } = require('../it_password_management/password_management.service')
 module.exports = {
-    CommunicationDeviceInsert: (req, res) => {
+    PasswordInsert: (req, res) => {
         const body = req.body;
-        // validate model Instert function
-        // const body_result = validateCommunicationCreate.validate(body);
-        // if (body_result.error) {
-        //     return res.status(200).json({
-        //         success: 2,
-        //         message: body_result.error.details[0].message
-        //     });
-        // }
-        // body.reciver_name = body_result.value.reciver_name;
-        CommunicationDeviceInsert(body, (err, result) => {
+        PasswordInsert(body, (err, result) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -25,9 +15,9 @@ module.exports = {
             })
         })
     },
-    CommunicationDeviceView: (req, res) => {
+    PasswordView: (req, res) => {
 
-        CommunicationDeviceView((err, results) => {
+        PasswordView((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -47,10 +37,10 @@ module.exports = {
 
         })
     },
-    CommunicationDeviceUpdate: (req, res) => {
+    PasswordUpdate: (req, res) => {
         const body = req.body;
 
-        CommunicationDeviceUpdate(body, (err, results) => {
+        PasswordUpdate(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -66,7 +56,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: " Details Updated successfully"
+                message: "Data Updated successfully"
             })
         })
     },

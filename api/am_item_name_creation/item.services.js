@@ -159,28 +159,6 @@ module.exports = {
         )
     },
 
-    itemInactive: (data, callback) => {
-
-        pool.query(
-
-            `UPDATE am_asset_item_map_master SET 
-                  item_create_status=0          
-            WHERE 
-            am_item_map_slno=?`,
-
-            [
-
-                data.am_item_map_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        )
-    },
-
     getitemFromMasterdemo: (data, callBack) => {
         pool.query(`
             select item_creation_slno, item_name,asset_spare

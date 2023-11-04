@@ -117,7 +117,7 @@ module.exports = {
     getReqByDeptBase: (id, callBack) => {
         pool.query(
             `select crf_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
-            request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,
+            request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,image_status,
             total_approx_cost,user_deptsec,incharge_req,incharge_approve,req_status,
             hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,
             (case when emergency=1 then "Emergency" else "Normal" end )as Emergency,

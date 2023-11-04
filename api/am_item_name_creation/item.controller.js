@@ -1,7 +1,7 @@
 
 const { validateItemCreate } = require('../../validation/validation_schema');
 const logger = require('../../logger/logger');
-const { ItemNameInsert, ItemNameview, ItemNameUpdate, itemInactive, getitemAll, getitemFromMasterdemo,
+const { ItemNameInsert, ItemNameview, ItemNameUpdate, getitemAll, getitemFromMasterdemo,
 
     getitemNoModelNo, getitemNoManufactr, getitemNoSubModel, getitemNoModel, getitemNoSubGroup,
     getitemNoGroup, getitemNoSubCat, getitemNoCat, getitemOnlyModelNo, getitemOnlyManufactr,
@@ -95,34 +95,6 @@ module.exports = {
             })
         })
     },
-
-
-
-    itemInactive: (req, res) => {
-        const body = req.body;
-
-        itemInactive(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (results === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: "No record found"
-
-                })
-            }
-            return res.status(200).json({
-                success: 2,
-                message: "Item Inactive successfully"
-            })
-        })
-    },
-
-
     getitemFromMasterdemo: (req, res) => {
 
         const body = req.body

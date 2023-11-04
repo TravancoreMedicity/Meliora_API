@@ -150,7 +150,7 @@ const wifiManagement = require('./api/it_wifi_management/wifi.router')
 const itemCreationDeptmap = require('./api/am_Item_creation_mast/item_creation_mast.router')
 const CustodianDeptMast = require('./api/am_custodian_department/am_custodian_dept.router')
 const ItemMapDetails = require('./api/am_item_creation_detail/am_itemdetail.router')
-
+const CrfImageUpload = require('./api/crf_fileupload/crf_fileupload.router')
 
 
 app.use(express.json({ limit: '50mb' }));
@@ -269,7 +269,7 @@ app.use('/api/wifiManagement', wifiManagement)
 app.use('/api/itemCreationDeptmap', itemCreationDeptmap)
 app.use('/api/CustodianDeptMast', CustodianDeptMast)
 app.use('/api/ItemMapDetails', ItemMapDetails)
-
+app.use('/api/CrfImageUpload', CrfImageUpload)
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

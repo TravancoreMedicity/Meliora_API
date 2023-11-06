@@ -630,7 +630,8 @@ module.exports = {
         pool.query(
             `select dept_slno,dept_name
             from crf_dept_map
-            left join co_department_mast on co_department_mast.dept_id=crf_dept_map.dept_slno`,
+            left join co_department_mast on co_department_mast.dept_id=crf_dept_map.dept_slno
+            order by dept_name ASC`,
             [],
             (error, results, fields) => {
                 if (error) {

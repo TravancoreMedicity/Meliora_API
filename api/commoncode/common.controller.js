@@ -819,7 +819,6 @@ module.exports = {
     getdeptHoddeptsec: (req, res) => {
         const id = req.params.id
         getdeptHoddeptsec(id, (err, results) => {
-            console.log(results);
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({
@@ -845,7 +844,6 @@ module.exports = {
     getdeptInchargedeptsec: (req, res) => {
         const id = req.params.id
         getdeptInchargedeptsec(id, (err, results) => {
-            console.log(results);
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({

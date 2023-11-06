@@ -191,7 +191,7 @@ where module_slno = ?`,
             `SELECT 
                 branch_slno,
                 branch_name
-                FROM medi_hrm.hrm_branch `,
+                FROM hrm_branch `,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -206,7 +206,7 @@ where module_slno = ?`,
             `SELECT 
             desg_slno,
             desg_name
-                FROM medi_hrm.designation `,
+                FROM designation `,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -221,7 +221,7 @@ where module_slno = ?`,
             `SELECT 
             sa_code,
             sal_name
-                FROM medi_hrm.hrm_salutation`,
+                FROM hrm_salutation`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -567,8 +567,8 @@ where module_slno = ?`,
     },
 
     getdeptHoddeptsec: (id, callBack) => {
-        pool.query(
-            `select dept_section from medi_hrm.hrm_authorization_assign
+        hrpool.query(
+            `select dept_section from hrm_authorization_assign
             where emp_id=? and auth_post=1 `,
             [
                 id
@@ -584,8 +584,8 @@ where module_slno = ?`,
     },
 
     getdeptInchargedeptsec: (id, callBack) => {
-        pool.query(
-            `select dept_section from medi_hrm.hrm_authorization_assign
+        hrpool.query(
+            `select dept_section from hrm_authorization_assign
             where emp_id=? and auth_post=2 `,
             [
                 id

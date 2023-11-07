@@ -256,7 +256,6 @@ module.exports = {
     },
 
     getDeptApprovList: (data, callBack) => {
-        console.log(data);
         pool.query(
             `select crf_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
             request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,sec_name,

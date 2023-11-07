@@ -120,6 +120,7 @@ module.exports = {
             request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,image_status,
             total_approx_cost,user_deptsec,incharge_req,incharge_approve,req_status,
             hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,
+            (case when location is null then "Not Given" else location end )as location,
             (case when emergency=1 then "Emergency" else "Normal" end )as Emergency,
              (case when incharge_req=1 and incharge_approve is null then  "not updated" when incharge_req=0 then "Not Required" when incharge_approve='1' then "Approved" else "Reject" end ) as approve_incharge ,
               (case when incharge_req=1 and  incharge_remarks is null then  "not updated" when incharge_req=0 then "Not Required" else incharge_remarks end) as incharge_remarks ,
@@ -135,7 +136,7 @@ module.exports = {
               (case when  ed_approve_remarks is null then  "not updated" else ed_approve_remarks end) as ed_approve_remarks 
              from crf_request_master
              left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
-            where user_deptsec=?`,
+            where user_deptsec=?  ORDER BY crf_request_master.req_slno DESC`,
             [
                 id
             ],
@@ -255,6 +256,7 @@ module.exports = {
     },
 
     getDeptApprovList: (data, callBack) => {
+        console.log(data);
         pool.query(
             `select crf_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
             request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,sec_name,
@@ -562,7 +564,7 @@ module.exports = {
                     left join co_employee_master C on C.em_id=crf_request_approval.cao_user
                     left join co_employee_master E on E.em_id=crf_request_approval.ed_user
                     left join co_deptsec_mast on co_deptsec_mast.sec_id=crf_request_master.request_deptsec_slno
-            where dms_req=1 and hod_approve=1 ORDER BY crf_request_master.req_slno DESC`,
+            where dms_req=1 and (hod_approve=1 OR hod_req )ORDER BY crf_request_master.req_slno DESC`,
             [],
             (error, results, fields) => {
                 if (error) {
@@ -863,6 +865,60 @@ module.exports = {
                     return callBack(error);
                 }
                 return callBack(null, results);
+            }
+        );
+    },
+
+    updateDMSApproval: (data, callback) => {
+        pool.query(
+            `UPDATE crf_request_approval 
+            SET dms_approve = ?,
+            dms_remarks = ?,
+            dms_detail_analysis=?,
+            dms_approve_date = ?,  
+            dms_user=?                            
+            WHERE req_approv_slno =?`,
+            [
+                data.dms_approve,
+                data.dms_remarks,
+                data.dms_detail_analysis,
+                data.dms_approve_date,
+                data.dms_user,
+                data.req_approv_slno
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateMSApproval: (data, callback) => {
+        pool.query(
+            `UPDATE crf_request_approval 
+            SET ms_approve = ?,
+            ms_approve_remark = ?,
+            ms_detail_analysis=?,
+            ms_approve_date = ?,  
+            ms_approve_user=?                            
+            WHERE req_approv_slno =?`,
+            [
+                data.ms_approve,
+                data.ms_approve_remark,
+                data.ms_detail_analysis,
+                data.ms_approve_date,
+                data.ms_approve_user,
+                data.req_approv_slno
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
             }
         );
     },

@@ -1,6 +1,6 @@
 const { getCategory, getGroup, getAssetType, getAmItemType, getAmSubcategory, getAmSubGroup,
     getAmManufacture, getAmModel, getUOM, getSubmodel, modelNoSelect, ItemBasedOnDeptSec,
-    SpareItemBasedOnDeptSec
+    SpareItemBasedOnDeptSec, rackselect, RoomBasedOnDeptSec
 } = require('../am_selectcomponents/select.services')
 const logger = require('../../logger/logger');
 
@@ -305,5 +305,49 @@ module.exports = {
             });
         });
     },
-
+    rackselect: (req, res) => {
+        rackselect((err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    RoomBasedOnDeptSec: (req, res) => {
+        const id = req.params.id
+        RoomBasedOnDeptSec(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
 }

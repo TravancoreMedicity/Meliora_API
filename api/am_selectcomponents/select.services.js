@@ -227,5 +227,39 @@ module.exports = {
             }
         );
     },
+    rackselect: (callback) => {
+        pool.query(
+            `SELECT 
+            am_rack_slno,
+            am_rack_name
+            FROM
+            am_rack_mast
+            WHERE am_rack_status=1`, [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
 
+            }
+        );
+    },
+
+    RoomBasedOnDeptSec: (id, callback) => {
+        pool.query(
+            `SELECT 
+            rm_room_slno,
+            rm_room_name
+             FROM
+            rm_newroom_creation
+           WHERE rm_outlet_slno=? and rm_room_status=1 ORDER BY rm_room_name ASC`, [id],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
 }

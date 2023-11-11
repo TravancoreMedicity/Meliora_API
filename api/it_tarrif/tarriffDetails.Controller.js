@@ -1,6 +1,6 @@
 const logger = require('../../logger/logger')
 
-const { MonthlyTarrifView, MonthlyTarrifUpdate, QuaterlyTarrifView, YearlyTarrifView, MonthlyTarrifInsert,
+const { MonthlyTarrifView, QuaterlyTarrifView, YearlyTarrifView, MonthlyTarrifInsert,
     QuaterlyTarrifInsert, YearlyTarrifInsert, CheckInsetQuaterlyOrNot, BillQuaterlyUpdate, CheckInsetMonthlyOrNot,
     BillMonthlyUpdate, CheckInsetYearlyOrNot, BillYearlyUpdate, getMonthData, getQuaterlyData, getYearData } = require('../it_tarrif/tarriffDetails.service')
 module.exports = {
@@ -25,27 +25,27 @@ module.exports = {
             })
         })
     },
-    MonthlyTarrifUpdate: (req, res) => {
-        const body = req.body;
-        MonthlyTarrifUpdate(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (results === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: "No record found"
-                })
-            }
-            return res.status(200).json({
-                success: 2,
-                message: "updated successfully"
-            })
-        })
-    },
+    // MonthlyTarrifUpdate: (req, res) => {
+    //     const body = req.body;
+    //     MonthlyTarrifUpdate(body, (err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (results === 0) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 message: "No record found"
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 2,
+    //             message: "updated successfully"
+    //         })
+    //     })
+    // },
     QuaterlyTarrifView: (req, res) => {
         QuaterlyTarrifView((err, results) => {
             if (err) {

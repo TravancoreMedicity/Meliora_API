@@ -156,8 +156,8 @@ const itemCreationDeptmap = require('./api/am_Item_creation_mast/item_creation_m
 const CustodianDeptMast = require('./api/am_custodian_department/am_custodian_dept.router')
 const ItemMapDetails = require('./api/am_item_creation_detail/am_itemdetail.router')
 const IiImageUpload = require('./api/it_managemnt_file_upload/it_file_upload.router')
-const PasswordDeviceType = require('./api/it_password_device_type/password_devicetype.router')
 const PasswordManagementMain = require('./api/it_password_management/password_management.router')
+const PasswordCredentialType = require('./api/it_password_credential_type_master/password_credential.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -281,8 +281,9 @@ app.use('/api/itemCreationDeptmap', itemCreationDeptmap)
 app.use('/api/CustodianDeptMast', CustodianDeptMast)
 app.use('/api/ItemMapDetails', ItemMapDetails)
 app.use('/api/ItImageUpload', IiImageUpload)
-app.use('/api/PasswordDeviceType', PasswordDeviceType)
+// app.use('/api/PasswordDeviceType', PasswordDeviceType)
 app.use('/api/PasswordManagementMain', PasswordManagementMain)
+app.use('/api/PasswordCredentialType', PasswordCredentialType)
 
 
 server.listen(process.env.APP_PORT, () =>

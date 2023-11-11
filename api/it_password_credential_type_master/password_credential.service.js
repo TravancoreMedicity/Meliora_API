@@ -1,18 +1,18 @@
 const { pool } = require('../../config/database')
 module.exports = {
-    DeviceTypeInsert: (data, callback) => {
+    CredentialInsert: (data, callback) => {
         pool.query(
-            `INSERT INTO it_password_device_type
+            `INSERT INTO it_passwrd_credential_type
           ( 
-            device_type_name,
-            device_type_status,
+            credential_name,
+            credential_status,
             create_user
          
           )
           VALUES(?,?,?)`,
             [
-                data.device_type_name,
-                data.device_type_status,
+                data.credential_name,
+                data.credential_status,
                 data.create_user
 
             ],
@@ -26,15 +26,15 @@ module.exports = {
             }
         );
     },
-    DeviceTypeView: (callback) => {
+    CredentialView: (callback) => {
         pool.query(
             `SELECT 
-            device_type_slno,
-            device_type_name, 
-            device_type_status,
-            if(device_type_status=1,'Yes','No')status
+            credential_slno,
+            credential_name, 
+            credential_status,
+            if(credential_status=1,'Yes','No')status
             FROM
-            it_password_device_type`, [],
+            it_passwrd_credential_type`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -43,24 +43,24 @@ module.exports = {
             }
         );
     },
-    DeviceTypeUpdate: (data, callback) => {
+    CredentialUpdate: (data, callback) => {
 
         pool.query(
 
-            `UPDATE it_password_device_type SET 
-            device_type_name=?,
-            device_type_status=?,
+            `UPDATE it_passwrd_credential_type SET 
+            credential_name=?,
+            credential_status=?,
             edit_user =?       
             WHERE 
-            device_type_slno=?`,
+            credential_slno=?`,
 
             [
 
 
-                data.device_type_name,
-                data.device_type_status,
+                data.credential_name,
+                data.credential_status,
                 data.edit_user,
-                data.device_type_slno,
+                data.credential_slno,
 
             ],
             (error, results, feilds) => {

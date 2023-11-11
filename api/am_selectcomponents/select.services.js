@@ -209,5 +209,57 @@ module.exports = {
             }
         );
     },
+    SpareItemBasedOnDeptSec: (id, callback) => {
+        pool.query(
+            `SELECT 
+            am_spare_item_map_master.spare_creation_slno,
+            item_name
+            FROM
+           am_spare_item_map_master
+           left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_spare_item_map_master.spare_creation_slno
+            WHERE spare_deptsec_slno=? and spare_create_status=1 group by spare_creation_slno`, [id],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
 
+            }
+        );
+    },
+    rackselect: (callback) => {
+        pool.query(
+            `SELECT 
+            am_rack_slno,
+            am_rack_name
+            FROM
+            am_rack_mast
+            WHERE am_rack_status=1`, [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
+
+    RoomBasedOnDeptSec: (id, callback) => {
+        pool.query(
+            `SELECT 
+            rm_room_slno,
+            rm_room_name
+             FROM
+            rm_newroom_creation
+           WHERE rm_outlet_slno=? and rm_room_status=1 ORDER BY rm_room_name ASC`, [id],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
 }

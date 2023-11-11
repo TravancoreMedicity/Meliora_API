@@ -6,7 +6,7 @@ const { getEmployeeID, getMenuBasedRights, getModuleGroupByID, getSubModuleRight
     getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
     getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor,
     updatemobapprequired, getMobileAppStatusCredential, getdeptSecInchhod, manualEmpList,
-    getCompSerialno, getCrfDept, getDeptType
+    getCompSerialno, getCrfDept, getDeptType, getdeptHoddeptsec, getdeptInchargedeptsec
 } = require('../commoncode/common.controller');
 
 router.get("/getempid/:id", checkToken, getEmployeeID)
@@ -47,5 +47,9 @@ router.get("/getCompSerialno", checkToken, getCompSerialno);
 
 router.get("/crfdept/:id", checkToken, getCrfDept)
 router.get("/deptType/:id", checkToken, getDeptType)
+
+router.get("/getdeptHoddeptsec/:id", checkToken, getdeptHoddeptsec)
+
+router.get("/getdeptInchargedeptsec/:id", checkToken, getdeptInchargedeptsec)
 
 module.exports = router;

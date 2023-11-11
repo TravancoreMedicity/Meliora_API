@@ -70,7 +70,7 @@ module.exports = {
     getNdrfList: (callback) => {
         pool.query(
             `select crf_request_master.req_slno,ndrf_date,crf_request_master.actual_requirement,
-            crf_request_master.needed,crf_request_master.location,ed_approve_req,
+            crf_request_master.needed,crf_request_master.location,ed_approve_req,crf_ndrf_mast.create_date as ndrf_date,
             crf_request_master.request_dept_slno,crf_request_master.request_deptsec_slno ,
             co_department_mast.dept_name as req_dept,total_approx_cost,incharge_req,incharge_approve,
             co_deptsec_mast.sec_name as req_deptsec,crf_request_master.remarks,category,inch_detial_analysis,

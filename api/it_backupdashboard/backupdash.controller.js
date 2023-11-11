@@ -125,7 +125,7 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 1,
-                    // message: "No Data Found",
+                    message: "No Data Found",
                     data: []
                 })
             }

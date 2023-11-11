@@ -1,18 +1,18 @@
 const { pool } = require('../../config/database')
 module.exports = {
-    CredentialInsert: (data, callback) => {
-        pool.query(
+    AssetRackInsert: (data, callback) => {
 
-            `INSERT INTO it_passwrd_credential_type
+        pool.query(
+            `INSERT INTO am_rack_mast
           ( 
-            credential_name,
-            credential_status,
+            am_rack_name,
+            am_rack_status,
             create_user
-                   )
+          )
           VALUES(?,?,?)`,
             [
-                data.credential_name,
-                data.credential_status,
+                data.am_rack_name,
+                data.am_rack_status,
                 data.create_user
             ],
 
@@ -24,39 +24,43 @@ module.exports = {
             }
         );
     },
-    CredentialView: (callback) => {
+    AssetRackView: (callback) => {
         pool.query(
             `SELECT 
-            credential_slno,
-            credential_name, 
-            credential_status,
-
-            if(credential_status=1,'Yes','No')status
+            am_rack_slno,
+            am_rack_name, 
+            am_rack_status,
+            if(am_rack_status=1,'Yes','No')status
             FROM
-            it_passwrd_credential_type`, [],
-
+            am_rack_mast`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
                 }
                 return callback(null, results);
+
             }
         );
     },
+    AssetRackUpdate: (data, callback) => {
 
-    CredentialUpdate: (data, callback) => {
         pool.query(
-            `UPDATE it_passwrd_credential_type SET 
-            credential_name=?,
-            credential_status=?,
-            edit_user =?       
+
+            `UPDATE am_rack_mast SET 
+            am_rack_name=?,
+            am_rack_status=?,
+            edit_user=?
             WHERE 
-            credential_slno=?`,
+            am_rack_slno=?`,
+
             [
-                data.credential_name,
-                data.credential_status,
+
+
+                data.am_rack_name,
+                data.manufacture_status,
                 data.edit_user,
-                data.credential_slno,
+                data.am_rack_slno,
+
             ],
             (error, results, feilds) => {
                 if (error) {

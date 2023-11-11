@@ -1041,14 +1041,14 @@ const validateItemCreate = Joi.object({
     item_name: Joi.string().required(),
     item_asset_type_slno: Joi.number().required(),
     item_type_slno: Joi.number().required(),
-    item_category_slno: Joi.number().optional(),
-    item_subcategory_slno: Joi.number().optional(),
-    item_group_slno: Joi.number().optional(),
-    item_subgroup_slno: Joi.number().optional(),
-    item_model_slno: Joi.number().optional(),
-    item_submodel_slno: Joi.number().optional(),
-    item_uom_slno: Joi.number().optional(),
-    item_manufactures_slno: Joi.number().optional(),
+    item_category_slno: Joi.optional(),
+    item_subcategory_slno: Joi.optional(),
+    item_group_slno: Joi.optional(),
+    item_subgroup_slno: Joi.optional(),
+    item_model_slno: Joi.optional(),
+    item_submodel_slno: Joi.optional(),
+    item_uom_slno: Joi.optional(),
+    item_manufactures_slno: Joi.optional(),
     item_base_name: Joi.optional(),
     item_model_num: Joi.optional(),
     item_specific_one: Joi.optional(),
@@ -1196,6 +1196,16 @@ const validateSelectedDaysBackupVerification = Joi.object({
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
 });
+
+const validateAssetRackMaster = Joi.object({
+
+    am_rack_name: Joi.string().trim().uppercase().required(),
+    am_rack_status: Joi.number().optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+    am_rack_slno: Joi.number().optional()
+});
+
 module.exports = {
     validateFloors,
     validateRoomCategory,
@@ -1267,7 +1277,8 @@ module.exports = {
     validateWeekBackupVerification,
     validateYearBackupVerification,
     validateSelectedDaysBackupVerification,
-    validateCommunicationCreate
+    validateCommunicationCreate,
+    validateAssetRackMaster
 
 
 }

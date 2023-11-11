@@ -4,7 +4,7 @@ const { requestRegistInsert, requestRegistInsertDetl, requestApprovalInsert, get
     updateEDApproval, updateReqMst, getApprovListDMS, deleteItemListByReqno, getCrfDeptDataCollect,
     CrfDeptDataCollectInsert, getDataCollectList, EditItemListByReqno, CrfDataCollactnSave,
     getItemListDataCollectByReqno, dataCollectDetailInsert, getApprovListMS, DataCollectComplete,
-    getDataCollectListExistOrNot
+    getDataCollectListExistOrNot, updateDMSApproval, updateMSApproval
 } = require('../crm_request_register/requestRegister.service');
 const { validateRequestRegister, validateRequestRegisterDetl, validateUserGroup } = require('../../validation/validation_schema');
 const logger = require('../../logger/logger');
@@ -906,6 +906,108 @@ module.exports = {
                 success: 1,
                 data: results
             });
+        });
+    },
+
+    updateDMSApproval: (req, res) => {
+        const body = req.body;
+        updateDMSApproval(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+            if (body.dms_approve === 3) {
+
+                const dataupdate = {
+                    req_slno: body.req_slno
+                }
+                updateReqMst(dataupdate, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    if (!results) {
+                        logger.infologwindow("Record Not Found")
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Record Not Found"
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Approved Successfully"
+                    });
+                });
+            } else {
+                return res.status(200).json({
+                    success: 2,
+                    message: "Approved Successfully"
+                });
+            }
+        });
+    },
+
+    updateMSApproval: (req, res) => {
+        const body = req.body;
+        updateMSApproval(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+            if (body.ms_approve === 3) {
+
+                const dataupdate = {
+                    req_slno: body.req_slno
+                }
+                updateReqMst(dataupdate, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    if (!results) {
+                        logger.infologwindow("Record Not Found")
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Record Not Found"
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Approved Successfully"
+                    });
+                });
+            } else {
+                return res.status(200).json({
+                    success: 2,
+                    message: "Approved Successfully"
+                });
+            }
         });
     },
 

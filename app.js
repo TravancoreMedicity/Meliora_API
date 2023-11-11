@@ -159,7 +159,8 @@ const CrfImageUpload = require('./api/crf_fileupload/crf_fileupload.router')
 const IiImageUpload = require('./api/it_managemnt_file_upload/it_file_upload.router')
 const PasswordDeviceType = require('./api/it_password_device_type/password_devicetype.router')
 const PasswordManagementMain = require('./api/it_password_management/password_management.router')
-
+const assetRackMast = require('./api/am_rack_master/am_rack.router')
+const assetDeptTransfer = require('./api/am_asset_dept_transfer/asset_depttransfer.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -286,6 +287,9 @@ app.use('/api/CrfImageUpload', CrfImageUpload)
 app.use('/api/ItImageUpload', IiImageUpload)
 app.use('/api/PasswordDeviceType', PasswordDeviceType)
 app.use('/api/PasswordManagementMain', PasswordManagementMain)
+app.use('/api/assetRackMast', assetRackMast)
+app.use('/api/assetDeptTransfer', assetDeptTransfer)
+
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

@@ -24,7 +24,8 @@ module.exports = {
             if (!results) {
                 let no = 1
                 var newList = body.map((val, index) => {
-                    return [val.item_creation_slno, val.item_dept_slno, val.item_deptsec_slno, val.item_create_status,
+                    return [val.item_creation_slno, val.item_dept_slno, val.item_deptsec_slno,
+                    val.item_room_slno, val.item_rack_slno, val.item_create_status,
                     val.item_custodian_dept, val.item_asset_no, no = no + 1, val.create_user]
                 })
                 ItemcreationdeptInsert(newList, (err, result) => {
@@ -44,9 +45,9 @@ module.exports = {
 
             let no = assetno.item_asset_no_only
 
-
             var newList = body.map((val, index) => {
-                return [val.item_creation_slno, val.item_dept_slno, val.item_deptsec_slno, val.item_create_status,
+                return [val.item_creation_slno, val.item_dept_slno, val.item_deptsec_slno,
+                val.item_room_slno, val.item_rack_slno, val.item_create_status,
                 val.item_custodian_dept, val.item_asset_no, no = no + 1, val.create_user]
             })
 
@@ -63,9 +64,6 @@ module.exports = {
                 })
             })
         });
-
-
-
     },
 
 
@@ -207,7 +205,7 @@ module.exports = {
                 let no = 1
                 var newList = body.map((val, index) => {
                     return [val.spare_creation_slno, val.spare_dept_slno, val.spare_deptsec_slno,
-                    val.spare_create_status,
+                    val.spare_room_slno, val.spare_rack_slno, val.spare_create_status,
                     val.spare_custodian_dept, val.spare_asset_no, no = no + 1, val.create_user]
                 })
 
@@ -228,7 +226,7 @@ module.exports = {
             let no = assetno.item_asset_no_only === undefined ? 0 : assetno.item_asset_no_only
             var newList = body.map((val, index) => {
                 return [val.spare_creation_slno, val.spare_dept_slno, val.spare_deptsec_slno,
-                val.spare_create_status,
+                val.spare_room_slno, val.spare_rack_slno, val.spare_create_status,
                 val.spare_custodian_dept, val.spare_asset_no, no = no + 1, val.create_user]
             })
             ItemcreationdeptInsertSpare(newList, (err, result) => {
@@ -337,8 +335,6 @@ module.exports = {
 
     getSpareItemsFronList: (req, res) => {
         const body = req.body
-
-
         getSpareItemsFronList(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)

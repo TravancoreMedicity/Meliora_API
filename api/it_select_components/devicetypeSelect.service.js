@@ -35,4 +35,21 @@ module.exports = {
             }
         );
     },
+    getPasswordCredential: (callback) => {
+        pool.query(
+            `SELECT 
+            credential_slno,
+            credential_name
+            FROM
+            meliora.it_passwrd_credential_type
+            WHERE credential_status=1`, [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
 }

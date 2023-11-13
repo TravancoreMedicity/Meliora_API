@@ -1,8 +1,8 @@
-const { DeviceTypeInsert, DeviceTypeView, DeviceTypeUpdate } = require('../it_password_device_type/password_devicetype.service')
+const { CredentialInsert, CredentialView, CredentialUpdate } = require('../it_password_credential_type_master/password_credential.service')
 module.exports = {
-    DeviceTypeInsert: (req, res) => {
+    CredentialInsert: (req, res) => {
         const body = req.body;
-        DeviceTypeInsert(body, (err, result) => {
+        CredentialInsert(body, (err, result) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -11,13 +11,13 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Device type inserted successfully"
+                message: "Data inserted successfully"
             })
         })
     },
-    DeviceTypeView: (req, res) => {
+    CredentialView: (req, res) => {
 
-        DeviceTypeView((err, results) => {
+        CredentialView((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -37,10 +37,10 @@ module.exports = {
 
         })
     },
-    DeviceTypeUpdate: (req, res) => {
+    CredentialUpdate: (req, res) => {
         const body = req.body;
 
-        DeviceTypeUpdate(body, (err, results) => {
+        CredentialUpdate(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -56,7 +56,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Device type Updated successfully"
+                message: "Data Updated successfully"
             })
         })
     },

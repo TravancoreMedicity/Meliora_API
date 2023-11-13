@@ -30,35 +30,35 @@ module.exports = {
 
     },
 
-    MonthlyTarrifUpdate: (data, callback) => {
-        pool.query(
-            `UPDATE it_tarrif_monthly_details SET 
-            tarrif=?,
-            amount=?,
-            bill_amount=?,
-            bill_date=?,
-            bill_entered_date=?,
-            file_upload_status=?,
-            payed_status=?                 
-            WHERE 
-            sl_no_monthly=?`,
-            [
-                data.tarrif,
-                data.amount,
-                data.bill_date,
-                data.bill_entered_date,
-                data.file_upload_status,
-                data.payed_status,
-                data.sl_no_monthly,
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        )
-    },
+    // MonthlyTarrifUpdate: (data, callback) => {
+    //     pool.query(
+    //         `UPDATE it_tarrif_monthly_details SET 
+    //         tarrif=?,
+    //         amount=?,
+    //         bill_amount=?,
+    //         bill_date=?,
+    //         bill_entered_date=?,
+    //         file_upload_status=?,
+    //         payed_status=?                 
+    //         WHERE 
+    //         sl_no_monthly=?`,
+    //         [
+    //             data.tarrif,
+    //             data.amount,
+    //             data.bill_date,
+    //             data.bill_entered_date,
+    //             data.file_upload_status,
+    //             data.payed_status,
+    //             data.sl_no_monthly,
+    //         ],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callback(error);
+    //             }
+    //             return callback(null, results);
+    //         }
+    //     )
+    // },
     QuaterlyTarrifView: (callback) => {
         pool.query(
             `SELECT
@@ -128,7 +128,8 @@ module.exports = {
             file_upload_status=?,
             payed_status=?,
             bill_number=?,            
-            bill_due_date=?            
+            bill_due_date=?,
+            edit_user=?            
             WHERE 
             monthly_slno=?`,
             [
@@ -139,6 +140,7 @@ module.exports = {
                 data.payed_status,
                 data.bill_number,
                 data.bill_due_date,
+                data.edit_user,
                 data.monthly_slno
             ],
             (error, results, feilds) => {
@@ -157,13 +159,15 @@ module.exports = {
             (
                 device_slno,
                 tarrif_amount,
-                monthly_bill_generate
+                monthly_bill_generate,
+                create_user
             ) 
-            VALUES (?,?,?)`,
+            VALUES (?,?,?,?)`,
             [
                 data.device_slno,
                 data.tarrif_amount,
                 data.monthly_bill_generate,
+                data.create_user
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -234,13 +238,15 @@ module.exports = {
             (
                 device_slno,
                 tarrif_amount,
-                yearly_bill_generate
+                yearly_bill_generate,
+                create_user
             ) 
-            VALUES (?,?,?)`,
+            VALUES (?,?,?,?)`,
             [
                 data.device_slno,
                 data.tarrif_amount,
                 data.yearly_bill_generate,
+                data.create_user
             ],
             (error, results, feilds) => {
 
@@ -342,7 +348,8 @@ module.exports = {
             file_upload_status=?,
             payed_status=?,
             bill_number=?,            
-            bill_due_date=?            
+            bill_due_date=?,
+            edit_user=?           
             WHERE 
             yearly_slno=?`,
             [
@@ -353,6 +360,7 @@ module.exports = {
                 data.payed_status,
                 data.bill_number,
                 data.bill_due_date,
+                data.edit_user,
                 data.yearly_slno
             ],
             (error, results, feilds) => {
@@ -373,13 +381,15 @@ module.exports = {
             (
                 device_slno,
                 tarrif_amount,
-                quaterly_bill_generate
+                quaterly_bill_generate,
+                create_user
             ) 
-            VALUES (?,?,?)`,
+            VALUES (?,?,?,?)`,
             [
                 data.device_slno,
                 data.tarrif_amount,
                 data.quaterly_bill_generate,
+                data.create_user
             ],
             (error, results, feilds) => {
 
@@ -442,7 +452,8 @@ module.exports = {
             file_upload_status=?,
             payed_status=?,
             bill_number=?,            
-            bill_due_date=?            
+            bill_due_date=?,
+            edit_user=?           
             WHERE 
             quaterly_slno=?`,
             [
@@ -453,6 +464,7 @@ module.exports = {
                 data.payed_status,
                 data.bill_number,
                 data.bill_due_date,
+                data.edit_user,
                 data.quaterly_slno
             ],
             (error, results, feilds) => {

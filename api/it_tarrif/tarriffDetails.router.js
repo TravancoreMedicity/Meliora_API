@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
-const { MonthlyTarrifView, MonthlyTarrifUpdate, QuaterlyTarrifView, YearlyTarrifView,
+const { MonthlyTarrifView, QuaterlyTarrifView, YearlyTarrifView,
     MonthlyTarrifInsert, QuaterlyTarrifInsert, CheckInsetQuaterlyOrNot, BillQuaterlyUpdate,
     YearlyTarrifInsert, CheckInsetMonthlyOrNot, BillMonthlyUpdate, CheckInsetYearlyOrNot,
     BillYearlyUpdate, getMonthData, getQuaterlyData, getYearData } = require('../it_tarrif/tarriffDetails.Controller');
@@ -8,7 +8,7 @@ const { MonthlyTarrifView, MonthlyTarrifUpdate, QuaterlyTarrifView, YearlyTarrif
 router.get('/monthlyview', checkToken, MonthlyTarrifView)
 router.get('/quaterlyview', checkToken, QuaterlyTarrifView)
 router.get('/yearlyview', checkToken, YearlyTarrifView)
-router.patch('/update', checkToken, MonthlyTarrifUpdate)
+// router.patch('/update', checkToken, MonthlyTarrifUpdate)
 
 router.patch('/updateMonthlybillModal', checkToken, BillMonthlyUpdate)
 router.post('/CheckInsetMonthlyOrNot', checkToken, CheckInsetMonthlyOrNot)

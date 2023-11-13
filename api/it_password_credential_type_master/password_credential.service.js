@@ -1,8 +1,9 @@
 const { pool } = require('../../config/database')
 module.exports = {
-    DeviceTypeInsert: (data, callback) => {
+    CredentialInsert: (data, callback) => {
         pool.query(
-            `INSERT INTO it_credential_type
+
+            `INSERT INTO it_passwrd_credential_type
           ( 
             credential_name,
             credential_status,
@@ -11,7 +12,7 @@ module.exports = {
           VALUES(?,?,?)`,
             [
                 data.credential_name,
-                data.device_type_status,
+                data.credential_status,
                 data.create_user
             ],
 
@@ -23,15 +24,17 @@ module.exports = {
             }
         );
     },
-    DeviceTypeView: (callback) => {
+    CredentialView: (callback) => {
         pool.query(
             `SELECT 
             credential_slno,
             credential_name, 
             credential_status,
-            if(device_type_status=1,'Yes','No')status
+
+            if(credential_status=1,'Yes','No')status
             FROM
-            it_credential_type`, [],
+            it_passwrd_credential_type`, [],
+
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -40,17 +43,18 @@ module.exports = {
             }
         );
     },
-    DeviceTypeUpdate: (data, callback) => {
+
+    CredentialUpdate: (data, callback) => {
         pool.query(
-            `UPDATE it_credential_type SET 
+            `UPDATE it_passwrd_credential_type SET 
             credential_name=?,
-            device_type_status=?,
+            credential_status=?,
             edit_user =?       
             WHERE 
             credential_slno=?`,
             [
                 data.credential_name,
-                data.device_type_status,
+                data.credential_status,
                 data.edit_user,
                 data.credential_slno,
             ],

@@ -18,9 +18,7 @@ const { ItemNameInsert, ItemNameview, ItemNameUpdate, getitemAll, getitemFromMas
     getitemCatGroupSubModel, getitemCatGroupManufctr, getitemCatGroupModelNo, getitemCatSubGroupModel,
     getitemCatSubGroupSubModel, getitemCatSubGroupManufctr, getitemCatSubGroupModelNo, getitemCatModelSubModel,
     getitemCatModelManufctr, getitemCatModelModelNo,
-
-
-    getitemFromMaster } = require('../am_item_name_creation/item.services');
+    getitemFromMaster, getItemSearchByName } = require('../am_item_name_creation/item.services');
 const { log } = require('winston');
 module.exports = {
     ItemNameInsert: (req, res) => {
@@ -123,13 +121,6 @@ module.exports = {
         })
 
     },
-
-
-
-
-
-
-
 
     getitemFromMaster: (req, res) => {
         const body = req.body
@@ -553,6 +544,7 @@ module.exports = {
                 });
             })
         } else if (category != 0 && subcat != 0 && group == 0 && subgroup == 0 && model == 0 && submodel == 0 && manufctr == 0 && modelno == null) {
+
             getitemCatSubCat(body, (err, results) => {
                 if (err) {
                     logger.logwindow(err)
@@ -2694,10 +2686,6 @@ module.exports = {
         //     })
         // }
 
-
-
-
-
         else {
 
             return res.status(200).json({
@@ -2705,10 +2693,34 @@ module.exports = {
                 message: "No Record Found"
             });
         }
+    },
 
 
 
+    getItemSearchByName: (req, res) => {
+        const body = req.body
+        getItemSearchByName(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
 
+            if (results.length == 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
 
     },
 }

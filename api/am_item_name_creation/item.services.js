@@ -244,12 +244,13 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? and
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and item_subgroup_slno=? and 
             item_model_slno=? and item_submodel_slno=? and 
             item_manufactures_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno,
                 data.item_group_slno,
@@ -272,12 +273,13 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? and
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and item_subgroup_slno=? and 
             item_model_slno=? and item_submodel_slno=? and 
             item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno,
                 data.item_group_slno,
@@ -300,12 +302,13 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? and
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and item_subgroup_slno=? and 
             item_model_slno=?  and 
             item_manufactures_slno=? and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno,
                 data.item_group_slno,
@@ -328,12 +331,13 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? and
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and item_subgroup_slno=? and 
              item_submodel_slno=? and 
             item_manufactures_slno=? and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno,
                 data.item_group_slno,
@@ -356,12 +360,13 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? and
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and 
             item_model_slno=? and item_submodel_slno=? and 
             item_manufactures_slno=? and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno,
                 data.item_group_slno,
@@ -383,12 +388,13 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? and
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? and
             item_subgroup_slno=? and 
             item_model_slno=? and item_submodel_slno=? and 
             item_manufactures_slno=? and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno,
                 data.item_subgroup_slno,
@@ -410,12 +416,13 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and 
+            where asset_spare=? and item_category_slno=? and 
             item_group_slno=? and item_subgroup_slno=? and 
             item_model_slno=? and item_submodel_slno=? and 
             item_manufactures_slno=? and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_group_slno,
                 data.item_subgroup_slno,
@@ -438,12 +445,13 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where  
+            where  asset_spare=? and 
             item_group_slno=? and item_subgroup_slno=? and 
             item_model_slno=? and item_submodel_slno=? and 
             item_manufactures_slno=? and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_group_slno,
                 data.item_subgroup_slno,
                 data.item_model_slno,
@@ -465,9 +473,10 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_model_num=?
+            where asset_spare=? and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_model_num
             ],
             (error, results, feilds) => {
@@ -503,9 +512,10 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where  item_submodel_slno=? 
+            where asset_spare=? and item_submodel_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_submodel_slno
             ],
             (error, results, feilds) => {
@@ -521,10 +531,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where 
+            where asset_spare=? and
             item_model_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_model_slno
             ],
             (error, results, feilds) => {
@@ -540,9 +551,10 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where  item_subgroup_slno=? 
+            where asset_spare=? and item_subgroup_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_subgroup_slno
             ],
             (error, results, feilds) => {
@@ -558,10 +570,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where 
+            where asset_spare=? and
             item_group_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_group_slno
             ],
             (error, results, feilds) => {
@@ -577,9 +590,10 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_subcategory_slno=? 
+            where asset_spare=? and item_subcategory_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_subcategory_slno
             ],
             (error, results, feilds) => {
@@ -595,9 +609,10 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? 
+            where asset_spare=? and item_category_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno
             ],
             (error, results, feilds) => {
@@ -613,9 +628,10 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? 
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno
             ],
@@ -633,11 +649,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where 
+            where asset_spare=? and
             item_group_slno=? and item_subgroup_slno=? 
             and item_creation_status=1`,
             [
-
+                data.asset_spare,
                 data.item_group_slno,
                 data.item_subgroup_slno
             ],
@@ -655,10 +671,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where  
+            where  asset_spare=? and
             item_model_slno=? and item_submodel_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_model_slno,
                 data.item_submodel_slno
             ],
@@ -673,13 +690,13 @@ module.exports = {
 
     getitemManufctrMdlNo: (data, callBack) => {
         pool.query(
-            `
-            select item_creation_slno, item_name,asset_spare
+            `select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where
+            where asset_spare=? and
             item_manufactures_slno=? and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_manufactures_slno,
                 data.item_model_num
             ],
@@ -694,13 +711,13 @@ module.exports = {
 
     getitemCatGrup: (data, callBack) => {
         pool.query(
-            `
-            select item_creation_slno, item_name,asset_spare
+            `select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and 
+            where asset_spare=? and item_category_slno=? and 
             item_group_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_group_slno
             ],
@@ -718,9 +735,10 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subgroup_slno=?
+            where asset_spare=? and item_category_slno=? and item_subgroup_slno=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subgroup_slno
             ],
@@ -737,10 +755,11 @@ module.exports = {
         pool.query(
             `select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and 
+            where asset_spare=? and item_category_slno=? and 
             item_model_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_model_slno
             ],
@@ -758,9 +777,10 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and  item_submodel_slno=?
+            where asset_spare=? and item_category_slno=? and  item_submodel_slno=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_submodel_slno
             ],
@@ -778,10 +798,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and 
+            where asset_spare=? and item_category_slno=? and 
             item_manufactures_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_manufactures_slno],
             (error, results, feilds) => {
@@ -799,9 +820,10 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_model_num=?
+            where asset_spare=? and item_category_slno=? and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_model_num
             ],
@@ -820,10 +842,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where  item_subcategory_slno=? and
+            where asset_spare=? and item_subcategory_slno=? and
             item_group_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_subcategory_slno,
                 data.item_group_slno
             ],
@@ -842,9 +865,10 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where  item_subcategory_slno=?  and item_subgroup_slno=? 
+            where asset_spare=? and item_subcategory_slno=?  and item_subgroup_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_subcategory_slno,
                 data.item_subgroup_slno
             ],
@@ -862,11 +886,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where  item_subcategory_slno=? and             
+            where asset_spare=? and item_subcategory_slno=? and             
             item_model_slno=? 
             and item_creation_status=1`,
             [
-
+                data.asset_spare,
                 data.item_subcategory_slno,
                 data.item_model_slno
             ],
@@ -884,10 +908,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_subcategory_slno=? and
+            where asset_spare=? and item_subcategory_slno=? and
             item_submodel_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_subcategory_slno,
                 data.item_submodel_slno
             ],
@@ -905,10 +930,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where  item_subcategory_slno=? and            
+            where asset_spare=? and item_subcategory_slno=? and            
             item_manufactures_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_subcategory_slno,
                 data.item_manufactures_slno
             ],
@@ -926,10 +952,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where  item_subcategory_slno=? and
+            where asset_spare=? and item_subcategory_slno=? and
              item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_subcategory_slno,
                 data.item_model_num
             ],
@@ -949,11 +976,12 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where 
-            item_group_slno=?  and 
+            where asset_spare=? and
+            item_group_slno=? and 
             item_model_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_group_slno,
                 data.item_model_slno
             ],
@@ -971,10 +999,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where 
+            where asset_spare=? and
             item_group_slno=?  and item_submodel_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_group_slno,
                 data.item_submodel_slno
             ],
@@ -992,11 +1021,12 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where 
+            where asset_spare=? and
             item_group_slno=? and 
             item_manufactures_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_group_slno,
                 data.item_manufactures_slno
             ],
@@ -1014,10 +1044,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where 
+            where asset_spare=? and
             item_group_slno=?  and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_group_slno,
                 data.item_model_num
             ],
@@ -1035,10 +1066,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where  item_subgroup_slno=? and 
+            where asset_spare=? and item_subgroup_slno=? and 
             item_model_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_subgroup_slno,
                 data.item_model_slno
             ],
@@ -1056,9 +1088,10 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_subgroup_slno=?  and item_submodel_slno=? 
+            where asset_spare=? and item_subgroup_slno=?  and item_submodel_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_subgroup_slno,
                 data.item_submodel_slno
             ],
@@ -1076,10 +1109,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where  item_subgroup_slno=? and              
+            where asset_spare=? and item_subgroup_slno=? and              
             item_manufactures_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_subgroup_slno,
                 data.item_manufactures_slno
             ],
@@ -1097,10 +1131,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where  item_subgroup_slno=? and 
+            where asset_spare=? and item_subgroup_slno=? and 
             item_model_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_subgroup_slno,
                 data.item_model_slno
             ],
@@ -1118,11 +1153,12 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where 
+            where asset_spare=? and
             item_model_slno=? and 
             item_manufactures_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_model_slno,
                 data.item_manufactures_slno
             ],
@@ -1140,10 +1176,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where 
+            where asset_spare=? and
             item_model_slno=?  and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_model_slno,
                 data.item_model_num
             ],
@@ -1161,10 +1198,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_submodel_slno=? and 
+            where asset_spare=? and item_submodel_slno=? and 
             item_manufactures_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_submodel_slno,
                 data.item_manufactures_slno
             ],
@@ -1180,12 +1218,13 @@ module.exports = {
     getitemSubModelModelNo: (data, callBack) => {
         pool.query(
             `
-            select item_creation_slno, item_name
+            select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where  item_submodel_slno=? and 
+            where asset_spare=? and item_submodel_slno=? and 
             item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_submodel_slno,
                 data.item_model_num
             ],
@@ -1203,10 +1242,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? and
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno,
                 data.item_group_slno
@@ -1225,10 +1265,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? and
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? and
             item_subgroup_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno,
                 data.item_subgroup_slno
@@ -1247,10 +1288,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? and
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? and
             item_model_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno,
                 data.item_model_slno
@@ -1269,10 +1311,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? and            
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? and            
             item_submodel_slno=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno,
                 data.item_submodel_slno
@@ -1291,10 +1334,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? and
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? and
             item_manufactures_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno,
                 data.item_manufactures_slno,
@@ -1313,10 +1357,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? and
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? and
             item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno,
                 data.item_model_num
@@ -1335,10 +1380,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=?  and
+            where asset_spare=? and item_category_slno=?  and
             item_group_slno=? and item_subgroup_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_group_slno,
                 data.item_subgroup_slno
@@ -1357,11 +1403,12 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and i
+            where asset_spare=? and item_category_slno=? and i
             item_group_slno=?  and 
             item_model_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_group_slno,
                 data.item_model_slno
@@ -1380,10 +1427,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and 
+            where asset_spare=? and item_category_slno=? and 
             item_group_slno=? and item_submodel_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_group_slno,
                 data.item_submodel_slno
@@ -1403,11 +1451,12 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and 
+            where asset_spare=? and item_category_slno=? and 
             item_group_slno=?  and 
             item_manufactures_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_group_slno,
                 data.item_manufactures_slno,
@@ -1426,10 +1475,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=?  and
+            where asset_spare=? and item_category_slno=?  and
             item_group_slno=?  and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_group_slno,
                 data.item_model_num
@@ -1448,10 +1498,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=?  and item_subgroup_slno=? and 
+            where asset_spare=? and item_category_slno=?  and item_subgroup_slno=? and 
             item_model_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subgroup_slno,
                 data.item_model_slno,
@@ -1470,10 +1521,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=?  and item_subgroup_slno=? and 
+            where asset_spare=? and item_category_slno=?  and item_subgroup_slno=? and 
              item_submodel_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subgroup_slno,
                 data.item_submodel_slno
@@ -1492,14 +1544,14 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=?  and item_subgroup_slno=? 
+            where asset_spare=? and item_category_slno=?  and item_subgroup_slno=? 
             item_manufactures_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subgroup_slno,
                 data.item_manufactures_slno
-
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -1516,12 +1568,12 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=?  and item_subgroup_slno=? and item_model_num=?
+            where asset_spare=? and item_category_slno=?  and item_subgroup_slno=? and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subgroup_slno,
-
                 data.item_model_num
             ],
             (error, results, feilds) => {
@@ -1539,10 +1591,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=?  and 
+            where asset_spare=? and item_category_slno=?  and 
             item_model_slno=? and item_submodel_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_model_slno,
                 data.item_submodel_slno
@@ -1562,11 +1615,12 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=?  and 
+            where asset_spare=? and item_category_slno=?  and 
             item_model_slno=?  and 
             item_manufactures_slno=? 
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_model_slno,
                 data.item_manufactures_slno,
@@ -1586,10 +1640,11 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=?  and 
+            where asset_spare=? and item_category_slno=?  and 
             item_model_slno=?  and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_model_slno,
                 data.item_model_num
@@ -1609,12 +1664,13 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? and
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and item_subgroup_slno=? and 
             item_model_slno=? and item_submodel_slno=? and 
             item_manufactures_slno=? and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno,
                 data.item_group_slno,
@@ -1639,12 +1695,13 @@ module.exports = {
             `
             select item_creation_slno, item_name,asset_spare
             from am_item_name_creation           
-            where item_category_slno=? and item_subcategory_slno=? and
+            where asset_spare=? and item_category_slno=? and item_subcategory_slno=? and
             item_group_slno=? and item_subgroup_slno=? and 
             item_model_slno=? and item_submodel_slno=? and 
             item_manufactures_slno=? and item_model_num=?
             and item_creation_status=1`,
             [
+                data.asset_spare,
                 data.item_category_slno,
                 data.item_subcategory_slno,
                 data.item_group_slno,
@@ -1664,4 +1721,22 @@ module.exports = {
     },
 
 
+    getItemSearchByName: (data, callBack) => {
+        pool.query(
+            `select item_creation_slno, item_name,asset_spare
+        from am_item_name_creation           
+        where  item_name LIKE '%${data.item_name}%' and  asset_spare=${data.asset_spare}
+        and item_creation_status=1`,
+            [data.item_name,
+            data.asset_spare],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+
+
+    },
 }

@@ -8,15 +8,16 @@ module.exports = {
            rm_floor_campus_slno,
            rm_floor_building_slno,
            rm_floor_build_block_slno,
-                     rm_floor_name,
+           rm_floor_name,
            rm_floor_alias,
            rm_floor_no,
            floor_order,
            rm_floor_room_starts,
            rm_floor_room_ends,
-           rm_floor_status
+           rm_floor_status,
+           create_user
           )
-          VALUES(?,?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.rm_floor_campus_slno,
                 data.rm_floor_building_slno,
@@ -27,12 +28,11 @@ module.exports = {
                 data.floor_order,
                 data.rm_floor_room_starts,
                 data.rm_floor_room_ends,
-                data.rm_floor_status
-
+                data.rm_floor_status,
+                data.create_user
             ],
             (error, results, fields) => {
                 if (error) {
-                    console.log(results);
                     return callback(error);
                 }
                 return callback(null, results);
@@ -42,8 +42,6 @@ module.exports = {
     },
 
     FloorLastRoom: (data, callback) => {
-
-
         pool.query(
             `INSERT INTO rm_floor_room_connect
           ( 
@@ -73,7 +71,7 @@ module.exports = {
             rm_floor_build_block_slno, rm_buildblock_mast.rm_buildblock_name,          
             rm_floor_name, rm_floor_alias,rm_floor_no,floor_order,rm_floor_room_starts,rm_floor_room_ends, rm_floor_status,
             if(rm_floor_creation.rm_floor_status = 1 ,'Yes','No') status
-            from rm_floor_creation
+                       from rm_floor_creation
             left join rm_campus_mast on rm_campus_mast.rm_campus_slno=rm_floor_creation.rm_floor_campus_slno
             left join rm_building_mast on rm_building_mast.rm_building_slno=rm_floor_creation.rm_floor_building_slno
             left join rm_buildblock_mast on rm_buildblock_mast.rm_buildblock_slno=rm_floor_creation.rm_floor_build_block_slno
@@ -102,7 +100,8 @@ module.exports = {
             floor_order=?,
             rm_floor_room_starts=?,
             rm_floor_room_ends=?,
-            rm_floor_status=? 
+            rm_floor_status=? ,
+            edit_user=?
             WHERE 
             rm_floor_slno=?`,
 
@@ -117,6 +116,7 @@ module.exports = {
                 data.rm_floor_room_starts,
                 data.rm_floor_room_ends,
                 data.rm_floor_status,
+                data.edit_user,
                 data.rm_floor_slno
             ],
             (error, results, feilds) => {

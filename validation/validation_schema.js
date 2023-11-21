@@ -107,6 +107,8 @@ const validateCampus = Joi.object({
 
         }),
     rm_campus_slno: Joi.optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional()
 
 });
 
@@ -132,6 +134,8 @@ const validateRoomCategory = Joi.object({
 
         }),
     rm_roomcategory_slno: Joi.optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional()
 
 });
 //building master validation Room management
@@ -156,6 +160,8 @@ const validateBuildingMast = Joi.object({
 
         }),
     rm_building_slno: Joi.optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional()
 
 });
 
@@ -181,6 +187,8 @@ const validateBuildBlock = Joi.object({
 
         }),
     rm_buildblock_slno: Joi.optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional()
 
 });
 // Inside building block master validation Room management
@@ -257,6 +265,8 @@ const validateRoomTypeMast = Joi.object({
         }),
     rm_roomtype_slno: Joi.optional(),
     rm_roomtype_type: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional()
 });
 
 //Floor creation validation room management 
@@ -970,7 +980,7 @@ const validateModelCreate = Joi.object({
 });
 //Manufacture Validation in item creation
 const validateManufactureCreate = Joi.object({
-    manufacture_name: Joi.string().trim().uppercase().min(3).max(45).required()
+    manufacture_name: Joi.string().trim().uppercase().min(2).max(45).required()
         .messages({
             'string.empty': 'Manufacture  Required',
             'string.min': 'Manufacture length must be at least 3 characters long',

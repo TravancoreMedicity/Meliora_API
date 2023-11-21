@@ -7,14 +7,16 @@ module.exports = {
             rm_campus_name,
              rm_campus_alias,
               rm_campus_no,
-               rm_campus_status
+               rm_campus_status,
+               create_user
           )
-          VALUES(?,?,?,?)`,
+          VALUES(?,?,?,?,?)`,
             [
                 data.rm_campus_name,
                 data.rm_campus_alias,
                 data.rm_campus_no,
-                data.rm_campus_status
+                data.rm_campus_status,
+                data.create_user
             ],
             (error, results, fields) => {
                 if (error) {
@@ -65,12 +67,19 @@ module.exports = {
 
         pool.query(
 
-            `UPDATE rm_campus_mast SET rm_campus_name=?,rm_campus_alias=?,rm_campus_no=?,rm_campus_status=? WHERE rm_campus_slno=?`,
+            `UPDATE rm_campus_mast SET 
+            rm_campus_name=?,
+            rm_campus_alias=?,
+            rm_campus_no=?,
+            rm_campus_status=?,
+            edit_user=?
+             WHERE rm_campus_slno=?`,
             [
                 data.rm_campus_name,
                 data.rm_campus_alias,
                 data.rm_campus_no,
                 data.rm_campus_status,
+                data.edit_user,
                 data.rm_campus_slno,
             ],
             (error, results, feilds) => {

@@ -7,15 +7,16 @@ module.exports = {
             rm_roomcategory_name, 
             rm_roomcategory_alias, 
             rm_roomcategory_no, 
-            rm_roomcategory_status
+            rm_roomcategory_status,
+            create_user
           )
-          VALUES(?,?,?,?)`,
+          VALUES(?,?,?,?,?)`,
             [
                 data.rm_roomcategory_name,
                 data.rm_roomcategory_alias,
                 data.rm_roomcategory_no,
-                data.rm_roomcategory_status
-
+                data.rm_roomcategory_status,
+                data.create_user
             ],
             (error, results, fields) => {
                 if (error) {
@@ -70,7 +71,8 @@ module.exports = {
             rm_roomcategory_name=?,
             rm_roomcategory_alias=?,
             rm_roomcategory_no=?,
-            rm_roomcategory_status=? 
+            rm_roomcategory_status=?,
+            edit_user=? 
             WHERE 
             rm_roomcategory_slno=?`,
             [
@@ -78,6 +80,7 @@ module.exports = {
                 data.rm_roomcategory_alias,
                 data.rm_roomcategory_no,
                 data.rm_roomcategory_status,
+                data.edit_user,
                 data.rm_roomcategory_slno,
             ],
             (error, results, feilds) => {

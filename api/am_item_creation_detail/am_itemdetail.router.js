@@ -7,7 +7,8 @@ const { checkDetailInsertOrNot, GRNDetailsInsert, GRNDetailsUpdate, BillDetailsI
     AmcPmInsertOrNotSpare, GRNDetailsInsertSpare, GRNDetailsUpdateSpare, BillDetailsInsertSpare,
     BillDetailsUpdateSpare, DeviceDetailsInsertSpare, DeviceDetailsUpdateSpare,
     LeaseDetailsInsertSpare, LeaseDetailsUpdateSpare, WarentGraruntyInsertSpare,
-    WarentGraruntyUpdateSpare, AmcPmInsertSpare, AmcPmUpdateSpare, getdeptsecBsedonCustdept
+    WarentGraruntyUpdateSpare, AmcPmInsertSpare, AmcPmUpdateSpare, getdeptsecBsedonCustdept,
+    getdeptsecBsedonCustdeptSpare
 } = require('../am_item_creation_detail/am_itemdetail.controller');
 
 router.get("/checkDetailInsertOrNot/:id", checkToken, checkDetailInsertOrNot)
@@ -53,6 +54,5 @@ router.post('/AmcPmInsertSpare', checkToken, AmcPmInsertSpare)
 router.patch('/AmcPmUpdateSpare', checkToken, AmcPmUpdateSpare)
 
 router.get("/getdeptsecBsedonCustdept/:id", checkToken, getdeptsecBsedonCustdept)
-
-
+router.get("/getdeptsecBsedonCustdeptSpare/:id", checkToken, getdeptsecBsedonCustdeptSpare)
 module.exports = router

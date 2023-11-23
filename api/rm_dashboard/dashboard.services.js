@@ -68,4 +68,51 @@ module.exports = {
         );
     },
 
+    getSubRoom: (id, callback) => {
+        pool.query(
+
+            `select rm_room_slno,subroom_name,subroom_slno
+            from rm_subroom_master
+            where rm_room_slno=? and sub_rm_roomtype_slno!=1`,
+            [id],
+
+            (error, results, fields) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+
+    getRoomAsset: (id, callback) => {
+        pool.query(
+            `select am_item_map_slno,
+            am_item_name_creation.item_name,
+           P.sec_name as cus_primary,
+           S.sec_name as cus_second,item_subroom_slno,
+           rm_newroom_creation.rm_room_name,
+           IFNULL(  rm_subroom_master.subroom_name,"Not Subroom" ) subroom_name
+                    from am_asset_item_map_master            
+                    left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
+                   left join co_deptsec_mast P on P.sec_id=am_asset_item_map_master.item_deptsec_slno
+                    left join co_deptsec_mast S on S.sec_id=am_asset_item_map_master.item_custodian_dept_sec
+              left join rm_newroom_creation on rm_newroom_creation.rm_room_slno=am_asset_item_map_master.item_room_slno
+           left join rm_subroom_master on rm_subroom_master.subroom_slno=am_asset_item_map_master.item_subroom_slno
+                    where item_room_slno =?`,
+            [id],
+
+            (error, results, fields) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+
 }

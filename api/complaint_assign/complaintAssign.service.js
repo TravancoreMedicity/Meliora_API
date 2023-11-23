@@ -267,7 +267,7 @@ module.exports = {
                date(assigned_date) as date,TIME_FORMAT(assigned_date,"%r") AS Time,cm_rectify_status,
             if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
             compdept_message,compdept_message_flag,message_reply_emp, 
-            if(rectify_pending_hold_remarks is null ,'Not Updated',rectify_pending_hold_remarks) as rectify_pending_hold_remarks 
+            if(rectify_pending_hold_remarks is null ,'Not Needed',rectify_pending_hold_remarks) as rectify_pending_hold_remarks 
            from cm_complaint_mast   
            left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
            left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
@@ -277,8 +277,6 @@ module.exports = {
            left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
            left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
             left join co_employee_master on co_employee_master.em_id=cm_complaint_detail.assigned_emp
-
-
             left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
             where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
                       where department_slno=?) and (assign_status=1 or compalint_status=0)

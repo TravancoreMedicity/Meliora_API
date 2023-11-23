@@ -928,11 +928,32 @@ module.exports = {
 
     getdeptsecBsedonCustdept: (id, callBack) => {
         pool.query(
-            `select am_custodian_deptsec_slno,
-            co_deptsec_mast.sec_name
-            from am_custodian_department
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=am_custodian_department.am_custodian_deptsec_slno
-            where am_custodian_slno=?`,
+            `select
+            P.sec_name as prim_cus,
+            S.sec_name as second_cus            
+            from am_item_map_details
+            left join co_deptsec_mast P on P.sec_id=am_item_map_details.am_primary_custodian
+            left join  co_deptsec_mast S on S.sec_id=am_item_map_details.am_secondary_custodian
+            where am_item_map_slno=?`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    callBack(error)
+                }
+                return callBack(null, results)
+            }
+        );
+    },
+
+    getdeptsecBsedonCustdeptSpare: (id, callBack) => {
+        pool.query(
+            `select
+            P.sec_name as prim_cus,
+            S.sec_name as second_cus            
+            from am_item_map_details
+            left join co_deptsec_mast P on P.sec_id=am_item_map_details.am_primary_custodian
+            left join  co_deptsec_mast S on S.sec_id=am_item_map_details.am_secondary_custodian
+            where am_spare_item_map_slno=?`,
             [id],
             (error, results, fields) => {
                 if (error) {

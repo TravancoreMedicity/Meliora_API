@@ -8,9 +8,11 @@ module.exports = {
             item_dept_slno,
             item_deptsec_slno,
             item_room_slno,
+            item_subroom_slno,
             item_rack_slno,
             item_create_status,
             item_custodian_dept,
+            item_custodian_dept_sec,
             item_asset_no,
             item_asset_no_only,
             create_user           
@@ -37,23 +39,27 @@ module.exports = {
             item_dept_slno,
             item_deptsec_slno,
             item_room_slno,
+            item_subroom_slno,
             item_rack_slno,
             item_create_status,
             item_custodian_dept,
+            item_custodian_dept_sec,
             item_asset_no,
             item_asset_no_only,
             create_user
             
           )
-          VALUES(?,?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.item_creation_slno,
                 data.item_dept_slno,
                 data.item_deptsec_slno,
                 data.item_room_slno,
+                data.item_subroom_slno,
                 data.item_rack_slno,
                 data.item_create_status,
                 data.item_custodian_dept,
+                data.item_custodian_dept_sec,
                 data.item_asset_no,
                 data.item_asset_no_only,
                 data.create_user
@@ -73,12 +79,15 @@ module.exports = {
             `SELECT 
             am_item_map_slno,  am_asset_item_map_master.item_creation_slno,item_dept_slno,item_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,
-            am_item_name_creation.item_name
+            am_item_name_creation.item_name,rm_newroom_creation.rm_room_name,
+            IFNULL(rm_subroom_master.subroom_name,"Not Subroom" ) subroom_name
           FROM
           am_asset_item_map_master
          left join co_department_mast on co_department_mast.dept_id=am_asset_item_map_master.item_dept_slno
           left join co_deptsec_mast on co_deptsec_mast.sec_id=am_asset_item_map_master.item_deptsec_slno
            left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
+           left join rm_newroom_creation on rm_newroom_creation.rm_room_slno=am_asset_item_map_master.item_room_slno
+           left join rm_subroom_master on rm_subroom_master.subroom_slno=am_asset_item_map_master.item_subroom_slno
           WHERE
           am_asset_item_map_master.item_creation_slno=? and  item_dept_slno = ?
            and item_deptsec_slno=?  and item_create_status=1 ORDER BY am_item_map_slno DESC`,
@@ -184,9 +193,11 @@ module.exports = {
             spare_dept_slno,
             spare_deptsec_slno,
             spare_room_slno,
+            spare_subroom_slno,
             spare_rack_slno,
             spare_create_status,
             spare_custodian_dept,
+            spare_custodian_dept_sec,
             spare_asset_no,
             spare_asset_no_only,
             create_user           
@@ -213,22 +224,26 @@ module.exports = {
             spare_dept_slno,
             spare_deptsec_slno,
             spare_room_slno,
+            spare_subroom_slno,
             spare_rack_slno,
             spare_create_status,
             spare_custodian_dept,
+            spare_custodian_dept_sec,
             spare_asset_no,
             spare_asset_no_only,
             create_user            
           )
-          VALUES(?,?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.spare_creation_slno,
                 data.spare_dept_slno,
                 data.spare_deptsec_slno,
                 data.spare_room_slno,
+                data.spare_subroom_slno,
                 data.spare_rack_slno,
                 data.spare_create_status,
                 data.spare_custodian_dept,
+                data.spare_custodian_dept_sec,
                 data.spare_asset_no,
                 data.spare_asset_no_only,
                 data.create_user
@@ -248,13 +263,16 @@ module.exports = {
             `SELECT 
             am_spare_item_map_slno,  am_spare_item_map_master.spare_creation_slno,spare_dept_slno,spare_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,
-            am_item_name_creation.item_name
+            am_item_name_creation.item_name,rm_newroom_creation.rm_room_name,
+            IFNULL(rm_subroom_master.subroom_name,"Not Subroom" ) subroom_name
           FROM
           am_spare_item_map_master
          left join co_department_mast on co_department_mast.dept_id=am_spare_item_map_master.spare_dept_slno
           left join co_deptsec_mast on co_deptsec_mast.sec_id=am_spare_item_map_master.spare_deptsec_slno
            left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_spare_item_map_master.spare_creation_slno
-          WHERE
+           left join rm_newroom_creation on rm_newroom_creation.rm_room_slno=am_spare_item_map_master.spare_room_slno
+           left join rm_subroom_master on rm_subroom_master.subroom_slno=am_spare_item_map_master.spare_subroom_slno
+           WHERE
           am_spare_item_map_master.spare_creation_slno=? and  spare_dept_slno = ?
            and spare_deptsec_slno=? and spare_create_status=1 ORDER BY am_spare_item_map_slno DESC`,
             [

@@ -262,4 +262,22 @@ module.exports = {
             }
         );
     },
+
+    SubRoomunderRoom: (id, callback) => {
+        pool.query(
+            `SELECT 
+            subroom_slno,
+            subroom_name
+             FROM
+            rm_subroom_master
+           WHERE rm_room_slno=? and subroom_status=1 ORDER BY subroom_name ASC`, [id],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
 }

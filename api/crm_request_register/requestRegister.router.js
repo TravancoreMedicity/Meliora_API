@@ -7,7 +7,7 @@ const { requestRegistInsert, requestRegistInsertDetl, requestApprovalInsert, get
     getCrfDeptDataCollect, CrfDeptDataCollectInsert, EditItemListByReqno,
     getDataCollectList, CrfDataCollactnSave, getItemListDataCollectByReqno,
     dataCollectDetailInsert, getApprovListMS, DataCollectComplete, getDataCollectListExistOrNot,
-    updateDMSApproval, updateMSApproval
+    updateDMSApproval, updateMSApproval, updateCrfClose
 } = require('../crm_request_register/requestRegister.controller');
 
 router.post("/", checkToken, requestRegistInsert);
@@ -48,4 +48,8 @@ router.get("/getApprovList/MS", checkToken, getApprovListMS)
 router.get("/DataCollectComplete/:id", checkToken, DataCollectComplete);
 
 router.get("/getDataCollectListExistOrNot/:id", checkToken, getDataCollectListExistOrNot);
+
+router.patch("/crfClose", checkToken, updateCrfClose);
+
+
 module.exports = router;

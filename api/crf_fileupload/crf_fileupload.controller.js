@@ -44,14 +44,9 @@ const crfRegistration = multer({
     limits: { fileSize: maxSize }
 }).array('files', 10);
 
-
-
-
-
 module.exports = {
 
     crfRegistration: (req, res) => {
-
 
         crfRegistration(req, res, async (err) => {
             const body = req.body;
@@ -62,7 +57,7 @@ module.exports = {
                     message: "Max file size 2MB allowed!",
                 });
             } else if (err) {
-                logger.errorLogger(err);
+                logger.logwindow(err)
                 return res.status(200).json({
                     status: 0,
                     message: err.message,
@@ -111,7 +106,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                logger.errorLogger(err)
+                logger.logwindow(err)
                 return res.status(200).json({
                     success: 0,
                     message: err

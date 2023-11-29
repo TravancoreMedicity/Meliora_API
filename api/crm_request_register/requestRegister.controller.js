@@ -4,7 +4,8 @@ const { requestRegistInsert, requestRegistInsertDetl, requestApprovalInsert, get
     updateEDApproval, updateReqMst, getApprovListDMS, deleteItemListByReqno, getCrfDeptDataCollect,
     CrfDeptDataCollectInsert, getDataCollectList, EditItemListByReqno, CrfDataCollactnSave,
     getItemListDataCollectByReqno, dataCollectDetailInsert, getApprovListMS, DataCollectComplete,
-    getDataCollectListExistOrNot, updateDMSApproval, updateMSApproval
+    getDataCollectListExistOrNot, updateDMSApproval, updateMSApproval, updateReqMstReject,
+    updateCrfClose, updateMasterCrfClose
 } = require('../crm_request_register/requestRegister.service');
 const { validateRequestRegister, validateRequestRegisterDetl, validateUserGroup } = require('../../validation/validation_schema');
 const logger = require('../../logger/logger');
@@ -308,6 +309,32 @@ module.exports = {
                     });
                 });
             }
+            if (body.incharge_approve === 2) {
+
+                const dataupdate = {
+                    req_slno: body.req_slno
+                }
+                updateReqMstReject(dataupdate, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    if (!results) {
+                        logger.infologwindow("Record Not Found")
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Record Not Found"
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Approved Successfully"
+                    });
+                });
+            }
             else {
                 return res.status(200).json({
                     success: 2,
@@ -339,6 +366,32 @@ module.exports = {
                     req_slno: body.req_slno
                 }
                 updateReqMst(dataupdate, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    if (!results) {
+                        logger.infologwindow("Record Not Found")
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Record Not Found"
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Approved Successfully"
+                    });
+                });
+            }
+            if (body.hod_approve === 2) {
+
+                const dataupdate = {
+                    req_slno: body.req_slno
+                }
+                updateReqMstReject(dataupdate, (err, results) => {
                     if (err) {
                         logger.logwindow(err)
                         return res.status(200).json({
@@ -1010,6 +1063,54 @@ module.exports = {
             }
         });
     },
+
+    updateCrfClose: (req, res) => {
+        const body = req.body;
+        updateCrfClose(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+            const dataupdate = {
+                req_slno: body.req_slno
+            }
+            updateMasterCrfClose(dataupdate, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                if (!results) {
+                    logger.infologwindow("Record Not Found")
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Record Not Found"
+                    });
+                }
+                else {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "CRf Close Successfully"
+                    });
+                }
+            });
+        });
+
+
+    },
+
 
 }
 

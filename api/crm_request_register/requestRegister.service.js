@@ -119,21 +119,20 @@ module.exports = {
             `select crf_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
             request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,image_status,
             total_approx_cost,user_deptsec,incharge_req,incharge_approve,req_status,
-            hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,
-            (case when location is null then "Not Given" else location end )as location,
-            (case when emergency=1 then "Emergency" else "Normal" end )as Emergency,
-             (case when incharge_req=1 and incharge_approve is null then  "not updated" when incharge_req=0 then "Not Required" when incharge_approve='1' then "Approved" else "Reject" end ) as approve_incharge ,
-              (case when incharge_req=1 and  incharge_remarks is null then  "not updated" when incharge_req=0 then "Not Required" else incharge_remarks end) as incharge_remarks ,
-             (case when hod_approve is null then  "not updated"  when hod_approve='1' then "Approved" else "Reject" end ) as approve_hod,
-             (case when hod_remarks is null then  "not updated"  else hod_remarks end) as hod_remarks,manag_operation_approv, senior_manage_approv,cao_approve,ed_approve,
-              (case when manag_operation_approv is null then  "not updated" when manag_operation_approv='1' then "Approved" else "Reject" end ) as manag_operation_approvs ,
-              (case when  manag_operation_remarks is null then  "not updated" else manag_operation_remarks end) as manag_operation_remarks ,
-               (case when senior_manage_approv is null then  "not updated" when senior_manage_approv='1' then "Approved" else "Reject" end ) as senior_manage_approvs ,
-              (case when  senior_manage_remarks is null then  "not updated" else senior_manage_remarks end) as senior_manage_remarks ,
-              (case when cao_approve is null then  "not updated" when cao_approve='1' then "Approved" else "Reject" end ) as cao_approves ,
-              (case when  cao_approve_remarks is null then  "not updated" else cao_approve_remarks end) as cao_approve_remarks ,
-               (case when ed_approve is null then  "not updated" when ed_approve='1' then "Approved" else "Reject" end ) as ed_approves ,
-              (case when  ed_approve_remarks is null then  "not updated" else ed_approve_remarks end) as ed_approve_remarks 
+            hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,emergency,             
+           incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date,
+            incharge_user,
+           hod_req, hod_approve, hod_remarks, hod_detial_analysis, hod_approve_date, hod_user,
+           dms_req, dms_approve, dms_remarks, dms_detail_analysis, dms_approve_date, dms_user,
+           ms_approve_req, ms_approve, ms_approve_remark, ms_detail_analysis, ms_approve_date, ms_approve_user,
+           manag_operation_req, manag_operation_approv, manag_operation_remarks, om_detial_analysis,
+           om_approv_date,
+           senior_manage_remarks, manag_operation_user, senior_manage_req, senior_manage_approv,
+           smo_detial_analysis, som_aprrov_date, senior_manage_user,
+           cao_approve_req, cao_approve, cao_approve_remarks, ceo_detial_analysis, cao_approv_date, cao_user,
+           ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date, ed_user,
+           md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,
+           crf_close,crf_close_remark,crf_close_user,crf_closed_one,close_date
              from crf_request_master
              left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
             where user_deptsec=?  ORDER BY crf_request_master.req_slno DESC`,
@@ -148,6 +147,42 @@ module.exports = {
             }
         );
     },
+
+
+    // getReqByDeptBase: (id, callBack) => {
+    //     pool.query(
+    //         `select crf_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
+    //         request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,image_status,
+    //         total_approx_cost,user_deptsec,incharge_req,incharge_approve,req_status,
+    //         hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,
+    //         (case when location is null then "Not Given" else location end )as location,
+    //         (case when emergency=1 then "Emergency" else "Normal" end )as Emergency,
+    //          (case when incharge_req=1 and incharge_approve is null then  "not updated" when incharge_req=0 then "Not Required" when incharge_approve='1' then "Approved" else "Reject" end ) as approve_incharge ,
+    //           (case when incharge_req=1 and  incharge_remarks is null then  "not updated" when incharge_req=0 then "Not Required" else incharge_remarks end) as incharge_remarks ,
+    //          (case when hod_approve is null then  "not updated"  when hod_approve='1' then "Approved" else "Reject" end ) as approve_hod,
+    //          (case when hod_remarks is null then  "not updated"  else hod_remarks end) as hod_remarks,manag_operation_approv, senior_manage_approv,cao_approve,ed_approve,
+    //           (case when manag_operation_approv is null then  "not updated" when manag_operation_approv='1' then "Approved" else "Reject" end ) as manag_operation_approvs ,
+    //           (case when  manag_operation_remarks is null then  "not updated" else manag_operation_remarks end) as manag_operation_remarks ,
+    //            (case when senior_manage_approv is null then  "not updated" when senior_manage_approv='1' then "Approved" else "Reject" end ) as senior_manage_approvs ,
+    //           (case when  senior_manage_remarks is null then  "not updated" else senior_manage_remarks end) as senior_manage_remarks ,
+    //           (case when cao_approve is null then  "not updated" when cao_approve='1' then "Approved" else "Reject" end ) as cao_approves ,
+    //           (case when  cao_approve_remarks is null then  "not updated" else cao_approve_remarks end) as cao_approve_remarks ,
+    //            (case when ed_approve is null then  "not updated" when ed_approve='1' then "Approved" else "Reject" end ) as ed_approves ,
+    //           (case when  ed_approve_remarks is null then  "not updated" else ed_approve_remarks end) as ed_approve_remarks 
+    //          from crf_request_master
+    //          left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
+    //         where user_deptsec=?  ORDER BY crf_request_master.req_slno DESC`,
+    //         [
+    //             id
+    //         ],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callBack(error);
+    //             }
+    //             return callBack(null, results);
+    //         }
+    //     );
+    // },
 
     getItemListByReqno: (id, callBack) => {
         pool.query(
@@ -174,11 +209,12 @@ module.exports = {
                 request_dept_slno = ?,
                 request_deptsec_slno = ?,
                 location = ?,
+                category=?,
                 remarks = ?,
                 total_approx_cost = ?, 
                 expected_date=?,
                 user_deptsec=?,
-                edit_user=? ,
+                edit_user=?,
                 emergency=?       
                 WHERE req_slno = ?`,
             [
@@ -187,6 +223,7 @@ module.exports = {
                 data.request_dept_slno,
                 data.request_deptsec_slno,
                 data.location,
+                data.category,
                 data.remarks,
                 data.total_approx_cost,
                 data.expected_date,
@@ -204,6 +241,7 @@ module.exports = {
         );
     },
     requestRegistDetlUpdate: (data, callback) => {
+
         pool.query(
             `UPDATE crf_request_mast_detail 
             SET req_slno = ?,
@@ -257,37 +295,34 @@ module.exports = {
 
     getDeptApprovList: (data, callBack) => {
         pool.query(
-            `select crf_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
-            request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,sec_name,
-            inch_detial_analysis,hod_detial_analysis,om_detial_analysis,smo_detial_analysis,
-            ceo_detial_analysis,ed_detial_analysis,
-            total_approx_cost,user_deptsec,incharge_req,incharge_approve,incharge_apprv_date,
-            (case when emergency=1 then "Emergency" else "Normal" end )as Emergency,
-            hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,I.em_name as inch_user,
-            (case when incharge_approve is null then  "not updated" when incharge_approve='1' then "Approved" when incharge_approve='2' then "Reject" else "OnHold" end ) as approve_incharge ,
-            (case when incharge_remarks is null then  "not updated" else incharge_remarks end) as incharge_remarks ,
-           (case when hod_approve is null then  "not updated"  when hod_approve='1' then "Approved" when hod_approve='2' then "Reject" else "OnHold"end ) as approve_hod,
-           (case when hod_remarks is null then  "not updated"  else hod_remarks end) as hod_remarks,
-           dms_req,dms_approve,dms_remarks,dms_approve_date,dms_user,
-            (case when dms_approve is null then  "not updated"  when dms_approve='1' then "Approved" when dms_approve='2' then "Reject" else "OnHold"end ) as approve_dms,
-           (case when dms_remarks is null then  "not updated"  else dms_remarks end) as remarks_dms,           
-           ms_approve_req,ms_approve,ms_approve_remark,ms_approve_date,ms_approve_user,
-            (case when ms_approve is null then  "not updated"  when ms_approve='1' then "Approved" when ms_approve='2' then "Reject" else "OnHold"end ) as approve_ms,
-           (case when ms_approve_remark is null then  "not updated"  else ms_approve_remark end) as remark_ms,
-           manag_operation_approv, senior_manage_approv,cao_approve,ed_approve,        
-           (case when manag_operation_approv is null then  "not updated" when manag_operation_approv='1' then "Approved" when manag_operation_approv='2' then "Reject" else "OnHold" end ) as manag_operation_approvs ,
-            (case when  manag_operation_remarks is null then  "not updated" else manag_operation_remarks end) as manag_operation_remarks ,
-             (case when senior_manage_approv is null then  "not updated" when senior_manage_approv='1' then "Approved" when senior_manage_approv='2' then "Reject" else "OnHold"end ) as senior_manage_approvs ,
-            (case when  senior_manage_remarks is null then  "not updated" else senior_manage_remarks end) as senior_manage_remarks ,
-            (case when cao_approve is null then  "not updated" when cao_approve='1' then "Approved" when cao_approve='2' then "Reject" else "OnHold" end ) as cao_approves ,
-            (case when  cao_approve_remarks is null then  "not updated" else cao_approve_remarks end) as cao_approve_remarks ,
-             (case when ed_approve is null then  "not updated" when ed_approve='1' then "Approved" when ed_approve='2' then "Reject" else "OnHold" end ) as ed_approves ,
-            (case when  ed_approve_remarks is null then  "not updated" else ed_approve_remarks end) as ed_approve_remarks 
+            ` select crf_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
+            co_department_mast.dept_name,R.sec_name as req_userdeptsec,U.sec_name as userdeptsec,
+            request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,image_status,
+            total_approx_cost,user_deptsec,req_approv_slno,emergency,req_status,C.em_name as req_user,         
+            incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date,
+            I.em_name as incharge_user,
+            hod_req, hod_approve, hod_remarks, hod_detial_analysis, hod_approve_date,H.em_name as hod_user,
+            dms_req, dms_approve, dms_remarks, dms_detail_analysis, dms_approve_date, dms_user,
+            ms_approve_req, ms_approve, ms_approve_remark, ms_detail_analysis, ms_approve_date, ms_approve_user,
+            manag_operation_req, manag_operation_approv, manag_operation_remarks, om_detial_analysis,
+            om_approv_date,
+            senior_manage_remarks, manag_operation_user, senior_manage_req, senior_manage_approv,
+            smo_detial_analysis, som_aprrov_date, senior_manage_user,
+            cao_approve_req, cao_approve, cao_approve_remarks, ceo_detial_analysis, cao_approv_date, cao_user,
+            ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date, ed_user,
+            md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,
+            crf_close,crf_close_remark,crf_closed_one,close_date,
+            S.em_name as close_user
             from crf_request_master
             left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
+            left join co_employee_master C on C.em_id=crf_request_master.create_user
             left join co_employee_master I on I.em_id=crf_request_approval.incharge_user
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=crf_request_master.request_deptsec_slno
-            where user_deptsec IN (?) ORDER BY crf_request_master.req_slno DESC`,
+            left join co_employee_master H on H.em_id=crf_request_approval.hod_user
+            left join co_employee_master S on S.em_id=crf_request_approval.crf_close_user   
+            left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
+            left join co_deptsec_mast R on R.dept_id=crf_request_master.request_deptsec_slno
+            left join co_deptsec_mast U on U.dept_id=crf_request_master.user_deptsec
+            where user_deptsec IN (?) GROUP BY req_slno ORDER BY crf_request_master.req_slno DESC`,
             [
                 data
             ],
@@ -299,6 +334,52 @@ module.exports = {
             }
         );
     },
+
+
+    // getDeptApprovList: (data, callBack) => {
+    //     pool.query(
+    //         `select crf_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
+    //         request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,sec_name,
+    //         inch_detial_analysis,hod_detial_analysis,om_detial_analysis,smo_detial_analysis,
+    //         ceo_detial_analysis,ed_detial_analysis,
+    //         total_approx_cost,user_deptsec,incharge_req,incharge_approve,incharge_apprv_date,
+    //         (case when emergency=1 then "Emergency" else "Normal" end )as Emergency,
+    //         hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,I.em_name as inch_user,
+    //         (case when incharge_approve is null then  "not updated" when incharge_approve='1' then "Approved" when incharge_approve='2' then "Reject" else "OnHold" end ) as approve_incharge ,
+    //         (case when incharge_remarks is null then  "not updated" else incharge_remarks end) as incharge_remarks ,
+    //        (case when hod_approve is null then  "not updated"  when hod_approve='1' then "Approved" when hod_approve='2' then "Reject" else "OnHold"end ) as approve_hod,
+    //        (case when hod_remarks is null then  "not updated"  else hod_remarks end) as hod_remarks,
+    //        dms_req,dms_approve,dms_remarks,dms_approve_date,dms_user,
+    //         (case when dms_approve is null then  "not updated"  when dms_approve='1' then "Approved" when dms_approve='2' then "Reject" else "OnHold"end ) as approve_dms,
+    //        (case when dms_remarks is null then  "not updated"  else dms_remarks end) as remarks_dms,           
+    //        ms_approve_req,ms_approve,ms_approve_remark,ms_approve_date,ms_approve_user,
+    //         (case when ms_approve is null then  "not updated"  when ms_approve='1' then "Approved" when ms_approve='2' then "Reject" else "OnHold"end ) as approve_ms,
+    //        (case when ms_approve_remark is null then  "not updated"  else ms_approve_remark end) as remark_ms,
+    //        manag_operation_approv, senior_manage_approv,cao_approve,ed_approve,        
+    //        (case when manag_operation_approv is null then  "not updated" when manag_operation_approv='1' then "Approved" when manag_operation_approv='2' then "Reject" else "OnHold" end ) as manag_operation_approvs ,
+    //         (case when  manag_operation_remarks is null then  "not updated" else manag_operation_remarks end) as manag_operation_remarks ,
+    //          (case when senior_manage_approv is null then  "not updated" when senior_manage_approv='1' then "Approved" when senior_manage_approv='2' then "Reject" else "OnHold"end ) as senior_manage_approvs ,
+    //         (case when  senior_manage_remarks is null then  "not updated" else senior_manage_remarks end) as senior_manage_remarks ,
+    //         (case when cao_approve is null then  "not updated" when cao_approve='1' then "Approved" when cao_approve='2' then "Reject" else "OnHold" end ) as cao_approves ,
+    //         (case when  cao_approve_remarks is null then  "not updated" else cao_approve_remarks end) as cao_approve_remarks ,
+    //          (case when ed_approve is null then  "not updated" when ed_approve='1' then "Approved" when ed_approve='2' then "Reject" else "OnHold" end ) as ed_approves ,
+    //         (case when  ed_approve_remarks is null then  "not updated" else ed_approve_remarks end) as ed_approve_remarks 
+    //         from crf_request_master
+    //         left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
+    //         left join co_employee_master I on I.em_id=crf_request_approval.incharge_user
+    //         left join co_deptsec_mast on co_deptsec_mast.sec_id=crf_request_master.request_deptsec_slno
+    //         where user_deptsec IN (?) ORDER BY crf_request_master.req_slno DESC`,
+    //         [
+    //             data
+    //         ],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callBack(error);
+    //             }
+    //             return callBack(null, results);
+    //         }
+    //     );
+    // },
     getApprovListOthers: (callback) => {
         pool.query(
             `select crf_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
@@ -523,6 +604,23 @@ module.exports = {
         );
     },
 
+    updateReqMstReject: (data, callback) => {
+        pool.query(
+            `UPDATE crf_request_master 
+            SET req_status = 'R'
+            WHERE req_slno =?`,
+            [
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
     getApprovListDMS: (callback) => {
         pool.query(
             `select crf_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
@@ -576,10 +674,10 @@ module.exports = {
 
     deleteItemListByReqno: (data, callback) => {
         pool.query(
-            `UPDATE crf_data_collect_detail 
+            `UPDATE crf_request_mast_detail 
                 SET item_status = 0 ,
                 delete_user=?  
-                WHERE req_detl_slno = ?`,
+                WHERE req_detl_slno =?`,
             [
                 data.delete_user,
                 data.req_detl_slno
@@ -912,6 +1010,49 @@ module.exports = {
                 data.ms_approve_user,
                 data.req_approv_slno
 
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateCrfClose: (data, callback) => {
+        pool.query(
+            `UPDATE crf_request_approval 
+            SET crf_close = ?,
+            crf_close_remark = ?,
+            crf_close_user=?,
+            crf_closed_one = ?,  
+            close_date=?                            
+            WHERE req_slno =?`,
+            [
+                data.crf_close,
+                data.crf_close_remark,
+                data.crf_close_user,
+                data.crf_closed_one,
+                data.close_date,
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateMasterCrfClose: (data, callback) => {
+        pool.query(
+            `UPDATE crf_request_master 
+            SET req_status = 'C'
+            WHERE req_slno =?`,
+            [
+                data.req_slno
             ],
             (error, results, feilds) => {
                 if (error) {

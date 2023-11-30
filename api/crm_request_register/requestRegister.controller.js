@@ -5,7 +5,7 @@ const { requestRegistInsert, requestRegistInsertDetl, requestApprovalInsert, get
     CrfDeptDataCollectInsert, getDataCollectList, EditItemListByReqno, CrfDataCollactnSave,
     getItemListDataCollectByReqno, dataCollectDetailInsert, getApprovListMS, DataCollectComplete,
     getDataCollectListExistOrNot, updateDMSApproval, updateMSApproval, updateReqMstReject,
-    updateCrfClose, updateMasterCrfClose
+    updateCrfClose, updateMasterCrfClose, updateReqMstApproved
 } = require('../crm_request_register/requestRegister.service');
 const { validateRequestRegister, validateRequestRegisterDetl, validateUserGroup } = require('../../validation/validation_schema');
 const logger = require('../../logger/logger');
@@ -736,7 +736,7 @@ module.exports = {
 
         const body = req.body;
         var newList = body.map((val, index) => {
-            return [val.crf_requst_slno, val.crf_req_collect_dept, val.req_user]
+            return [val.crf_requst_slno, val.crf_req_collect_dept, val.crf_req_remark, val.req_user]
         })
 
         // checkInsertVal(newList, (err, results) => {
@@ -979,11 +979,12 @@ module.exports = {
                     message: "Record Not Found"
                 });
             }
+            const dataupdate = {
+                req_slno: body.req_slno
+            }
+
             if (body.dms_approve === 3) {
 
-                const dataupdate = {
-                    req_slno: body.req_slno
-                }
                 updateReqMst(dataupdate, (err, results) => {
                     if (err) {
                         logger.logwindow(err)
@@ -1004,12 +1005,53 @@ module.exports = {
                         message: "Approved Successfully"
                     });
                 });
-            } else {
+            }
+
+            if (body.dms_approve === 2) {
+
+                updateReqMstReject(dataupdate, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    if (!results) {
+                        logger.infologwindow("Record Not Found")
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Record Not Found"
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Approved Successfully"
+                    });
+                });
+            }
+
+
+            updateReqMstApproved(dataupdate, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                if (!results) {
+                    logger.infologwindow("Record Not Found")
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Record Not Found"
+                    });
+                }
                 return res.status(200).json({
                     success: 2,
                     message: "Approved Successfully"
                 });
-            }
+            });
         });
     },
 

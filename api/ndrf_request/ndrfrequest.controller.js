@@ -1,5 +1,5 @@
 const { updateNdrfConvert, InsertNdrf, getNdrfList, checkInsertVal, updateEDApproval, ndrfApprovalInsert,
-    updateOMApproval, updateSMOApproval, updateCAOApproval, getNdrfPdf
+    updateOMApproval, updateSMOApproval, updateCAOApproval, getNdrfPdf, updateMDApproval
 } = require('../ndrf_request/ndrfrequest.service')
 const logger = require('../../logger/logger')
 
@@ -183,7 +183,30 @@ module.exports = {
             });
         });
     },
+    updateMDApproval: (req, res) => {
+        const body = req.body;
 
+        updateMDApproval(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Approved Successfully"
+            });
+        });
+    },
     getNdrfPdf: (req, res) => {
         getNdrfPdf((err, results) => {
             if (err) {

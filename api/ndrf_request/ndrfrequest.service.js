@@ -236,7 +236,29 @@ module.exports = {
             }
         );
     },
-
+    updateMDApproval: (data, callback) => {
+        pool.query(
+            `UPDATE crf_ndrf_approval 
+            SET ndrf_md_approve = ?,
+            ndrf_md_approve_remarks = ?,
+            ndrf_md_approve_date = ?,
+            ndrf_md_user=?                                     
+            WHERE ndrf_mast_slno =?`,
+            [
+                data.ndrf_md_approve,
+                data.ndrf_md_approve_remarks,
+                data.ndrf_md_approve_date,
+                data.ndrf_md_user,
+                data.ndrf_mast_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
     getNdrfPdf: (callback) => {
         pool.query(
             `select crf_ndrf_mast.ndrf_mast_slno,V.req_slno,ndrf_date,
@@ -250,7 +272,7 @@ module.exports = {
              ndrf_cao_approve, ndrf_cao_approve_remarks, ndrf_cao_approv_date, ndrf_cao_user, ndrf_ed_approve,
              ndrf_ed_approve_remarks, ndrf_ed_approve_date, ndrf_ed_user,I.em_name as inchuser,H.em_name as hoduser,
               O.em_name as omuser,S.em_name as smouser,C.em_name as caouser,R.em_name as requser,
-             E.em_name as eduser,N.em_name as ndrfuser
+             E.em_name as eduser,N.em_name as ndrfuser,ndrf_md_approve
             from crf_ndrf_mast
                   left join co_department_mast on co_department_mast.dept_id= crf_ndrf_mast.request_dept_slno 
                   left join co_deptsec_mast on co_deptsec_mast.sec_id= crf_ndrf_mast.request_deptsec_slno  

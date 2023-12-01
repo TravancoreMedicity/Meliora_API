@@ -387,6 +387,7 @@ module.exports = {
             total_approx_cost,user_deptsec,incharge_req,incharge_approve,category,
             incharge_apprv_date,hod_approve_date,om_approv_date,som_aprrov_date,
             inch_detial_analysis,hod_detial_analysis,om_detial_analysis,smo_detial_analysis,
+            md_approve_req,md_approve,md_approve_remarks,md_approve_date,
             ceo_detial_analysis,ed_detial_analysis,
             (case when emergency=1 then "Emergency" else "Normal" end )as Emergency,
             cao_approv_date,ed_approve_date,I.em_name as inch_user,H.em_name as hod_user,
@@ -539,6 +540,7 @@ module.exports = {
             ceo_detial_analysis=?,
             cao_approv_date = ?,
             ed_approve_req=?,
+            md_approve_req=?,
             cao_user=?                            
             WHERE req_approv_slno =?`,
             [
@@ -547,6 +549,7 @@ module.exports = {
                 data.ceo_detial_analysis,
                 data.cao_approv_date,
                 data.ed_approve_req,
+                data.md_approve_req,
                 data.cao_user,
                 data.req_approv_slno
 
@@ -587,6 +590,32 @@ module.exports = {
         );
     },
 
+    updateMDApproval: (data, callback) => {
+        pool.query(
+            `UPDATE crf_request_approval 
+            SET md_approve = ?,
+            md_approve_remarks = ?,
+            md_detial_analysis=?,
+            md_approve_date = ?,
+            md_user=?                              
+            WHERE req_approv_slno =?`,
+            [
+                data.md_approve,
+                data.md_approve_remarks,
+                data.md_detial_analysis,
+                data.md_approve_date,
+                data.md_user,
+                data.req_approv_slno
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
     updateReqMst: (data, callback) => {
         pool.query(
             `UPDATE crf_request_master 
@@ -646,8 +675,8 @@ module.exports = {
             incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date,
             I.em_name as incharge_user,
             hod_req, hod_approve, hod_remarks, hod_detial_analysis, hod_approve_date,H.em_name as hod_user,
-            dms_req, dms_approve, dms_remarks, dms_detail_analysis, dms_approve_date, dms_user,
-            ms_approve_req, ms_approve, ms_approve_remark, ms_detail_analysis, ms_approve_date, ms_approve_user,
+            dms_req, dms_approve, dms_remarks, dms_detail_analysis, dms_approve_date,D.em_name as dms_user ,
+            ms_approve_req, ms_approve, ms_approve_remark, ms_detail_analysis, ms_approve_date,M.em_name as ms_user,
             manag_operation_req, manag_operation_approv, manag_operation_remarks, om_detial_analysis,
             om_approv_date,
             senior_manage_remarks, manag_operation_user, senior_manage_req, senior_manage_approv,
@@ -662,6 +691,8 @@ module.exports = {
             left join co_employee_master C on C.em_id=crf_request_master.create_user
             left join co_employee_master I on I.em_id=crf_request_approval.incharge_user
             left join co_employee_master H on H.em_id=crf_request_approval.hod_user
+            left join co_employee_master D on D.em_id=crf_request_approval.dms_user
+            left join co_employee_master M on M.em_id=crf_request_approval.ms_approve_user
             left join co_employee_master S on S.em_id=crf_request_approval.crf_close_user   
             left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
             left join co_deptsec_mast R on R.dept_id=crf_request_master.request_deptsec_slno
@@ -1007,14 +1038,14 @@ module.exports = {
             ms_detail_analysis=?,
             ms_approve_date = ?,  
             ms_approve_user=?                            
-            WHERE req_approv_slno =?`,
+            WHERE req_slno =?`,
             [
                 data.ms_approve,
                 data.ms_approve_remark,
                 data.ms_detail_analysis,
                 data.ms_approve_date,
                 data.ms_approve_user,
-                data.req_approv_slno
+                data.req_slno
 
             ],
             (error, results, feilds) => {

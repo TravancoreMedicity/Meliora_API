@@ -5,7 +5,7 @@ const { requestRegistInsert, requestRegistInsertDetl, requestApprovalInsert, get
     CrfDeptDataCollectInsert, getDataCollectList, EditItemListByReqno, CrfDataCollactnSave,
     getItemListDataCollectByReqno, dataCollectDetailInsert, getApprovListMS, DataCollectComplete,
     getDataCollectListExistOrNot, updateDMSApproval, updateMSApproval, updateReqMstReject,
-    updateCrfClose, updateMasterCrfClose, updateReqMstApproved
+    updateCrfClose, updateMasterCrfClose, updateReqMstApproved, updateMDApproval
 } = require('../crm_request_register/requestRegister.service');
 const { validateRequestRegister, validateRequestRegisterDetl, validateUserGroup } = require('../../validation/validation_schema');
 const logger = require('../../logger/logger');
@@ -578,6 +578,57 @@ module.exports = {
         const body = req.body;
 
         updateEDApproval(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+            if (body.ed_approve === 3) {
+
+                const dataupdate = {
+                    req_slno: body.req_slno
+                }
+                updateReqMst(dataupdate, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    if (!results) {
+                        logger.infologwindow("Record Not Found")
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Record Not Found"
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Approved Successfully"
+                    });
+                });
+            } else {
+                return res.status(200).json({
+                    success: 2,
+                    message: "Approved Successfully"
+                });
+            }
+        });
+    },
+    updateMDApproval: (req, res) => {
+        const body = req.body;
+
+        updateMDApproval(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({

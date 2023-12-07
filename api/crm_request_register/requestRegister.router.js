@@ -25,12 +25,12 @@ router.get("/getApprovList/others", checkToken, getApprovListOthers);
 
 router.patch("/approval/incharge", checkToken, updateInchargeApproval);
 router.patch("/approval/hod", checkToken, updateHodApproval);
+router.patch("/approval/dms", checkToken, updateDMSApproval);
+router.patch("/approval/ms", checkToken, updateMSApproval);
 router.patch("/approval/om", checkToken, updateOMApproval);
 router.patch("/approval/som", checkToken, updateSOMpproval);
 router.patch("/approval/ceo", checkToken, updateCEOApproval);
 router.patch("/approval/ed", checkToken, updateEDApproval);
-router.patch("/approval/dms", checkToken, updateDMSApproval);
-router.patch("/approval/ms", checkToken, updateMSApproval);
 router.patch("/approval/md", checkToken, updateMDApproval);
 
 router.get("/getApprovList/DMS", checkToken, getApprovListDMS);//getDMS approval List

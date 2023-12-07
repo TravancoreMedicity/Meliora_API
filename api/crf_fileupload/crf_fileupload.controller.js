@@ -32,13 +32,14 @@ const crfRegistration = multer({
         if (
             file.mimetype == "image/png" ||
             file.mimetype == "image/jpg" ||
-            file.mimetype == "image/jpeg"
+            file.mimetype == "image/jpeg" ||
+            file.mimetype == "application/pdf"
         ) {
             cb(null, true);
         } else {
             cb(null, false);
 
-            return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+            return cb(new Error('Only .png, .jpeg, and .pdf format allowed!'));
         }
     },
     limits: { fileSize: maxSize }

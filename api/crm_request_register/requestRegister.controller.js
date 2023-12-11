@@ -283,66 +283,82 @@ module.exports = {
                 });
             }
 
-            if (body.incharge_approve === 3) {
-
-                const dataupdate = {
-                    req_slno: body.req_slno
-                }
-                updateReqMst(dataupdate, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
-                        return res.status(200).json({
-                            success: 0,
-                            message: err
-                        });
-                    }
-                    if (!results) {
-                        logger.infologwindow("Record Not Found")
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Record Not Found"
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Approved Successfully"
-                    });
-                });
-            }
-            if (body.incharge_approve === 2) {
-
-                const dataupdate = {
-                    req_slno: body.req_slno
-                }
-                updateReqMstReject(dataupdate, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
-                        return res.status(200).json({
-                            success: 0,
-                            message: err
-                        });
-                    }
-                    if (!results) {
-                        logger.infologwindow("Record Not Found")
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Record Not Found"
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Approved Successfully"
-                    });
-                });
-            }
             else {
-                return res.status(200).json({
-                    success: 2,
-                    message: "Approved Successfully"
-                });
+                const dataupdate = {
+                    req_slno: body.req_slno
+                }
+                if (body.incharge_approve === 3) {
+                    updateReqMst(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "On-Hold Successfully"
+                        });
+                    });
+                }
+                else if (body.incharge_approve === 2) {
+                    updateReqMstReject(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Rejected Successfully"
+                        });
+                    });
+                } else {
+                    updateReqMstApproved(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Approved Successfully"
+                        });
+                    });
+                }
+
+
             }
+
         });
     },
+
     updateHodApproval: (req, res) => {
         const body = req.body;
         updateHodApproval(body, (err, results) => {
@@ -360,63 +376,264 @@ module.exports = {
                     message: "Record Not Found"
                 });
             }
-            if (body.hod_approve === 3) {
 
+            else {
                 const dataupdate = {
                     req_slno: body.req_slno
                 }
-                updateReqMst(dataupdate, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+                if (body.hod_approve === 3) {
+                    updateReqMst(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 2,
+                            message: "On-Hold Successfully"
                         });
-                    }
-                    if (!results) {
-                        logger.infologwindow("Record Not Found")
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Record Not Found"
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Approved Successfully"
                     });
-                });
+                }
+                else if (body.hod_approve === 2) {
+                    updateReqMstReject(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Rejected Successfully"
+                        });
+                    });
+                } else {
+                    updateReqMstApproved(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Approved Successfully"
+                        });
+                    });
+                }
+
+
             }
-            if (body.hod_approve === 2) {
 
-                const dataupdate = {
-                    req_slno: body.req_slno
-                }
-                updateReqMstReject(dataupdate, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
-                        return res.status(200).json({
-                            success: 0,
-                            message: err
-                        });
-                    }
-                    if (!results) {
-                        logger.infologwindow("Record Not Found")
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Record Not Found"
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Approved Successfully"
-                    });
-                });
-            } else {
+        });
+    },
+
+    updateDMSApproval: (req, res) => {
+        const body = req.body;
+        updateDMSApproval(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
                 return res.status(200).json({
-                    success: 2,
-                    message: "Approved Successfully"
+                    success: 0,
+                    message: err
                 });
             }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+
+            else {
+                const dataupdate = {
+                    req_slno: body.req_slno
+                }
+                if (body.dms_approve === 3) {
+                    updateReqMst(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "On-Hold Successfully"
+                        });
+                    });
+                }
+                else if (body.dms_approve === 2) {
+                    updateReqMstReject(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Rejected Successfully"
+                        });
+                    });
+                } else {
+                    updateReqMstApproved(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Approved Successfully"
+                        });
+                    });
+                }
+            }
+
+        });
+    },
+
+    updateMSApproval: (req, res) => {
+        const body = req.body;
+        updateMSApproval(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+
+            else {
+                const dataupdate = {
+                    req_slno: body.req_slno
+                }
+                if (body.ms_approve === 3) {
+                    updateReqMst(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "On-Hold Successfully"
+                        });
+                    });
+                }
+                else if (body.ms_approve === 2) {
+                    updateReqMstReject(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Rejected Successfully"
+                        });
+                    });
+                } else {
+                    updateReqMstApproved(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Approved Successfully"
+                        });
+                    });
+                }
+            }
+
         });
     },
 
@@ -437,37 +654,78 @@ module.exports = {
                     message: "Record Not Found"
                 });
             }
-            if (body.manag_operation_approv === 3) {
 
+            else {
                 const dataupdate = {
                     req_slno: body.req_slno
                 }
-                updateReqMst(dataupdate, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+                if (body.manag_operation_approv === 3) {
+                    updateReqMst(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 2,
+                            message: "On-Hold Successfully"
                         });
-                    }
-                    if (!results) {
-                        logger.infologwindow("Record Not Found")
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Record Not Found"
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Approved Successfully"
                     });
-                });
-            } else {
-                return res.status(200).json({
-                    success: 2,
-                    message: "Approved Successfully"
-                });
+                }
+                else if (body.manag_operation_approv === 2) {
+                    updateReqMstReject(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Rejected Successfully"
+                        });
+                    });
+                } else {
+                    updateReqMstApproved(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Approved Successfully"
+                        });
+                    });
+                }
             }
+
         });
     },
 
@@ -488,43 +746,83 @@ module.exports = {
                     message: "Record Not Found"
                 });
             }
-            if (body.senior_manage_approv === 3) {
 
+            else {
                 const dataupdate = {
                     req_slno: body.req_slno
                 }
-                updateReqMst(dataupdate, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+                if (body.senior_manage_approv === 3) {
+                    updateReqMst(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 2,
+                            message: "On-Hold Successfully"
                         });
-                    }
-                    if (!results) {
-                        logger.infologwindow("Record Not Found")
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Record Not Found"
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Approved Successfully"
                     });
-                });
-            } else {
-                return res.status(200).json({
-                    success: 2,
-                    message: "Approved Successfully"
-                });
+                }
+                else if (body.senior_manage_approv === 2) {
+                    updateReqMstReject(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Rejected Successfully"
+                        });
+                    });
+                } else {
+                    updateReqMstApproved(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Approved Successfully"
+                        });
+                    });
+                }
             }
+
         });
     },
 
     updateCEOApproval: (req, res) => {
         const body = req.body;
-
         updateCEOApproval(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
@@ -540,94 +838,83 @@ module.exports = {
                     message: "Record Not Found"
                 });
             }
-            if (body.cao_approve === 3) {
 
+            else {
                 const dataupdate = {
                     req_slno: body.req_slno
                 }
-                updateReqMst(dataupdate, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+                if (body.cao_approve === 3) {
+                    updateReqMst(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 2,
+                            message: "On-Hold Successfully"
                         });
-                    }
-                    if (!results) {
-                        logger.infologwindow("Record Not Found")
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Record Not Found"
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Approved Successfully"
                     });
-                });
-            } else {
-                return res.status(200).json({
-                    success: 2,
-                    message: "Approved Successfully"
-                });
-            }
-        });
-    },
-
-    updateEDApproval: (req, res) => {
-        const body = req.body;
-
-        updateEDApproval(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (!results) {
-                logger.infologwindow("Record Not Found")
-                return res.status(200).json({
-                    success: 1,
-                    message: "Record Not Found"
-                });
-            }
-            if (body.ed_approve === 3) {
-
-                const dataupdate = {
-                    req_slno: body.req_slno
                 }
-                updateReqMst(dataupdate, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+                else if (body.cao_approve === 2) {
+                    updateReqMstReject(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 2,
+                            message: "Rejected Successfully"
                         });
-                    }
-                    if (!results) {
-                        logger.infologwindow("Record Not Found")
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Record Not Found"
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Approved Successfully"
                     });
-                });
-            } else {
-                return res.status(200).json({
-                    success: 2,
-                    message: "Approved Successfully"
-                });
+                } else {
+                    updateReqMstApproved(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Approved Successfully"
+                        });
+                    });
+                }
             }
+
         });
     },
+
     updateMDApproval: (req, res) => {
         const body = req.body;
-
         updateMDApproval(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
@@ -643,39 +930,174 @@ module.exports = {
                     message: "Record Not Found"
                 });
             }
-            if (body.ed_approve === 3) {
 
+            else {
                 const dataupdate = {
                     req_slno: body.req_slno
                 }
-                updateReqMst(dataupdate, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+                if (body.md_approve === 3) {
+                    updateReqMst(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 2,
+                            message: "On-Hold Successfully"
                         });
-                    }
-                    if (!results) {
-                        logger.infologwindow("Record Not Found")
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Record Not Found"
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Approved Successfully"
                     });
-                });
-            } else {
-                return res.status(200).json({
-                    success: 2,
-                    message: "Approved Successfully"
-                });
+                }
+                else if (body.md_approve === 2) {
+                    updateReqMstReject(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Rejected Successfully"
+                        });
+                    });
+                } else {
+                    updateReqMstApproved(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Approved Successfully"
+                        });
+                    });
+                }
             }
+
         });
     },
+
+    updateEDApproval: (req, res) => {
+        const body = req.body;
+        updateEDApproval(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+
+            else {
+                const dataupdate = {
+                    req_slno: body.req_slno
+                }
+                if (body.ed_approve === 3) {
+                    updateReqMst(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "On-Hold Successfully"
+                        });
+                    });
+                }
+                else if (body.ed_approve === 2) {
+                    updateReqMstReject(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Rejected Successfully"
+                        });
+                    });
+                } else {
+                    updateReqMstApproved(dataupdate, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        if (!results) {
+                            logger.infologwindow("Record Not Found")
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Record Not Found"
+                            });
+                        }
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Approved Successfully"
+                        });
+                    });
+                }
+            }
+
+        });
+    },
+
+
     getApprovListDMS: (req, res) => {
         getApprovListDMS((err, results) => {
             if (err) {
@@ -1013,149 +1435,7 @@ module.exports = {
         });
     },
 
-    updateDMSApproval: (req, res) => {
-        const body = req.body;
-        updateDMSApproval(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (!results) {
-                logger.infologwindow("Record Not Found")
-                return res.status(200).json({
-                    success: 1,
-                    message: "Record Not Found"
-                });
-            }
-            const dataupdate = {
-                req_slno: body.req_slno
-            }
 
-            if (body.dms_approve === 3) {
-
-                updateReqMst(dataupdate, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
-                        return res.status(200).json({
-                            success: 0,
-                            message: err
-                        });
-                    }
-                    if (!results) {
-                        logger.infologwindow("Record Not Found")
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Record Not Found"
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Approved Successfully"
-                    });
-                });
-            }
-
-            if (body.dms_approve === 2) {
-
-                updateReqMstReject(dataupdate, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
-                        return res.status(200).json({
-                            success: 0,
-                            message: err
-                        });
-                    }
-                    if (!results) {
-                        logger.infologwindow("Record Not Found")
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Record Not Found"
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Approved Successfully"
-                    });
-                });
-            }
-
-
-            updateReqMstApproved(dataupdate, (err, results) => {
-                if (err) {
-                    logger.logwindow(err)
-                    return res.status(200).json({
-                        success: 0,
-                        message: err
-                    });
-                }
-                if (!results) {
-                    logger.infologwindow("Record Not Found")
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Record Not Found"
-                    });
-                }
-                return res.status(200).json({
-                    success: 2,
-                    message: "Approved Successfully"
-                });
-            });
-        });
-    },
-
-    updateMSApproval: (req, res) => {
-        const body = req.body;
-        updateMSApproval(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (!results) {
-                logger.infologwindow("Record Not Found")
-                return res.status(200).json({
-                    success: 1,
-                    message: "Record Not Found"
-                });
-            }
-            if (body.ms_approve === 3) {
-
-                const dataupdate = {
-                    req_slno: body.req_slno
-                }
-                updateReqMst(dataupdate, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
-                        return res.status(200).json({
-                            success: 0,
-                            message: err
-                        });
-                    }
-                    if (!results) {
-                        logger.infologwindow("Record Not Found")
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Record Not Found"
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Approved Successfully"
-                    });
-                });
-            } else {
-                return res.status(200).json({
-                    success: 2,
-                    message: "Approved Successfully"
-                });
-            }
-        });
-    },
 
     updateCrfClose: (req, res) => {
         const body = req.body;

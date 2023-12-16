@@ -6,7 +6,8 @@ const { checkDetailInsertOrNot, GRNDetailsInsert, GRNDetailsUpdate, BillDetailsI
     AmcPmInsertOrNotSpare, GRNDetailsInsertSpare, GRNDetailsUpdateSpare, BillDetailsInsertSpare,
     BillDetailsUpdateSpare, DeviceDetailsInsertSpare, DeviceDetailsUpdateSpare, LeaseDetailsInsertSpare,
     LeaseDetailsUpdateSpare, WarentGraruntyInsertSpare, WarentGraruntyUpdateSpare, AmcPmInsertSpare,
-    AmcPmUpdateSpare, getdeptsecBsedonCustdept, getdeptsecBsedonCustdeptSpare
+    AmcPmUpdateSpare, getdeptsecBsedonCustdept, getdeptsecBsedonCustdeptSpare, SpecificationInsertOrNot,
+    SpecificationInsert, SepcifiDelete
 } = require('../am_item_creation_detail/am_itemdetail.service')
 module.exports = {
     checkDetailInsertOrNot: (req, res) => {
@@ -702,4 +703,74 @@ module.exports = {
             });
         });
     },
+
+    SpecificationInsertOrNot: (req, res) => {
+        const id = req.params.id;
+        SpecificationInsertOrNot(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    SpecificationInsert: (req, res) => {
+        const body = req.body;
+        var newList = body.map((val, index) => {
+            return [val.am_item_map_slno, val.specifications, val.status, val.create_user]
+        })
+        SpecificationInsert(newList, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            } return res.status(200).json({
+                success: 1,
+                message: "Specification inserted Successfully"
+            });
+
+        });
+    },
+
+    SepcifiDelete: (req, res) => {
+        const body = req.body;
+        SepcifiDelete(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Item Removed successfully"
+            });
+        });
+    },
+
+
+
 }

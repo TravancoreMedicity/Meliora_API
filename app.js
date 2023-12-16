@@ -162,6 +162,8 @@ const PasswordCredentialType = require('./api/it_password_credential_type_master
 const assetRackMast = require('./api/am_rack_master/am_rack.router')
 const assetDeptTransfer = require('./api/am_asset_dept_transfer/asset_depttransfer.router')
 const subRoomMaster = require('./api/rm_newsubroom_mast/rm_newsubroom_mast.router')
+const crfDashBoard = require('./api/crf_dashboards/crfdashboard.router')
+
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -292,7 +294,7 @@ app.use('/api/PasswordCredentialType', PasswordCredentialType)
 app.use('/api/assetRackMast', assetRackMast)
 app.use('/api/assetDeptTransfer', assetDeptTransfer)
 app.use('/api/subRoomMaster', subRoomMaster)
-
+app.use('/api/crfDashBoard', crfDashBoard)
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

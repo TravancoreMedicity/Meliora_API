@@ -1,6 +1,7 @@
 const { updateNdrfConvert, InsertNdrf, getNdrfList, checkInsertVal, updateEDApproval, ndrfApprovalInsert,
     updateOMApproval, updateSMOApproval, updateCAOApproval, getNdrfPdf, updateMDApproval, ndrfDetailInsert
-    , getItemListDataCollectByReqno, purchaseAcknlodge
+    , getItemListDataCollectByReqno, purchaseAcknlodge, purchasePoClose, InsertsinglePO, InsertMultiplePO,
+    getPOList, updateNdrfPOAdd, updateNdrfPOAddObj
 } = require('../ndrf_request/ndrfrequest.service')
 const logger = require('../../logger/logger')
 
@@ -309,6 +310,136 @@ module.exports = {
             return res.status(200).json({
                 success: 2,
                 message: "Approved Successfully"
+            });
+        });
+    },
+
+    purchasePoClose: (req, res) => {
+        const body = req.body;
+
+        purchasePoClose(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "PO Close Successfully"
+            });
+        });
+    },
+
+    InsertsinglePO: (req, res) => {
+        const body = req.body;
+        InsertsinglePO(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            updateNdrfPOAdd(body, (err, result) => {
+                if (err) {
+                    // logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                if (!results) {
+                    return res.status(400).json({
+                        success: 2,
+                        message: "Record Not Found"
+                    })
+                }
+            });
+
+
+            return res.status(200).json({
+                success: 1,
+                message: "PO Inserted Successfully",
+            });
+        });
+
+    },
+
+    InsertMultiplePO: (req, res) => {
+        const body = req.body;
+        var a1 = body.map((value, index) => {
+            return [value.ndrf_mast_slno, value.po_number, value.po_date, value.po_status, value.create_user,
+            value.create_date
+            ]
+        })
+        var no = body.find((val) => {
+            return val.ndrf_mast_slno
+        })
+
+        InsertMultiplePO(a1, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            else {
+
+                updateNdrfPOAddObj(no.ndrf_mast_slno, (err, result) => {
+                    if (err) {
+                        // logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    if (!results) {
+                        return res.status(400).json({
+                            success: 2,
+                            message: "Record Not Found"
+                        })
+                    }
+                });
+
+                return res.status(200).json({
+                    success: 1,
+                    message: "Multiple PO inserted Successfully",
+                });
+
+            }
+
+        });
+    },
+
+    getPOList: (req, res) => {
+        const id = req.params.id
+        getPOList(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
             });
         });
     },

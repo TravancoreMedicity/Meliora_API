@@ -759,6 +759,7 @@ module.exports = {
         );
     },
 
+
     AmcPmInsertOrNotSpare: (id, callBack) => {
         pool.query(
             `SELECT *           
@@ -960,6 +961,60 @@ module.exports = {
                     callBack(error)
                 }
                 return callBack(null, results)
+            }
+        );
+    },
+
+    SpecificationInsertOrNot: (id, callBack) => {
+        pool.query(
+            `SELECT *           
+            FROM am_item_specification_detail
+            WHERE am_item_map_slno=? and status=1`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    callBack(error)
+                }
+                return callBack(null, results)
+            }
+        );
+    },
+    SpecificationInsert: (data, callBack) => {
+        pool.query(
+            `INSERT INTO am_item_specification_detail
+            (
+                am_item_map_slno,
+                specifications,
+                create_user
+               
+            ) 
+            VALUES ?`,
+            [
+                data
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    SepcifiDelete: (data, callback) => {
+        pool.query(
+            `UPDATE am_item_specification_detail 
+                SET status = 0,
+                delete_user=?  
+                WHERE am_sec_detal_slno =?`,
+            [
+                data.delete_user,
+                data.am_sec_detal_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
             }
         );
     },

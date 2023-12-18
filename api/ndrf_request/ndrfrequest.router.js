@@ -3,7 +3,8 @@ const { checkToken } = require("../../authentication/token_validation");
 const { InsertNdrf, getNdrfList, updateEDApproval, ndrfApprovalInsert,
     updateOMApproval, updateSMOApproval, updateCAOApproval, getNdrfPdf,
     updateMDApproval, ndrfDetailInsert, getItemListDataCollectByReqno,
-    purchaseAcknlodge
+    purchaseAcknlodge, purchasePoClose, InsertsinglePO, InsertMultiplePO,
+    getPOList
 } = require('../ndrf_request/ndrfrequest.controller')
 
 
@@ -22,4 +23,10 @@ router.patch("/approval/md", checkToken, updateMDApproval);
 router.get("/ndrfpdf", checkToken, getNdrfPdf);
 
 router.patch("/purchaseAcknlodge", checkToken, purchaseAcknlodge);
+
+router.patch("/purchasePoClose", checkToken, purchasePoClose);
+router.post("/InsertsinglePO", checkToken, InsertsinglePO)
+router.post("/InsertMultiplePO", checkToken, InsertMultiplePO);
+router.get("/getPOList/:id", checkToken, getPOList);
+
 module.exports = router;

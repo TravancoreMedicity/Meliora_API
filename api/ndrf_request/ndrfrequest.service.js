@@ -90,7 +90,9 @@ module.exports = {
             crf_close, crf_close_remark,  S.em_name as close_user, crf_closed_one, close_date,
            crf_ndrf_mast.create_date as ndrfcreate,crf_request_master.create_date as reqcreate,
            R.sec_name as req_userdeptsec,U.sec_name as userdeptsec,C.em_name as req_user,
-           image_status,expected_date,remarks,category,rm_ndrf,emergency
+           image_status,expected_date,remarks,category,rm_ndrf,emergency,
+           purchase_date,expected_purchase_date,PA.em_name as purchase_user,ndrf_po_close,ndrf_po_close_remarks,
+           PC.em_name as ndrf_po_close_user, ndrf_po_close_date,ndrf_po_add
                       from crf_ndrf_mast                                              
             
                left join crf_request_master on crf_request_master.req_slno=crf_ndrf_mast.req_slno
@@ -117,6 +119,8 @@ module.exports = {
                     left join co_employee_master NC on NC.em_id=crf_ndrf_approval.ndrf_cao_user 
                     left join co_employee_master NE on NE.em_id=crf_ndrf_approval.ndrf_ed_user
                      left join co_employee_master NM on NM.em_id=crf_ndrf_approval.ndrf_md_user
+                     left join co_employee_master PA on PA.em_id=crf_ndrf_mast.purchase_user
+                     left join co_employee_master PC on PC.em_id=crf_ndrf_mast.ndrf_po_close_user
                     GROUP BY req_slno ORDER BY crf_request_master.req_slno DESC
                `,
             [],
@@ -367,6 +371,134 @@ module.exports = {
                 data.ndrf_mast_slno
             ],
             (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    purchasePoClose: (data, callback) => {
+        pool.query(
+            `UPDATE crf_ndrf_mast 
+            SET ndrf_po_close = ?,
+            ndrf_po_close_remarks = ?,
+            ndrf_po_close_user=?,
+            ndrf_po_close_date=?
+            WHERE ndrf_mast_slno =?`,
+            [
+                data.ndrf_po_close,
+                data.ndrf_po_close_remarks,
+                data.ndrf_po_close_user,
+                data.ndrf_po_close_date,
+                data.ndrf_mast_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    InsertsinglePO: (data, callBack) => {
+        pool.query(
+            `INSERT INTO crf_purchase_ndrf_po_detl (
+                ndrf_mast_slno,
+                po_number,
+                po_date,
+                po_status,
+                create_user,
+                create_date
+                
+            )
+            VALUES (?,?,?,?,?,?)`,
+            [
+                data.ndrf_mast_slno,
+                data.po_number,
+                data.po_date,
+                data.po_status,
+                data.create_user,
+                data.create_date
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    InsertMultiplePO: (data, callback) => {
+        pool.query(
+            `INSERT INTO crf_purchase_ndrf_po_detl (
+                ndrf_mast_slno,
+                po_number,
+                po_date,
+                po_status,
+                create_user,
+                create_date
+               )
+               values ?`,
+            [
+                data
+            ],
+            (error, results, fields) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getPOList: (id, callBack) => {
+        pool.query(
+            `  select po_number,po_date
+                         from crf_purchase_ndrf_po_detl
+                        where ndrf_mast_slno=? and po_status=1`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    updateNdrfPOAdd: (data, callback) => {
+        pool.query(
+            `UPDATE crf_ndrf_mast 
+            SET ndrf_po_add=1            
+            WHERE ndrf_mast_slno=?`,
+            [
+                data.ndrf_mast_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateNdrfPOAddObj: (data, callback) => {
+        pool.query(
+            `UPDATE crf_ndrf_mast 
+            SET ndrf_po_add=1            
+            WHERE ndrf_mast_slno=?`,
+            [
+                data
+            ],
+            (error, results, fields) => {
                 if (error) {
                     return callback(error);
                 }

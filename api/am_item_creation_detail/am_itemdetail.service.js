@@ -985,6 +985,7 @@ module.exports = {
             (
                 am_item_map_slno,
                 specifications,
+                status,
                 create_user
                
             ) 

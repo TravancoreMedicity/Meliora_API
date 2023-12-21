@@ -4,6 +4,8 @@ const path = require('path');
 const fs = require("fs")
 const { CrfImageStatusUpdate } = require('../crf_fileupload/crf_fileupload.service');
 const logger = require('../../logger/logger');
+
+
 const crfRegisterstorage = multer.diskStorage({
     destination: (req, file, cb) => {
 

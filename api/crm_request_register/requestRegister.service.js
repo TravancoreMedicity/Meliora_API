@@ -354,14 +354,14 @@ module.exports = {
             inch_detial_analysis=?,
             incharge_apprv_date = ?,
             incharge_user=?
-            WHERE req_approv_slno =?`,
+            WHERE req_slno =?`,
             [
                 data.incharge_approve,
                 data.incharge_remarks,
                 data.inch_detial_analysis,
                 data.incharge_apprv_date,
                 data.incharge_user,
-                data.req_approv_slno
+                data.req_slno
 
             ],
             (error, results, feilds) => {
@@ -381,14 +381,14 @@ module.exports = {
             hod_detial_analysis=?,
             hod_approve_date = ?,
             hod_user=?                              
-            WHERE req_approv_slno =?`,
+            WHERE req_slno =?`,
             [
                 data.hod_approve,
                 data.hod_remarks,
                 data.hod_detial_analysis,
                 data.hod_approve_date,
                 data.hod_user,
-                data.req_approv_slno
+                data.req_slno
 
             ],
             (error, results, feilds) => {

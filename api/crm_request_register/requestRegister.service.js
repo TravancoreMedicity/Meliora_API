@@ -284,8 +284,8 @@ module.exports = {
             left join co_employee_master H on H.em_id=crf_request_approval.hod_user
             left join co_employee_master S on S.em_id=crf_request_approval.crf_close_user   
             left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
-            left join co_deptsec_mast R on R.dept_id=crf_request_master.request_deptsec_slno
-            left join co_deptsec_mast U on U.dept_id=crf_request_master.user_deptsec
+            left join co_deptsec_mast R on R.sec_id=crf_request_master.request_deptsec_slno
+            left join co_deptsec_mast U on U.sec_id=crf_request_master.user_deptsec
             where user_deptsec IN (?) GROUP BY req_slno ORDER BY crf_request_master.req_slno DESC`,
             [
                 data
@@ -333,8 +333,8 @@ module.exports = {
             left join co_employee_master ED on ED.em_id=crf_request_approval.ed_user
             left join co_employee_master MD on MD.em_id=crf_request_approval.md_user
             left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
-            left join co_deptsec_mast R on R.dept_id=crf_request_master.request_deptsec_slno
-            left join co_deptsec_mast U on U.dept_id=crf_request_master.user_deptsec
+            left join co_deptsec_mast R on R.sec_id=crf_request_master.request_deptsec_slno
+            left join co_deptsec_mast U on U.sec_id=crf_request_master.user_deptsec
             where hod_approve=1  GROUP BY req_slno  ORDER BY crf_request_master.req_slno DESC`,
             [],
             (error, results, fields) => {
@@ -622,8 +622,8 @@ module.exports = {
             left join co_employee_master ED on ED.em_id=crf_request_approval.ed_user
             left join co_employee_master MD on MD.em_id=crf_request_approval.md_user
             left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
-            left join co_deptsec_mast R on R.dept_id=crf_request_master.request_deptsec_slno
-            left join co_deptsec_mast U on U.dept_id=crf_request_master.user_deptsec
+            left join co_deptsec_mast R on R.sec_id=crf_request_master.request_deptsec_slno
+            left join co_deptsec_mast U on U.sec_id=crf_request_master.user_deptsec
             where dms_req=1 and (hod_approve=1 AND hod_req=1 ) GROUP BY req_slno ORDER BY crf_request_master.req_slno DESC`,
             [],
             (error, results, fields) => {
@@ -732,7 +732,7 @@ module.exports = {
             request_deptsec_slno,remarks,expected_date,rm_ndrf,category,sec_name,
             inch_detial_analysis,hod_detial_analysis,om_detial_analysis,smo_detial_analysis,
             ceo_detial_analysis,ed_detial_analysis,hod_approve_date,
-            crf_data_collection.crf_data_collect_slno,
+            crf_data_collection.crf_data_collect_slno,crf_dept_remarks,crf_req_remark,
             total_approx_cost,user_deptsec,incharge_req,incharge_approve,incharge_apprv_date,
             (case when location is null then "Not Given" else location end )as location,
             (case when emergency=1 then "Emergency" else "Normal" end )as Emergency,
@@ -890,13 +890,17 @@ module.exports = {
 
     DataCollectComplete: (id, callBack) => {
         pool.query(
-            `select crf_req_collect_dept,
-            co_department_mast.dept_name,
-            crf_data_collection.crf_dept_status
-             from crf_data_collection
-            left join crf_dept_map on crf_dept_map.crf_dept_slno =crf_data_collection.crf_req_collect_dept
-            left join co_department_mast on co_department_mast.dept_id=crf_dept_map.dept_slno
-            where crf_requst_slno=?`,
+            `select crf_data_collect_slno, crf_requst_slno, crf_req_collect_dept, crf_dept_status,
+            crf_dept_remarks, req_user, save_user, crf_req_remark, 
+                       co_deptsec_mast.sec_name as data_entered,
+                       crf_data_collection.crf_dept_status,
+                       RU.em_name as req_user,
+                        EU.em_name as datagive_user
+                        from crf_data_collection          
+                       left join co_deptsec_mast on co_deptsec_mast.sec_id=crf_data_collection.crf_req_collect_dept
+                       left join co_employee_master RU on RU.em_id=crf_data_collection.req_user
+                       left join co_employee_master EU on EU.em_id=crf_data_collection.save_user            
+                       where crf_requst_slno=?`,
             [
                 id
             ],

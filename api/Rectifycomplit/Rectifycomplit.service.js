@@ -5,7 +5,7 @@ module.exports = {
         pool.query(
             `select cm_complaint_mast.complaint_slno,complaint_desc,assigned_date,complaint_dept_name,req_type_name,complaint_type_name,
             assigned_emp,em_name,compalint_status,cm_rectify_status,rectify_pending_hold_remarks,verify_remarks,
-            S.sec_name as sec_name,  IFNULL( L.sec_name,"Nill" ) location,
+            S.sec_name as sec_name,  IFNULL( L.sec_name,"Nill" ) location,complaint_remark,
                         (case when verify_remarks is null then " User Verified" else verify_remarks end ) as verify_remarks1,
                         (case when rectify_pending_hold_remarks is null then "not updated" else rectify_pending_hold_remarks end ) as rectify_pending_hold_remarks1,
                         (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" else "Rectified" end ) as compalint_status1,

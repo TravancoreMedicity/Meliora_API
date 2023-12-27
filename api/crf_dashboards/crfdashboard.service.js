@@ -4,10 +4,10 @@ module.exports = {
     getDashClinicalCRF: (callback) => {
         pool.query(
             `select 
-
             crf_request_master.req_slno, req_date, actual_requirement, needed, request_dept_slno,
+            co_department_mast.dept_name,R.sec_name as req_userdeptsec,U.sec_name as userdeptsec,
              request_deptsec_slno, category, location, remarks, expected_date, 
-            CU.em_name as create_user,  crf_request_master.create_date,  rm_ndrf, total_approx_cost,
+             CU.em_name as req_user,  crf_request_master.create_date,  rm_ndrf, total_approx_cost,
              user_deptsec, req_status, emergency, image_status,
              incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date, I.em_name as incharge_user,
              hod_req, hod_approve, hod_remarks, hod_detial_analysis, hod_approve_date,H.em_name as hod_user, 
@@ -21,7 +21,9 @@ module.exports = {
               crf_close, crf_close_remark, crf_close_user, crf_closed_one, close_date
             FROM meliora.crf_request_master
              left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
-             
+             left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
+             left join co_deptsec_mast R on R.sec_id=crf_request_master.request_deptsec_slno
+             left join co_deptsec_mast U on U.sec_id=crf_request_master.user_deptsec
                            left join co_employee_master CU on CU.em_id=crf_request_master.create_user
                            left join co_employee_master I on I.em_id=crf_request_approval.incharge_user
                            left join co_employee_master H on H.em_id=crf_request_approval.hod_user
@@ -33,7 +35,8 @@ module.exports = {
                            left join co_employee_master ED on ED.em_id=crf_request_approval.ed_user
                            left join co_employee_master MD on MD.em_id=crf_request_approval.md_user
               where dms_req=1 AND (incharge_approve is NULL OR incharge_approve is NULL OR hod_approve is NULL  OR dms_approve is NULL OR ms_approve is NULL
-              OR manag_operation_approv is NULL  OR senior_manage_approv is NULL  OR cao_approve is NULL )
+              OR manag_operation_approv is NULL  OR senior_manage_approv is NULL  OR cao_approve is NULL
+              OR (md_approve_req=1  AND  md_approve is NULL) OR (ed_approve_req=1  AND  ed_approve is NULL))
               GROUP BY req_slno ORDER BY crf_request_master.req_slno DESC
                `,
             [],
@@ -50,10 +53,10 @@ module.exports = {
     getDashNonClinicalCRF: (callback) => {
         pool.query(
             `select 
-
             crf_request_master.req_slno, req_date, actual_requirement, needed, request_dept_slno,
+            co_department_mast.dept_name,R.sec_name as req_userdeptsec,U.sec_name as userdeptsec,
              request_deptsec_slno, category, location, remarks, expected_date, 
-            CU.em_name as create_user,  crf_request_master.create_date,  rm_ndrf, total_approx_cost,
+             CU.em_name as req_user,  crf_request_master.create_date,  rm_ndrf, total_approx_cost,
              user_deptsec, req_status, emergency, image_status,
              incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date, I.em_name as incharge_user,
              hod_req, hod_approve, hod_remarks, hod_detial_analysis, hod_approve_date,H.em_name as hod_user, 
@@ -66,8 +69,10 @@ module.exports = {
              md_approve_req, md_approve, md_approve_remarks, md_detial_analysis, md_approve_date,MD.em_name as md_user,
               crf_close, crf_close_remark, crf_close_user, crf_closed_one, close_date
             FROM meliora.crf_request_master
-             left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
-             
+            left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
+            left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
+            left join co_deptsec_mast R on R.sec_id=crf_request_master.request_deptsec_slno
+            left join co_deptsec_mast U on U.sec_id=crf_request_master.user_deptsec           
                            left join co_employee_master CU on CU.em_id=crf_request_master.create_user
                            left join co_employee_master I on I.em_id=crf_request_approval.incharge_user
                            left join co_employee_master H on H.em_id=crf_request_approval.hod_user
@@ -78,8 +83,9 @@ module.exports = {
                            left join co_employee_master CO on CO.em_id=crf_request_approval.cao_user
                            left join co_employee_master ED on ED.em_id=crf_request_approval.ed_user
                            left join co_employee_master MD on MD.em_id=crf_request_approval.md_user
-              where dms_req=0 AND (incharge_approve is NULL OR hod_approve is NULL  OR dms_approve is NULL OR ms_approve is NULL
-              OR manag_operation_approv is NULL  OR senior_manage_approv is NULL  OR cao_approve is NULL )
+              where dms_req=0 AND (incharge_approve is NULL OR hod_approve is NULL 
+              OR manag_operation_approv is NULL  OR senior_manage_approv is NULL  OR cao_approve is NULL
+              OR (md_approve_req=1  AND  md_approve is NULL) OR (ed_approve_req=1  AND  ed_approve is NULL))
               GROUP BY req_slno ORDER BY crf_request_master.req_slno DESC
                `,
             [],
@@ -125,8 +131,8 @@ module.exports = {
                left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
                  left join crf_ndrf_approval on crf_ndrf_approval.ndrf_mast_slno=crf_ndrf_mast.ndrf_mast_slno
                     left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
-            left join co_deptsec_mast R on R.dept_id=crf_request_master.request_deptsec_slno
-            left join co_deptsec_mast U on U.dept_id=crf_request_master.user_deptsec   
+                    left join co_deptsec_mast R on R.sec_id=crf_request_master.request_deptsec_slno
+                    left join co_deptsec_mast U on U.sec_id=crf_request_master.user_deptsec 
                left join co_employee_master C on C.em_id=crf_request_master.create_user
                left join co_employee_master I on I.em_id=crf_request_approval.incharge_user
                left join co_employee_master H on H.em_id=crf_request_approval.hod_user
@@ -147,9 +153,9 @@ module.exports = {
                      left join co_employee_master NM on NM.em_id=crf_ndrf_approval.ndrf_md_user
                      left join co_employee_master PA on PA.em_id=crf_ndrf_mast.purchase_user
                      left join co_employee_master PC on PC.em_id=crf_ndrf_mast.ndrf_po_close_user
-                     where ndrf_om_approv is NULL  OR ndrf_smo_approv is NULL  OR ndrf_cao_approve is NULL
+                     where dms_req=1 AND (ndrf_om_approv is NULL  OR ndrf_smo_approv is NULL  OR ndrf_cao_approve is NULL
                      OR ndrf_ed_approve is NULL OR ndrf_md_approve is NULL OR ndrf_purchase is NULL
-                     OR ndrf_po_add is NULL           
+                     OR ndrf_po_add is NULL OR ndrf_purchase =1)         
                         GROUP BY req_slno ORDER BY crf_request_master.req_slno DESC
                `,
             [],
@@ -194,9 +200,8 @@ module.exports = {
                left join crf_request_master on crf_request_master.req_slno=crf_ndrf_mast.req_slno
                left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
                  left join crf_ndrf_approval on crf_ndrf_approval.ndrf_mast_slno=crf_ndrf_mast.ndrf_mast_slno
-                    left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
-            left join co_deptsec_mast R on R.dept_id=crf_request_master.request_deptsec_slno
-            left join co_deptsec_mast U on U.dept_id=crf_request_master.user_deptsec   
+                 left join co_deptsec_mast R on R.sec_id=crf_request_master.request_deptsec_slno
+                 left join co_deptsec_mast U on U.sec_id=crf_request_master.user_deptsec 
                left join co_employee_master C on C.em_id=crf_request_master.create_user
                left join co_employee_master I on I.em_id=crf_request_approval.incharge_user
                left join co_employee_master H on H.em_id=crf_request_approval.hod_user
@@ -219,7 +224,7 @@ module.exports = {
                      left join co_employee_master PC on PC.em_id=crf_ndrf_mast.ndrf_po_close_user
                      where dms_req=0 AND (ndrf_om_approv is NULL  OR ndrf_smo_approv is NULL  OR ndrf_cao_approve is NULL
                      OR ndrf_ed_approve is NULL OR ndrf_md_approve is NULL OR ndrf_purchase is NULL
-                     OR ndrf_po_add is NULL)
+                     OR ndrf_po_add is NULL OR ndrf_purchase =1)
                         GROUP BY req_slno ORDER BY crf_request_master.req_slno DESC
                `,
             [],

@@ -893,13 +893,14 @@ module.exports = {
             `select crf_data_collect_slno, crf_requst_slno, crf_req_collect_dept, crf_dept_status,
             crf_dept_remarks, req_user, save_user, crf_req_remark, 
                        co_deptsec_mast.sec_name as data_entered,
-                       crf_data_collection.crf_dept_status,
+                       crf_data_collection.crf_dept_status,crf_data_collection.create_date,crf_data_collection.update_date,
                        RU.em_name as req_user,
                         EU.em_name as datagive_user
                         from crf_data_collection          
                        left join co_deptsec_mast on co_deptsec_mast.sec_id=crf_data_collection.crf_req_collect_dept
                        left join co_employee_master RU on RU.em_id=crf_data_collection.req_user
-                       left join co_employee_master EU on EU.em_id=crf_data_collection.save_user            
+                       left join co_employee_master EU on EU.em_id=crf_data_collection.save_user
+                          
                        where crf_requst_slno=?`,
             [
                 id

@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require("fs")
 const { CrfImageStatusUpdate } = require('../crf_fileupload/crf_fileupload.service');
 const logger = require('../../logger/logger');
+const { log } = require('console');
 
 
 const crfRegisterstorage = multer.diskStorage({
@@ -20,8 +21,11 @@ const crfRegisterstorage = multer.diskStorage({
         cb(null, filepath);
     },
     filename: function (req, file, cb) {
-
-        cb(null, file.originalname)
+        // Generate a unique filename using a timestamp
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = path.extname(file.originalname);
+        const filename = 'crf' + uniqueSuffix + extension;
+        cb(null, filename);
     },
 })
 
@@ -74,8 +78,6 @@ module.exports = {
                 const data = {
                     req_slno: body.id
                 }
-                // Insert the em_id into the database using the reusable function
-
 
                 CrfImageStatusUpdate(data, (err, results) => {
                     if (err) {
@@ -105,7 +107,6 @@ module.exports = {
     // for getting the file
     crfRegimageGet: (req, res) => {
         const id = req.params.id
-
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {

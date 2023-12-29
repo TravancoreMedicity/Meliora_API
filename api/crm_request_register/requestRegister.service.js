@@ -335,7 +335,7 @@ module.exports = {
             left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
             left join co_deptsec_mast R on R.sec_id=crf_request_master.request_deptsec_slno
             left join co_deptsec_mast U on U.sec_id=crf_request_master.user_deptsec
-            where hod_approve=1  GROUP BY req_slno  ORDER BY crf_request_master.req_slno DESC`,
+            where (req_status!='C' OR req_status is NULL) GROUP BY req_slno  ORDER BY crf_request_master.req_slno DESC`,
             [],
             (error, results, fields) => {
                 if (error) {

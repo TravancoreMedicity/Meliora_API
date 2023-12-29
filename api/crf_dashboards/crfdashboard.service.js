@@ -34,7 +34,7 @@ module.exports = {
                            left join co_employee_master CO on CO.em_id=crf_request_approval.cao_user
                            left join co_employee_master ED on ED.em_id=crf_request_approval.ed_user
                            left join co_employee_master MD on MD.em_id=crf_request_approval.md_user
-              where dms_req=1 AND (incharge_approve is NULL OR incharge_approve is NULL OR hod_approve is NULL  OR dms_approve is NULL OR ms_approve is NULL
+              where dms_req=1 AND (req_status!='C' OR req_status is NULL) AND (incharge_approve is NULL OR incharge_approve is NULL OR hod_approve is NULL  OR dms_approve is NULL OR ms_approve is NULL
               OR manag_operation_approv is NULL  OR senior_manage_approv is NULL  OR cao_approve is NULL
               OR (md_approve_req=1  AND  md_approve is NULL) OR (ed_approve_req=1  AND  ed_approve is NULL))
               GROUP BY req_slno ORDER BY crf_request_master.req_slno DESC
@@ -83,7 +83,7 @@ module.exports = {
                            left join co_employee_master CO on CO.em_id=crf_request_approval.cao_user
                            left join co_employee_master ED on ED.em_id=crf_request_approval.ed_user
                            left join co_employee_master MD on MD.em_id=crf_request_approval.md_user
-              where dms_req=0 AND (incharge_approve is NULL OR hod_approve is NULL 
+              where dms_req=0 AND (req_status!='C' OR req_status is NULL) AND (incharge_approve is NULL OR hod_approve is NULL 
               OR manag_operation_approv is NULL  OR senior_manage_approv is NULL  OR cao_approve is NULL
               OR (md_approve_req=1  AND  md_approve is NULL) OR (ed_approve_req=1  AND  ed_approve is NULL))
               GROUP BY req_slno ORDER BY crf_request_master.req_slno DESC
@@ -153,7 +153,7 @@ module.exports = {
                      left join co_employee_master NM on NM.em_id=crf_ndrf_approval.ndrf_md_user
                      left join co_employee_master PA on PA.em_id=crf_ndrf_mast.purchase_user
                      left join co_employee_master PC on PC.em_id=crf_ndrf_mast.ndrf_po_close_user
-                     where dms_req=1 AND (ndrf_om_approv is NULL  OR ndrf_smo_approv is NULL  OR ndrf_cao_approve is NULL
+                     where dms_req=1 AND (req_status!='C' OR req_status is NULL) AND (ndrf_cao_approve is NULL
                      OR ndrf_ed_approve is NULL OR ndrf_md_approve is NULL OR ndrf_purchase is NULL
                      OR ndrf_po_add is NULL OR ndrf_purchase =1)         
                         GROUP BY req_slno ORDER BY crf_request_master.req_slno DESC
@@ -200,8 +200,9 @@ module.exports = {
                left join crf_request_master on crf_request_master.req_slno=crf_ndrf_mast.req_slno
                left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
                  left join crf_ndrf_approval on crf_ndrf_approval.ndrf_mast_slno=crf_ndrf_mast.ndrf_mast_slno
-                 left join co_deptsec_mast R on R.sec_id=crf_request_master.request_deptsec_slno
-                 left join co_deptsec_mast U on U.sec_id=crf_request_master.user_deptsec 
+                    left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
+                    left join co_deptsec_mast R on R.sec_id=crf_request_master.request_deptsec_slno
+                    left join co_deptsec_mast U on U.sec_id=crf_request_master.user_deptsec 
                left join co_employee_master C on C.em_id=crf_request_master.create_user
                left join co_employee_master I on I.em_id=crf_request_approval.incharge_user
                left join co_employee_master H on H.em_id=crf_request_approval.hod_user
@@ -222,7 +223,7 @@ module.exports = {
                      left join co_employee_master NM on NM.em_id=crf_ndrf_approval.ndrf_md_user
                      left join co_employee_master PA on PA.em_id=crf_ndrf_mast.purchase_user
                      left join co_employee_master PC on PC.em_id=crf_ndrf_mast.ndrf_po_close_user
-                     where dms_req=0 AND (ndrf_om_approv is NULL  OR ndrf_smo_approv is NULL  OR ndrf_cao_approve is NULL
+                     where dms_req=0 AND (req_status!='C' OR req_status is NULL) AND (ndrf_cao_approve is NULL
                      OR ndrf_ed_approve is NULL OR ndrf_md_approve is NULL OR ndrf_purchase is NULL
                      OR ndrf_po_add is NULL OR ndrf_purchase =1)
                         GROUP BY req_slno ORDER BY crf_request_master.req_slno DESC

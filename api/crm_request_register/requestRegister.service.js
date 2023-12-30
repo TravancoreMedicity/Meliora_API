@@ -951,7 +951,6 @@ module.exports = {
                 data.dms_approve_date,
                 data.dms_user,
                 data.req_slno
-
             ],
             (error, results, feilds) => {
                 if (error) {

@@ -237,5 +237,232 @@ module.exports = {
             }
         );
     },
+    updateDMSApproval: (data, callback) => {
+        pool.query(
+            `UPDATE crf_request_approval 
+            SET hod_approve=?,
+            hod_remarks=?,
+            hod_approve_date=?,
+            hod_user=?,
+            dms_approve = ?,
+            dms_remarks = ?,
+            dms_detail_analysis=?,
+            dms_approve_date = ?,  
+            dms_user=?                            
+            WHERE req_slno =?`,
+            [
+                data.hod_approve,
+                data.hod_remarks,
+                data.hod_approve_date,
+                data.hod_user,
+                data.dms_approve,
+                data.dms_remarks,
+                data.dms_detail_analysis,
+                data.dms_approve_date,
+                data.dms_user,
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateMSApproval: (data, callback) => {
+        pool.query(
+            `UPDATE crf_request_approval 
+            SET  hod_approve=?,
+            hod_remarks=?,
+            hod_approve_date=?,
+            hod_user=?,
+            ms_approve = ?,
+            ms_approve_remark = ?,
+            ms_detail_analysis=?,
+            ms_approve_date = ?,  
+            ms_approve_user=?                            
+            WHERE req_slno =?`,
+            [
+                data.hod_approve,
+                data.hod_remarks,
+                data.hod_approve_date,
+                data.hod_user,
+                data.ms_approve,
+                data.ms_approve_remark,
+                data.ms_detail_analysis,
+                data.ms_approve_date,
+                data.ms_approve_user,
+                data.req_slno
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateOMApproval: (data, callback) => {
+        pool.query(
+            `UPDATE crf_request_approval 
+            SET hod_approve=?,
+            hod_remarks=?,
+            hod_approve_date=?,
+            hod_user=?,
+            manag_operation_approv = ?,
+            manag_operation_remarks = ?,
+            om_detial_analysis=?,
+            om_approv_date = ?,  
+            manag_operation_user=?                            
+            WHERE req_slno =?`,
+            [
+                data.hod_approve,
+                data.hod_remarks,
+                data.hod_approve_date,
+                data.hod_user,
+                data.manag_operation_approv,
+                data.manag_operation_remarks,
+                data.om_detial_analysis,
+                data.om_approv_date,
+                data.manag_operation_user,
+                data.req_slno
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateSOMpproval: (data, callback) => {
+        pool.query(
+            `UPDATE crf_request_approval 
+            SET hod_approve=?,
+            hod_remarks=?,
+            hod_approve_date=?,
+            hod_user=?,
+            senior_manage_approv = ?,
+            senior_manage_remarks = ?,
+            smo_detial_analysis=?,
+            som_aprrov_date = ?,
+            senior_manage_user=?                                         
+            WHERE req_slno =?`,
+            [
+                data.hod_approve,
+                data.hod_remarks,
+                data.hod_approve_date,
+                data.hod_user,
+                data.senior_manage_approv,
+                data.senior_manage_remarks,
+                data.smo_detial_analysis,
+                data.som_aprrov_date,
+                data.senior_manage_user,
+                data.req_slno
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateCEOApproval: (data, callback) => {
+        pool.query(
+            `UPDATE crf_request_approval 
+            SET hod_approve=?,
+            hod_remarks=?,
+            hod_approve_date=?,
+            hod_user=?,
+            cao_approve = ?,
+            cao_approve_remarks = ?,
+            ceo_detial_analysis=?,
+            cao_approv_date = ?,
+            ed_approve_req=?,
+            md_approve_req=?,
+            cao_user=?                            
+            WHERE req_slno =?`,
+            [
+                data.hod_approve,
+                data.hod_remarks,
+                data.hod_approve_date,
+                data.hod_user,
+                data.cao_approve,
+                data.cao_approve_remarks,
+                data.ceo_detial_analysis,
+                data.cao_approv_date,
+                data.ed_approve_req,
+                data.md_approve_req,
+                data.cao_user,
+                data.req_slno
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateReqMst: (data, callback) => {
+        pool.query(
+            `UPDATE crf_request_master 
+            SET req_status = 'P'
+            WHERE req_slno =?`,
+            [
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    updateReqMstReject: (data, callback) => {
+        pool.query(
+            `UPDATE crf_request_master 
+            SET req_status = 'R'
+            WHERE req_slno =?`,
+            [
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateReqMstApproved: (data, callback) => {
+        pool.query(
+            `UPDATE crf_request_master 
+            SET req_status = 'A'
+            WHERE req_slno =?`,
+            [
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 
 }

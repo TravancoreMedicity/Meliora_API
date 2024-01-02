@@ -116,25 +116,31 @@ module.exports = {
 
     getReqByDeptBase: (id, callBack) => {
         pool.query(
-            `select crf_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
-            request_deptsec_slno,location,remarks,expected_date,rm_ndrf,category,image_status,
-            total_approx_cost,user_deptsec,incharge_req,incharge_approve,req_status,
-            hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,emergency,             
-           incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date,
-            incharge_user,
-           hod_req, hod_approve, hod_remarks, hod_detial_analysis, hod_approve_date, hod_user,
-           dms_req, dms_approve, dms_remarks, dms_detail_analysis, dms_approve_date, dms_user,
-           ms_approve_req, ms_approve, ms_approve_remark, ms_detail_analysis, ms_approve_date, ms_approve_user,
-           manag_operation_req, manag_operation_approv, manag_operation_remarks, om_detial_analysis,
-           om_approv_date,
-           senior_manage_remarks, manag_operation_user, senior_manage_req, senior_manage_approv,
-           smo_detial_analysis, som_aprrov_date, senior_manage_user,
-           cao_approve_req, cao_approve, cao_approve_remarks, ceo_detial_analysis, cao_approv_date, cao_user,
-           ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date, ed_user,
-           md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,
-           crf_close,crf_close_remark,crf_close_user,crf_closed_one,close_date
-             from crf_request_master
-             left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
+            `select crf_request_master.req_slno,req_date,crf_request_master.actual_requirement,
+            crf_request_master.needed,crf_request_master.request_dept_slno,
+                        crf_request_master.request_deptsec_slno,crf_request_master.location,remarks,expected_date,rm_ndrf,category,image_status,
+                        total_approx_cost,user_deptsec,incharge_req,incharge_approve,req_status,
+                        hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,emergency,             
+                       incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date,
+                        incharge_user,
+                       hod_req, hod_approve, hod_remarks, hod_detial_analysis, hod_approve_date, hod_user,
+                       dms_req, dms_approve, dms_remarks, dms_detail_analysis, dms_approve_date, dms_user,
+                       ms_approve_req, ms_approve, ms_approve_remark, ms_detail_analysis, ms_approve_date, ms_approve_user,
+                       manag_operation_req, manag_operation_approv, manag_operation_remarks, om_detial_analysis,
+                       om_approv_date,
+                       senior_manage_remarks, manag_operation_user, senior_manage_req, senior_manage_approv,
+                       smo_detial_analysis, som_aprrov_date, senior_manage_user,
+                       cao_approve_req, cao_approve, cao_approve_remarks, ceo_detial_analysis, cao_approv_date, cao_user,
+                       ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date, ed_user,
+                       md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,
+                       crf_close,crf_close_remark,crf_close_user,crf_closed_one,close_date,
+                       ndrf_cao_approve,ndrf_cao_approve_remarks,ndrf_ed_approve,ndrf_ed_approve_remarks,
+                       ndrf_md_approve,ndrf_md_approve_remarks
+
+                         from crf_request_master
+                         left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
+                          left join crf_ndrf_mast on crf_ndrf_mast.req_slno=crf_request_master.req_slno
+                          left join crf_ndrf_approval on crf_ndrf_approval.ndrf_mast_slno=crf_ndrf_mast.ndrf_mast_slno
             where user_deptsec=?  ORDER BY crf_request_master.req_slno DESC`,
             [
                 id
@@ -335,7 +341,7 @@ module.exports = {
             left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
             left join co_deptsec_mast R on R.sec_id=crf_request_master.request_deptsec_slno
             left join co_deptsec_mast U on U.sec_id=crf_request_master.user_deptsec
-            where (req_status!='C' OR req_status is NULL) GROUP BY req_slno  ORDER BY crf_request_master.req_slno DESC`,
+            where hod_approve=1 and req_status!='C' GROUP BY req_slno  ORDER BY crf_request_master.req_slno DESC`,
             [],
             (error, results, fields) => {
                 if (error) {
@@ -728,13 +734,13 @@ module.exports = {
 
     getDataCollectList: (id, callBack) => {
         pool.query(
-            `select crf_request_master.req_slno,req_date,actual_requirement,needed,request_dept_slno,
-            request_deptsec_slno,remarks,expected_date,rm_ndrf,category,sec_name,
+            `select crf_request_master.req_slno,req_date,crf_request_master.actual_requirement,crf_request_master.needed,crf_request_master.request_dept_slno,
+            crf_request_master.request_deptsec_slno,remarks,expected_date,rm_ndrf,category,sec_name,
             inch_detial_analysis,hod_detial_analysis,om_detial_analysis,smo_detial_analysis,
             ceo_detial_analysis,ed_detial_analysis,hod_approve_date,
             crf_data_collection.crf_data_collect_slno,crf_dept_remarks,crf_req_remark,
             total_approx_cost,user_deptsec,incharge_req,incharge_approve,incharge_apprv_date,
-            (case when location is null then "Not Given" else location end )as location,
+            crf_request_master.location,
             (case when emergency=1 then "Emergency" else "Normal" end )as Emergency,
             hod_req,hod_approve,hod_remarks,req_approv_slno,manag_operation_approv,I.em_name as inch_user,H.em_name as hod_user,
             (case when incharge_approve is null then  "not updated" when incharge_approve='1' then "Approved" when incharge_approve='2' then "Reject" else "OnHold" end ) as approve_incharge ,
@@ -748,9 +754,19 @@ module.exports = {
             (case when cao_approve is null then  "not updated" when cao_approve='1' then "Approved" when cao_approve='2' then "Reject" else "OnHold" end ) as cao_approves ,
             (case when  cao_approve_remarks is null then  "not updated" else cao_approve_remarks end) as cao_approve_remarks ,
              (case when ed_approve is null then  "not updated" when ed_approve='1' then "Approved" when ed_approve='2' then "Reject" else "OnHold" end ) as ed_approves ,
-            (case when  ed_approve_remarks is null then  "not updated" else ed_approve_remarks end) as ed_approve_remarks 
+            (case when  ed_approve_remarks is null then  "not updated" else ed_approve_remarks end) as ed_approve_remarks ,
+            (case when md_approve is null then  "not updated" when md_approve='1' then "Approved" when md_approve='2' then "Reject" else "OnHold" end ) as md_approves ,
+            (case when  md_approve_remarks is null then  "not updated" else md_approve_remarks end) as md_approve_remarks ,
+            (case when ndrf_cao_approve is null then  "not updated" when ndrf_cao_approve='1' then "Approved" when ndrf_cao_approve='2' then "Reject" else "OnHold" end ) as ndrf_cao_approves ,
+            (case when  ndrf_cao_approve_remarks is null then  "not updated" else ndrf_cao_approve_remarks end) as ndrf_cao_approve_remarks ,
+            (case when ndrf_ed_approve is null then  "not updated" when ndrf_ed_approve='1' then "Approved" when ndrf_ed_approve='2' then "Reject" else "OnHold" end ) as ndrf_ed_approves ,
+            (case when  ndrf_ed_approve_remarks is null then  "not updated" else ndrf_ed_approve_remarks end) as ndrf_ed_approve_remarks ,
+            (case when ndrf_md_approve is null then  "not updated" when ndrf_md_approve='1' then "Approved" when ndrf_md_approve='2' then "Reject" else "OnHold" end ) as ndrf_md_approves ,
+            (case when  ed_approve_remarks is null then  "not updated" else ndrf_md_approve_remarks end) as ndrf_md_approve_remarks
             from crf_request_master
             left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
+            left join crf_ndrf_mast on crf_ndrf_mast.req_slno=crf_request_master.req_slno
+            left join crf_ndrf_approval on crf_ndrf_approval.ndrf_mast_slno=crf_ndrf_mast.ndrf_mast_slno
             left join co_employee_master I on I.em_id=crf_request_approval.incharge_user
             left join co_employee_master H on H.em_id=crf_request_approval.hod_user
             left join co_deptsec_mast on co_deptsec_mast.sec_id=crf_request_master.request_deptsec_slno

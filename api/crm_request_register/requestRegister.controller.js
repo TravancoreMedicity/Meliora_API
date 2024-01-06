@@ -5,7 +5,8 @@ const { requestRegistInsert, requestRegistInsertDetl, requestApprovalInsert, get
     CrfDeptDataCollectInsert, getDataCollectList, EditItemListByReqno, CrfDataCollactnSave,
     getItemListDataCollectByReqno, dataCollectDetailInsert, getApprovListMS, DataCollectComplete,
     getDataCollectListExistOrNot, updateDMSApproval, updateMSApproval, updateReqMstReject,
-    updateCrfClose, updateMasterCrfClose, updateReqMstApproved, updateMDApproval
+    updateCrfClose, updateMasterCrfClose, updateReqMstApproved, updateMDApproval,
+    DataCollectionNotComplete
 } = require('../crm_request_register/requestRegister.service');
 const { validateRequestRegister, validateRequestRegisterDetl, validateUserGroup } = require('../../validation/validation_schema');
 const logger = require('../../logger/logger');
@@ -1484,6 +1485,28 @@ module.exports = {
 
     },
 
-
+    DataCollectionNotComplete: (req, res) => {
+        const id = req.params.id
+        DataCollectionNotComplete(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
 }
 

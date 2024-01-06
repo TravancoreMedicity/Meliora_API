@@ -735,7 +735,9 @@ module.exports = {
     getDataCollectList: (id, callBack) => {
         pool.query(
             `select crf_request_master.req_slno,req_date,crf_request_master.actual_requirement,crf_request_master.needed,crf_request_master.request_dept_slno,
-            crf_request_master.request_deptsec_slno,remarks,expected_date,rm_ndrf,category,sec_name,
+            crf_request_master.request_deptsec_slno,remarks,expected_date,rm_ndrf,category,
+            co_department_mast.dept_name,R.sec_name as req_userdeptsec,U.sec_name as userdeptsec,
+            expected_date,crf_dept_status,
             inch_detial_analysis,hod_detial_analysis,om_detial_analysis,smo_detial_analysis,
             ceo_detial_analysis,ed_detial_analysis,hod_approve_date,
             crf_data_collection.crf_data_collect_slno,crf_dept_remarks,crf_req_remark,
@@ -762,15 +764,23 @@ module.exports = {
             (case when ndrf_ed_approve is null then  "not updated" when ndrf_ed_approve='1' then "Approved" when ndrf_ed_approve='2' then "Reject" else "OnHold" end ) as ndrf_ed_approves ,
             (case when  ndrf_ed_approve_remarks is null then  "not updated" else ndrf_ed_approve_remarks end) as ndrf_ed_approve_remarks ,
             (case when ndrf_md_approve is null then  "not updated" when ndrf_md_approve='1' then "Approved" when ndrf_md_approve='2' then "Reject" else "OnHold" end ) as ndrf_md_approves ,
-            (case when  ed_approve_remarks is null then  "not updated" else ndrf_md_approve_remarks end) as ndrf_md_approve_remarks
+            (case when  ed_approve_remarks is null then  "not updated" else ndrf_md_approve_remarks end) as ndrf_md_approve_remarks,
+            crf_data_collection.create_date as datacoll_reqdate,
+            C.em_name as req_user, DC.em_name as datacoll_requser
+
             from crf_request_master
             left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
             left join crf_ndrf_mast on crf_ndrf_mast.req_slno=crf_request_master.req_slno
             left join crf_ndrf_approval on crf_ndrf_approval.ndrf_mast_slno=crf_ndrf_mast.ndrf_mast_slno
+            left join co_employee_master C on C.em_id=crf_request_master.create_user
             left join co_employee_master I on I.em_id=crf_request_approval.incharge_user
             left join co_employee_master H on H.em_id=crf_request_approval.hod_user
             left join co_deptsec_mast on co_deptsec_mast.sec_id=crf_request_master.request_deptsec_slno
             left join crf_data_collection on crf_data_collection.crf_requst_slno=crf_request_master.req_slno
+            left join co_employee_master DC on DC.em_id=crf_data_collection.req_user
+            left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
+            left join co_deptsec_mast R on R.sec_id=crf_request_master.request_deptsec_slno
+            left join co_deptsec_mast U on U.sec_id=crf_request_master.user_deptsec
             where crf_data_collection.crf_req_collect_dept=?`,
             [
                 id
@@ -908,7 +918,7 @@ module.exports = {
         pool.query(
             `select crf_data_collect_slno, crf_requst_slno, crf_req_collect_dept, crf_dept_status,
             crf_dept_remarks, req_user, save_user, crf_req_remark, 
-                       co_deptsec_mast.sec_name as data_entered,
+                       co_deptsec_mast.sec_name as data_entered,data_coll_image_status,
                        crf_data_collection.crf_dept_status,crf_data_collection.create_date,crf_data_collection.update_date,
                        RU.em_name as req_user,
                         EU.em_name as datagive_user
@@ -1043,6 +1053,31 @@ module.exports = {
                     return callback(error);
                 }
                 return callback(null, results);
+            }
+        );
+    },
+
+    DataCollectionNotComplete: (id, callBack) => {
+        pool.query(
+            `select crf_data_collect_slno, crf_requst_slno, crf_req_collect_dept, crf_dept_status,
+            crf_dept_remarks, req_user, save_user, crf_req_remark, 
+                       co_deptsec_mast.sec_name as data_entered,data_coll_image_status,
+                       crf_data_collection.crf_dept_status,crf_data_collection.create_date,crf_data_collection.update_date,
+                       RU.em_name as req_user,
+                        EU.em_name as datagive_user
+                        from crf_data_collection          
+                       left join co_deptsec_mast on co_deptsec_mast.sec_id=crf_data_collection.crf_req_collect_dept
+                       left join co_employee_master RU on RU.em_id=crf_data_collection.req_user
+                       left join co_employee_master EU on EU.em_id=crf_data_collection.save_user                          
+                       where crf_requst_slno=? and crf_dept_status=0`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
             }
         );
     },

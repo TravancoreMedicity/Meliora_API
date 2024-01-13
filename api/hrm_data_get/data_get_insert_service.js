@@ -275,5 +275,56 @@ module.exports = {
         })
     },
 
+    updateDepartment: (data) => {
+        return new Promise((resolve, reject) => {
+            data.map((val) => {
+                pool.query(
+                    `update meliora.co_department_mast
+                    set dept_status=?,
+                    dept_type=?
+                    where dept_id=? `,
+                    [
+                        val.dept_status,
+                        val.dept_type,
+                        val.dept_id
+                    ],
+                    (error, results, fields) => {
+
+
+                        if (error) {
+                            return reject(error)
+                        }
+                        return resolve(results)
+                    }
+                )
+            })
+        })
+    },
+
+    updateDepartmentSec: (data) => {
+        return new Promise((resolve, reject) => {
+            data.map((val) => {
+                pool.query(
+                    `update meliora.co_deptsec_mast
+                    set dept_id=?,
+                    sec_status=?
+                    where sec_id=? `,
+                    [
+                        val.dept_id,
+                        val.sec_status,
+                        val.sec_id
+                    ],
+                    (error, results, fields) => {
+
+
+                        if (error) {
+                            return reject(error)
+                        }
+                        return resolve(results)
+                    }
+                )
+            })
+        })
+    },
 
 }

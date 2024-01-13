@@ -2,7 +2,7 @@ const logger = require('../../logger/logger')
 const { getdepartment, createDept, getdepartmentMeli, getdepartmentSection, getdepartmentSecMeli,
     createDeptSec, getemployeemasterHrm, getemployeemasterMeli, creategetemployeemaster, creategetemployeeuserPass,
     getemployeeuserPassHrm, getemployeeuserPassMeli, getauthorization, getauthorizationMeli, createAuthorization,
-    updateEmpMaster
+    updateEmpMaster, updateDepartment, updateDepartmentSec
 } = require("../hrm_data_get/data_get_insert_service")
 module.exports = {
 
@@ -280,4 +280,93 @@ module.exports = {
             })
         });
     },
+
+    departmentUpdate: (req, res) => {
+        getdepartment((err, results) => {
+            const employeeHr = [...results]
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            getdepartmentMeli((err, results) => {
+                const meliemployee = [...results]
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 2,
+                        message: err
+                    });
+                }
+                let newmeli = employeeHr.filter(value => {
+                    return !meliemployee.find(values => {
+                        return values.dept_id === value.dept_id &&
+                            values.dept_type === value.dept_type &&
+                            values.dept_status === value.dept_status
+                    })
+                })
+
+                const result = updateDepartment(newmeli)
+                    .then((r) => {
+
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Update Successfully"
+                        });
+                    }).catch((e) => {
+                        return res.status(200).json({
+                            success: 0,
+                            message: e.sqlMessage
+                        });
+                    })
+            })
+        });
+    },
+
+    departmentSecUpdate: (req, res) => {
+        getdepartmentSection((err, results) => {
+            const employeeHr = [...results]
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            getdepartmentSecMeli((err, results) => {
+                const meliemployee = [...results]
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 2,
+                        message: err
+                    });
+                }
+                let newmeli = employeeHr.filter(value => {
+                    return !meliemployee.find(values => {
+                        return values.sect_id === value.sec_id &&
+                            values.dept_id === value.dept_id &&
+                            values.sect_status === value.sec_status
+                    })
+                })
+
+                const result = updateDepartmentSec(newmeli)
+                    .then((r) => {
+
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Update Successfully"
+                        });
+                    }).catch((e) => {
+                        return res.status(200).json({
+                            success: 0,
+                            message: e.sqlMessage
+                        });
+                    })
+            })
+        });
+    },
+
 }

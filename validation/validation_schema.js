@@ -880,7 +880,7 @@ const ValidatePrority = Joi.object({
 
 //Asset Type Validation in item creation
 const validateAssetType = Joi.object({
-    asset_type_name: Joi.string().trim().uppercase().min(3).max(45).required()
+    asset_type_name: Joi.string().trim().uppercase().min(1).max(45).required()
         .messages({
             'string.empty': 'Asset Name  Required',
             'string.min': 'Asset Name length must be at least 3 characters long',
@@ -894,7 +894,7 @@ const validateAssetType = Joi.object({
 
 //Item Type Validation in item creation
 const validateItemType = Joi.object({
-    item_type_name: Joi.string().trim().uppercase().min(3).max(45).required()
+    item_type_name: Joi.string().trim().uppercase().min(1).max(45).required()
         .messages({
             'string.empty': 'Item Name  Required',
             'string.min': 'Item Name length must be at least 3 characters long',
@@ -908,7 +908,7 @@ const validateItemType = Joi.object({
 
 //Category Validation in item creation
 const validateCategoryCreate = Joi.object({
-    category_name: Joi.string().trim().uppercase().min(3).max(45).required()
+    category_name: Joi.string().trim().uppercase().min(1).max(45).required()
         .messages({
             'string.empty': 'Category  Required',
             'string.min': 'Category length must be at least 3 characters long',
@@ -923,7 +923,7 @@ const validateCategoryCreate = Joi.object({
 
 //SubCategory Validation in item creation
 const validateSubcategoryCreate = Joi.object({
-    subcategory_name: Joi.string().trim().uppercase().min(3).max(45).required()
+    subcategory_name: Joi.string().trim().uppercase().min(1).max(45).required()
         .messages({
             'string.empty': 'Subcategory  Required',
             'string.min': 'Subcategory length must be at least 3 characters long',
@@ -938,7 +938,7 @@ const validateSubcategoryCreate = Joi.object({
 
 //group Validation in item creation
 const validateGroupCreate = Joi.object({
-    group_name: Joi.string().trim().uppercase().min(3).max(45).required()
+    group_name: Joi.string().trim().uppercase().min(1).max(45).required()
         .messages({
             'string.empty': 'Group  Required',
             'string.min': 'Group length must be at least 3 characters long',
@@ -952,7 +952,7 @@ const validateGroupCreate = Joi.object({
 
 //subgroup Validation in item creation
 const validateSubGroupCreate = Joi.object({
-    sub_group_name: Joi.string().trim().uppercase().min(3).max(45).required()
+    sub_group_name: Joi.string().trim().uppercase().min(1).max(45).required()
         .messages({
             'string.empty': 'Subgroup  Required',
             'string.min': 'Subgroup length must be at least 3 characters long',
@@ -967,7 +967,7 @@ const validateSubGroupCreate = Joi.object({
 
 //model Validation in item creation
 const validateModelCreate = Joi.object({
-    model_name: Joi.string().trim().uppercase().min(3).max(45).required()
+    model_name: Joi.string().trim().uppercase().min(1).max(45).required()
         .messages({
             'string.empty': 'Model  Required',
             'string.min': 'Model length must be at least 3 characters long',
@@ -980,7 +980,7 @@ const validateModelCreate = Joi.object({
 });
 //Manufacture Validation in item creation
 const validateManufactureCreate = Joi.object({
-    manufacture_name: Joi.string().trim().uppercase().min(2).max(45).required()
+    manufacture_name: Joi.string().trim().uppercase().min(1).max(45).required()
         .messages({
             'string.empty': 'Manufacture  Required',
             'string.min': 'Manufacture length must be at least 3 characters long',
@@ -993,7 +993,7 @@ const validateManufactureCreate = Joi.object({
 });
 //uom Validation in item creation
 const validateUOMCreate = Joi.object({
-    uom_name: Joi.string().trim().uppercase().min(3).max(45).required()
+    uom_name: Joi.string().trim().uppercase().min(1).max(45).required()
         .messages({
             'string.empty': 'Unit of Measurement  Required',
             'string.min': 'Unit of Measurement length must be at least 3 characters long',
@@ -1006,7 +1006,7 @@ const validateUOMCreate = Joi.object({
 });
 //sumodel Validation in item creation
 const validateSubModelCreate = Joi.object({
-    submodel_name: Joi.string().trim().uppercase().min(3).max(45).required()
+    submodel_name: Joi.string().trim().uppercase().min(1).max(45).required()
         .messages({
             'string.empty': 'Submodel  Required',
             'string.min': 'Submodel length must be at least 3 characters long',

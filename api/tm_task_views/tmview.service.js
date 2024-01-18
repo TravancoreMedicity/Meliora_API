@@ -26,7 +26,7 @@ module.exports = {
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             where tm_task_due_date=current_date() AND tm_task_dept_sec=?
-            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) || (tm_new_task_mast.tm_task_status iS NULL ))
+            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0)|| (tm_new_task_mast.tm_task_status=2) || (tm_new_task_mast.tm_task_status iS NULL ))
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -61,8 +61,8 @@ module.exports = {
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
-            where yearweek(tm_task_due_date,1)=yearweek(current_date(),1)+1 AND tm_task_dept_sec=1               
-            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) || (tm_new_task_mast.tm_task_status iS NULL ))
+            where yearweek(tm_task_due_date,1)=yearweek(current_date(),1)+1 AND tm_task_dept_sec=?             
+            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) |||| (tm_new_task_mast.tm_task_status=2)|| (tm_new_task_mast.tm_task_status iS NULL ))
             group by tm_new_task_mast.tm_task_slno
             order By tm_task_due_date asc`,
             [id],
@@ -98,7 +98,7 @@ module.exports = {
             left join co_employee_master on co_employee_master.em_id = tm_new_task_mast_detl.tm_assigne_emp
             where(year(tm_task_due_date) = year(current_date())AND month(tm_task_due_date) = month(current_date()) + 1)
             Or(year(tm_task_due_date) = year(current_date()) + 1 AND month(tm_task_due_date) = 1) AND tm_task_dept_sec=?
-            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) || (tm_new_task_mast.tm_task_status iS NULL ))
+            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0)|| (tm_new_task_mast.tm_task_status=2) || (tm_new_task_mast.tm_task_status iS NULL ))
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -132,7 +132,7 @@ module.exports = {
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             where tm_new_task_mast_detl.tm_assigne_emp=?
-            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) || (tm_new_task_mast.tm_task_status iS NULL ))
+            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) || (tm_new_task_mast.tm_task_status=2)|| (tm_new_task_mast.tm_task_status iS NULL ))
             AND (tm_new_task_mast.tm_task_due_date >=current_date())
             group by tm_new_task_mast.tm_task_slno`,
             [id],
@@ -196,7 +196,7 @@ module.exports = {
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             where tm_new_task_mast_detl.tm_assigne_emp=?
-            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) || (tm_new_task_mast.tm_task_status iS NULL ))
+            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0)|| (tm_new_task_mast.tm_task_status=2) || (tm_new_task_mast.tm_task_status iS NULL ))
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -228,7 +228,7 @@ module.exports = {
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             where tm_new_task_mast_detl.tm_assigne_emp=? AND tm_task_due_date < current_date()
-            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) || (tm_new_task_mast.tm_task_status iS NULL ))
+            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0)|| (tm_new_task_mast.tm_task_status=2) || (tm_new_task_mast.tm_task_status iS NULL ))
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -263,7 +263,7 @@ module.exports = {
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             WHERE tm_new_task_mast.tm_task_dept_sec =? AND (tm_new_task_mast.tm_task_due_date >=current_date())
-            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) || (tm_new_task_mast.tm_task_status iS NULL ))
+            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) || (tm_new_task_mast.tm_task_status=2)|| (tm_new_task_mast.tm_task_status iS NULL ))
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -329,7 +329,7 @@ module.exports = {
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno = tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id = tm_new_task_mast_detl.tm_assigne_emp
             WHERE tm_new_task_mast.tm_task_dept_sec =?
-            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) || (tm_new_task_mast.tm_task_status iS NULL ))
+            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0)|| (tm_new_task_mast.tm_task_status=2) || (tm_new_task_mast.tm_task_status iS NULL ))
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -364,7 +364,7 @@ module.exports = {
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno = tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id = tm_new_task_mast_detl.tm_assigne_emp
             WHERE tm_new_task_mast.tm_task_dept_sec =? AND tm_task_due_date < current_date()
-            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) || (tm_new_task_mast.tm_task_status iS NULL ))
+            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0)|| (tm_new_task_mast.tm_task_status=2) || (tm_new_task_mast.tm_task_status iS NULL ))
             group by tm_new_task_mast.tm_task_slno
             order By tm_task_due_date desc`,
             [id],

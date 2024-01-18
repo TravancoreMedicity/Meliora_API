@@ -7,14 +7,16 @@ module.exports = {
            rm_building_name,
            rm_building_alias,
            rm_building_no,
-           rm_building_status
+           rm_building_status,
+           create_user
           )
-          VALUES(?,?,?,?)`,
+          VALUES(?,?,?,?,?)`,
             [
                 data.rm_building_name,
                 data.rm_building_alias,
                 data.rm_building_no,
-                data.rm_building_status
+                data.rm_building_status,
+                data.create_user
 
             ],
             (error, results, fields) => {
@@ -88,7 +90,8 @@ module.exports = {
             rm_building_name=?,
             rm_building_alias=?,
             rm_building_no=?,
-            rm_building_status=? 
+            rm_building_status=? ,
+            edit_user=?
             WHERE 
             rm_building_slno=?`,
             [
@@ -96,6 +99,7 @@ module.exports = {
                 data.rm_building_alias,
                 data.rm_building_no,
                 data.rm_building_status,
+                data.edit_user,
                 data.rm_building_slno,
             ],
             (error, results, feilds) => {

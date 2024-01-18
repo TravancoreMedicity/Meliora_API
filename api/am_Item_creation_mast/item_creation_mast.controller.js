@@ -1,7 +1,9 @@
 const logger = require('../../logger/logger');
 const { ItemcreationdeptInsert, insertItemAdditional, getInsertData, getItemsFronList, itemInactive,
     getCustdyBasedLastAssetNo, ItemcreationdeptInsertSpare, getCustdyBasedLastSpareNo,
-    insertSpareItemAdditional, getInsertSpareData, itemInactiveSpare, getSpareItemsFronList
+    insertSpareItemAdditional, getInsertSpareData, itemInactiveSpare, getSpareItemsFronList,
+    getItemsFronListonlydept, getItemsFronListdeptandsec, getSpareItemsFronListonlydept,
+    getSpareItemsFronListdeptandsec
 } = require('../am_Item_creation_mast/item_creation_mast.service')
 module.exports = {
     ItemcreationdeptInsert: (req, res) => {
@@ -25,8 +27,8 @@ module.exports = {
                 let no = 1
                 var newList = body.map((val, index) => {
                     return [val.item_creation_slno, val.item_dept_slno, val.item_deptsec_slno,
-                    val.item_room_slno, val.item_rack_slno, val.item_create_status,
-                    val.item_custodian_dept, val.item_asset_no, no = no + 1, val.create_user]
+                    val.item_room_slno, val.item_subroom_slno, val.item_rack_slno, val.item_create_status,
+                    val.item_custodian_dept, val.item_custodian_dept_sec, val.item_asset_no, no = no + 1, val.create_user]
                 })
                 ItemcreationdeptInsert(newList, (err, result) => {
                     if (err) {
@@ -47,8 +49,8 @@ module.exports = {
 
             var newList = body.map((val, index) => {
                 return [val.item_creation_slno, val.item_dept_slno, val.item_deptsec_slno,
-                val.item_room_slno, val.item_rack_slno, val.item_create_status,
-                val.item_custodian_dept, val.item_asset_no, no = no + 1, val.create_user]
+                val.item_room_slno, val.item_subroom_slno, val.item_rack_slno, val.item_create_status,
+                val.item_custodian_dept, val.item_custodian_dept_sec, val.item_asset_no, no = no + 1, val.create_user]
             })
 
             ItemcreationdeptInsert(newList, (err, result) => {
@@ -160,29 +162,83 @@ module.exports = {
     getItemsFronList: (req, res) => {
         const body = req.body
 
+        const dept = body.item_dept_slno
+        const deptsec = body.item_deptsec_slno
+        const itemslno = body.item_creation_slno
 
-        getItemsFronList(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
+        if (dept !== 0 && (deptsec === undefined || deptsec === 0) && (itemslno === undefined || itemslno === 0)) {
+            getItemsFronListonlydept(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
                 return res.status(200).json({
-                    success: 0,
-                    message: err
+                    success: 1,
+                    data: results
                 });
-            }
+            })
+        }
+        else if (dept !== 0 && deptsec !== undefined && (itemslno === undefined || itemslno === 0)) {
+            getItemsFronListdeptandsec(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
 
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
                 return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
+                    success: 1,
+                    data: results
                 });
-            }
+            })
+        }
+        else {
+            getItemsFronList(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
 
-            return res.status(200).json({
-                success: 1,
-                data: results
-            });
-        })
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
     },
 
     ItemcreationdeptInsertSpare: (req, res) => {
@@ -205,8 +261,8 @@ module.exports = {
                 let no = 1
                 var newList = body.map((val, index) => {
                     return [val.spare_creation_slno, val.spare_dept_slno, val.spare_deptsec_slno,
-                    val.spare_room_slno, val.spare_rack_slno, val.spare_create_status,
-                    val.spare_custodian_dept, val.spare_asset_no, no = no + 1, val.create_user]
+                    val.spare_room_slno, val.spare_subroom_slno, val.spare_rack_slno, val.spare_create_status,
+                    val.spare_custodian_dept, val.spare_custodian_dept_sec, val.spare_asset_no, no = no + 1, val.create_user]
                 })
 
                 ItemcreationdeptInsertSpare(newList, (err, result) => {
@@ -226,8 +282,8 @@ module.exports = {
             let no = assetno.item_asset_no_only === undefined ? 0 : assetno.item_asset_no_only
             var newList = body.map((val, index) => {
                 return [val.spare_creation_slno, val.spare_dept_slno, val.spare_deptsec_slno,
-                val.spare_room_slno, val.spare_rack_slno, val.spare_create_status,
-                val.spare_custodian_dept, val.spare_asset_no, no = no + 1, val.create_user]
+                val.spare_room_slno, val.spare_subroom_slno, val.spare_rack_slno, val.spare_create_status,
+                val.spare_custodian_dept, val.spare_custodian_dept_sec, val.spare_asset_no, no = no + 1, val.create_user]
             })
             ItemcreationdeptInsertSpare(newList, (err, result) => {
                 if (err) {
@@ -263,8 +319,8 @@ module.exports = {
             else {
                 const assetno = JSON.parse(JSON.stringify(results[0]))
 
-                let no = assetno.item_asset_no_only
-                body.item_asset_no_only = no + 1
+                let no = assetno.spare_asset_no_only
+                body.spare_asset_no_only = no + 1
                 insertSpareItemAdditional(body, (err, result) => {
 
                     if (err) {
@@ -335,27 +391,84 @@ module.exports = {
 
     getSpareItemsFronList: (req, res) => {
         const body = req.body
-        getSpareItemsFronList(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
 
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
+        const dept = body.spare_dept_slno
+        const deptsec = body.spare_deptsec_slno
+        const itemslno = body.spare_creation_slno
 
-            return res.status(200).json({
-                success: 1,
-                data: results
-            });
-        })
+        if (dept !== 0 && (deptsec === undefined || deptsec === 0) && (itemslno === undefined || itemslno === 0)) {
+            getSpareItemsFronListonlydept(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+        else if (dept !== 0 && deptsec !== undefined && (itemslno === undefined || itemslno === 0)) {
+            getSpareItemsFronListdeptandsec(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+        else {
+            getSpareItemsFronList(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (results.length == 0) {
+                    logger.infologwindow("No Results Found")
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Record Found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        }
+
     },
+
 }

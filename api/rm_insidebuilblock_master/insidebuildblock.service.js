@@ -7,14 +7,16 @@ module.exports = {
             rm_insidebuildblock_name,
             rm_insidebuildblock_alias,
             rm_insidebuildblock_no,
-            rm_insidebuildblock_status
+            rm_insidebuildblock_status,
+            create_user
           )
-          VALUES(?,?,?,?)`,
+          VALUES(?,?,?,?,?)`,
             [
                 data.rm_insidebuildblock_name,
                 data.rm_insidebuildblock_alias,
                 data.rm_insidebuildblock_no,
-                data.rm_insidebuildblock_status
+                data.rm_insidebuildblock_status,
+                data.create_user
 
             ],
             (error, results, fields) => {
@@ -53,7 +55,8 @@ module.exports = {
             rm_insidebuildblock_name=?,
             rm_insidebuildblock_alias=?,
             rm_insidebuildblock_no=?,
-            rm_insidebuildblock_status=? 
+            rm_insidebuildblock_status=?,
+            edit_user=?
             WHERE 
             rm_insidebuildblock_slno=?`,
             [
@@ -61,6 +64,7 @@ module.exports = {
                 data.rm_insidebuildblock_alias,
                 data.rm_insidebuildblock_no,
                 data.rm_insidebuildblock_status,
+                data.edit_user,
                 data.rm_insidebuildblock_slno,
             ],
             (error, results, feilds) => {

@@ -1,10 +1,8 @@
 const { getCategory, getGroup, getAssetType, getAmItemType, getAmSubcategory, getAmSubGroup,
     getAmManufacture, getAmModel, getUOM, getSubmodel, modelNoSelect, ItemBasedOnDeptSec,
-    SpareItemBasedOnDeptSec, rackselect, RoomBasedOnDeptSec
+    SpareItemBasedOnDeptSec, rackselect, RoomBasedOnDeptSec, SubRoomunderRoom
 } = require('../am_selectcomponents/select.services')
 const logger = require('../../logger/logger');
-
-
 
 module.exports = {
 
@@ -337,7 +335,31 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    SubRoomunderRoom: (req, res) => {
+        const id = req.params.id
+        SubRoomunderRoom(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
                 logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,

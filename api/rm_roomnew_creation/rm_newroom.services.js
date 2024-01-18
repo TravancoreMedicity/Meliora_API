@@ -17,9 +17,11 @@ module.exports = {
             rm_outlet_slno,
             rm_room_status,
             actual_rm_no,
-            rm_room_no_dis
+            rm_room_no_dis,
+            rm_old_roomno,
+            create_user
           )
-          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.rm_room_name,
                 data.rm_room_no,
@@ -33,7 +35,9 @@ module.exports = {
                 data.rm_outlet_slno,
                 data.rm_room_status,
                 data.actual_rm_no,
-                data.rm_room_no_dis
+                data.rm_room_no_dis,
+                data.rm_old_roomno,
+                data.create_user
 
             ],
 
@@ -62,7 +66,7 @@ module.exports = {
             rm_floor_creation.rm_floor_name,
             rm_insidebuildblock_mast.rm_insidebuildblock_name,
             rm_room_type_master.rm_roomtype_name,
-            rm_room_category_master.rm_roomcategory_name 
+            rm_room_category_master.rm_roomcategory_name,rm_old_roomno
             from 
             rm_newroom_creation
             LEFT JOIN rm_building_mast ON rm_building_mast.rm_building_slno=rm_newroom_creation.rm_build_slno 
@@ -98,7 +102,9 @@ module.exports = {
             rm_category_slno=?,
             rm_outlet_slno=?,
             rm_room_status=?,
-            rm_room_no_dis=?
+            rm_room_no_dis=?,
+            rm_old_roomno=?,
+            edit_user=?
             WHERE 
             rm_room_slno=?`,
 
@@ -117,6 +123,8 @@ module.exports = {
                 data.rm_outlet_slno,
                 data.rm_room_status,
                 data.rm_room_no_dis,
+                data.rm_old_roomno,
+                data.edit_user,
                 data.rm_room_slno
             ],
             (error, results, feilds) => {

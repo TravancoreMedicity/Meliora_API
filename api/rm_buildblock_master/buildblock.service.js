@@ -8,14 +8,16 @@ module.exports = {
               rm_buildblock_name, 
               rm_buildblock_alias, 
               rm_buildblock_no, 
-              rm_buildblock_status
+              rm_buildblock_status,
+              create_user
             )
-            VALUES(?,?,?,?)`,
+            VALUES(?,?,?,?,?)`,
             [
                 data.rm_buildblock_name,
                 data.rm_buildblock_alias,
                 data.rm_buildblock_no,
-                data.rm_buildblock_status
+                data.rm_buildblock_status,
+                data.create_user
             ],
             (error, results, fields) => {
                 if (error) {
@@ -71,7 +73,8 @@ module.exports = {
             SET rm_buildblock_name=?,
             rm_buildblock_alias=?,
             rm_buildblock_no=?,
-            rm_buildblock_status=? 
+            rm_buildblock_status=? ,
+            edit_user=?
             WHERE
             rm_buildblock_slno=?`,
             [
@@ -79,6 +82,7 @@ module.exports = {
                 data.rm_buildblock_alias,
                 data.rm_buildblock_no,
                 data.rm_buildblock_status,
+                data.edit_user,
                 data.rm_buildblock_slno,
             ],
             (error, results, feilds) => {

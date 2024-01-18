@@ -7,7 +7,8 @@ const { requestRegistInsert, requestRegistInsertDetl, requestApprovalInsert, get
     getCrfDeptDataCollect, CrfDeptDataCollectInsert, EditItemListByReqno,
     getDataCollectList, CrfDataCollactnSave, getItemListDataCollectByReqno,
     dataCollectDetailInsert, getApprovListMS, DataCollectComplete, getDataCollectListExistOrNot,
-    updateDMSApproval, updateMSApproval
+    updateDMSApproval, updateMSApproval, updateCrfClose, updateMDApproval,
+    DataCollectionNotComplete
 } = require('../crm_request_register/requestRegister.controller');
 
 router.post("/", checkToken, requestRegistInsert);
@@ -25,12 +26,13 @@ router.get("/getApprovList/others", checkToken, getApprovListOthers);
 
 router.patch("/approval/incharge", checkToken, updateInchargeApproval);
 router.patch("/approval/hod", checkToken, updateHodApproval);
+router.patch("/approval/dms", checkToken, updateDMSApproval);
+router.patch("/approval/ms", checkToken, updateMSApproval);
 router.patch("/approval/om", checkToken, updateOMApproval);
 router.patch("/approval/som", checkToken, updateSOMpproval);
 router.patch("/approval/ceo", checkToken, updateCEOApproval);
 router.patch("/approval/ed", checkToken, updateEDApproval);
-router.patch("/approval/dms", checkToken, updateDMSApproval);
-router.patch("/approval/ms", checkToken, updateMSApproval);
+router.patch("/approval/md", checkToken, updateMDApproval);
 
 router.get("/getApprovList/DMS", checkToken, getApprovListDMS);//getDMS approval List
 
@@ -48,4 +50,10 @@ router.get("/getApprovList/MS", checkToken, getApprovListMS)
 router.get("/DataCollectComplete/:id", checkToken, DataCollectComplete);
 
 router.get("/getDataCollectListExistOrNot/:id", checkToken, getDataCollectListExistOrNot);
+
+router.patch("/crfClose", checkToken, updateCrfClose);
+
+router.get("/DataCollectionNotComplete/:id", checkToken, DataCollectionNotComplete);
+
+
 module.exports = router;

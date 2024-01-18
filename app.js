@@ -167,7 +167,7 @@ const TmTableView = require('./api/tm_task_views/tmview.router')
 const TmDropDowns = require('./api/tm_dropdowns/tm_list.router')
 const subRoomMaster = require('./api/rm_newsubroom_mast/rm_newsubroom_mast.router')
 const crfDashBoard = require('./api/crf_dashboards/crfdashboard.router')
-
+const amReport = require('./api/am_reports/am_reports.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {

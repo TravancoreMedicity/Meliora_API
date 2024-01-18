@@ -120,6 +120,23 @@ module.exports = {
 
     PasswordMasterView: (callback) => {
         pool.query(
+            // `SELECT 
+            // pswd_mast_slno,
+            // am_item_name_creation.item_creation_slno,
+            // co_deptsec_mast.sec_id,
+            // am_category.category_slno,
+            // am_group.group_slno,
+            // am_category.category_name,
+            // am_group.group_name,
+            // co_deptsec_mast.sec_name,
+            // pswd_mast_description,         
+            // am_item_name_creation.item_name,
+            // pswd_mast_asset_no
+            // FROM meliora.it_pswd_master
+            // left join am_item_name_creation on am_item_name_creation.item_creation_slno=it_pswd_master.pswd_mast_item_no
+            // left join am_category on am_category.category_slno=it_pswd_master.pswd_mast_categry_no
+            // left join am_group on am_group.group_slno=it_pswd_master.pswd_mast_group_no
+            // left join co_deptsec_mast on co_deptsec_mast.sec_id=it_pswd_master.pswd_mast_location`
             `SELECT 
             pswd_mast_slno,
             am_item_name_creation.item_creation_slno,
@@ -131,12 +148,21 @@ module.exports = {
             co_deptsec_mast.sec_name,
             pswd_mast_description,         
             am_item_name_creation.item_name,
-            pswd_mast_asset_no
+            pswd_mast_asset_no,
+            it_pswd_mast_detail.pswd_detail_description,
+            psw_detail_username,
+            psw_detail_password,
+            psw_detail_port,
+            psw_detail_remarks,
+            credential_name
             FROM meliora.it_pswd_master
             left join am_item_name_creation on am_item_name_creation.item_creation_slno=it_pswd_master.pswd_mast_item_no
             left join am_category on am_category.category_slno=it_pswd_master.pswd_mast_categry_no
             left join am_group on am_group.group_slno=it_pswd_master.pswd_mast_group_no
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=it_pswd_master.pswd_mast_location`, [],
+            left join it_pswd_mast_detail on it_pswd_mast_detail.pswd_detail_mast_slno=it_pswd_master.pswd_mast_slno
+            left join it_passwrd_credential_type on it_passwrd_credential_type.credential_slno=it_pswd_mast_detail.psw_detail_credintial
+            left join co_deptsec_mast on co_deptsec_mast.sec_id=it_pswd_master.pswd_mast_location`
+            , [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);

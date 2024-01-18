@@ -162,6 +162,10 @@ const PasswordCredentialType = require('./api/it_password_credential_type_master
 const assetRackMast = require('./api/am_rack_master/am_rack.router')
 const assetDeptTransfer = require('./api/am_asset_dept_transfer/asset_depttransfer.router')
 
+const taskManagement = require('./api/tm_task_management/taskmanagement.router')
+const TmFileUpload = require('./api/tm_task_file_upload/task_file_upload.router')
+const TmTableView = require('./api/tm_task_views/tmview.router')
+const TmDropDowns = require('./api/tm_dropdowns/tm_list.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -286,11 +290,15 @@ app.use('/api/CustodianDeptMast', CustodianDeptMast)
 app.use('/api/ItemMapDetails', ItemMapDetails)
 app.use('/api/CrfImageUpload', CrfImageUpload)
 app.use('/api/ItImageUpload', IiImageUpload)
-// app.use('/api/PasswordDeviceType', PasswordDeviceType)
 app.use('/api/PasswordManagementMain', PasswordManagementMain)
 app.use('/api/PasswordCredentialType', PasswordCredentialType)
 app.use('/api/assetRackMast', assetRackMast)
 app.use('/api/assetDeptTransfer', assetDeptTransfer)
+app.use('/api/taskManagement', taskManagement)
+app.use('/api/TmFileUpload', TmFileUpload)
+app.use('/api/TmTableView', TmTableView)
+app.use('/api/TmDropDowns', TmDropDowns)
+
 
 
 

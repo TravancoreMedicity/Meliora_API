@@ -1216,6 +1216,17 @@ const validateAssetRackMaster = Joi.object({
     am_rack_slno: Joi.number().optional()
 });
 
+
+const validateEmergncyType = Joi.object({
+    emer_type_name: Joi.string().trim().uppercase().required(),
+    emer_type_escalation: Joi.number().required(),
+    emer_type_status: Joi.number().required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+    emergency_slno: Joi.number().optional()
+});
+
+
 module.exports = {
     validateFloors,
     validateRoomCategory,
@@ -1288,7 +1299,7 @@ module.exports = {
     validateYearBackupVerification,
     validateSelectedDaysBackupVerification,
     validateCommunicationCreate,
-    validateAssetRackMaster
-
+    validateAssetRackMaster,
+    validateEmergncyType
 
 }

@@ -13,11 +13,14 @@ module.exports = {
             tm_task_due_date,        
             tm_task_description,
             tm_task_status,
-            tm_project_slno,             
+            tm_project_slno,
+            tm_onhold_remarks,
+            tm_pending_remark,
+            tm_completed_remarks,        
             create_user
 
           )
-          VALUES(?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
             [
 
                 data.tm_task_name,
@@ -27,7 +30,43 @@ module.exports = {
                 data.tm_task_description,
                 data.tm_task_status,
                 data.tm_project_slno,
+                data.tm_onhold_remarks,
+                data.tm_pending_remark,
+                data.tm_completed_remarks,
                 data.create_user
+
+            ],
+
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+
+            }
+        );
+    },
+
+    TaskDateInserT: (data, callback) => {
+
+        pool.query(
+            `INSERT INTO tm_task_mast_log
+          ( 
+          
+            tm_task_slno,
+            tm_task_status,
+            tm_task_due_date,                
+            tm_change_user
+
+          )
+          VALUES(?,?,?,?)`,
+            [
+
+                data.tm_task_slno,
+                data.tm_task_status,
+                data.tm_task_due_date,
+                data.tm_change_user
 
             ],
 
@@ -80,7 +119,11 @@ module.exports = {
 			tm_task_description,
             tm_task_status, 
 			tm_project_name,
-            tm_detail_status,     
+            tm_new_task_mast.create_date,
+            tm_detail_status,
+            tm_onhold_remarks,
+            tm_pending_remark,
+            tm_completed_remarks,    
             tm_new_task_mast.tm_project_slno,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
             GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
@@ -206,31 +249,40 @@ module.exports = {
     },
 
     CreateSubTaskInsert: (data, callback) => {
-
-
         pool.query(
             `INSERT INTO tm_new_task_mast
-          (            
-         
+          ( 
+          
             tm_task_name,
             tm_task_dept,
-            tm_task_dept_sec,               
-            tm_task_due_date,
+            tm_task_dept_sec,
+            tm_task_due_date,        
             tm_task_description,
-            tm_task_status,                   
-            create_user,
-            main_task_slno
+            tm_task_status,
+            tm_project_slno,
+            tm_onhold_remarks,
+            tm_pending_remark,
+            tm_completed_remarks,
+            main_task_slno,        
+            create_user
+
           )
-          VALUES (?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
+
                 data.tm_task_name,
                 data.tm_task_dept,
                 data.tm_task_dept_sec,
                 data.tm_task_due_date,
                 data.tm_task_description,
                 data.tm_task_status,
-                data.create_user,
-                data.main_task_slno
+                data.tm_project_slno,
+                data.tm_onhold_remarks,
+                data.tm_pending_remark,
+                data.tm_completed_remarks,
+                data.main_task_slno,
+                data.create_user
+
             ],
 
             (error, results, fields) => {
@@ -287,6 +339,10 @@ module.exports = {
 			tm_task_description,
             tm_new_task_mast.tm_project_slno,
             tm_project_name,
+            tm_pending_remark,
+            tm_onhold_remarks,
+            tm_completed_remarks,
+            tm_new_task_mast.create_date,
             tm_task_status,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
             GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
@@ -296,8 +352,7 @@ module.exports = {
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
-            WHERE tm_new_task_mast.tm_task_dept_sec=? AND (tm_task_due_date >= current_date)
-            AND(tm_new_task_mast.tm_task_status=0||tm_new_task_mast.tm_task_status=2 || tm_new_task_mast.tm_task_status iS NULL)
+            WHERE tm_new_task_mast.tm_task_dept_sec=?
             group by tm_new_task_mast.tm_task_slno
 			ORDER BY tm_task_slno DESC`,
             [id],
@@ -343,6 +398,8 @@ module.exports = {
             tm_task_description,
             tm_task_status,
             tm_project_slno,
+            tm_pending_remark,
+            tm_onhold_remarks,
             main_task_slno           
             FROM tm_new_task_mast            
              WHERE tm_task_slno=?`,
@@ -371,8 +428,14 @@ module.exports = {
             co_deptsec_mast.sec_name,
             tm_task_due_date,           
             tm_assigne_emp,
-            tm_task_status,           
+            tm_task_status,
+            tm_pending_remark,
+            tm_onhold_remarks,
+            tm_completed_remarks,
+            tm_new_task_mast.create_date,          
 			tm_task_description,
+            tm_new_task_mast.tm_project_slno,
+            main_task_slno,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
             GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
@@ -380,6 +443,7 @@ module.exports = {
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
+            left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             WHERE tm_new_task_mast.main_task_slno=? 
             group by tm_new_task_mast.tm_task_slno`,
             [id],
@@ -394,6 +458,7 @@ module.exports = {
     },
     UpdateMasterTask: (data, callback) => {
 
+
         pool.query(
 
             `UPDATE tm_new_task_mast SET                 
@@ -404,6 +469,9 @@ module.exports = {
             tm_task_description=?,
             tm_task_status=?,
             tm_project_slno=?,
+            tm_pending_remark=?,
+            tm_onhold_remarks=?,
+            tm_completed_remarks=?,
             edit_user=?  
  			WHERE 
              tm_task_slno=?`,
@@ -415,6 +483,9 @@ module.exports = {
                 data.tm_task_description,
                 data.tm_task_status,
                 data.tm_project_slno,
+                data.tm_pending_remark,
+                data.tm_onhold_remarks,
+                data.tm_completed_remarks,
                 data.edit_user,
                 data.tm_task_slno
 
@@ -437,7 +508,10 @@ module.exports = {
             tm_task_name=?,
             tm_task_dept=?,
             tm_task_dept_sec=?,
-            tm_task_due_date=?,                 
+            tm_task_due_date=?,
+            tm_pending_remark=?,
+            tm_onhold_remarks=?,
+            tm_completed_remarks=?,                
             tm_task_description=?,
             tm_task_status=?,
             edit_user=?    
@@ -448,6 +522,9 @@ module.exports = {
                 data.tm_task_dept,
                 data.tm_task_dept_sec,
                 data.tm_task_due_date,
+                data.tm_pending_remark,
+                data.tm_onhold_remarks,
+                data.tm_completed_remarks,
                 data.tm_task_description,
                 data.tm_task_status,
                 data.edit_user,
@@ -475,6 +552,9 @@ module.exports = {
             co_deptsec_mast.sec_name,
             tm_task_due_date,
             tm_task_status,
+            tm_completed_remarks,
+            tm_onhold_remarks,
+            tm_pending_remark,
             tm_task_description                    
             FROM tm_new_task_mast
              left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
@@ -562,7 +642,7 @@ module.exports = {
     // },
     GoalView: (callback) => {
         pool.query(
-            `		SELECT 
+            `SELECT 
             tm_goals_slno,
             tm_goal_name,
             tm_goal_dept,
@@ -883,52 +963,119 @@ module.exports = {
 
         );
     },
-    // ProjectDeptUpdate: (data, callback) => {
+    ProgressInsert: (data, callback) => {
+        pool.query(
+            `INSERT INTO tm_task_progress_detl
+            (
+                tm_task_slno,
+                tm_task_status,
+                tm_progres_date,
+                progress_emp,
+                tm_task_progress        
+                   
+            )
+            VALUES (?,?,?,?,?)`,
+            [
 
-    //     pool.query(
-
-    //         ``,
-    //         [
-    //             // data.tm_task_name,
-    //             // data.tm_task_dept,
-    //             // data.tm_task_dept_sec,
-    //             // data.tm_task_due_date,
-    //             // data.tm_task_description,
-    //             // data.edit_user,
-    //             // data.tm_task_slno
-
-
-    //         ],
-    //         (error, results, feilds) => {
-    //             if (error) {
-    //                 return callback(error);
-    //             }
-    //             return callback(null, results);
-    //         }
-    //     )
-    // },
-    // ProjectDeptUpdate: (data, callback) => {
-
-    //     pool.query(
-
-    //         ``,
-    //         [
-    //             data.tm_project_name,
-    //             data.tm_project_dept,
-    //             data.tm_project_deptsec,
-    //             data.tm_project_duedate,
-    //             data.tm_project_description,
-    //             data.tm_project_edit_user,
-    //             data.tm_project_slno
+                data.tm_task_slno,
+                data.tm_task_status,
+                data.tm_progres_date,
+                data.progress_emp,
+                data.tm_task_progress
+            ],
 
 
-    //         ],
-    //         (error, results, feilds) => {
-    //             if (error) {
-    //                 return callback(error);
-    //             }
-    //             return callback(null, results);
-    //         }
-    //     )
-    // },
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+
+            }
+        );
+    },
+    ProgressView: (data, callback) => {
+        pool.query(
+            `SELECT 
+            progress_slno,  
+            tm_task_slno,
+            tm_task_status,
+            tm_progres_date,
+            em_name,
+            tm_task_progress,
+            progress_emp 
+            FROM meliora.tm_task_progress_detl            
+            left join co_employee_master on co_employee_master.em_id=tm_task_progress_detl.progress_emp
+            where tm_task_slno=?
+            order by tm_progres_date desc `,
+            [
+                data.tm_task_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    SubProgressView: (data, callback) => {
+
+        pool.query(
+            `SELECT 
+            progress_slno,  
+            tm_task_slno,
+            tm_task_status,
+            tm_progres_date,
+            em_name,
+            tm_task_progress,
+            progress_emp 
+            FROM meliora.tm_task_progress_detl            
+            left join co_employee_master on co_employee_master.em_id=tm_task_progress_detl.progress_emp
+            where tm_task_slno=?
+            order by tm_progres_date desc `,
+            [
+                data.tm_task_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+
+    ProgressUpdate: (data, callback) => {
+
+        pool.query(
+            `UPDATE tm_task_progress_detl SET                 
+            tm_task_slno=?,
+            tm_task_status=?,
+            tm_progres_date=?,
+            progress_emp=?,
+            tm_task_progress=?              
+            WHERE 
+             progress_slno=?`,
+            [
+                data.tm_task_slno,
+                data.tm_task_status,
+                data.tm_progres_date,
+                data.progress_emp,
+                data.tm_task_progress,
+                data.progress_slno
+
+
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
 }

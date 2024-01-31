@@ -169,6 +169,10 @@ const subRoomMaster = require('./api/rm_newsubroom_mast/rm_newsubroom_mast.route
 const crfDashBoard = require('./api/crf_dashboards/crfdashboard.router')
 const amReport = require('./api/am_reports/am_reports.router')
 
+const crmEmergncyType = require('./api/crm_emergncytype_mast/emergncy_tpe.router')
+const assetInternalTrans = require('./api/am_asset_internaltrans/asset_internaltrans.router')
+
+
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
     //     res.header("Access-Control-Allow-Origin", "http://192.168.10.170:8080
@@ -304,7 +308,8 @@ app.use('/api/subRoomMaster', subRoomMaster)
 app.use('/api/crfDashBoard', crfDashBoard)
 app.use('/api/amReport', amReport)
 
-
+app.use('/api/crmEmergncyType', crmEmergncyType)
+app.use('/api/assetInternalTrans', assetInternalTrans)
 
 
 server.listen(process.env.APP_PORT, () =>

@@ -34,11 +34,15 @@ module.exports = {
         pool.query(
             `UPDATE am_asset_item_map_master
             SET item_dept_slno=?,
-            item_deptsec_slno=?
+            item_deptsec_slno=?,
+            item_room_slno=?,
+            item_subroom_slno=?
             WHERE  am_item_map_slno=?`,
             [
                 data.item_dept_slno,
                 data.item_deptsec_slno,
+                data.item_room_slno,
+                data.item_subroom_slno,
                 data.am_item_map_slno
             ],
             (error, results, fields) => {

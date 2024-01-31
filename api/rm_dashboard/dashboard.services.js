@@ -94,6 +94,7 @@ module.exports = {
            P.sec_name as cus_primary,
            S.sec_name as cus_second,item_subroom_slno,
            rm_newroom_creation.rm_room_name,
+           am_category.category_name,
            IFNULL(  rm_subroom_master.subroom_name,"Not Subroom" ) subroom_name
                     from am_asset_item_map_master            
                     left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
@@ -101,7 +102,8 @@ module.exports = {
                     left join co_deptsec_mast S on S.sec_id=am_asset_item_map_master.item_custodian_dept_sec
               left join rm_newroom_creation on rm_newroom_creation.rm_room_slno=am_asset_item_map_master.item_room_slno
            left join rm_subroom_master on rm_subroom_master.subroom_slno=am_asset_item_map_master.item_subroom_slno
-                    where item_room_slno =?`,
+           left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno
+           where item_room_slno =?`,
             [id],
 
             (error, results, fields) => {

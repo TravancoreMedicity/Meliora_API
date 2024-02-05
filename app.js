@@ -171,7 +171,7 @@ const amReport = require('./api/am_reports/am_reports.router')
 
 const crmEmergncyType = require('./api/crm_emergncytype_mast/emergncy_tpe.router')
 const assetInternalTrans = require('./api/am_asset_internaltrans/asset_internaltrans.router')
-
+const TmReport = require('./api/tm_reports/tmreports.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -310,7 +310,7 @@ app.use('/api/amReport', amReport)
 
 app.use('/api/crmEmergncyType', crmEmergncyType)
 app.use('/api/assetInternalTrans', assetInternalTrans)
-
+app.use('/api/tmReport', TmReport)
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

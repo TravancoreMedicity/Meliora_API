@@ -13,6 +13,7 @@ router.patch('/updateMasterTask', checkToken, UpdateMasterTask)
 
 router.post('/insertDateInLogTable', checkToken, TaskDateInserT)
 
+
 router.post('/searchDeptAndSec', checkToken, DeptSearch)
 router.post('/searchGoalDeptAndSec', checkToken, GoalDeptSearch)
 router.post('/searchProjectDeptAndSec', checkToken, ProjectDeptSearch)
@@ -32,6 +33,7 @@ router.post('/insertProject', checkToken, ProjectInsert)
 router.get('/viewProject', checkToken, ProjectView)
 router.patch('/updateProject', checkToken, ProjectUpdate)
 router.get('/viewDeptProject/:id', checkToken, ProjectDeptView)
+
 
 router.post('/insertDeptGoal', checkToken, GoalDeptInsert)
 router.get('/viewDeptGoal/:id', checkToken, GoalDeptView)

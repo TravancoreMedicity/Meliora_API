@@ -1,7 +1,7 @@
 const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnProgress, EmployeeCompleted, EmployeeAllTask, EmployeeOnHold,
     EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue, EmployeeName, EmployeeOnPending,
     ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted, DepartmentOnHold, DepartmentPending, ViewAllEmployeeTask,
-    GoalsOverDue } = require('../tm_task_views/tmview.service')
+    GoalsOverDue, ProjectInCompleted, GoalsInCompleted } = require('../tm_task_views/tmview.service')
 module.exports = {
 
     ViewOverDueToday: (req, res) => {
@@ -440,6 +440,28 @@ module.exports = {
             });
         })
     },
+    ProjectInCompleted: (req, res) => {
+        const id = req.params.id;
+        ProjectInCompleted(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
 
     ProjectOverDue: (req, res) => {
         const id = req.params.id;
@@ -490,6 +512,29 @@ module.exports = {
     GoalsCompleted: (req, res) => {
         const id = req.params.id;
         GoalsCompleted(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+
+    GoalsInCompleted: (req, res) => {
+        const id = req.params.id;
+        GoalsInCompleted(id, (err, results) => {
 
             if (err) {
                 return res.status(200).json({

@@ -40,6 +40,8 @@ module.exports = {
         })
     },
 
+
+
     CreateTaskDetailInsert: (req, res) => {
         const body = req.body;
         const data = body && body.map((val) => {
@@ -50,6 +52,7 @@ module.exports = {
 
             ]
         })
+
         CreateTaskDetailInsert(data, (err, result) => {
             if (err) {
                 return res.status(200).json({
@@ -129,6 +132,7 @@ module.exports = {
         })
     },
 
+
     ProjectDeptSearch: (req, res) => {
         const body = req.body;
         ProjectDeptSearch(body, (err, results) => {
@@ -151,6 +155,7 @@ module.exports = {
         })
     },
 
+
     CreateSubTaskInsert: (req, res) => {
         const body = req.body;
         CreateSubTaskInsert(body, (err, result) => {
@@ -160,6 +165,7 @@ module.exports = {
                     message: err
                 });
             }
+
             return res.status(200).json({
                 success: 1,
                 message: "Subtask Created successfully",
@@ -170,7 +176,9 @@ module.exports = {
     },
 
     CreateTaskSubTaskDetailInsert: (req, res) => {
+
         const body = req.body;
+
         const data = body && body.map((val) => {
             return [val.tm_task_slno,
             val.tm_assigne_emp,
@@ -178,6 +186,7 @@ module.exports = {
             val.tm_detl_create
             ]
         })
+
         CreateTaskSubTaskDetailInsert(data, (err, result) => {
             if (err) {
                 return res.status(200).json({
@@ -193,8 +202,10 @@ module.exports = {
         })
     },
     MasterTaskviewBySecid: (req, res) => {
+
         const id = req.params.id;
         MasterTaskviewBySecid(id, (err, results) => {
+
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -213,6 +224,7 @@ module.exports = {
             });
         })
     },
+
     SubTaskviewByid: (req, res) => {
         const id = req.params.id;
         SubTaskviewByid(id, (err, results) => {
@@ -236,9 +248,12 @@ module.exports = {
         })
     },
 
+
     MasterEmpByid: (req, res) => {
+
         const id = req.params.id;
         MasterEmpByid(id, (err, results) => {
+
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -327,8 +342,11 @@ module.exports = {
     },
 
     MasterTaskviewByidForEdit: (req, res) => {
+
         const id = req.params.id;
+
         MasterTaskviewByidForEdit(id, (err, results) => {
+
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -531,9 +549,13 @@ module.exports = {
         })
     },
 
+
+
     ProjectDeptView: (req, res) => {
+
         const id = req.params.id;
         ProjectDeptView(id, (err, results) => {
+
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -583,6 +605,7 @@ module.exports = {
                 })
             })
 
+
         })
     },
 
@@ -607,7 +630,6 @@ module.exports = {
             })
         })
     },
-
     SubProgressView: (req, res) => {
         const body = req.body;
         SubProgressView(body, (err, results) => {
@@ -629,7 +651,6 @@ module.exports = {
             })
         })
     },
-
     ProgressUpdate: (req, res) => {
         const body = req.body;
         ProgressUpdate(body, (err, results) => {

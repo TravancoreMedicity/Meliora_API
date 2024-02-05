@@ -1,15 +1,18 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { CreateTaskInsert, CreateTaskDetailInsert, CreateTaskView, CreateSubTaskInsert, CreateTaskSubTaskDetailInsert, SubTaskviewByid, MasterTaskviewBySecid,
-    MasterEmpByid, UpdateMasterTask, UpdateSubTask, SubtaskviewByidForEdit, MasterTaskviewByidForEdit, employeeInactive, DeptSearch, GoalView,
-    ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptView, GoalDeptUpdate, ProjectDeptView, ProjectDeptSearch,
-    GoalDeptSearch } = require('../tm_task_management/taskmanagement.controller');
+    MasterEmpByid, UpdateMasterTask, UpdateSubTask, SubtaskviewByidForEdit, MasterTaskviewByidForEdit, employeeInactive, DeptSearch, GoalView, ProgressInsert,
+    ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptView, GoalDeptUpdate, ProjectDeptView, ProjectDeptSearch, TaskDateInserT, ProgressView,
+    GoalDeptSearch, ProgressUpdate, SubProgressView } = require('../tm_task_management/taskmanagement.controller');
 
 router.post('/insertTask', checkToken, CreateTaskInsert)
 router.get('/viewTask', checkToken, CreateTaskView)
 router.get('/viewMasterTaskBySecid/:id', checkToken, MasterTaskviewBySecid)
 router.get('/viewMasterTaskByid/:id', checkToken, MasterTaskviewByidForEdit)
 router.patch('/updateMasterTask', checkToken, UpdateMasterTask)
+
+router.post('/insertDateInLogTable', checkToken, TaskDateInserT)
+
 
 router.post('/searchDeptAndSec', checkToken, DeptSearch)
 router.post('/searchGoalDeptAndSec', checkToken, GoalDeptSearch)
@@ -37,5 +40,10 @@ router.get('/viewDeptGoal/:id', checkToken, GoalDeptView)
 router.patch('/updateDeptGoal', checkToken, GoalDeptUpdate)
 router.get('/viewGoal', checkToken, GoalView)
 
+router.post('/insertProgress', checkToken, ProgressInsert)
+router.post('/viewProgress', checkToken, ProgressView)
+
+router.post('/viewSubProgress', checkToken, SubProgressView)
+router.patch('/updateProgress', checkToken, ProgressUpdate)
 
 module.exports = router

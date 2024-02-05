@@ -1,8 +1,8 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
-const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnProgress, EmployeeCompleted,
-    EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue,
-    ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted, GoalsOverDue,
+const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnProgress, EmployeeCompleted, EmployeeOnHold, DepartmentPending, ViewAllEmployeeTask,
+    EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue, DepartmentOnHold,
+    ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted, GoalsOverDue, EmployeeAllTask, EmployeeName, EmployeeOnPending,
 } = require('../tm_task_views/tmview.controller');
 
 router.get('/ViewOverDueToday/:id', checkToken, ViewOverDueToday)
@@ -13,11 +13,22 @@ router.get('/employeeOnProgress/:id', checkToken, EmployeeOnProgress)
 router.get('/employeeCompleted/:id', checkToken, EmployeeCompleted)
 router.get('/employeeInCompleted/:id', checkToken, EmployeeInCompleted)
 router.get('/employeeOverDue/:id', checkToken, EmployeeOverDue)
+router.get('/employeeAllTask/:id', checkToken, EmployeeAllTask)
+router.get('/employeeOnHold/:id', checkToken, EmployeeOnHold)
+router.get('/employeeOnPending/:id', checkToken, EmployeeOnPending)
+
+router.get('/empname/:id', checkToken, EmployeeName)
 
 router.get('/departmentOnProgress/:id', checkToken, DepartmentOnProgress)
 router.get('/departmentCompleted/:id', checkToken, DepartmentCompleted)
 router.get('/departmentInCompleted/:id', checkToken, DepartmentInCompleted)
 router.get('/departmentOverDue/:id', checkToken, DepartmentOverDue)
+router.get('/departmentOnHold/:id', checkToken, DepartmentOnHold)
+router.get('/departmentPending/:id', checkToken, DepartmentPending)
+
+
+router.get('/viewAllEmployeeTask/:id', checkToken, ViewAllEmployeeTask)
+
 
 router.get('/projectOnProgress/:id', checkToken, ProjectOnProgress)
 router.get('/projectCompleted/:id', checkToken, ProjectCompleted)
@@ -26,6 +37,5 @@ router.get('/ProjectOverDue/:id', checkToken, ProjectOverDue)
 router.get('/goalsOnProgress/:id', checkToken, GoalsOnProgress)
 router.get('/goalsCompleted/:id', checkToken, GoalsCompleted)
 router.get('/goalsOverDue/:id', checkToken, GoalsOverDue)
-
 
 module.exports = router

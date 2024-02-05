@@ -326,5 +326,144 @@ module.exports = {
             })
         })
     },
+    getdesignation: (callback) => {
+        hrpool.query(
+            `select * from medi_hrm.designation`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 
+    getdesignationMeli: (callback) => {
+        pool.query(
+            `select * from meliora.co_designation`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    createdesignation: (data, callBack) => {
+        pool.query(
+            `INSERT INTO co_designation
+            (desg_slno,
+                desg_name,
+                desg_status,
+                create_user,
+                edit_user                 
+            )
+            VALUES ?`,
+            [
+                data
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    getbranch: (callback) => {
+        hrpool.query(
+            `select * from medi_hrm.hrm_branch`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getbranchMeli: (callback) => {
+        pool.query(
+            `select * from meliora.co_designation`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    createbranch: (data, callBack) => {
+        pool.query(
+            `INSERT INTO co_branch
+            (branch_slno,
+                branch_name,
+                branch_address,
+                branch_status                   
+            )
+            VALUES ?`,
+            [
+                data
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getSalutation: (callback) => {
+        hrpool.query(
+            `select * from medi_hrm.hrm_salutation`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getSalutationMeli: (callback) => {
+        pool.query(
+            `select * from meliora.co_salutation`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    createSalutation: (data, callBack) => {
+        pool.query(
+            `INSERT INTO co_salutation
+            (sa_code,
+                sal_name,
+                sal_gender,
+                sal_status                   
+            )
+            VALUES ?`,
+            [
+                data
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 }

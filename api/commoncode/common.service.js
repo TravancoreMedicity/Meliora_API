@@ -187,11 +187,11 @@ where module_slno = ?`,
 
     },
     getBranch: (callBack) => {
-        hrpool.query(
+        pool.query(
             `SELECT 
                 branch_slno,
                 branch_name
-                FROM hrm_branch `,
+                FROM co_branch `,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -202,11 +202,11 @@ where module_slno = ?`,
         );
     },
     getDesignation: (callBack) => {
-        hrpool.query(
+        pool.query(
             `SELECT 
             desg_slno,
             desg_name
-                FROM designation `,
+                FROM co_designation `,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -217,11 +217,11 @@ where module_slno = ?`,
         );
     },
     getSalutation: (callBack) => {
-        hrpool.query(
+        pool.query(
             `SELECT 
             sa_code,
             sal_name
-                FROM hrm_salutation`,
+                FROM co_salutation`,
             [],
             (error, results, feilds) => {
                 if (error) {

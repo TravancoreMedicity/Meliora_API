@@ -2,7 +2,9 @@ const logger = require('../../logger/logger')
 const { getdepartment, createDept, getdepartmentMeli, getdepartmentSection, getdepartmentSecMeli,
     createDeptSec, getemployeemasterHrm, getemployeemasterMeli, creategetemployeemaster, creategetemployeeuserPass,
     getemployeeuserPassHrm, getemployeeuserPassMeli, getauthorization, getauthorizationMeli, createAuthorization,
-    updateEmpMaster, updateDepartment, updateDepartmentSec
+    updateEmpMaster, updateDepartment, updateDepartmentSec, getdesignation, getdesignationMeli,
+    createdesignation, getbranch, getbranchMeli, createbranch, getSalutation, getSalutationMeli,
+    createSalutation
 } = require("../hrm_data_get/data_get_insert_service")
 module.exports = {
 
@@ -369,4 +371,139 @@ module.exports = {
         });
     },
 
+
+    getdesignation: (req, res) => {
+        getdesignation((err, results) => {
+            const designation = [...results]
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            getdesignationMeli((err, results) => {
+                const melidesignation = [...results]
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 2,
+                        message: err
+                    });
+                }
+                let newmeli = designation.filter(value => {
+                    return !melidesignation.find(values => {
+                        return values.desg_slno === value.desg_slno
+                    })
+                })
+                var a1 = newmeli.map((value, index) => {
+                    return [value.desg_slno, value.desg_name, value.desg_status, value.create_user,
+                    value.edit_user
+                    ]
+                })
+                createdesignation(a1, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Designation Inserted Successfully"
+                    });
+                });
+            })
+        });
+    },
+    getbranch: (req, res) => {
+        getbranch((err, results) => {
+            const branch = [...results]
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            getbranchMeli((err, results) => {
+                const melibranch = [...results]
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 2,
+                        message: err
+                    });
+                }
+                let newmeli = branch.filter(value => {
+                    return !melibranch.find(values => {
+                        return values.branch_slno === value.branch_slno
+                    })
+                })
+                var a1 = newmeli.map((value, index) => {
+                    return [value.branch_slno, value.branch_name, value.branch_address, value.branch_status
+                    ]
+                })
+                createbranch(a1, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Branch Inserted Successfully"
+                    });
+                });
+            })
+        });
+    },
+
+    getSalutation: (req, res) => {
+        getSalutation((err, results) => {
+            const salutation = [...results]
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            getSalutationMeli((err, results) => {
+                const meliSalutation = [...results]
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 2,
+                        message: err
+                    });
+                }
+                let newmeli = salutation.filter(value => {
+                    return !meliSalutation.find(values => {
+                        return values.sa_code === value.sa_code
+                    })
+                })
+                var a1 = newmeli.map((value, index) => {
+                    return [value.sa_code, value.sal_name, value.sal_gender, value.sal_status
+                    ]
+                })
+                createSalutation(a1, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Salutation Inserted Successfully"
+                    });
+                });
+            })
+        });
+    },
 }

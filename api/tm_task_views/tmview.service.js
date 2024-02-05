@@ -670,6 +670,32 @@ module.exports = {
             }
         );
     },
+    ProjectInCompleted: (id, callback) => {
+        pool.query(
+            `SELECT 
+            tm_project_mast.tm_project_slno,
+            tm_project_name,
+            tm_project_dept,
+            co_department_mast.dept_name,        
+            tm_project_deptsec, 
+            co_deptsec_mast.sec_name,
+            tm_project_duedate,
+            tm_project_status,                   
+			tm_project_description
+            FROM meliora.tm_project_mast            
+            left join co_department_mast on co_department_mast.dept_id=tm_project_mast.tm_project_dept
+            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_project_mast.tm_project_deptsec        
+           WHERE tm_project_mast.tm_project_deptsec =? AND (tm_project_mast.tm_project_status !=1)
+            group by tm_project_mast.tm_project_slno`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 
     ProjectOverDue: (id, callback) => {
         pool.query(
@@ -742,6 +768,32 @@ module.exports = {
             left join co_department_mast on co_department_mast.dept_id=tm_goal_mast.tm_goal_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_goal_mast.tm_goal_dept        
            WHERE tm_goal_mast.tm_goal_deptsec =? AND tm_goal_mast.tm_goal_status =1
+            group by tm_goal_mast.tm_goals_slno`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    GoalsInCompleted: (id, callback) => {
+        pool.query(
+            `SELECT 
+            tm_goal_mast.tm_goals_slno,
+            tm_goal_name,
+            tm_goal_dept,
+            co_department_mast.dept_name,        
+            tm_goal_deptsec, 
+            co_deptsec_mast.sec_name,
+            tm_goal_duedate,
+            tm_goal_status,                    
+			tm_goal_description
+            FROM meliora.tm_goal_mast            
+            left join co_department_mast on co_department_mast.dept_id=tm_goal_mast.tm_goal_dept
+            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_goal_mast.tm_goal_dept        
+           WHERE tm_goal_mast.tm_goal_deptsec =? AND tm_goal_mast.tm_goal_status !=1
             group by tm_goal_mast.tm_goals_slno`,
             [id],
             (error, results, fields) => {

@@ -171,10 +171,9 @@ const amReport = require('./api/am_reports/am_reports.router')
 
 const crmEmergncyType = require('./api/crm_emergncytype_mast/emergncy_tpe.router')
 const assetInternalTrans = require('./api/am_asset_internaltrans/asset_internaltrans.router')
+const TmReport = require('./api/tm_reports/tmreports.router')
 const newCRFRegister = require('./api/crm_newrequest_registration/newRequestRegister.router')
 const newCRFRegisterImages = require('./api/crm_new_file_upload/crm_fileupload.router')
-
-
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -313,6 +312,7 @@ app.use('/api/amReport', amReport)
 
 app.use('/api/crmEmergncyType', crmEmergncyType)
 app.use('/api/assetInternalTrans', assetInternalTrans)
+app.use('/api/tmReport', TmReport)
 app.use('/api/newCRFRegister', newCRFRegister)
 app.use('/api/newCRFRegisterImages', newCRFRegisterImages)
 

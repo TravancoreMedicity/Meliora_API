@@ -3,7 +3,7 @@ const { checkToken } = require("../../authentication/token_validation");
 const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnProgress, EmployeeCompleted, EmployeeOnHold, DepartmentPending, ViewAllEmployeeTask,
     EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue, DepartmentOnHold,
     ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted, GoalsOverDue, EmployeeAllTask, EmployeeName, EmployeeOnPending,
-} = require('../tm_task_views/tmview.controller');
+    ProjectInCompleted, GoalsInCompleted } = require('../tm_task_views/tmview.controller');
 
 router.get('/ViewOverDueToday/:id', checkToken, ViewOverDueToday)
 router.get('/ViewOverDueNextWeek/:id', checkToken, ViewOverDueNextWeek)
@@ -32,10 +32,12 @@ router.get('/viewAllEmployeeTask/:id', checkToken, ViewAllEmployeeTask)
 
 router.get('/projectOnProgress/:id', checkToken, ProjectOnProgress)
 router.get('/projectCompleted/:id', checkToken, ProjectCompleted)
+router.get('/projectInCompleted/:id', checkToken, ProjectInCompleted)
 router.get('/ProjectOverDue/:id', checkToken, ProjectOverDue)
 
 router.get('/goalsOnProgress/:id', checkToken, GoalsOnProgress)
 router.get('/goalsCompleted/:id', checkToken, GoalsCompleted)
+router.get('/goalsInCompleted/:id', checkToken, GoalsInCompleted)
 router.get('/goalsOverDue/:id', checkToken, GoalsOverDue)
 
 module.exports = router

@@ -2,11 +2,9 @@ const { pool } = require('../../config/database')
 module.exports = {
 
     CreateTaskInsert: (data, callback) => {
-
         pool.query(
             `INSERT INTO tm_new_task_mast
-          ( 
-          
+          (           
             tm_task_name,
             tm_task_dept,
             tm_task_dept_sec,
@@ -18,11 +16,9 @@ module.exports = {
             tm_pending_remark,
             tm_completed_remarks,        
             create_user
-
           )
           VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
             [
-
                 data.tm_task_name,
                 data.tm_task_dept,
                 data.tm_task_dept_sec,
@@ -34,49 +30,37 @@ module.exports = {
                 data.tm_pending_remark,
                 data.tm_completed_remarks,
                 data.create_user
-
             ],
-
             (error, results, fields) => {
                 if (error) {
                     return callback(error);
                 }
                 return callback(null, results);
-
-
             }
         );
     },
 
     TaskDateInserT: (data, callback) => {
-
         pool.query(
             `INSERT INTO tm_task_mast_log
-          ( 
-          
+          (           
             tm_task_slno,
             tm_task_status,
             tm_task_due_date,                
             tm_change_user
-
           )
           VALUES(?,?,?,?)`,
             [
-
                 data.tm_task_slno,
                 data.tm_task_status,
                 data.tm_task_due_date,
                 data.tm_change_user
-
             ],
-
             (error, results, fields) => {
                 if (error) {
                     return callback(error);
                 }
                 return callback(null, results);
-
-
             }
         );
     },
@@ -104,7 +88,6 @@ module.exports = {
     },
     CreateTaskView: (callback) => {
         pool.query(
-
             `SELECT 
             tm_new_task_mast.tm_task_slno,
             tm_task_name,
@@ -194,6 +177,7 @@ module.exports = {
             tm_goal_deptsec,
             co_department_mast.dept_name,
             co_deptsec_mast.sec_name,
+            tm_goal_fromdate,
 			tm_goal_duedate,
             tm_goal_status,      
       		tm_goal_description
@@ -215,9 +199,7 @@ module.exports = {
         );
     },
 
-
     ProjectDeptSearch: (data, callback) => {
-
         pool.query(
             `SELECT 
             tm_project_slno,
@@ -265,11 +247,9 @@ module.exports = {
             tm_completed_remarks,
             main_task_slno,        
             create_user
-
           )
           VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
-
                 data.tm_task_name,
                 data.tm_task_dept,
                 data.tm_task_dept_sec,
@@ -282,7 +262,6 @@ module.exports = {
                 data.tm_completed_remarks,
                 data.main_task_slno,
                 data.create_user
-
             ],
 
             (error, results, fields) => {
@@ -295,9 +274,7 @@ module.exports = {
         );
     },
 
-
     CreateTaskSubTaskDetailInsert: (data, callback) => {
-
         pool.query(
             `INSERT INTO tm_new_task_mast_detl
           (            
@@ -321,9 +298,7 @@ module.exports = {
         );
     },
 
-
     MasterTaskviewBySecid: (id, callback) => {
-
         pool.query(
             `SELECT 
             tm_new_task_mast.tm_task_slno,
@@ -366,9 +341,7 @@ module.exports = {
         );
     },
 
-
     MasterEmpByid: (id, callback) => {
-
         pool.query(
             ` SELECT 
             tm_create_detl_slno,           
@@ -382,15 +355,13 @@ module.exports = {
                 }
                 return callback(null, results);
             }
-
-
         );
     },
 
     MasterTaskviewByidForEdit: (id, callback) => {
-
         pool.query(
-            ` SELECT 
+            ` SELECT
+            tm_task_slno,
             tm_task_name,           
             tm_task_dept,
             tm_task_dept_sec,
@@ -400,8 +371,9 @@ module.exports = {
             tm_project_slno,
             tm_pending_remark,
             tm_onhold_remarks,
+            tm_completed_remarks,
             main_task_slno           
-            FROM tm_new_task_mast            
+            FROM tm_new_task_mast                    
              WHERE tm_task_slno=?`,
             [id],
             (error, results, fields) => {
@@ -414,10 +386,7 @@ module.exports = {
         );
     },
 
-
-
     SubTaskviewByid: (id, callback) => {
-
         pool.query(
             `SELECT 
             tm_new_task_mast.tm_task_slno,
@@ -457,10 +426,7 @@ module.exports = {
         );
     },
     UpdateMasterTask: (data, callback) => {
-
-
         pool.query(
-
             `UPDATE tm_new_task_mast SET                 
             tm_task_name=?,
             tm_task_dept=?,
@@ -488,8 +454,6 @@ module.exports = {
                 data.tm_completed_remarks,
                 data.edit_user,
                 data.tm_task_slno
-
-
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -501,9 +465,7 @@ module.exports = {
     },
 
     UpdateSubTask: (data, callback) => {
-
         pool.query(
-
             `UPDATE tm_new_task_mast SET                 
             tm_task_name=?,
             tm_task_dept=?,
@@ -529,8 +491,6 @@ module.exports = {
                 data.tm_task_status,
                 data.edit_user,
                 data.tm_task_slno
-
-
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -541,7 +501,6 @@ module.exports = {
         )
     },
     SubtaskviewByidForEdit: (id, callback) => {
-
         pool.query(
             ` SELECT 
             tm_task_slno,
@@ -571,11 +530,8 @@ module.exports = {
         );
     },
 
-
     updateSubTaskDetail: (data, callback) => {
-
         pool.query(
-
             `UPDATE tm_new_task_mast_detl
             SET
             tm_assigne_emp=?,
@@ -586,8 +542,6 @@ module.exports = {
                 data.tm_assigne_emp,
                 data.tm_detl_edit,
                 data.tm_create_detl_slno
-
-
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -602,9 +556,6 @@ module.exports = {
         return Promise.all(body.map((data) => {
             return new Promise((resolve, reject) => {
                 pool.query(
-                    // `UPDATE tm_new_task_mast_detl
-                    // SET  tm_detail_status=0
-                    // WHERE tm_task_slno=? AND tm_assigne_emp=?`
                     `DELETE FROM tm_new_task_mast_detl WHERE tm_task_slno=? AND tm_assigne_emp=?`
                     ,
                     [
@@ -623,23 +574,6 @@ module.exports = {
         )
     },
 
-    // GoalInsert: (data, callback) => {
-    //     pool.query(
-    //         ``,
-    //         [
-
-    //         ],
-
-    //         (error, results, fields) => {
-    //             if (error) {
-    //                 return callback(error);
-    //             }
-    //             return callback(null, results);
-
-
-    //         }
-    //     );
-    // },
     GoalView: (callback) => {
         pool.query(
             `SELECT 
@@ -648,7 +582,8 @@ module.exports = {
             tm_goal_dept,
             dept_name,
             sec_name,
-            tm_goal_deptsec, 
+            tm_goal_deptsec,
+            tm_goal_fromdate, 
             tm_goal_duedate,
             tm_goal_status,
             tm_goal_description          
@@ -664,30 +599,6 @@ module.exports = {
             }
         );
     },
-    // GoalUpdate: (data, callback) => {
-
-    //     pool.query(
-
-    //         ``,
-    //         [
-    //             // data.tm_task_name,
-    //             // data.tm_task_dept,
-    //             // data.tm_task_dept_sec,
-    //             // data.tm_task_due_date,
-    //             // data.tm_task_description,
-    //             // data.edit_user,
-    //             // data.tm_task_slno
-
-
-    //         ],
-    //         (error, results, feilds) => {
-    //             if (error) {
-    //                 return callback(error);
-    //             }
-    //             return callback(null, results);
-    //         }
-    //     )
-    // },
 
     ProjectInsert: (data, callback) => {
         pool.query(
@@ -704,7 +615,6 @@ module.exports = {
             )
             VALUES (?,?,?,?,?,?,?,?)`,
             [
-
                 data.tm_project_name,
                 data.tm_project_dept,
                 data.tm_project_deptsec,
@@ -714,18 +624,15 @@ module.exports = {
                 data.tm_goal_slno,
                 data.tm_project_create_user
             ],
-
-
             (error, results, fields) => {
                 if (error) {
                     return callback(error);
                 }
                 return callback(null, results);
-
-
             }
         );
     },
+
     ProjectView: (callback) => {
         pool.query(
             `SELECT 
@@ -751,8 +658,8 @@ module.exports = {
             }
         );
     },
-    ProjectUpdate: (data, callback) => {
 
+    ProjectUpdate: (data, callback) => {
         pool.query(
             `UPDATE tm_project_mast SET                 
             tm_project_name=?,
@@ -775,8 +682,6 @@ module.exports = {
                 data.tm_goal_slno,
                 data.tm_project_edit_user,
                 data.tm_project_slno
-
-
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -786,6 +691,7 @@ module.exports = {
             }
         )
     },
+
     GoalDeptInsert: (data, callback) => {
         pool.query(
             `INSERT INTO tm_goal_mast
@@ -793,17 +699,18 @@ module.exports = {
                 tm_goal_name,
                 tm_goal_dept,
                 tm_goal_deptsec,
+                tm_goal_fromdate,
                 tm_goal_duedate,
                 tm_goal_description,
                 tm_goal_status,
                 tm_goal_createuser            
             )
-            VALUES (?,?,?,?,?,?,?)`,
+            VALUES (?,?,?,?,?,?,?,?)`,
             [
-
                 data.tm_goal_name,
                 data.tm_goal_dept,
                 data.tm_goal_deptsec,
+                data.tm_goal_fromdate,
                 data.tm_goal_duedate,
                 data.tm_goal_description,
                 data.tm_goal_status,
@@ -820,30 +727,8 @@ module.exports = {
             }
         );
     },
-    // GoalDeptView: (callback) => {
-    //     pool.query(
-    //         `SELECT 
-    //         tm_goals_slno,
-    //         tm_goal_name,
-    //         tm_goal_dept,
-    //         tm_goal_deptsec, 
-    //         tm_goal_duedate,
-    //         tm_goal_description          
-    //         FROM meliora.tm_goal_mast            
-    //         left join co_department_mast on co_department_mast.dept_id=tm_goal_mast.tm_goal_dept
-    //         left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_goal_mast.tm_goal_deptsec            
-    //         ORDER BY tm_goal_duedate DESC;`, [],
-    //         (error, results, feilds) => {
-    //             if (error) {
-    //                 return callback(error);
-    //             }
-    //             return callback(null, results);
-    //         }
-    //     );
-    // },
+
     GoalDeptView: (id, callback) => {
-
-
         pool.query(
             `SELECT 
                      tm_goals_slno,
@@ -851,7 +736,8 @@ module.exports = {
                      tm_goal_dept,
                      dept_name,
                      sec_name,
-                     tm_goal_deptsec, 
+                     tm_goal_deptsec,
+                     tm_goal_fromdate,
                      tm_goal_duedate,
                      tm_goal_description          
                      FROM meliora.tm_goal_mast            
@@ -871,13 +757,12 @@ module.exports = {
     },
 
     GoalDeptUpdate: (data, callback) => {
-
         pool.query(
-
             `UPDATE tm_goal_mast SET                 
             tm_goal_name=?,
             tm_goal_dept=?,
             tm_goal_deptsec=?,
+            tm_goal_fromdate=?,
             tm_goal_duedate=?,                 
             tm_goal_description=?,
             tm_goal_status=?,
@@ -888,13 +773,12 @@ module.exports = {
                 data.tm_goal_name,
                 data.tm_goal_dept,
                 data.tm_goal_deptsec,
+                data.tm_goal_fromdate,
                 data.tm_goal_duedate,
                 data.tm_goal_description,
                 data.tm_goal_status,
                 data.tm_goal_edituser,
                 data.tm_goals_slno
-
-
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -905,7 +789,6 @@ module.exports = {
         )
     },
 
-
     GoalDeptView: (id, callback) => {
         pool.query(
             `SELECT 
@@ -914,7 +797,8 @@ module.exports = {
                      tm_goal_dept,
                      dept_name,
                      sec_name,
-                     tm_goal_deptsec, 
+                     tm_goal_deptsec,
+                     tm_goal_fromdate,
                      tm_goal_duedate,
                      tm_goal_status,
                      tm_goal_description          
@@ -934,8 +818,6 @@ module.exports = {
         );
     },
     ProjectDeptView: (id, callback) => {
-
-
         pool.query(
             `SELECT 
             tm_project_slno,
@@ -971,7 +853,7 @@ module.exports = {
                 tm_task_status,
                 tm_progres_date,
                 progress_emp,
-                tm_task_progress        
+                tm_task_progress     
                    
             )
             VALUES (?,?,?,?,?)`,
@@ -983,18 +865,15 @@ module.exports = {
                 data.progress_emp,
                 data.tm_task_progress
             ],
-
-
             (error, results, fields) => {
                 if (error) {
                     return callback(error);
                 }
                 return callback(null, results);
-
-
             }
         );
     },
+
     ProgressView: (data, callback) => {
         pool.query(
             `SELECT 
@@ -1020,8 +899,8 @@ module.exports = {
             }
         );
     },
-    SubProgressView: (data, callback) => {
 
+    SubProgressView: (data, callback) => {
         pool.query(
             `SELECT 
             progress_slno,  
@@ -1047,9 +926,7 @@ module.exports = {
         );
     },
 
-
     ProgressUpdate: (data, callback) => {
-
         pool.query(
             `UPDATE tm_task_progress_detl SET                 
             tm_task_slno=?,
@@ -1066,8 +943,24 @@ module.exports = {
                 data.progress_emp,
                 data.tm_task_progress,
                 data.progress_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
 
-
+    taskStatusUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE tm_new_task_mast SET               
+                      tm_task_status=2
+             			WHERE 
+             tm_task_slno=?`,
+            [
+                data.tm_task_slno
 
             ],
             (error, results, feilds) => {
@@ -1078,4 +971,5 @@ module.exports = {
             }
         )
     },
+
 }

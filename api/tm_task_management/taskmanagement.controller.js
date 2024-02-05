@@ -1,7 +1,7 @@
 const { CreateTaskInsert, CreateTaskDetailInsert, CreateTaskView, CreateSubTaskInsert, CreateTaskSubTaskDetailInsert, SubTaskviewByid, MasterTaskviewBySecid,
     MasterEmpByid, UpdateMasterTask, UpdateSubTask, SubtaskviewByidForEdit, employeeInactive, updateSubTaskDetail, MasterTaskviewByidForEdit, DeptSearch,
     GoalView, ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptView, GoalDeptUpdate, TaskDateInserT, ProgressInsert, ProgressView, ProgressUpdate,
-    ProjectDeptView, GoalDeptSearch, ProjectDeptSearch, SubProgressView } = require('../tm_task_management/taskmanagement.service')
+    ProjectDeptView, GoalDeptSearch, ProjectDeptSearch, SubProgressView, taskStatusUpdate } = require('../tm_task_management/taskmanagement.service')
 
 const logger = require('../../logger/logger');
 module.exports = {
@@ -584,11 +584,28 @@ module.exports = {
                     message: err
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                message: "Task Progress Added",
-                insertId: result.insertId,
+            taskStatusUpdate(body, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    })
+                }
+                if (results === 0) {
+                    return res.status(200).json({
+                        success: 1,
+                        message: "No record found"
+
+                    })
+                }
+                return res.status(200).json({
+                    success: 1,
+                    message: "Task Progress Added",
+                    // insertId: result.insertId,
+                })
             })
+
+
         })
     },
 

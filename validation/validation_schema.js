@@ -311,7 +311,10 @@ const validateDeptSec = Joi.object({
     dept_sub_sect: Joi.optional(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
-    ou_code: Joi.optional()
+    ou_code: Joi.optional(),
+    level_one: Joi.optional(),
+    level_two: Joi.optional(),
+
 });
 //ModuleMaster Validation 
 const validateModulemaster = Joi.object({
@@ -1227,6 +1230,32 @@ const validateEmergncyType = Joi.object({
 });
 
 
+const validateCRMRequestRegister = Joi.object({
+
+    request_dept_slno: Joi.number().min(1).required().messages({
+        'string.empty': 'Select Department'
+    }),
+    request_deptsec_slno: Joi.number().min(1).required().messages({
+        'string.empty': 'Select Department Section'
+    }),
+    category: Joi.optional(),
+    location: Joi.optional(),
+    actual_requirement: Joi.optional(),
+    needed: Joi.optional(),
+    expected_date: Joi.date().optional(),
+    emergency_flag: Joi.number().optional(),
+    emer_slno: Joi.optional(),
+    emergeny_remarks: Joi.optional(),
+    total_approx_cost: Joi.number().optional(),
+    user_deptsec: Joi.number().optional(),
+    rm_ndrf: Joi.optional(),
+    req_status: Joi.optional(),
+    image_status: Joi.optional(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+    req_slno: Joi.number().optional()
+})
+
 module.exports = {
     validateFloors,
     validateRoomCategory,
@@ -1300,6 +1329,6 @@ module.exports = {
     validateSelectedDaysBackupVerification,
     validateCommunicationCreate,
     validateAssetRackMaster,
-    validateEmergncyType
-
+    validateEmergncyType,
+    validateCRMRequestRegister
 }

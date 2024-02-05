@@ -1,6 +1,7 @@
 const { validateEmergncyType } = require('../../validation/validation_schema');
 const logger = require('../../logger/logger');
-const { EmergncyTypeInsert, EmergncyTypeView, EmergncyTypeUpdate } = require('../crm_emergncytype_mast/emergncy_type.service')
+const { EmergncyTypeInsert, EmergncyTypeView, EmergncyTypeUpdate, CrmEmerListSelect
+} = require('../crm_emergncytype_mast/emergncy_type.service')
 module.exports = {
     EmergncyTypeInsert: (req, res) => {
         const body = req.body;
@@ -78,6 +79,29 @@ module.exports = {
                 success: 2,
                 message: "Emergency Type Updated successfully"
             })
+        })
+    },
+
+    CrmEmerListSelect: (req, res) => {
+
+        CrmEmerListSelect((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+
         })
     },
 }

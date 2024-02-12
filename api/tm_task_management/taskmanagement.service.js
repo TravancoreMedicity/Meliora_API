@@ -109,7 +109,7 @@ module.exports = {
             tm_completed_remarks,    
             tm_new_task_mast.tm_project_slno,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
-            GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
@@ -144,9 +144,10 @@ module.exports = {
             main_task_slno,
             tm_new_task_mast.tm_project_slno,
 			tm_task_description,
-            tm_task_status,
+            tm_task_status,      
+            tm_project_name,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
-            GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
@@ -320,7 +321,7 @@ module.exports = {
             tm_new_task_mast.create_date,
             tm_task_status,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
-            GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec

@@ -6,7 +6,12 @@ const { backupDetailsInsert,
     scheduleTimeInsert,
     ScheduleTimeInactive,
     SelectedDaysInsert,
-    SelectedDaysUpdate
+    SelectedDaysUpdate,
+    backupDailyInsert,
+    DailyDetailsDelete,
+    MonthlyDetailsDelete,
+    WeekDetailsDelete,
+    YearDetailsDelete
 } = require('./backupDetails.service')
 module.exports = {
     backupDetailsInsert: (req, res) => {
@@ -94,7 +99,7 @@ module.exports = {
         var dataList = body?.map((val, index) => {
             return [val.backup_slno, val.backup_name, val.backup_schedule_type, val.backup_schedule_time, val.status, val.create_user]
         })
-        scheduleTimeInsert(dataList, (err, result) => {
+        scheduleTimeInsert(dataList, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -103,6 +108,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
+                time_id: results.insertId,
                 message: "Backup Details Saved"
             })
         })
@@ -120,7 +126,7 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 1,
-                    message: "No record found"
+                    // message: "No record found"
                 })
             }
             return res.status(200).json({
@@ -167,4 +173,112 @@ module.exports = {
             })
         })
     },
+
+    backupDailyInsert: (req, res) => {
+        const body = req.body;
+        var daysinsert = body?.map((val, index) => {
+            return [val.time_slno, val.backup_slno, val.backup_daily_date, val.backup_schedule_time, val.verify_status, val.create_user]
+        })
+        backupDailyInsert(daysinsert, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Backup Details Saved"
+            })
+        })
+    },
+
+    DailyDetailsDelete: async (req, res) => {
+        const body = req.body;
+        DailyDetailsDelete(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Deleted successfully"
+            })
+        })
+    },
+
+    MonthlyDetailsDelete: async (req, res) => {
+        const body = req.body;
+        MonthlyDetailsDelete(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Deleted successfully"
+            })
+        })
+    },
+
+    WeekDetailsDelete: async (req, res) => {
+        const body = req.body;
+        WeekDetailsDelete(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Deleted successfully"
+            })
+        })
+    },
+
+    YearDetailsDelete: async (req, res) => {
+        const body = req.body;
+        YearDetailsDelete(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Deleted successfully"
+            })
+        })
+    },
+
 }

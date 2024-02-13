@@ -227,5 +227,92 @@ module.exports = {
             }
         )
     },
+    backupDailyInsert: (data, callBack) => {
+        pool.query(
+            `INSERT INTO it_backup_daily_details
+               ( 
+                time_slno,
+                backup_slno,
+                backup_daily_date,
+                backup_schedule_time,
+                verify_status,
+                create_user
+                )
+
+                VALUES ?`,
+            [
+                data
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    DailyDetailsDelete: (data, callBack) => {
+        pool.query(
+
+            `DELETE FROM it_backup_daily_details WHERE backup_daily_date=current_date() and backup_slno=? and verify_status=0`,
+            [
+                data.backup_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+    MonthlyDetailsDelete: (data, callBack) => {
+        pool.query(
+
+            `DELETE FROM it_backup_monthly_details WHERE backup_slno=? and verify_status=0`,
+            [
+                data.backup_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+    WeekDetailsDelete: (data, callBack) => {
+        pool.query(
+
+            `DELETE FROM it_backup_weekly_details WHERE backup_slno=? and verify_status=0`,
+            [
+                data.backup_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    YearDetailsDelete: (data, callBack) => {
+        pool.query(
+
+            `DELETE FROM it_backup_yearly_details WHERE backup_slno=? and verify_status=0`,
+            [
+                data.backup_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
 
 }
+

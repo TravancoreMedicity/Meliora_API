@@ -1226,6 +1226,19 @@ const validateEmergncyType = Joi.object({
     emergency_slno: Joi.number().optional()
 });
 
+// qualityIndicators
+const validateQualityDept = Joi.object({
+    qi_dept_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Department Name Required',
+            'string.min': 'Department Name length must be at least 3 characters long',
+            'string.max': 'Department Name length must be less than or equal to 45 characters long'
+        }),
+    qi_dept_slno: Joi.number().optional(),
+    qi_dept_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
 
 module.exports = {
     validateFloors,
@@ -1300,6 +1313,7 @@ module.exports = {
     validateSelectedDaysBackupVerification,
     validateCommunicationCreate,
     validateAssetRackMaster,
-    validateEmergncyType
+    validateEmergncyType,
+    validateQualityDept,
 
 }

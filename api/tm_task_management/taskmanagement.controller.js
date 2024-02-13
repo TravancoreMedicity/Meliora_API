@@ -1,7 +1,7 @@
 const { CreateTaskInsert, CreateTaskDetailInsert, CreateTaskView, CreateSubTaskInsert, CreateTaskSubTaskDetailInsert, SubTaskviewByid, MasterTaskviewBySecid,
     MasterEmpByid, UpdateMasterTask, UpdateSubTask, SubtaskviewByidForEdit, employeeInactive, updateSubTaskDetail, MasterTaskviewByidForEdit, DeptSearch,
-    GoalView, ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptView, GoalDeptUpdate,
-    ProjectDeptView, GoalDeptSearch, ProjectDeptSearch } = require('../tm_task_management/taskmanagement.service')
+    GoalView, ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptView, GoalDeptUpdate, TaskDateInserT, ProgressInsert, ProgressView, ProgressUpdate,
+    ProjectDeptView, GoalDeptSearch, ProjectDeptSearch, SubProgressView, taskStatusUpdate } = require('../tm_task_management/taskmanagement.service')
 
 const logger = require('../../logger/logger');
 module.exports = {
@@ -22,6 +22,25 @@ module.exports = {
             })
         })
     },
+
+    TaskDateInserT: (req, res) => {
+        const body = req.body;
+        TaskDateInserT(body, (err, result) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Task Created successfully",
+                insertId: result.insertId,
+            })
+        })
+    },
+
+
 
     CreateTaskDetailInsert: (req, res) => {
         const body = req.body;
@@ -139,10 +158,7 @@ module.exports = {
 
     CreateSubTaskInsert: (req, res) => {
         const body = req.body;
-
-
         CreateSubTaskInsert(body, (err, result) => {
-
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -210,7 +226,6 @@ module.exports = {
     },
 
     SubTaskviewByid: (req, res) => {
-
         const id = req.params.id;
         SubTaskviewByid(id, (err, results) => {
 
@@ -409,6 +424,7 @@ module.exports = {
         })
     },
 
+
     ProjectInsert: (req, res) => {
         const body = req.body;
         ProjectInsert(body, (err, result) => {
@@ -556,6 +572,105 @@ module.exports = {
                 success: 2,
                 data: results
             });
+        })
+    },
+
+    ProgressInsert: (req, res) => {
+        const body = req.body;
+        ProgressInsert(body, (err, result) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            taskStatusUpdate(body, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    })
+                }
+                if (results === 0) {
+                    return res.status(200).json({
+                        success: 1,
+                        message: "No record found"
+
+                    })
+                }
+                return res.status(200).json({
+                    success: 1,
+                    message: "Task Progress Added",
+                    // insertId: result.insertId,
+                })
+            })
+
+
+        })
+    },
+
+    ProgressView: (req, res) => {
+        const body = req.body;
+        ProgressView(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    SubProgressView: (req, res) => {
+        const body = req.body;
+        SubProgressView(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    ProgressUpdate: (req, res) => {
+        const body = req.body;
+        ProgressUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Task Progress Updated "
+            })
         })
     },
 

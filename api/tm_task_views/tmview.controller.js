@@ -1,7 +1,8 @@
-const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnProgress, EmployeeCompleted,
-    EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue,
-    ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted,
-    GoalsOverDue } = require('../tm_task_views/tmview.service')
+const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnProgress, EmployeeCompleted, EmployeeAllTask, EmployeeOnHold,
+    EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue, EmployeeName, EmployeeOnPending,
+    ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted, DepartmentOnHold, DepartmentPending, ViewAllEmployeeTask,
+    GoalsOverDue, ProjectInCompleted, GoalsInCompleted, EmpProjectTask, EmpTaskCount, AllProjectUnderSection, AllEmployeeProject,
+    TTCTcountUnderProject, EmployeeTTCTcount } = require('../tm_task_views/tmview.service')
 module.exports = {
 
     ViewOverDueToday: (req, res) => {
@@ -96,6 +97,100 @@ module.exports = {
         })
     },
 
+    EmployeeOnPending: (req, res) => {
+        const id = req.params.id;
+        EmployeeOnPending(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+
+    EmployeeOnHold: (req, res) => {
+        const id = req.params.id;
+        EmployeeOnHold(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+
+    EmployeeAllTask: (req, res) => {
+        const id = req.params.id;
+
+        EmployeeAllTask(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+
+    EmployeeName: (req, res) => {
+        const id = req.params.id;
+
+        EmployeeName(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+
     EmployeeCompleted: (req, res) => {
         const id = req.params.id;
         EmployeeCompleted(id, (err, results) => {
@@ -168,6 +263,50 @@ module.exports = {
     DepartmentOnProgress: (req, res) => {
         const id = req.params.id;
         DepartmentOnProgress(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+    DepartmentPending: (req, res) => {
+        const id = req.params.id;
+        DepartmentPending(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+    DepartmentOnHold: (req, res) => {
+        const id = req.params.id;
+        DepartmentOnHold(id, (err, results) => {
 
             if (err) {
                 return res.status(200).json({
@@ -302,6 +441,28 @@ module.exports = {
             });
         })
     },
+    ProjectInCompleted: (req, res) => {
+        const id = req.params.id;
+        ProjectInCompleted(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
 
     ProjectOverDue: (req, res) => {
         const id = req.params.id;
@@ -372,6 +533,29 @@ module.exports = {
         })
     },
 
+    GoalsInCompleted: (req, res) => {
+        const id = req.params.id;
+        GoalsInCompleted(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+
     GoalsOverDue: (req, res) => {
         const id = req.params.id;
         GoalsOverDue(id, (err, results) => {
@@ -392,6 +576,158 @@ module.exports = {
                 success: 2,
                 data: results
             });
+        })
+    },
+
+
+    ViewAllEmployeeTask: (req, res) => {
+        const id = req.params.id;
+        ViewAllEmployeeTask(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+
+
+    EmpProjectTask: (req, res) => {
+        const id = req.params.id;
+        EmpProjectTask(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+    EmpTaskCount: (req, res) => {
+        const body = req.body;
+        EmpTaskCount(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+
+    AllProjectUnderSection: (req, res) => {
+        const id = req.params.id;
+        AllProjectUnderSection(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+    AllEmployeeProject: (req, res) => {
+        const id = req.params.id;
+        AllEmployeeProject(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+    TTCTcountUnderProject: (req, res) => {
+        const body = req.body;
+        TTCTcountUnderProject(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    EmployeeTTCTcount: (req, res) => {
+        const body = req.body;
+        EmployeeTTCTcount(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
         })
     },
 

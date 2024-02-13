@@ -72,4 +72,21 @@ module.exports = {
             }
         )
     },
+
+    CrmEmerListSelect: (callback) => {
+        pool.query(
+            `SELECT 
+            emergency_slno,
+            emer_type_name           
+            FROM
+            crm_emergency_mast`, [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
 }

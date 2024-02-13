@@ -1343,10 +1343,7 @@ module.exports = {
     validateCommunicationCreate,
     validateAssetRackMaster,
     validateEmergncyType,
-<<<<<<< HEAD
     validateQualityDept,
-
-=======
     validateCRMRequestRegister
->>>>>>> d42ebb8356c728b61c8a9c425dbfd6f82622c650
+
 }

@@ -159,7 +159,7 @@ module.exports = {
             tm_task_description,
             tm_new_task_mast.create_date,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
-            GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
@@ -328,8 +328,9 @@ module.exports = {
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
-            where  tm_new_task_mast_detl.tm_assigne_emp=?
-            group by tm_new_task_mast.tm_task_slno`,
+            where  (tm_new_task_mast_detl.tm_assigne_emp=? and tm_new_task_mast.tm_task_status!=1)
+            group by tm_new_task_mast.tm_task_slno
+            ORDER BY tm_new_task_mast.tm_task_status DESC`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -454,11 +455,14 @@ module.exports = {
             main_task_slno,          
 			tm_task_description,            
             tm_task_status,
+            tm_pending_remark,
+            tm_onhold_remarks,
+            tm_completed_remarks,
             tm_new_task_mast.tm_project_slno,
             tm_project_name,
             tm_new_task_mast.create_date,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
-            GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
@@ -488,14 +492,17 @@ module.exports = {
             co_deptsec_mast.sec_name,
             tm_task_due_date, 
             tm_assigne_emp,
-            main_task_slno,          
+            main_task_slno,
+            tm_pending_remark,
+            tm_onhold_remarks,
+            tm_completed_remarks,          
 			tm_task_description,
             tm_new_task_mast.create_date,
             tm_new_task_mast.tm_project_slno,
             tm_project_name,
             tm_task_status,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
-            GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
@@ -529,12 +536,15 @@ module.exports = {
             tm_assigne_emp,
             main_task_slno,          
 			tm_task_description,
+            tm_pending_remark,
+            tm_onhold_remarks,
+            tm_completed_remarks,
             tm_new_task_mast.tm_project_slno,
             tm_project_name,
             tm_new_task_mast.create_date,
             tm_task_status,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
-            GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
@@ -568,10 +578,13 @@ module.exports = {
             tm_new_task_mast.create_date,
             tm_new_task_mast.tm_project_slno,
             tm_project_name,
+            tm_pending_remark,
+            tm_onhold_remarks,
+            tm_completed_remarks,
             tm_task_description,
             tm_task_status,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
-            GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name  
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name  
             FROM meliora.tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id = tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id = tm_new_task_mast.tm_task_dept_sec
@@ -602,13 +615,16 @@ module.exports = {
             tm_task_due_date,
             tm_assigne_emp,
             main_task_slno,
+            tm_pending_remark,
+            tm_onhold_remarks,
+            tm_completed_remarks,
             tm_task_status,
             tm_new_task_mast.create_date,
             tm_new_task_mast.tm_project_slno,
             tm_project_name,
             tm_task_description,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
-            GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id = tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id = tm_new_task_mast.tm_task_dept_sec
@@ -641,13 +657,16 @@ module.exports = {
             tm_task_due_date,
             tm_assigne_emp,
             main_task_slno,
+            tm_pending_remark,
+            tm_onhold_remarks,
+            tm_completed_remarks,
             tm_task_status,
             tm_new_task_mast.tm_project_slno,
             tm_project_name,
             tm_new_task_mast.create_date,
             tm_task_description,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
-            GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id = tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id = tm_new_task_mast.tm_task_dept_sec
@@ -893,7 +912,7 @@ module.exports = {
                 from tm_new_task_mast_detl TD
                 left join co_employee_master E on E.em_id=TD.tm_assigne_emp
                    left join tm_new_task_mast T on T.tm_task_slno=TD.tm_task_slno
-                where tm_detail_status=1  and T.tm_project_slno
+                where tm_detail_status=1  
                    GROUP BY emslno    
                    union all
                       select tm_assigne_emp emslno,
@@ -903,10 +922,32 @@ module.exports = {
                 from tm_new_task_mast_detl TD
                 left join tm_new_task_mast T on T.tm_task_slno=TD.tm_task_slno
                 left join co_employee_master E on E.em_id=TD.tm_assigne_emp
-                where tm_detail_status=1 and T.tm_task_status=1 and T.tm_project_slno
+                where tm_detail_status=1 and T.tm_task_status=1
                    GROUP BY emslno ) AA
                 where    AA.emslno in (select em_id from co_employee_master where em_department=? and em_status=1)
                 group by emslno`,
+            // select emslno,empname, sum(TT) TT, sum(TC) TC from(
+            //     select tm_assigne_emp emslno,
+            //     E.em_name empname,
+            //     count(TD.tm_task_slno) TT,
+            //     0 TC
+            //     from tm_new_task_mast_detl TD
+            //     left join co_employee_master E on E.em_id=TD.tm_assigne_emp
+            //        left join tm_new_task_mast T on T.tm_task_slno=TD.tm_task_slno
+            //     where tm_detail_status=1  and T.tm_project_slno
+            //        GROUP BY emslno    
+            //        union all
+            //           select tm_assigne_emp emslno,
+            //     E.em_name empname,
+            //     0 TT,
+            //     count(TD.tm_task_slno) TC
+            //     from tm_new_task_mast_detl TD
+            //     left join tm_new_task_mast T on T.tm_task_slno=TD.tm_task_slno
+            //     left join co_employee_master E on E.em_id=TD.tm_assigne_emp
+            //     where tm_detail_status=1 and T.tm_task_status=1 and T.tm_project_slno
+            //        GROUP BY emslno ) AA
+            //     where    AA.emslno in (select em_id from co_employee_master where em_department=? and em_status=1)
+            //     group by emslno,
             [id],
             (error, results, fields) => {
                 if (error) {

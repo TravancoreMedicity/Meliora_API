@@ -7,7 +7,8 @@ const { checkDetailInsertOrNot, GRNDetailsInsert, GRNDetailsUpdate, BillDetailsI
     BillDetailsUpdateSpare, DeviceDetailsInsertSpare, DeviceDetailsUpdateSpare, LeaseDetailsInsertSpare,
     LeaseDetailsUpdateSpare, WarentGraruntyInsertSpare, WarentGraruntyUpdateSpare, AmcPmInsertSpare,
     AmcPmUpdateSpare, getdeptsecBsedonCustdept, getdeptsecBsedonCustdeptSpare, SpecificationInsertOrNot,
-    SpecificationInsert, SepcifiDelete
+    SpecificationInsert, SepcifiDelete, GetFreespareList, SpareDetailsInsert, SpareDetailsInsertOrNot,
+    SpareDelete
 } = require('../am_item_creation_detail/am_itemdetail.service')
 module.exports = {
     checkDetailInsertOrNot: (req, res) => {
@@ -772,5 +773,96 @@ module.exports = {
     },
 
 
+    GetFreespareList: (req, res) => {
+        const body = req.body
+        GetFreespareList(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Record Found")
+                return res.status(400).json({
+                    success: 0,
+                    message: "No Record Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    SpareDetailsInsert: (req, res) => {
+        const body = req.body;
 
+        var newList = body.map((val, index) => {
+            return [val.am_item_map_slno, val.am_spare_item_map_slno, val.spare_status, val.create_user]
+        })
+
+        SpareDetailsInsert(newList, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            } return res.status(200).json({
+                success: 1,
+                message: "Specification inserted Successfully"
+            });
+
+        });
+    },
+
+    SpareDetailsInsertOrNot: (req, res) => {
+        const id = req.params.id;
+        SpareDetailsInsertOrNot(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    SpareDelete: (req, res) => {
+        const body = req.body;
+        SpareDelete(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Item Removed successfully"
+            });
+        });
+    },
 }

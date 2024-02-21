@@ -109,7 +109,7 @@ module.exports = {
             tm_completed_remarks,    
             tm_new_task_mast.tm_project_slno,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
-            GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
@@ -140,13 +140,15 @@ module.exports = {
 			tm_task_due_date, 
             tm_assigne_emp,
             tm_detail_status,
-            co_employee_master.em_name,           
+            co_employee_master.em_name,
+            tm_new_task_mast.create_date,         
             main_task_slno,
             tm_new_task_mast.tm_project_slno,
 			tm_task_description,
-            tm_task_status,
+            tm_task_status,      
+            tm_project_name,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
-            GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
@@ -320,14 +322,14 @@ module.exports = {
             tm_new_task_mast.create_date,
             tm_task_status,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
-            GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
-            WHERE tm_new_task_mast.tm_task_dept_sec=?
+            WHERE ((tm_new_task_mast.tm_task_dept_sec=?) And (tm_new_task_mast.tm_task_status!=1))
             group by tm_new_task_mast.tm_task_slno
 			ORDER BY tm_task_slno DESC`,
             [id],

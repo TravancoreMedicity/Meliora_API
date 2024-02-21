@@ -168,13 +168,18 @@ const TmDropDowns = require('./api/tm_dropdowns/tm_list.router')
 const subRoomMaster = require('./api/rm_newsubroom_mast/rm_newsubroom_mast.router')
 const crfDashBoard = require('./api/crf_dashboards/crfdashboard.router')
 const amReport = require('./api/am_reports/am_reports.router')
-
 const crmEmergncyType = require('./api/crm_emergncytype_mast/emergncy_tpe.router')
 const assetInternalTrans = require('./api/am_asset_internaltrans/asset_internaltrans.router')
+const qualitydept = require('./api/qi_departmentmast/qidepartment.router')
+const qltyindicator = require('./api/qi_master/qltyIndicator.router')
+const qidetails = require('./api/qi_dailydetailsEndoscopy/qi_daily.router')
+const emergencyqi = require('./api/qi_dailydetailsEmergency/qi_emergency.router')
+
 const TmReport = require('./api/tm_reports/tmreports.router')
 const newCRFRegister = require('./api/crm_newrequest_registration/newRequestRegister.router')
 const newCRFRegisterImages = require('./api/crm_new_file_upload/crm_fileupload.router')
 const CRFRegisterApproval = require('./api/crm_req_approval/crmreq_approval.router')
+
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -317,6 +322,11 @@ app.use('/api/tmReport', TmReport)
 app.use('/api/newCRFRegister', newCRFRegister)
 app.use('/api/newCRFRegisterImages', newCRFRegisterImages)
 app.use('/api/CRFRegisterApproval', CRFRegisterApproval)
+app.use('/api/qualityDept', qualitydept)
+app.use('/api/qualityindicator', qltyindicator)
+app.use('/api/qiendoscopy', qidetails)
+app.use('/api/qiemergency', emergencyqi)
+
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

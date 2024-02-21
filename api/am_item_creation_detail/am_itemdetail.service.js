@@ -1019,4 +1019,87 @@ module.exports = {
             }
         );
     },
+
+
+    GetFreespareList: (data, callBack) => {
+        pool.query(
+            `select am_spare_item_map_slno, am_item_name_creation.item_name,
+            spare_asset_no,spare_asset_no_only
+            from am_spare_item_map_master
+            left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_spare_item_map_master.spare_creation_slno
+            where spare_dept_slno=? and spare_deptsec_slno=? and
+               am_spare_item_map_slno not in
+               (select am_spare_item_map_slno from am_asset_spare_details where spare_status=1 )`,
+            [
+                data.spare_dept_slno,
+                data.spare_deptsec_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    SpareDetailsInsert: (data, callBack) => {
+        pool.query(
+            `INSERT INTO am_asset_spare_details
+            (
+                am_item_map_slno,
+                am_spare_item_map_slno,
+                spare_status,
+                create_user               
+            ) 
+            VALUES ?`,
+            [
+                data
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    SpareDetailsInsertOrNot: (id, callBack) => {
+        pool.query(
+            `SELECT asset_spare_slno,am_item_map_slno,am_asset_spare_details.am_spare_item_map_slno,am_item_name_creation.item_name,
+            spare_asset_no,spare_asset_no_only
+                        FROM am_asset_spare_details
+                        left join am_spare_item_map_master on am_spare_item_map_master.am_spare_item_map_slno=am_asset_spare_details.am_spare_item_map_slno
+                        left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_spare_item_map_master.spare_creation_slno
+            WHERE am_item_map_slno=? and spare_status=1`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    callBack(error)
+                }
+                return callBack(null, results)
+            }
+        );
+    },
+
+
+    SpareDelete: (data, callback) => {
+        pool.query(
+            `UPDATE am_asset_spare_details 
+                SET spare_status = 0,
+                delete_user=?  
+                WHERE asset_spare_slno =?`,
+            [
+                data.delete_user,
+                data.asset_spare_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 }

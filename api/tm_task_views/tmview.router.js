@@ -3,7 +3,8 @@ const { checkToken } = require("../../authentication/token_validation");
 const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnProgress, EmployeeCompleted, EmployeeOnHold, DepartmentPending, ViewAllEmployeeTask,
     EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue, DepartmentOnHold,
     ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted, GoalsOverDue, EmployeeAllTask, EmployeeName, EmployeeOnPending,
-    ProjectInCompleted, GoalsInCompleted } = require('../tm_task_views/tmview.controller');
+    ProjectInCompleted, GoalsInCompleted, EmpProjectTask, EmpTaskCount, AllProjectUnderSection, AllEmployeeProject, TTCTcountUnderProject,
+    EmployeeTTCTcount } = require('../tm_task_views/tmview.controller');
 
 router.get('/ViewOverDueToday/:id', checkToken, ViewOverDueToday)
 router.get('/ViewOverDueNextWeek/:id', checkToken, ViewOverDueNextWeek)
@@ -39,5 +40,18 @@ router.get('/goalsOnProgress/:id', checkToken, GoalsOnProgress)
 router.get('/goalsCompleted/:id', checkToken, GoalsCompleted)
 router.get('/goalsInCompleted/:id', checkToken, GoalsInCompleted)
 router.get('/goalsOverDue/:id', checkToken, GoalsOverDue)
+
+
+
+router.get('/EmpProjectTask/:id', checkToken, EmpProjectTask)
+router.post('/EmpTaskCountUnderProject', checkToken, EmpTaskCount)
+
+router.get('/allProjectUnderSection/:id', checkToken, AllProjectUnderSection)
+router.get('/allEmployeeProject/:id', checkToken, AllEmployeeProject)
+
+router.post('/TTCTcountUnderProject', checkToken, TTCTcountUnderProject)
+
+router.post('/EmployeeTTCTcount', checkToken, EmployeeTTCTcount)
+
 
 module.exports = router

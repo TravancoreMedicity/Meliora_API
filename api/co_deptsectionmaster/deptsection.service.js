@@ -172,7 +172,7 @@ module.exports = {
             sec_id,
             sec_name
         FROM co_deptsec_mast 
-        WHERE dept_id = ? order by sec_name ASC`,
+        WHERE dept_id = ? and sec_status=1 order by sec_name ASC`,
             [id],
             (error, results, feilds) => {
                 if (error) {

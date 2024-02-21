@@ -174,6 +174,7 @@ const assetInternalTrans = require('./api/am_asset_internaltrans/asset_internalt
 const TmReport = require('./api/tm_reports/tmreports.router')
 const newCRFRegister = require('./api/crm_newrequest_registration/newRequestRegister.router')
 const newCRFRegisterImages = require('./api/crm_new_file_upload/crm_fileupload.router')
+const CRFRegisterApproval = require('./api/crm_req_approval/crmreq_approval.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -315,7 +316,7 @@ app.use('/api/assetInternalTrans', assetInternalTrans)
 app.use('/api/tmReport', TmReport)
 app.use('/api/newCRFRegister', newCRFRegister)
 app.use('/api/newCRFRegisterImages', newCRFRegisterImages)
-
+app.use('/api/CRFRegisterApproval', CRFRegisterApproval)
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

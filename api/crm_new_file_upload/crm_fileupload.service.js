@@ -21,7 +21,7 @@ module.exports = {
 
     CrfDataColectionImageStatusUpdate: (data, callback) => {
         pool.query(
-            `UPDATE crf_data_collection SET 
+            `UPDATE crm_data_collection SET 
             data_coll_image_status=1
             WHERE 
             crf_data_collect_slno=?`,

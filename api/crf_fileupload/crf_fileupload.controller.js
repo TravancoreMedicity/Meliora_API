@@ -4,7 +4,6 @@ const path = require('path');
 const fs = require("fs")
 const { CrfImageStatusUpdate, CrfDataColectionImageStatusUpdate } = require('../crf_fileupload/crf_fileupload.service');
 const logger = require('../../logger/logger');
-const { log } = require('console');
 
 
 const crfRegisterstorage = multer.diskStorage({
@@ -55,7 +54,7 @@ const crfDataCollectionstorage = multer.diskStorage({
     },
 })
 
-const maxSize = 2 * 1024 * 1024
+const maxSize = 25 * 1024 * 1024
 
 
 const crfRegistration = multer({
@@ -223,7 +222,6 @@ module.exports = {
     },
 
     getDataCollectionImage: (req, res) => {
-        console.log(req);
         const reqslno = req.body.req_slno
         const datacollslno = req.body.crf_data_collect_slno
 

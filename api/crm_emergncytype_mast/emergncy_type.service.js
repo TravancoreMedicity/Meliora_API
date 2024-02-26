@@ -9,7 +9,7 @@ module.exports = {
             emer_type_status,
             create_user
           )
-          VALUES(?,?,?)`,
+          VALUES(?,?,?,?)`,
             [
                 data.emer_type_name,
                 data.emer_type_escalation,

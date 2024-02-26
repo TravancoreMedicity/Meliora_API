@@ -504,5 +504,190 @@ module.exports = {
         );
     },
 
+    CrfDeptDataCollectInsert: (data, callBack) => {
+        pool.query(
+            `INSERT INTO crm_data_collection
+            (
+                crf_requst_slno,
+                crf_req_collect_dept,
+                crf_req_remark,
+                reqest_one,
+                req_user   
+            ) 
+            VALUES ?`,
+            [
+                data
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 
+    DataCollectComplete: (id, callBack) => {
+        pool.query(
+            `select crf_data_collect_slno, crf_requst_slno, crf_req_collect_dept, crf_dept_status,
+            crf_dept_remarks, req_user, save_user, crf_req_remark, reqest_one,
+                       co_deptsec_mast.sec_name as data_entered,data_coll_image_status,
+                       crm_data_collection.crf_dept_status,crm_data_collection.create_date,crm_data_collection.update_date,
+                       RU.em_name as req_user,
+                        EU.em_name as datagive_user
+                        from crm_data_collection          
+                       left join co_deptsec_mast on co_deptsec_mast.sec_id=crm_data_collection.crf_req_collect_dept
+                       left join co_employee_master RU on RU.em_id=crm_data_collection.req_user
+                       left join co_employee_master EU on EU.em_id=crm_data_collection.save_user
+                          
+                       where crf_requst_slno=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    getDataCollectList: (id, callBack) => {
+        pool.query(
+            `select crm_request_master.req_slno,crm_request_master.actual_requirement,
+            crm_request_master.needed,crm_request_master.request_dept_slno,co_department_mast.dept_name,
+            R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,          
+            crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
+                        crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
+                        rm_ndrf,category,image_status,emergency_flag,emer_slno,crm_request_master.create_date,
+                        total_approx_cost,user_deptsec,req_status,crf_data_collect_slno, crf_requst_slno, 
+                        crf_req_collect_dept, crf_dept_status, crf_dept_remarks, reqest_one,
+                        RU.em_name as requser,SU.em_name  as saveuser, crf_req_remark,
+                         crm_data_collection.create_date,crm_data_collection.update_date,
+                          data_coll_image_status,RE.sec_name as data_entered
+                          
+  				from crm_request_master
+                          left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
+                          left join co_department_mast on co_department_mast.dept_id=crm_request_master.request_dept_slno
+                          left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
+                          left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
+                          left join crm_data_collection on crm_data_collection.crf_requst_slno=crm_request_master.req_slno
+                          left join co_employee_master CR on CR.em_id=crm_request_master.create_user
+                            left join co_employee_master RU on RU.em_id=crm_data_collection.req_user           
+                         left join co_employee_master SU on SU.em_id=crm_data_collection.save_user
+                         left join co_deptsec_mast RE on RE.sec_id=crm_data_collection.crf_req_collect_dept
+                        where crf_req_collect_dept=? ORDER BY crm_request_master.req_slno DESC`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    CrfDataCollactnSave: (data, callback) => {
+        pool.query(
+            `UPDATE crm_data_collection 
+            SET         
+            crf_dept_remarks = ?,
+            crf_dept_status = 1,
+            save_user=?         
+            WHERE crf_data_collect_slno =?`,
+            [
+                data.crf_dept_remarks,
+                data.save_user,
+                data.crf_data_collect_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getAllForPdfView: (callBack) => {
+        pool.query(
+            `select crm_request_master.req_slno,crm_request_master.actual_requirement,
+            crm_request_master.needed,crm_request_master.request_dept_slno,co_department_mast.dept_name,
+            R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,
+            crf_close,crf_close_remark,crf_closed_one,close_date,C.em_name as closed_user,
+            crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
+                        crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
+                        rm_ndrf,category,image_status,emergency_flag,emer_slno,crm_request_master.create_date,
+                        total_approx_cost,user_deptsec,req_status,
+                        req_approv_slno,           
+                       incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date,
+                        I.em_name as incharge_user,
+                       hod_req, hod_approve, hod_remarks, hod_detial_analysis, hod_approve_date, H.em_name as hod_user,
+                       dms_req, dms_approve, dms_remarks, dms_detail_analysis, dms_approve_date, D.em_name as dms_user,
+                       ms_approve_req, ms_approve, ms_approve_remark, ms_detail_analysis, ms_approve_date, M.em_name as ms_approve_user,
+                       manag_operation_req, manag_operation_approv, manag_operation_remarks, om_detial_analysis,
+                       om_approv_date, OM.em_name as manag_operation_user,
+                       senior_manage_remarks,  senior_manage_req, senior_manage_approv,
+                       smo_detial_analysis, som_aprrov_date, SM.em_name as  senior_manage_user,
+                       gm_approve_req, gm_approve, gm_approve_remarks, gm_detial_analysis, gm_approv_date, GM.em_name as  gm_user,
+                       ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date, ED.em_name as  ed_user,
+                       md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,MD.em_name as md_user,
+                       crf_close,crf_close_remark,crf_close_user,crf_closed_one,close_date,
+                       ndrf_cao_approve,ndrf_cao_approve_remarks,ndrf_ed_approve,ndrf_ed_approve_remarks,
+                       ndrf_md_approve,ndrf_md_approve_remarks,
+                       ed_user as edid,md_user as mdid
+
+                         from crm_request_master
+                         left join crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
+                          left join crf_ndrf_mast on crf_ndrf_mast.req_slno=crm_request_master.req_slno
+                          left join crf_ndrf_approval on crf_ndrf_approval.ndrf_mast_slno=crf_ndrf_mast.ndrf_mast_slno
+                          left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
+                          left join co_department_mast on co_department_mast.dept_id=crm_request_master.request_dept_slno
+                          left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
+                          left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
+                          
+            left join co_employee_master CR on CR.em_id=crm_request_master.create_user
+            left join co_employee_master I on I.em_id=crm_request_approval.incharge_user
+            left join co_employee_master H on H.em_id=crm_request_approval.hod_user
+            left join co_employee_master D on D.em_id=crm_request_approval.dms_user
+            left join co_employee_master M on M.em_id=crm_request_approval.ms_approve_user
+            left join co_employee_master C on C.em_id=crm_request_approval.crf_close_user
+            left join co_employee_master OM on OM.em_id=crm_request_approval.manag_operation_user
+            left join co_employee_master SM on SM.em_id=crm_request_approval.senior_manage_user
+            left join co_employee_master GM on GM.em_id=crm_request_approval.gm_user
+            left join co_employee_master ED on ED.em_id=crm_request_approval.ed_user
+            left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
+            where md_approve=1 and ed_approve=1 ORDER BY crm_request_master.req_slno DESC `,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    getFinalItemListApproval: (id, callBack) => {
+        pool.query(
+            `  select approve_item_desc,approve_item_brand,am_uom.uom_name as approved_itemunit,
+            item_qnty_approved,approve_item_specification,approve_item_unit_price,
+            approve_aprox_cost,old_item_slno
+                        from crm_request_mast_detail
+                         left join am_uom on am_uom.uom_slno=crm_request_mast_detail.approve_item_unit
+                        where req_slno=? and approve_item_status=1 and item_status_approved=1`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 }

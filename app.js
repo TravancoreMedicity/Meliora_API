@@ -179,7 +179,7 @@ const TmReport = require('./api/tm_reports/tmreports.router')
 const newCRFRegister = require('./api/crm_newrequest_registration/newRequestRegister.router')
 const newCRFRegisterImages = require('./api/crm_new_file_upload/crm_fileupload.router')
 const CRFRegisterApproval = require('./api/crm_req_approval/crmreq_approval.router')
-
+const newCRFPurchase = require('./api/crm_new_purchase/crm_purchase.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -326,7 +326,7 @@ app.use('/api/qualityDept', qualitydept)
 app.use('/api/qualityindicator', qltyindicator)
 app.use('/api/qiendoscopy', qidetails)
 app.use('/api/qiemergency', emergencyqi)
-
+app.use('/api/newCRFPurchase', newCRFPurchase)
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

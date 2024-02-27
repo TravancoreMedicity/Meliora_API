@@ -32,10 +32,10 @@ module.exports = {
         );
     },
 
-    EndoscopyAlreadyExist: (id, callBack) => {
+    EndoscopyAlreadyExist: (body, callBack) => {
         pool.query(
             `SELECT * from qi_details_endoscopy where qi_date=?`,
-            [id],
+            [body.dailyDate],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -44,7 +44,6 @@ module.exports = {
             }
         );
     },
-
     EndoscopyQiUpdate: (data, callback) => {
         pool.query(
             `UPDATE 

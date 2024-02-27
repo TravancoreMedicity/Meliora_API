@@ -3,11 +3,16 @@ const { checkToken } = require("../../authentication/token_validation");
 
 const {
     EmergencyQiInsert,
-    EmergencyAlreadyExist
+    EmergencyAlreadyExist,
+    EmergencyQiUpdate,
+    getQIReportEmergency,
+    getMonthlyReportEmergency
 } = require('./qi_emergency.controller');
 
 router.post('/savedata', checkToken, EmergencyQiInsert);
-router.get('/exist/:id', checkToken, EmergencyAlreadyExist);
-
+router.post('/exist', checkToken, EmergencyAlreadyExist);
+router.patch('/update', checkToken, EmergencyQiUpdate);
+router.post('/emerReport', checkToken, getQIReportEmergency);
+router.post('/monthlyReport', checkToken, getMonthlyReportEmergency);
 
 module.exports = router;

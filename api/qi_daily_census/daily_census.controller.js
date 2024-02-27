@@ -1,17 +1,18 @@
 const {
-    EndoscopyQiInsert,
-    EndoscopyAlreadyExist,
-    EndoscopyQiUpdate,
-    getQualityInicatorList,
-    getQIReportEndoscopy } = require('./qi_daily.service')
+    DailyCensusInsert,
+    DailyCensusAlreadyExist,
+    DailyCensusYesterdayCount,
+    GetDailyCensusReport,
+    DailyCensusUpdate,
+    GetCensusBargraphReport
+} = require('./daily_census.service')
 module.exports = {
-
-    EndoscopyQiInsert: (req, res) => {
+    DailyCensusInsert: (req, res) => {
         const body = req.body;
-        EndoscopyAlreadyExist(body, (err, results) => {
+        DailyCensusAlreadyExist(body, (err, results) => {
             const value = JSON.parse(JSON.stringify(results))
             if (Object.keys(value).length === 0) {
-                EndoscopyQiInsert(body, (err, result) => {
+                DailyCensusInsert(body, (err, result) => {
                     if (err) {
                         return res.status(200).json({
                             success: 0,
@@ -32,9 +33,10 @@ module.exports = {
             }
         })
     },
-    EndoscopyAlreadyExist: (req, res) => {
+
+    DailyCensusAlreadyExist: (req, res) => {
         const body = req.body;
-        EndoscopyAlreadyExist(body, (err, results) => {
+        DailyCensusAlreadyExist(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -54,9 +56,55 @@ module.exports = {
             })
         })
     },
-    EndoscopyQiUpdate: (req, res) => {
+
+
+    DailyCensusYesterdayCount: (req, res) => {
         const body = req.body;
-        EndoscopyQiUpdate(body, (err, results) => {
+        DailyCensusYesterdayCount(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+    GetDailyCensusReport: (req, res) => {
+        const body = req.body;
+        GetDailyCensusReport(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+    DailyCensusUpdate: (req, res) => {
+        const body = req.body;
+        DailyCensusUpdate(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -65,53 +113,31 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Data Saved"
+                message: "Data Updated"
+            })
+        })
+    },
+    GetCensusBargraphReport: (req, res) => {
+        const body = req.body;
+        GetCensusBargraphReport(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
             })
         })
     },
 
-    getQualityInicatorList: (req, res) => {
-        const id = req.params.id;
-        getQualityInicatorList(id, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Data Found",
-                    data: []
-                })
-            }
-            return res.status(200).json({
-                success: 1,
-                data: results
-            })
-        })
-    },
-    getQIReportEndoscopy: (req, res) => {
-        const body = req.body;
-        getQIReportEndoscopy(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Data Found",
-                    data: []
-                })
-            }
-            return res.status(200).json({
-                success: 1,
-                data: results
-            })
-        })
-    },
 }

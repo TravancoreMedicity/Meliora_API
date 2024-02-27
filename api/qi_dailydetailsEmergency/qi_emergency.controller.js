@@ -1,7 +1,9 @@
 const {
     EmergencyQiInsert,
-    EmergencyAlreadyExist
-
+    EmergencyAlreadyExist,
+    EmergencyQiUpdate,
+    getQIReportEmergency,
+    getMonthlyReportEmergency
 } = require('./qi_emergency.service')
 module.exports = {
     EmergencyQiInsert: (req, res) => {
@@ -31,8 +33,8 @@ module.exports = {
         })
     },
     EmergencyAlreadyExist: (req, res) => {
-        const id = req.params.id;
-        EmergencyAlreadyExist(id, (err, results) => {
+        const body = req.body;
+        EmergencyAlreadyExist(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -44,6 +46,66 @@ module.exports = {
                     success: 2,
                     message: "No record found"
 
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+    EmergencyQiUpdate: (req, res) => {
+        const body = req.body;
+        EmergencyQiUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Data Saved"
+            })
+        })
+    },
+
+    getQIReportEmergency: (req, res) => {
+        const body = req.body;
+        getQIReportEmergency(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+    getMonthlyReportEmergency: (req, res) => {
+        const body = req.body;
+        getMonthlyReportEmergency(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data Found",
+                    data: []
                 })
             }
             return res.status(200).json({

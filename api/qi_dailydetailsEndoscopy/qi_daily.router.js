@@ -8,7 +8,7 @@ const {
     getQualityInicatorList,
     getQIReportEndoscopy } = require('./qi_daily.controller');
 router.post('/savedata', checkToken, EndoscopyQiInsert);
-router.get('/exist/:id', checkToken, EndoscopyAlreadyExist);
+router.post('/exist', checkToken, EndoscopyAlreadyExist);
 router.patch('/update', checkToken, EndoscopyQiUpdate);
 router.get('/getqi/:id', checkToken, getQualityInicatorList);
 router.post('/endoReport', checkToken, getQIReportEndoscopy);

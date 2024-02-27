@@ -11,7 +11,8 @@ const { backupDetailsInsert,
     DailyDetailsDelete,
     MonthlyDetailsDelete,
     WeekDetailsDelete,
-    YearDetailsDelete
+    YearDetailsDelete,
+    SelectedDaysDelete
 } = require('./backupDetails.service')
 module.exports = {
     backupDetailsInsert: (req, res) => {
@@ -262,6 +263,27 @@ module.exports = {
     YearDetailsDelete: async (req, res) => {
         const body = req.body;
         YearDetailsDelete(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Deleted successfully"
+            })
+        })
+    },
+    SelectedDaysDelete: async (req, res) => {
+        const body = req.body;
+        SelectedDaysDelete(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,

@@ -170,7 +170,6 @@ const crfDashBoard = require('./api/crf_dashboards/crfdashboard.router')
 const amReport = require('./api/am_reports/am_reports.router')
 const crmEmergncyType = require('./api/crm_emergncytype_mast/emergncy_tpe.router')
 const assetInternalTrans = require('./api/am_asset_internaltrans/asset_internaltrans.router')
-
 const qltyindicator = require('./api/qi_master/qltyIndicator.router')
 const qidetails = require('./api/qi_dailydetailsEndoscopy/qi_daily.router')
 const emergencyqi = require('./api/qi_dailydetailsEmergency/qi_emergency.router')
@@ -317,29 +316,19 @@ app.use('/api/TmDropDowns', TmDropDowns)
 app.use('/api/subRoomMaster', subRoomMaster)
 app.use('/api/crfDashBoard', crfDashBoard)
 app.use('/api/amReport', amReport)
-
 app.use('/api/crmEmergncyType', crmEmergncyType)
 app.use('/api/assetInternalTrans', assetInternalTrans)
 app.use('/api/tmReport', TmReport)
 app.use('/api/newCRFRegister', newCRFRegister)
 app.use('/api/newCRFRegisterImages', newCRFRegisterImages)
-<<<<<<< HEAD
-
-
 app.use('/api/qualityindicator', qltyindicator)
 app.use('/api/qiendoscopy', qidetails)
 app.use('/api/qiemergency', emergencyqi)
 app.use('/api/qidailycensus', dailycensus)
 app.use('/api/censusNursingStat', censusNursMast)
-
-=======
 app.use('/api/CRFRegisterApproval', CRFRegisterApproval)
-app.use('/api/qualityDept', qualitydept)
-app.use('/api/qualityindicator', qltyindicator)
-app.use('/api/qiendoscopy', qidetails)
-app.use('/api/qiemergency', emergencyqi)
 app.use('/api/newCRFPurchase', newCRFPurchase)
->>>>>>> 352f4786ed9df45e3c1b041894ba9c80097b413d
+
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

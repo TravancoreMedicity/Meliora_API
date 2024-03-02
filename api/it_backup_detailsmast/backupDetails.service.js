@@ -255,7 +255,7 @@ module.exports = {
     DailyDetailsDelete: (data, callBack) => {
         pool.query(
 
-            `DELETE FROM it_backup_daily_details WHERE backup_daily_date=current_date() and backup_slno=? and verify_status=0`,
+            `DELETE FROM it_backup_daily_details WHERE backup_daily_date=current_date() and backup_slno=?`,
             [
                 data.backup_slno
             ],
@@ -270,7 +270,8 @@ module.exports = {
     MonthlyDetailsDelete: (data, callBack) => {
         pool.query(
 
-            `DELETE FROM it_backup_monthly_details WHERE backup_slno=? and verify_status=0`,
+            `DELETE FROM it_backup_monthly_details WHERE backup_slno=? and 
+            EXTRACT(YEAR_MONTH FROM backup_monthly_date) = EXTRACT(YEAR_MONTH FROM CURDATE())`,
             [
                 data.backup_slno
             ],
@@ -285,7 +286,8 @@ module.exports = {
     WeekDetailsDelete: (data, callBack) => {
         pool.query(
 
-            `DELETE FROM it_backup_weekly_details WHERE backup_slno=? and verify_status=0`,
+            `DELETE FROM it_backup_weekly_details WHERE backup_slno=? and WEEK(backup_weekly_date) = WEEK(CURDATE())
+            AND YEAR(backup_weekly_date) = YEAR(CURDATE())`,
             [
                 data.backup_slno
             ],
@@ -301,7 +303,24 @@ module.exports = {
     YearDetailsDelete: (data, callBack) => {
         pool.query(
 
-            `DELETE FROM it_backup_yearly_details WHERE backup_slno=? and verify_status=0`,
+            `DELETE FROM it_backup_yearly_details WHERE backup_slno=? and 
+            EXTRACT(YEAR FROM backup_yearly_date) = EXTRACT(YEAR FROM CURDATE())`,
+            [
+                data.backup_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+
+    SelectedDaysDelete: (data, callBack) => {
+        pool.query(
+
+            `DELETE FROM it_backup_selecteddays_details WHERE backup_slno=? and verify_status=0`,
             [
                 data.backup_slno
             ],

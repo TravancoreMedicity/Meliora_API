@@ -11,7 +11,8 @@ const { backupDetailsInsert,
     DailyDetailsDelete,
     MonthlyDetailsDelete,
     WeekDetailsDelete,
-    YearDetailsDelete
+    YearDetailsDelete,
+    SelectedDaysDelete
 } = require('./backupDetails.controller');
 router.post('/insertMast', checkToken, backupDetailsInsert);
 router.post('/detailInsert', checkToken, scheduleTimeInsert);
@@ -25,4 +26,5 @@ router.post('/daydelete', checkToken, DailyDetailsDelete);
 router.post('/monthdelete', checkToken, MonthlyDetailsDelete);
 router.post('/weekdelete', checkToken, WeekDetailsDelete);
 router.post('/yeardelete', checkToken, YearDetailsDelete);
+router.post('/seldaysdelete', checkToken, SelectedDaysDelete);
 module.exports = router;

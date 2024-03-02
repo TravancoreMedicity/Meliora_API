@@ -1,7 +1,8 @@
 const { getAllApprovedForPurchase, InsertPurchaseAck, QuatationCalling,
     QuatationNegotiation, QuatationFixing, InsertinglePO, updatePOAdd,
     InsertMultiplePO, getPOList, PoComplete, PoFinals, getAllApprovedForStore,
-    storedataUpdate
+    storedataUpdate, getSubstores, getMainStore, storeReciverdataUpdate,
+    getPOListSubStorewise, SubstoreReciverdataUpdate
 } = require('../crm_new_purchase/crm_purchase.service');
 
 const logger = require('../../logger/logger');
@@ -161,7 +162,8 @@ module.exports = {
     InsertMultiplePO: (req, res) => {
         const body = req.body;
         var a1 = body.map((value, index) => {
-            return [value.req_slno, value.po_number, value.po_date, value.po_status, value.create_user
+            return [value.req_slno, value.po_number, value.po_date, value.po_status,
+            value.supply_store, value.expected_delivery, value.create_user
 
             ]
         })
@@ -329,6 +331,124 @@ module.exports = {
         });
     },
 
+    getSubstores: (req, res) => {
+        getSubstores((err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
 
+    getMainStore: (req, res) => {
+        const id = req.params.id
+        getMainStore(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    storeReciverdataUpdate: (req, res) => {
+        const body = req.body;
+
+        storeReciverdataUpdate(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "PO Enetering Complete updated successfully"
+            });
+        });
+    },
+
+    getPOListSubStorewise: (req, res) => {
+        const id = req.params.id
+        getPOListSubStorewise(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    SubstoreReciverdataUpdate: (req, res) => {
+        const body = req.body;
+
+        SubstoreReciverdataUpdate(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "PO Enetering Complete updated successfully"
+            });
+        });
+    },
 }
 

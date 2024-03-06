@@ -1,7 +1,9 @@
 const { CreateTaskInsert, CreateTaskDetailInsert, CreateTaskView, CreateSubTaskInsert, CreateTaskSubTaskDetailInsert, SubTaskviewByid, MasterTaskviewBySecid,
     MasterEmpByid, UpdateMasterTask, UpdateSubTask, SubtaskviewByidForEdit, employeeInactive, updateSubTaskDetail, MasterTaskviewByidForEdit, DeptSearch,
     GoalView, ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptView, GoalDeptUpdate, TaskDateInserT, ProgressInsert, ProgressView, ProgressUpdate,
-    ProjectDeptView, GoalDeptSearch, ProjectDeptSearch, SubProgressView, taskStatusUpdate } = require('../tm_task_management/taskmanagement.service')
+    ProjectDeptView, GoalDeptSearch, ProjectDeptSearch, SubProgressView, taskStatusUpdate, SearchProjectAndEmployee, GetTaskSlno, UpdateStatus,
+    // GetTaskSlno, UpdateStatus
+} = require('../tm_task_management/taskmanagement.service')
 
 const logger = require('../../logger/logger');
 module.exports = {
@@ -176,9 +178,7 @@ module.exports = {
     },
 
     CreateTaskSubTaskDetailInsert: (req, res) => {
-
         const body = req.body;
-
         const data = body && body.map((val) => {
             return [val.tm_task_slno,
             val.tm_assigne_emp,
@@ -317,6 +317,77 @@ module.exports = {
             })
         })
     },
+    // UpdateSubTask: (req, res) => {
+    //     const body = req.body;
+    //     UpdateSubTask(body, (err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (results === 0) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 message: "No record found"
+
+    //             })
+    //         }
+
+    //         const id = body.main_task_slno
+    //         GetTaskSlno(id, (err, results) => {
+
+    //             if (err) {
+    //                 return res.status(200).json({
+    //                     success: 0,
+    //                     message: err
+    //                 });
+    //             }
+    //             if (!results) {
+    //                 return res.status(200).json({
+    //                     success: 1,
+    //                     message: "No Data"
+    //                 });
+    //             }
+    //             ;
+    //             const status = JSON.parse(JSON.stringify(results[0])).tm_task_status
+    //             if (status === 0) {
+    //                 const updatedata = {
+    //                     tm_task_slno: body.main_task_slno
+    //                 }
+
+    //                 UpdateStatus(updatedata, (err, results) => {
+    //                     if (err) {
+    //                         return res.status(200).json({
+    //                             success: 0,
+    //                             message: err
+    //                         })
+    //                     }
+    //                     if (results === 0) {
+    //                         return res.status(200).json({
+    //                             success: 1,
+    //                             message: "No record found"
+
+    //                         })
+    //                     }
+    //                     return res.status(200).json({
+    //                         success: 2,
+    //                         message: "Task Updated successfully"
+    //                     })
+    //                 })
+    //             }
+    //             // return res.status(200).json({
+    //             //     success: 2,
+    //             //     data: results
+    //             // });
+    //         })
+
+    //         // return res.status(200).json({
+    //         //     success: 2,
+    //         //     message: "Subtask Updated successfully"
+    //         // })
+    //     })
+    // },
     SubtaskviewByidForEdit: (req, res) => {
 
         const id = req.params.id;
@@ -584,27 +655,114 @@ module.exports = {
                     message: err
                 });
             }
-            taskStatusUpdate(body, (err, results) => {
-                if (err) {
-                    return res.status(200).json({
-                        success: 0,
-                        message: err
-                    })
-                }
-                if (results === 0) {
+
+            if (body.main_task_slno === null) {
+                taskStatusUpdate(body, (err, results) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        })
+                    }
+                    if (results === 0) {
+                        return res.status(200).json({
+                            success: 1,
+                            message: "No record found"
+
+                        })
+                    }
                     return res.status(200).json({
                         success: 1,
-                        message: "No record found"
-
+                        // message: "Task Progress Added",
+                        // insertId: result.insertId,
                     })
-                }
-                return res.status(200).json({
-                    success: 1,
-                    message: "Task Progress Added",
-                    // insertId: result.insertId,
                 })
-            })
 
+            }
+            else {
+                const id = body.main_task_slno
+                GetTaskSlno(id, (err, results) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    if (!results) {
+                        return res.status(200).json({
+                            success: 1,
+                            message: "No Data"
+                        });
+                    }
+                    const status = JSON.parse(JSON.stringify(results[0])).tm_task_status
+                    if (status === 0) {
+                        const updateDta = {
+                            tm_task_slno: body.main_task_slno
+                        }
+                        UpdateStatus(updateDta, (err, results) => {
+                            if (err) {
+                                return res.status(200).json({
+                                    success: 0,
+                                    message: err
+                                })
+                            }
+                            if (results === 0) {
+                                return res.status(200).json({
+                                    success: 1,
+                                    message: "No record found"
+
+                                })
+                            }
+                            taskStatusUpdate(body, (err, results) => {
+                                if (err) {
+                                    return res.status(200).json({
+                                        success: 0,
+                                        message: err
+                                    })
+                                }
+                                if (results === 0) {
+                                    return res.status(200).json({
+                                        success: 1,
+                                        message: "No record found"
+
+                                    })
+                                }
+                                return res.status(200).json({
+                                    success: 1,
+                                    message: "Task Progress Added",
+                                    // insertId: result.insertId,
+                                })
+                            })
+
+                        })
+
+                    }
+                    else {
+                        taskStatusUpdate(body, (err, results) => {
+                            if (err) {
+                                return res.status(200).json({
+                                    success: 0,
+                                    message: err
+                                })
+                            }
+                            if (results === 0) {
+                                return res.status(200).json({
+                                    success: 1,
+                                    message: "No record found"
+
+                                })
+                            }
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Task Progress Added",
+                                // insertId: result.insertId,
+                            })
+                        })
+
+
+                    }
+                })
+            }
 
         })
     },
@@ -673,6 +831,29 @@ module.exports = {
             })
         })
     },
+
+    SearchProjectAndEmployee: (req, res) => {
+        const body = req.body;
+        SearchProjectAndEmployee(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+
 
 }
 

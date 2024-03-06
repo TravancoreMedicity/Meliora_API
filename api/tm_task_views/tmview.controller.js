@@ -1,8 +1,8 @@
 const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnProgress, EmployeeCompleted, EmployeeAllTask, EmployeeOnHold,
     EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue, EmployeeName, EmployeeOnPending,
     ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted, DepartmentOnHold, DepartmentPending, ViewAllEmployeeTask,
-    GoalsOverDue, ProjectInCompleted, GoalsInCompleted, EmpProjectTask, EmpTaskCount, AllProjectUnderSection, AllEmployeeProject,
-    TTCTcountUnderProject, EmployeeTTCTcount } = require('../tm_task_views/tmview.service')
+    GoalsOverDue, ProjectInCompleted, GoalsInCompleted, EmpProjectTask, EmpTaskCount, AllProjectUnderSection, AllEmployeeProject, AllTaskUnderProject,
+    TTCTcountUnderProject, EmployeeTTCTcount, AllEmployeeTask, EmpTaskCountWithoutProject, SubTaskUnderTask, TTCTcountSubtask, } = require('../tm_task_views/tmview.service')
 module.exports = {
 
     ViewOverDueToday: (req, res) => {
@@ -730,5 +730,111 @@ module.exports = {
             })
         })
     },
+    AllEmployeeTask: (req, res) => {
+        const id = req.params.id;
+        AllEmployeeTask(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+    AllTaskUnderProject: (req, res) => {
+        const body = req.body;
+        AllTaskUnderProject(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    EmpTaskCountWithoutProject: (req, res) => {
+        const body = req.body;
+        EmpTaskCountWithoutProject(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    SubTaskUnderTask: (req, res) => {
+        const body = req.body;
+        SubTaskUnderTask(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    TTCTcountSubtask: (req, res) => {
+        const body = req.body;
+        TTCTcountSubtask(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+
 
 }

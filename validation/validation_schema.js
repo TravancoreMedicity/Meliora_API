@@ -1230,21 +1230,22 @@ const validateEmergncyType = Joi.object({
 });
 
 // qualityIndicators
-const validateQualityDept = Joi.object({
-    qi_dept_name: Joi.string().trim().uppercase().min(3).max(45).required()
+const validateCensusNursingStation = Joi.object({
+    census_ns_name: Joi.string().trim().uppercase().min(3).max(45).required()
         .messages({
-            'string.empty': 'Department Name Required',
-            'string.min': 'Department Name length must be at least 3 characters long',
-            'string.max': 'Department Name length must be less than or equal to 45 characters long'
+            'string.empty': 'Nursing Station Name Required',
+            'string.min': 'Nursing Station Name length must be at least 3 characters long',
+            'string.max': 'Nursing Station Name length must be less than or equal to 45 characters long'
         }),
-    qi_dept_slno: Joi.number().optional(),
-    qi_dept_status: Joi.number().min(0).max(1).required(),
+    census_ns_code: Joi.string().trim().uppercase().required(),
+    census_ou_code: Joi.string().trim().uppercase().required(),
+    census_ns_slno: Joi.number().optional(),
+    nursing_status: Joi.number().min(0).max(1).required(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
 });
 
 const validateCRMRequestRegister = Joi.object({
-
     request_dept_slno: Joi.number().min(1).required().messages({
         'string.empty': 'Select Department'
     }),
@@ -1259,7 +1260,7 @@ const validateCRMRequestRegister = Joi.object({
     emergency_flag: Joi.number().optional(),
     emer_slno: Joi.optional(),
     emergeny_remarks: Joi.optional(),
-    total_approx_cost: Joi.number().optional(),
+    // total_approx_cost: Joi.number().optional(),
     user_deptsec: Joi.number().optional(),
     rm_ndrf: Joi.optional(),
     req_status: Joi.optional(),
@@ -1343,7 +1344,7 @@ module.exports = {
     validateCommunicationCreate,
     validateAssetRackMaster,
     validateEmergncyType,
-    validateQualityDept,
+    validateCensusNursingStation,
     validateCRMRequestRegister
 
 }

@@ -315,7 +315,7 @@ module.exports = {
             `SELECT 
             am_spare_item_map_master.am_spare_item_map_slno,  am_spare_item_map_master.spare_creation_slno,spare_dept_slno,spare_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,spare_custodian_dept,
-            am_custodian_name,am_category.category_name,
+            am_custodian_name,am_category.category_name,am_manufacture_no,
             am_item_name_creation.item_name,spare_asset_no,spare_asset_no_only,due_date
           FROM
           am_spare_item_map_master
@@ -325,6 +325,7 @@ module.exports = {
            left join am_custodian_department on am_custodian_department.am_custodian_slno=am_spare_item_map_master.spare_custodian_dept
            left join am_item_map_amcpm_detail on am_item_map_amcpm_detail.am_item_map_slno=am_spare_item_map_master.am_spare_item_map_slno
            left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno
+           left join am_item_map_details on am_item_map_details.am_spare_item_map_slno=am_spare_item_map_master.am_spare_item_map_slno
            WHERE
            spare_dept_slno = ? and spare_create_status=1
            ORDER BY am_spare_item_map_master.am_spare_item_map_slno DESC`,
@@ -344,7 +345,7 @@ module.exports = {
             `SELECT 
             am_spare_item_map_master.am_spare_item_map_slno,  am_spare_item_map_master.spare_creation_slno,spare_dept_slno,spare_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,spare_custodian_dept,
-            am_custodian_name,am_category.category_name,
+            am_custodian_name,am_category.category_name,am_manufacture_no,
             am_item_name_creation.item_name,spare_asset_no,spare_asset_no_only,due_date
           FROM
           am_spare_item_map_master
@@ -354,6 +355,7 @@ module.exports = {
            left join am_custodian_department on am_custodian_department.am_custodian_slno=am_spare_item_map_master.spare_custodian_dept
            left join am_item_map_amcpm_detail on am_item_map_amcpm_detail.am_item_map_slno=am_spare_item_map_master.am_spare_item_map_slno
            left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno
+           left join am_item_map_details on am_item_map_details.am_spare_item_map_slno=am_spare_item_map_master.am_spare_item_map_slno
            WHERE
            spare_dept_slno = ?
            and spare_deptsec_slno=?  and spare_create_status=1
@@ -375,7 +377,7 @@ module.exports = {
             `SELECT 
             am_spare_item_map_master.am_spare_item_map_slno,  am_spare_item_map_master.spare_creation_slno,spare_dept_slno,spare_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,spare_custodian_dept,
-            am_custodian_name,am_category.category_name,
+            am_custodian_name,am_category.category_name,am_manufacture_no,
             am_item_name_creation.item_name,spare_asset_no,spare_asset_no_only,due_date
           FROM
           am_spare_item_map_master
@@ -385,6 +387,7 @@ module.exports = {
            left join am_custodian_department on am_custodian_department.am_custodian_slno=am_spare_item_map_master.spare_custodian_dept
            left join am_item_map_amcpm_detail on am_item_map_amcpm_detail.am_item_map_slno=am_spare_item_map_master.am_spare_item_map_slno
            left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno
+           left join am_item_map_details on am_item_map_details.am_spare_item_map_slno=am_spare_item_map_master.am_spare_item_map_slno
            WHERE
            spare_dept_slno = ?
            and spare_deptsec_slno=? and am_spare_item_map_master.spare_creation_slno=? and spare_create_status=1

@@ -3,7 +3,7 @@ const { checkToken } = require("../../authentication/token_validation");
 const { CreateTaskInsert, CreateTaskDetailInsert, CreateTaskView, CreateSubTaskInsert, CreateTaskSubTaskDetailInsert, SubTaskviewByid, MasterTaskviewBySecid,
     MasterEmpByid, UpdateMasterTask, UpdateSubTask, SubtaskviewByidForEdit, MasterTaskviewByidForEdit, employeeInactive, DeptSearch, GoalView, ProgressInsert,
     ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptView, GoalDeptUpdate, ProjectDeptView, ProjectDeptSearch, TaskDateInserT, ProgressView,
-    GoalDeptSearch, ProgressUpdate, SubProgressView } = require('../tm_task_management/taskmanagement.controller');
+    GoalDeptSearch, ProgressUpdate, SubProgressView, SearchProjectAndEmployee, } = require('../tm_task_management/taskmanagement.controller');
 
 router.post('/insertTask', checkToken, CreateTaskInsert)
 router.get('/viewTask', checkToken, CreateTaskView)
@@ -45,5 +45,7 @@ router.post('/viewProgress', checkToken, ProgressView)
 
 router.post('/viewSubProgress', checkToken, SubProgressView)
 router.patch('/updateProgress', checkToken, ProgressUpdate)
+
+router.post('/searchProjectAndEmployee', checkToken, SearchProjectAndEmployee)
 
 module.exports = router

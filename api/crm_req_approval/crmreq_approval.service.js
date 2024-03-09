@@ -556,7 +556,7 @@ module.exports = {
     getDataCollectList: (id, callBack) => {
         pool.query(
             `select crm_request_master.req_slno,crm_request_master.actual_requirement,
-            crm_request_master.needed,crm_request_master.request_dept_slno,co_department_mast.dept_name,
+            crm_request_master.needed,
             R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,          
             crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
                         crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
@@ -569,7 +569,6 @@ module.exports = {
                           
   				from crm_request_master
                           left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
-                          left join co_department_mast on co_department_mast.dept_id=crm_request_master.request_dept_slno
                           left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
                           left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
                           left join crm_data_collection on crm_data_collection.crf_requst_slno=crm_request_master.req_slno
@@ -615,7 +614,7 @@ module.exports = {
     getAllForPdfView: (callBack) => {
         pool.query(
             `select crm_request_master.req_slno,crm_request_master.actual_requirement,
-            crm_request_master.needed,crm_request_master.request_dept_slno,co_department_mast.dept_name,
+            crm_request_master.needed,
             R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,
             crf_close,crf_close_remark,crf_closed_one,close_date,C.em_name as closed_user,
             crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
@@ -645,8 +644,7 @@ module.exports = {
                           left join crf_ndrf_mast on crf_ndrf_mast.req_slno=crm_request_master.req_slno
                           left join crf_ndrf_approval on crf_ndrf_approval.ndrf_mast_slno=crf_ndrf_mast.ndrf_mast_slno
                           left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
-                          left join co_department_mast on co_department_mast.dept_id=crm_request_master.request_dept_slno
-                          left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
+                         left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
                           left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
                           
             left join co_employee_master CR on CR.em_id=crm_request_master.create_user
@@ -674,7 +672,7 @@ module.exports = {
     getFinalItemListApproval: (id, callBack) => {
         pool.query(
             `  select approve_item_desc,approve_item_brand,am_uom.uom_name as approved_itemunit,
-            item_qnty_approved,approve_item_specification,approve_item_unit_price,
+            item_qnty_approved,approve_item_specification,approve_item_unit_price,item_slno,
             approve_aprox_cost,old_item_slno
                         from crm_request_mast_detail
                          left join am_uom on am_uom.uom_slno=crm_request_mast_detail.approve_item_unit

@@ -1,19 +1,20 @@
 const logger = require('../../logger/logger');
-const { validateQualityDept, } = require('../../validation/validation_schema');
+const { validateCensusNursingStation } = require('../../validation/validation_schema');
 
-const { qualityDepInsert, qualityDeptView, qualityDeptUpdate, qualityDeptList } = require('./qidepartment.service')
+const { censusNursingStatInsert, censusNursingStationView, NursingStationUpdate, getNursingStationActive } = require('./census_nursing.service')
 module.exports = {
-    qualityDepInsert: (req, res) => {
+
+    censusNursingStatInsert: (req, res) => {
         const body = req.body;
-        const body_result = validateQualityDept.validate(body);
+        const body_result = validateCensusNursingStation.validate(body);
         if (body_result.error) {
             return res.status(200).json({
                 success: 2,
                 message: body_result.error.details[0].message
             });
         }
-        body.qi_dept_name = body_result.value.qi_dept_name;
-        qualityDepInsert(body, (err, result) => {
+        body.census_ns_name = body_result.value.census_ns_name;
+        censusNursingStatInsert(body, (err, result) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -23,12 +24,13 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 insertid: result.insertId,
-                message: "Department Created"
+                message: "Nursing Station Created"
             })
         })
     },
-    qualityDeptView: (req, res) => {
-        qualityDeptView((err, results) => {
+
+    censusNursingStationView: (req, res) => {
+        censusNursingStationView((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -36,6 +38,7 @@ module.exports = {
                 })
             }
             if (Object.keys(results).length === 0) {
+
                 return res.status(200).json({
                     success: 1,
                     message: "No Data Found",
@@ -43,14 +46,16 @@ module.exports = {
                 })
             }
             return res.status(200).json({
+
                 success: 2,
                 data: results
             })
         })
     },
-    qualityDeptUpdate: (req, res) => {
+
+    NursingStationUpdate: (req, res) => {
         const body = req.body;
-        const body_result = validateQualityDept.validate(body);
+        const body_result = validateCensusNursingStation.validate(body);
         if (body_result.error) {
             logger.warnlogwindow(body_result.error.details[0].message)
             return res.status(200).json({
@@ -58,8 +63,8 @@ module.exports = {
                 message: body_result.error.details[0].message
             });
         }
-        body.qi_dept_name = body_result.value.qi_dept_name;
-        qualityDeptUpdate(body, (err, results) => {
+        body.census_ns_name = body_result.value.census_ns_name;
+        NursingStationUpdate(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -79,8 +84,8 @@ module.exports = {
         })
     },
 
-    qualityDeptList: (req, res) => {
-        qualityDeptList((err, results) => {
+    getNursingStationActive: (req, res) => {
+        getNursingStationActive((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -88,6 +93,7 @@ module.exports = {
                 })
             }
             if (Object.keys(results).length === 0) {
+
                 return res.status(200).json({
                     success: 1,
                     message: "No Data Found",

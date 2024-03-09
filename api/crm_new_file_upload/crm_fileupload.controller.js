@@ -56,7 +56,7 @@ const crfDataCollectionstorage = multer.diskStorage({
     },
 })
 
-const maxSize = 2 * 1024 * 1024
+const maxSize = 25 * 1024 * 1024
 
 
 const crfRegistration = multer({

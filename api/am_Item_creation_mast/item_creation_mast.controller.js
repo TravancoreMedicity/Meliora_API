@@ -245,9 +245,10 @@ module.exports = {
         const body = req.body;
 
         var custodian = body.map((val) => {
-            return val.item_custodian_dept
+            return val.spare_custodian_dept
         })
         var xx = custodian.find((e) => e)
+
         getCustdyBasedLastSpareNo(xx, (err, results) => {
 
             if (err) {
@@ -279,7 +280,7 @@ module.exports = {
                 })
             }
             const assetno = JSON.parse(JSON.stringify(results[0]))
-            let no = assetno.item_asset_no_only === undefined ? 0 : assetno.item_asset_no_only
+            let no = assetno.spare_asset_no_only === undefined ? 0 : assetno.spare_asset_no_only
             var newList = body.map((val, index) => {
                 return [val.spare_creation_slno, val.spare_dept_slno, val.spare_deptsec_slno,
                 val.spare_room_slno, val.spare_subroom_slno, val.spare_rack_slno, val.spare_create_status,
@@ -302,7 +303,7 @@ module.exports = {
 
     insertSpareItemAdditional: (req, res) => {
         const body = req.body;
-        getCustdyBasedLastSpareNo(body.item_custodian_dept, (err, results) => {
+        getCustdyBasedLastSpareNo(body.spare_custodian_dept, (err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({

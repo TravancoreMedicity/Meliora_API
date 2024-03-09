@@ -170,15 +170,17 @@ const crfDashBoard = require('./api/crf_dashboards/crfdashboard.router')
 const amReport = require('./api/am_reports/am_reports.router')
 const crmEmergncyType = require('./api/crm_emergncytype_mast/emergncy_tpe.router')
 const assetInternalTrans = require('./api/am_asset_internaltrans/asset_internaltrans.router')
-const qualitydept = require('./api/qi_departmentmast/qidepartment.router')
 const qltyindicator = require('./api/qi_master/qltyIndicator.router')
 const qidetails = require('./api/qi_dailydetailsEndoscopy/qi_daily.router')
 const emergencyqi = require('./api/qi_dailydetailsEmergency/qi_emergency.router')
+const dailycensus = require('./api/qi_daily_census/daily_census.router')
+const censusNursMast = require('./api/qicensusnursing_mast/census_nursing.router')
 
 const TmReport = require('./api/tm_reports/tmreports.router')
 const newCRFRegister = require('./api/crm_newrequest_registration/newRequestRegister.router')
 const newCRFRegisterImages = require('./api/crm_new_file_upload/crm_fileupload.router')
-
+const CRFRegisterApproval = require('./api/crm_req_approval/crmreq_approval.router')
+const newCRFPurchase = require('./api/crm_new_purchase/crm_purchase.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -314,17 +316,18 @@ app.use('/api/TmDropDowns', TmDropDowns)
 app.use('/api/subRoomMaster', subRoomMaster)
 app.use('/api/crfDashBoard', crfDashBoard)
 app.use('/api/amReport', amReport)
-
 app.use('/api/crmEmergncyType', crmEmergncyType)
 app.use('/api/assetInternalTrans', assetInternalTrans)
 app.use('/api/tmReport', TmReport)
 app.use('/api/newCRFRegister', newCRFRegister)
 app.use('/api/newCRFRegisterImages', newCRFRegisterImages)
-
-app.use('/api/qualityDept', qualitydept)
 app.use('/api/qualityindicator', qltyindicator)
 app.use('/api/qiendoscopy', qidetails)
 app.use('/api/qiemergency', emergencyqi)
+app.use('/api/qidailycensus', dailycensus)
+app.use('/api/censusNursingStat', censusNursMast)
+app.use('/api/CRFRegisterApproval', CRFRegisterApproval)
+app.use('/api/newCRFPurchase', newCRFPurchase)
 
 
 server.listen(process.env.APP_PORT, () =>

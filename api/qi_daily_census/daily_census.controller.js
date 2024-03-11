@@ -4,15 +4,22 @@ const {
     DailyCensusYesterdayCount,
     GetDailyCensusReport,
     DailyCensusUpdate,
-    GetCensusBargraphReport
+    GetCensusBargraphReport,
+    CensusAlreadyInsert
 } = require('./daily_census.service')
 module.exports = {
     DailyCensusInsert: (req, res) => {
         const body = req.body;
-        DailyCensusAlreadyExist(body, (err, results) => {
+        const data = body?.map((val) => {
+            return [val.census_ns_slno, val.census_date, val.yesterday_census, val.total_admission, val.total_discharge,
+            val.transfer_in, val.transfer_out, val.total_death, val.census_total, val.create_user,
+            val.ora_admission, val.ora_discharge, val.ora_death, val.ora_census_total]
+        })
+        const { census_date } = body[0]
+        CensusAlreadyInsert(census_date, (err, results) => {
             const value = JSON.parse(JSON.stringify(results))
             if (Object.keys(value).length === 0) {
-                DailyCensusInsert(body, (err, result) => {
+                DailyCensusInsert(data, (err, result) => {
                     if (err) {
                         return res.status(200).json({
                             success: 0,
@@ -36,6 +43,9 @@ module.exports = {
 
     DailyCensusAlreadyExist: (req, res) => {
         const body = req.body;
+        // var data = body?.map((val, index) => {
+        //     return [val.census_ns_slno, val.census_date]
+        // })
         DailyCensusAlreadyExist(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
@@ -71,12 +81,11 @@ module.exports = {
                 return res.status(200).json({
                     success: 2,
                     message: "No Record Found"
-
                 })
             }
             return res.status(200).json({
                 success: 1,
-                data: results
+                yestdata: results
             })
         })
     },
@@ -139,5 +148,6 @@ module.exports = {
             })
         })
     },
+
 
 }

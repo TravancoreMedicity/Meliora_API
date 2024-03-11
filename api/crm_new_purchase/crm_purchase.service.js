@@ -154,14 +154,18 @@ module.exports = {
                 po_number,
                 po_date,
                 po_status,
+                supply_store,
+                expected_delivery,
                 create_user            
                             )
-            VALUES (?,?,?,?,?)`,
+            VALUES (?,?,?,?,?,?,?)`,
             [
                 data.req_slno,
                 data.po_number,
                 data.po_date,
                 data.po_status,
+                data.supply_store,
+                data.expected_delivery,
                 data.create_user
             ],
             (error, results, feilds) => {
@@ -179,7 +183,8 @@ module.exports = {
                 req_slno,
                 po_number,
                 po_date,
-                po_status,
+                po_status,supply_store,
+                expected_delivery,
                 create_user
                )
                values ?`,
@@ -198,8 +203,10 @@ module.exports = {
 
     getPOList: (id, callBack) => {
         pool.query(
-            `  select po_number,po_date
-                         from crm_purchase_po_details
+            ` select po_detail_slno, req_slno, po_number,po_date,expected_delivery,supply_store,
+            sub_store_name, main_store_slno, main_store, store_code,store_recieve
+          from crm_purchase_po_details
+          left join crm_store_master on crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store
                         where req_slno=? and po_status=1`,
             [
                 id
@@ -337,6 +344,109 @@ module.exports = {
                 data.store_receive_user,
                 data.store_receive_date,
                 data.crm_purchase_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getSubstores: (callBack) => {
+        pool.query(
+            `select crm_store_master_slno,sub_store_name
+            from crm_store_master 
+            `,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+    getMainStore: (id, callBack) => {
+        pool.query(
+            `  select main_store
+            from crm_store_master 
+                        where crm_store_master_slno=? `,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    storeReciverdataUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE crm_purchase_po_details 
+            SET         
+            store_recieve = 1,
+            store_receive_user = ?,
+            store_receive_date = ?                
+            WHERE po_detail_slno =?`,
+            [
+                data.store_receive_user,
+                data.store_receive_date,
+                data.po_detail_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getPOListSubStorewise: (id, callBack) => {
+        pool.query(
+            `select po_detail_slno,crm_request_master.req_slno, po_number,po_date,expected_delivery,
+            supply_store,sub_store_name, main_store_slno, main_store, store_code,store_recieve,
+            store_receive_user,store_receive_date,
+            R.sec_name as req_deptsec,U.sec_name as user_deptsection,
+            sub_store_recieve,sub_store_recieve_user,sub_store_date,actual_requirement,
+            needed,expected_date,crm_request_master.create_date as req_date
+
+          from crm_purchase_po_details
+          
+          left join crm_store_master on crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store
+          left join crm_request_master on crm_request_master.req_slno=crm_purchase_po_details.req_slno
+          left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
+          left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
+                        where supply_store=? and  store_recieve=1`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    SubstoreReciverdataUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE crm_purchase_po_details 
+            SET         
+            sub_store_recieve = 1,
+            sub_store_recieve_user = ?,
+            sub_store_date = ?                
+            WHERE po_detail_slno =?`,
+            [
+                data.sub_store_recieve_user,
+                data.sub_store_date,
+                data.po_detail_slno
             ],
             (error, results, feilds) => {
                 if (error) {

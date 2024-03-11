@@ -4,7 +4,7 @@ const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnP
     EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue, DepartmentOnHold,
     ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted, GoalsOverDue, EmployeeAllTask, EmployeeName, EmployeeOnPending,
     ProjectInCompleted, GoalsInCompleted, EmpProjectTask, EmpTaskCount, AllProjectUnderSection, AllEmployeeProject, TTCTcountUnderProject,
-    EmployeeTTCTcount } = require('../tm_task_views/tmview.controller');
+    EmployeeTTCTcount, AllEmployeeTask, AllTaskUnderProject, EmpTaskCountWithoutProject, SubTaskUnderTask, TTCTcountSubtask } = require('../tm_task_views/tmview.controller');
 
 router.get('/ViewOverDueToday/:id', checkToken, ViewOverDueToday)
 router.get('/ViewOverDueNextWeek/:id', checkToken, ViewOverDueNextWeek)
@@ -27,9 +27,7 @@ router.get('/departmentOverDue/:id', checkToken, DepartmentOverDue)
 router.get('/departmentOnHold/:id', checkToken, DepartmentOnHold)
 router.get('/departmentPending/:id', checkToken, DepartmentPending)
 
-
 router.get('/viewAllEmployeeTask/:id', checkToken, ViewAllEmployeeTask)
-
 
 router.get('/projectOnProgress/:id', checkToken, ProjectOnProgress)
 router.get('/projectCompleted/:id', checkToken, ProjectCompleted)
@@ -41,17 +39,16 @@ router.get('/goalsCompleted/:id', checkToken, GoalsCompleted)
 router.get('/goalsInCompleted/:id', checkToken, GoalsInCompleted)
 router.get('/goalsOverDue/:id', checkToken, GoalsOverDue)
 
-
-
 router.get('/EmpProjectTask/:id', checkToken, EmpProjectTask)
 router.post('/EmpTaskCountUnderProject', checkToken, EmpTaskCount)
-
 router.get('/allProjectUnderSection/:id', checkToken, AllProjectUnderSection)
 router.get('/allEmployeeProject/:id', checkToken, AllEmployeeProject)
-
 router.post('/TTCTcountUnderProject', checkToken, TTCTcountUnderProject)
-
 router.post('/EmployeeTTCTcount', checkToken, EmployeeTTCTcount)
-
+router.get('/allEmployeeTaskList/:id', checkToken, AllEmployeeTask)
+router.post('/allTaskUnderProject', checkToken, AllTaskUnderProject)
+router.post('/subTaskUnderTask', checkToken, SubTaskUnderTask)
+router.post('/EmpTaskCountWithoutProject', checkToken, EmpTaskCountWithoutProject)
+router.post('/TTCTcountSubtask', checkToken, TTCTcountSubtask)
 
 module.exports = router

@@ -1246,9 +1246,9 @@ const validateCensusNursingStation = Joi.object({
 });
 
 const validateCRMRequestRegister = Joi.object({
-    request_dept_slno: Joi.number().min(1).required().messages({
-        'string.empty': 'Select Department'
-    }),
+    // request_dept_slno: Joi.number().min(1).required().messages({
+    //     'string.empty': 'Select Department'
+    // }),
     request_deptsec_slno: Joi.number().min(1).required().messages({
         'string.empty': 'Select Department Section'
     }),
@@ -1260,7 +1260,7 @@ const validateCRMRequestRegister = Joi.object({
     emergency_flag: Joi.number().optional(),
     emer_slno: Joi.optional(),
     emergeny_remarks: Joi.optional(),
-    total_approx_cost: Joi.number().optional(),
+    // total_approx_cost: Joi.number().optional(),
     user_deptsec: Joi.number().optional(),
     rm_ndrf: Joi.optional(),
     req_status: Joi.optional(),

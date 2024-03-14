@@ -1,9 +1,8 @@
 const { CreateTaskInsert, CreateTaskDetailInsert, CreateTaskView, CreateSubTaskInsert, CreateTaskSubTaskDetailInsert, SubTaskviewByid, MasterTaskviewBySecid,
     MasterEmpByid, UpdateMasterTask, UpdateSubTask, SubtaskviewByidForEdit, employeeInactive, updateSubTaskDetail, MasterTaskviewByidForEdit, DeptSearch,
     GoalView, ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptView, GoalDeptUpdate, TaskDateInserT, ProgressInsert, ProgressView, ProgressUpdate,
-    ProjectDeptView, GoalDeptSearch, ProjectDeptSearch, SubProgressView, taskStatusUpdate, SearchProjectAndEmployee, GetTaskSlno, UpdateStatus,
-    // GetTaskSlno, UpdateStatus
-} = require('../tm_task_management/taskmanagement.service')
+    ProjectDeptView, GoalDeptSearch, ProjectDeptSearch, SubProgressView, taskStatusUpdate, SearchProjectAndEmployee, GetTaskSlno,
+    UpdateStatus } = require('../tm_task_management/taskmanagement.service')
 
 const logger = require('../../logger/logger');
 module.exports = {
@@ -42,8 +41,6 @@ module.exports = {
         })
     },
 
-
-
     CreateTaskDetailInsert: (req, res) => {
         const body = req.body;
         const data = body && body.map((val) => {
@@ -54,7 +51,6 @@ module.exports = {
 
             ]
         })
-
         CreateTaskDetailInsert(data, (err, result) => {
             if (err) {
                 return res.status(200).json({
@@ -157,7 +153,6 @@ module.exports = {
         })
     },
 
-
     CreateSubTaskInsert: (req, res) => {
         const body = req.body;
         CreateSubTaskInsert(body, (err, result) => {
@@ -186,7 +181,6 @@ module.exports = {
             val.tm_detl_create
             ]
         })
-
         CreateTaskSubTaskDetailInsert(data, (err, result) => {
             if (err) {
                 return res.status(200).json({
@@ -201,11 +195,10 @@ module.exports = {
             })
         })
     },
-    MasterTaskviewBySecid: (req, res) => {
 
+    MasterTaskviewBySecid: (req, res) => {
         const id = req.params.id;
         MasterTaskviewBySecid(id, (err, results) => {
-
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -228,7 +221,6 @@ module.exports = {
     SubTaskviewByid: (req, res) => {
         const id = req.params.id;
         SubTaskviewByid(id, (err, results) => {
-
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -248,12 +240,9 @@ module.exports = {
         })
     },
 
-
     MasterEmpByid: (req, res) => {
-
         const id = req.params.id;
         MasterEmpByid(id, (err, results) => {
-
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -295,6 +284,7 @@ module.exports = {
             })
         })
     },
+
     UpdateSubTask: (req, res) => {
         const body = req.body;
         UpdateSubTask(body, (err, results) => {
@@ -308,7 +298,6 @@ module.exports = {
                 return res.status(200).json({
                     success: 1,
                     message: "No record found"
-
                 })
             }
             return res.status(200).json({
@@ -317,82 +306,10 @@ module.exports = {
             })
         })
     },
-    // UpdateSubTask: (req, res) => {
-    //     const body = req.body;
-    //     UpdateSubTask(body, (err, results) => {
-    //         if (err) {
-    //             return res.status(200).json({
-    //                 success: 0,
-    //                 message: err
-    //             })
-    //         }
-    //         if (results === 0) {
-    //             return res.status(200).json({
-    //                 success: 1,
-    //                 message: "No record found"
 
-    //             })
-    //         }
-
-    //         const id = body.main_task_slno
-    //         GetTaskSlno(id, (err, results) => {
-
-    //             if (err) {
-    //                 return res.status(200).json({
-    //                     success: 0,
-    //                     message: err
-    //                 });
-    //             }
-    //             if (!results) {
-    //                 return res.status(200).json({
-    //                     success: 1,
-    //                     message: "No Data"
-    //                 });
-    //             }
-    //             ;
-    //             const status = JSON.parse(JSON.stringify(results[0])).tm_task_status
-    //             if (status === 0) {
-    //                 const updatedata = {
-    //                     tm_task_slno: body.main_task_slno
-    //                 }
-
-    //                 UpdateStatus(updatedata, (err, results) => {
-    //                     if (err) {
-    //                         return res.status(200).json({
-    //                             success: 0,
-    //                             message: err
-    //                         })
-    //                     }
-    //                     if (results === 0) {
-    //                         return res.status(200).json({
-    //                             success: 1,
-    //                             message: "No record found"
-
-    //                         })
-    //                     }
-    //                     return res.status(200).json({
-    //                         success: 2,
-    //                         message: "Task Updated successfully"
-    //                     })
-    //                 })
-    //             }
-    //             // return res.status(200).json({
-    //             //     success: 2,
-    //             //     data: results
-    //             // });
-    //         })
-
-    //         // return res.status(200).json({
-    //         //     success: 2,
-    //         //     message: "Subtask Updated successfully"
-    //         // })
-    //     })
-    // },
     SubtaskviewByidForEdit: (req, res) => {
-
         const id = req.params.id;
         SubtaskviewByidForEdit(id, (err, results) => {
-
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -413,11 +330,8 @@ module.exports = {
     },
 
     MasterTaskviewByidForEdit: (req, res) => {
-
         const id = req.params.id;
-
         MasterTaskviewByidForEdit(id, (err, results) => {
-
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -450,7 +364,6 @@ module.exports = {
                 return res.status(200).json({
                     success: 1,
                     message: "No record found"
-
                 })
             }
             return res.status(200).json({
@@ -494,7 +407,6 @@ module.exports = {
             })
         })
     },
-
 
     ProjectInsert: (req, res) => {
         const body = req.body;
@@ -574,10 +486,8 @@ module.exports = {
     },
 
     GoalDeptView: (req, res) => {
-
         const id = req.params.id;
         GoalDeptView(id, (err, results) => {
-
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -620,13 +530,9 @@ module.exports = {
         })
     },
 
-
-
     ProjectDeptView: (req, res) => {
-
         const id = req.params.id;
         ProjectDeptView(id, (err, results) => {
-
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -655,7 +561,6 @@ module.exports = {
                     message: err
                 });
             }
-
             if (body.main_task_slno === null) {
                 taskStatusUpdate(body, (err, results) => {
                     if (err) {
@@ -732,7 +637,6 @@ module.exports = {
                             })
 
                         })
-
                     }
                     else {
                         taskStatusUpdate(body, (err, results) => {
@@ -752,11 +656,8 @@ module.exports = {
                             return res.status(200).json({
                                 success: 1,
                                 message: "Task Progress Added",
-                                // insertId: result.insertId,
                             })
                         })
-
-
                     }
                 })
             }
@@ -850,8 +751,6 @@ module.exports = {
             })
         })
     },
-
-
 }
 
 

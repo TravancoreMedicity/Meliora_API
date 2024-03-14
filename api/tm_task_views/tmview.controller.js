@@ -169,7 +169,6 @@ module.exports = {
 
     EmployeeName: (req, res) => {
         const id = req.params.id;
-
         EmployeeName(id, (err, results) => {
 
             if (err) {
@@ -814,7 +813,5 @@ module.exports = {
             })
         })
     },
-
-
 
 }

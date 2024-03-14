@@ -238,8 +238,7 @@ module.exports = {
     CreateSubTaskInsert: (data, callback) => {
         pool.query(
             `INSERT INTO tm_new_task_mast
-          ( 
-          
+          (           
             tm_task_name,
             tm_task_dept,
             tm_task_dept_sec,
@@ -913,18 +912,6 @@ module.exports = {
 
     SubProgressView: (data, callback) => {
         pool.query(
-            // `SELECT 
-            // progress_slno,  
-            // tm_task_slno,
-            // tm_task_status,
-            // tm_progres_date,
-            // em_name,
-            // tm_task_progress,
-            // progress_emp 
-            // FROM meliora.tm_task_progress_detl            
-            // left join co_employee_master on co_employee_master.em_id=tm_task_progress_detl.progress_emp
-            // where tm_task_slno=?
-            // order by tm_progres_date desc `
             `SELECT 
             progress_slno,  
             tm_task_progress_detl.tm_task_slno,
@@ -982,8 +969,8 @@ module.exports = {
 
         pool.query(
             `UPDATE tm_new_task_mast SET               
-                      tm_task_status=2
-             			WHERE 
+              tm_task_status=2
+             WHERE 
              tm_task_slno=?`,
             [
                 data.tm_task_slno
@@ -1033,7 +1020,6 @@ module.exports = {
 			ORDER BY tm_task_slno DESC`,
             [data.tm_task_dept_sec,
             data.tm_project_slno,
-                // data.tm_assigne_emp
             ],
             (error, results, feilds) => {
                 if (error) {

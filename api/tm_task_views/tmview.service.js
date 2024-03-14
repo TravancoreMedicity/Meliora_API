@@ -1,7 +1,6 @@
 const { pool } = require('../../config/database')
 module.exports = {
 
-
     ViewOverDueToday: (id, callback) => {
 
         pool.query(
@@ -301,7 +300,6 @@ module.exports = {
 
 
     EmployeeAllTask: (id, callback) => {
-
         pool.query(
             `SELECT 
             tm_new_task_mast.tm_task_slno,
@@ -342,16 +340,15 @@ module.exports = {
     },
 
     EmployeeName: (id, callback) => {
-
         pool.query(
-            ` select
-            tm_new_task_mast.tm_task_slno,
-            GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
-            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
-            FROM meliora.tm_new_task_mast
-           left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
-           left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
-            where tm_new_task_mast.tm_task_slno=?`,
+            `select
+             tm_new_task_mast.tm_task_slno,
+             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
+             GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
+             FROM meliora.tm_new_task_mast
+             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
+             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
+             where tm_new_task_mast.tm_task_slno=?`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -440,7 +437,6 @@ module.exports = {
         );
     },
 
-
     DepartmentOnProgress: (id, callback) => {
         pool.query(
             `SELECT 
@@ -522,7 +518,6 @@ module.exports = {
         );
     },
 
-
     DepartmentOnHold: (id, callback) => {
         pool.query(
             `SELECT 
@@ -563,6 +558,7 @@ module.exports = {
             }
         );
     },
+
     DepartmentCompleted: (id, callback) => {
         pool.query(
             `SELECT 
@@ -603,6 +599,7 @@ module.exports = {
             }
         );
     },
+
     DepartmentInCompleted: (id, callback) => {
         pool.query(
             `SELECT 
@@ -645,7 +642,6 @@ module.exports = {
     },
 
     DepartmentOverDue: (id, callback) => {
-
         pool.query(
             `SELECT 
             tm_new_task_mast.tm_task_slno,
@@ -703,7 +699,7 @@ module.exports = {
             FROM meliora.tm_project_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_project_mast.tm_project_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_project_mast.tm_project_deptsec        
-           WHERE tm_project_mast.tm_project_deptsec =? AND tm_project_mast.tm_project_status is NULL or tm_project_mast.tm_project_status=0
+            WHERE tm_project_mast.tm_project_deptsec =? AND tm_project_mast.tm_project_status is NULL or tm_project_mast.tm_project_status=0
             group by tm_project_mast.tm_project_slno`,
             [id],
             (error, results, fields) => {
@@ -730,7 +726,7 @@ module.exports = {
             FROM meliora.tm_project_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_project_mast.tm_project_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_project_mast.tm_project_deptsec        
-           WHERE tm_project_mast.tm_project_deptsec =? AND tm_project_mast.tm_project_status =1
+            WHERE tm_project_mast.tm_project_deptsec =? AND tm_project_mast.tm_project_status =1
             group by tm_project_mast.tm_project_slno`,
             [id],
             (error, results, fields) => {
@@ -756,7 +752,7 @@ module.exports = {
             FROM meliora.tm_project_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_project_mast.tm_project_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_project_mast.tm_project_deptsec        
-           WHERE tm_project_mast.tm_project_deptsec =? AND (tm_project_mast.tm_project_status !=1)
+            WHERE tm_project_mast.tm_project_deptsec =? AND (tm_project_mast.tm_project_status !=1)
             group by tm_project_mast.tm_project_slno`,
             [id],
             (error, results, fields) => {
@@ -785,7 +781,6 @@ module.exports = {
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_project_mast.tm_project_deptsec        
             WHERE tm_project_mast.tm_project_deptsec =? AND tm_project_duedate < current_date() AND (tm_project_mast.tm_project_status=0 OR tm_project_mast.tm_project_status is NULL)
             group by tm_project_mast.tm_project_slno`,
-
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -838,7 +833,7 @@ module.exports = {
             FROM meliora.tm_goal_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_goal_mast.tm_goal_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_goal_mast.tm_goal_dept        
-           WHERE tm_goal_mast.tm_goal_deptsec =? AND tm_goal_mast.tm_goal_status =1
+            WHERE tm_goal_mast.tm_goal_deptsec =? AND tm_goal_mast.tm_goal_status =1
             group by tm_goal_mast.tm_goals_slno`,
             [id],
             (error, results, fields) => {
@@ -864,7 +859,7 @@ module.exports = {
             FROM meliora.tm_goal_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_goal_mast.tm_goal_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_goal_mast.tm_goal_dept        
-           WHERE tm_goal_mast.tm_goal_deptsec =? AND tm_goal_mast.tm_goal_status !=1
+            WHERE tm_goal_mast.tm_goal_deptsec =? AND tm_goal_mast.tm_goal_status !=1
             group by tm_goal_mast.tm_goals_slno`,
             [id],
             (error, results, fields) => {
@@ -902,6 +897,7 @@ module.exports = {
             }
         );
     },
+
     ViewAllEmployeeTask: (id, callback) => {
         pool.query(
             `select emslno,empname,dept_name,sec_name, sum(TT) TT, sum(TC) TC from(
@@ -1036,7 +1032,7 @@ module.exports = {
     AllEmployeeProject: (id, callback) => {
 
         pool.query(
-            ` 			SELECT 
+            `SELECT 
             tm_project_mast.tm_project_slno,
             tm_project_mast.tm_project_name,
             tm_new_task_mast.tm_task_slno,

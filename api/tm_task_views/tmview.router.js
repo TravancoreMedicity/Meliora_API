@@ -26,7 +26,6 @@ router.get('/departmentInCompleted/:id', checkToken, DepartmentInCompleted)
 router.get('/departmentOverDue/:id', checkToken, DepartmentOverDue)
 router.get('/departmentOnHold/:id', checkToken, DepartmentOnHold)
 router.get('/departmentPending/:id', checkToken, DepartmentPending)
-
 router.get('/viewAllEmployeeTask/:id', checkToken, ViewAllEmployeeTask)
 
 router.get('/projectOnProgress/:id', checkToken, ProjectOnProgress)
@@ -49,6 +48,5 @@ router.get('/allEmployeeTaskList/:id', checkToken, AllEmployeeTask)
 router.post('/allTaskUnderProject', checkToken, AllTaskUnderProject)
 router.post('/subTaskUnderTask', checkToken, SubTaskUnderTask)
 router.post('/EmpTaskCountWithoutProject', checkToken, EmpTaskCountWithoutProject)
-
 
 module.exports = router

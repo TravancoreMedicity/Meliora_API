@@ -97,12 +97,12 @@ module.exports = {
                 return res.status(200).json({
                     success: 1,
                     message: "No Data Found",
-                    data: []
+                    nurslist: []
                 })
             }
             return res.status(200).json({
                 success: 2,
-                data: results
+                nurslist: results
             })
         })
     },

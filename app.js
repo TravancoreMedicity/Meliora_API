@@ -181,6 +181,8 @@ const newCRFRegister = require('./api/crm_newrequest_registration/newRequestRegi
 const newCRFRegisterImages = require('./api/crm_new_file_upload/crm_fileupload.router')
 const CRFRegisterApproval = require('./api/crm_req_approval/crmreq_approval.router')
 const newCRFPurchase = require('./api/crm_new_purchase/crm_purchase.router')
+const InchHODAuthorization = require('./api/co_inchhod_authriztn/inchhod_authoriztn.router')
+
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -328,7 +330,7 @@ app.use('/api/qidailycensus', dailycensus)
 app.use('/api/censusNursingStat', censusNursMast)
 app.use('/api/CRFRegisterApproval', CRFRegisterApproval)
 app.use('/api/newCRFPurchase', newCRFPurchase)
-
+app.use('/api/InchHODAuthorization', InchHODAuthorization)
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

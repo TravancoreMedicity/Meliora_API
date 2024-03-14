@@ -13,7 +13,7 @@ module.exports = {
         const data = body?.map((val) => {
             return [val.census_ns_slno, val.census_date, val.yesterday_census, val.total_admission, val.total_discharge,
             val.transfer_in, val.transfer_out, val.total_death, val.census_total, val.create_user,
-            val.ora_admission, val.ora_discharge, val.ora_death, val.ora_census_total]
+            val.ora_admission, val.ora_discharge, val.ora_death, val.ora_census_total, val.update_status]
         })
         const { census_date } = body[0]
         CensusAlreadyInsert(census_date, (err, results) => {

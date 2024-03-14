@@ -428,9 +428,7 @@ module.exports = {
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             where tm_new_task_mast_detl.tm_assigne_emp=? AND tm_task_due_date < current_date()
-            AND ((tm_new_task_mast.tm_task_status =0)||(tm_new_task_mast.tm_task_status =2)||
-            (tm_new_task_mast.tm_task_status =3)||(tm_new_task_mast.tm_task_status =4)||
-            (tm_new_task_mast.tm_task_status iS NULL))
+            AND ((tm_new_task_mast.tm_task_status =0)||(tm_new_task_mast.tm_task_status =2)||(tm_new_task_mast.tm_task_status iS NULL))
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -948,9 +946,10 @@ module.exports = {
             tm_new_task_mast.tm_task_slno,
         	tm_project_mast.tm_project_duedate,
      		tm_project_name,
-             tm_project_mast.create_date,
-             tm_project_mast.tm_project_status,
+            tm_project_mast.create_date,
+            tm_project_mast.tm_project_status,
              tm_new_task_mast.tm_project_slno,
+             tm_new_task_mast.main_task_slno,
             tm_assigne_emp
              FROM meliora.tm_new_task_mast         
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
@@ -1272,27 +1271,5 @@ module.exports = {
         );
 
     },
-
-
-    TTCTcountSubtask: (data, callback) => {
-        pool.query(
-            ` `,
-            [
-
-
-
-            ],
-
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-
-        );
-
-    },
-
 
 }

@@ -673,8 +673,6 @@ module.exports = {
                     }
                     return res.status(200).json({
                         success: 1,
-                        // message: "Task Progress Added",
-                        // insertId: result.insertId,
                     })
                 })
 
@@ -730,7 +728,6 @@ module.exports = {
                                 return res.status(200).json({
                                     success: 1,
                                     message: "Task Progress Added",
-                                    // insertId: result.insertId,
                                 })
                             })
 

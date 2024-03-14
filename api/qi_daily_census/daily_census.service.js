@@ -4,30 +4,13 @@ module.exports = {
         pool.query(
             `INSERT INTO qi_daily_census
           ( 
-            census_ns_slno,census_date,yesterday_census,total_admission,total_discharge,transfer_in,
-            transfer_out,total_death,census_total,create_user,ora_admission,ora_discharge,ora_death,ora_census_total
+            census_ns_slno,census_date,yesterday_census,total_admission,total_discharge,transfer_in,transfer_out,
+            total_death,census_total,create_user,ora_admission,ora_discharge,ora_death,ora_census_total,update_status
           )
           VALUES ?`,
             [
                 data
             ],
-
-            //   VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-            //     [
-            //         data.census_ns_slno,
-            //         data.census_date,
-            //         data.yesterday_census,
-            //         data.total_admission,
-            //         data.total_discharge,
-            //         data.transfer_in,
-            //         data.transfer_out,
-            //         data.total_death,
-            //         data.census_total,
-            //         data.create_user,
-            //         data.ora_admission,
-            //         data.ora_discharge,
-            //         data.ora_death
-            //     ],
             (error, results, fields) => {
                 if (error) {
                     return callback(error);
@@ -56,10 +39,10 @@ module.exports = {
             `SELECT
                    census_slno, qi_daily_census.census_ns_slno,qi_census_nursing_mast.census_ns_name, census_date, 
                    yesterday_census, total_admission, total_discharge, transfer_in, transfer_out, total_death,
-                    census_total,ora_admission,ora_discharge,ora_death
+                   census_total,ora_admission,ora_discharge,ora_death,ora_census_total,update_status
             FROM qi_daily_census 
                    left join qi_census_nursing_mast on qi_census_nursing_mast.census_ns_slno=qi_daily_census.census_ns_slno
-             WHERE
+            WHERE
                    qi_daily_census.census_ns_slno in (?) and census_date=?`,
             [
                 body.census_ns_slno,
@@ -76,7 +59,7 @@ module.exports = {
 
     DailyCensusYesterdayCount: (body, callBack) => {
         pool.query(
-            `SELECT census_total,census_ns_slno from qi_daily_census where census_ns_slno in (?) and census_date=?`,
+            `SELECT census_total,ora_census_total,census_ns_slno from qi_daily_census where census_ns_slno in (?) and census_date=?`,
             [
                 body.census_ns_slno,
                 body.census_date
@@ -123,7 +106,8 @@ module.exports = {
                 transfer_out=?,
                 total_death=?,
                 census_total=?,
-                edit_user=?
+                edit_user=?,
+                update_status=?
             WHERE 
                  census_slno=? and census_ns_slno=? and census_date=?`,
             [
@@ -135,9 +119,11 @@ module.exports = {
                 data.total_death,
                 data.census_total,
                 data.edit_user,
+                data.update_status,
                 data.census_slno,
                 data.census_ns_slno,
                 data.census_date
+
             ],
             (error, results, feilds) => {
                 if (error) {

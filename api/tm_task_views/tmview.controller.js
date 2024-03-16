@@ -2,7 +2,7 @@ const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnP
     EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue, EmployeeName, EmployeeOnPending,
     ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted, DepartmentOnHold, DepartmentPending, ViewAllEmployeeTask,
     GoalsOverDue, ProjectInCompleted, GoalsInCompleted, EmpProjectTask, EmpTaskCount, AllProjectUnderSection, AllEmployeeProject, AllTaskUnderProject,
-    TTCTcountUnderProject, EmployeeTTCTcount, AllEmployeeTask, EmpTaskCountWithoutProject, SubTaskUnderTask, TTCTcountSubtask, } = require('../tm_task_views/tmview.service')
+    TTCTcountUnderProject, EmployeeTTCTcount, AllEmployeeTask, EmpTaskCountWithoutProject, SubTaskUnderTask, } = require('../tm_task_views/tmview.service')
 module.exports = {
 
     ViewOverDueToday: (req, res) => {
@@ -169,7 +169,6 @@ module.exports = {
 
     EmployeeName: (req, res) => {
         const id = req.params.id;
-
         EmployeeName(id, (err, results) => {
 
             if (err) {
@@ -814,27 +813,5 @@ module.exports = {
             })
         })
     },
-    TTCTcountSubtask: (req, res) => {
-        const body = req.body;
-        TTCTcountSubtask(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (results.length === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: "No Records"
-                })
-            }
-            return res.status(200).json({
-                success: 2,
-                data: results
-            })
-        })
-    },
-
 
 }

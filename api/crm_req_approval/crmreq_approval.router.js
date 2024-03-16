@@ -4,7 +4,8 @@ const { updateInchargeApproval, MaxItemSlno, InactiveItemDetail, getItemListAppr
     DetailApprvInsert, updateCrfClose, updateHODApproval, updateDMSApproval, updateMSApproval,
     updateMOApproval, updateSMOApproval, updateGMApproval, updateMDApproval, updateEDApproval,
     CrfDeptDataCollectInsert, DataCollectComplete, getDataCollectList, CrfDataCollactnSave,
-    getAllForPdfView, getFinalItemListApproval
+    getAllForPdfView, getFinalItemListApproval, getMaxItemSlno, AddMoreItemsDetails,
+    updateUserAck
 } = require('../crm_req_approval/crmreq_approval.controller');
 
 router.get("/getItemListApproval/:id", checkToken, getItemListApproval);
@@ -31,5 +32,11 @@ router.patch("/CrfDataCollactnSave", checkToken, CrfDataCollactnSave);
 
 router.get("/getAllForPdfView", checkToken, getAllForPdfView);
 router.get("/getFinalItemListApproval/:id", checkToken, getFinalItemListApproval);
+
+router.get("/getMaxItemSlno/:id", checkToken, getMaxItemSlno);
+router.post("/AddMoreItemsDetails", checkToken, AddMoreItemsDetails);
+
+router.patch("/userAck", checkToken, updateUserAck);
+
 
 module.exports = router;

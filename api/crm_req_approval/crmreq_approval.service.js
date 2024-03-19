@@ -688,4 +688,101 @@ module.exports = {
             }
         );
     },
+    getMaxItemSlno: (id, callBack) => {
+        pool.query(
+            `  select max(item_slno) as max_slno from crm_request_mast_detail
+            where req_slno=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    AddMoreItemsDetails: (data, callback) => {
+        pool.query(
+            `INSERT INTO crm_request_mast_detail (
+                req_slno,
+                item_slno,
+                item_desc,
+                item_brand,
+                item_unit,
+                item_qnty,
+                item_specification,
+                item_unit_price,
+                aprox_cost,
+                item_status,
+                approve_item_desc,
+                approve_item_brand,
+                approve_item_unit,
+                item_qnty_approved,
+                approve_item_specification,
+                approve_item_unit_price,
+                item_status_approved,
+                approve_item_status,
+                item_add_higher,
+                create_user
+               )
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+            [
+                data.req_slno,
+                data.item_slno,
+                data.item_desc,
+                data.item_brand,
+                data.item_unit,
+                data.item_qnty,
+                data.item_specification,
+                data.item_unit_price,
+                data.aprox_cost,
+                data.item_status,
+                data.approve_item_desc,
+                data.approve_item_brand,
+                data.approve_item_unit,
+                data.item_qnty_approved,
+                data.approve_item_specification,
+                data.approve_item_unit_price,
+                data.item_status_approved,
+                data.approve_item_status,
+                data.item_add_higher,
+                data.create_user
+            ],
+            (error, results, fields) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateUserAck: (data, callback) => {
+        pool.query(
+            `UPDATE crm_request_master 
+                SET user_acknldge = ? ,
+                user_acknldge_remarks=?,
+                user_ack_user=?,
+                user_ack_date =?
+                WHERE req_slno =?`,
+            [
+                data.user_acknldge,
+                data.user_acknldge_remarks,
+                data.user_ack_user,
+                data.user_ack_date,
+                data.req_slno
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 }

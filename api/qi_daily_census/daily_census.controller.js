@@ -5,15 +5,16 @@ const {
     GetDailyCensusReport,
     DailyCensusUpdate,
     GetCensusBargraphReport,
-    CensusAlreadyInsert
+    CensusAlreadyInsert,
+    ElliderDataUpdate
 } = require('./daily_census.service')
 module.exports = {
     DailyCensusInsert: (req, res) => {
         const body = req.body;
         const data = body?.map((val) => {
             return [val.census_ns_slno, val.census_date, val.yesterday_census, val.total_admission, val.total_discharge,
-            val.transfer_in, val.transfer_out, val.total_death, val.census_total, val.create_user,
-            val.ora_admission, val.ora_discharge, val.ora_death, val.ora_census_total, val.update_status]
+            val.transfer_in, val.transfer_out, val.total_death, val.census_total, val.create_user, val.ora_admission,
+            val.ora_discharge, val.ora_death, val.ora_census_total, val.update_status, val.ora_dama, val.ora_lama]
         })
         const { census_date } = body[0]
         CensusAlreadyInsert(census_date, (err, results) => {
@@ -40,12 +41,8 @@ module.exports = {
             }
         })
     },
-
     DailyCensusAlreadyExist: (req, res) => {
         const body = req.body;
-        // var data = body?.map((val, index) => {
-        //     return [val.census_ns_slno, val.census_date]
-        // })
         DailyCensusAlreadyExist(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
@@ -64,6 +61,21 @@ module.exports = {
                 success: 1,
                 data: results
             })
+        })
+    },
+
+    ElliderDataUpdate: async (req, res) => {
+        const body = req.body;
+        ElliderDataUpdate(body).then(results => {
+            return res.status(200).json({
+                success: 1,
+                message: "Data Updated"
+            });
+        }).catch(err => {
+            return res.status(200).json({
+                success: 0,
+                message: err
+            });
         })
     },
 

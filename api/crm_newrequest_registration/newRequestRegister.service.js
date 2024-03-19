@@ -196,7 +196,7 @@ module.exports = {
             item_qnty,item_specification,aprox_cost,item_status,item_unit_price
                          from crm_request_mast_detail
                          left join am_uom on am_uom.uom_slno=crm_request_mast_detail.item_unit
-                        where req_slno=? and item_status=1`,
+                        where req_slno=? and item_status=1 and item_add_higher!=1`,
             [
                 id
             ],
@@ -449,7 +449,7 @@ module.exports = {
                        crf_close,crf_close_remark,crf_close_user,crf_closed_one,close_date,
                        ack_status,quatation_calling_status,quatation_negotiation,quatation_fixing,
                        po_prepartion,po_complete,po_approva_level_one,po_approva_level_two,po_to_supplier,
-
+                       sub_store_recieve,user_acknldge,
                      store_receive
 
                          from crm_request_master

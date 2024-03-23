@@ -19,7 +19,7 @@ module.exports = {
                        QC.em_name as quatation_user,quatation_negotiation,quatation_negotiation_date,
                        QN.em_name as quatation_neguser,quatation_fixing,quatation_fixing_date,
                        QF.em_name as quatation_fixuser,po_prepartion,po_complete,po_approva_level_one,
-                       po_approva_level_two,po_to_supplier
+                       po_approva_level_two,po_to_supplier,store_receive
 
 
                          from crm_request_master
@@ -204,7 +204,7 @@ module.exports = {
     getPOList: (id, callBack) => {
         pool.query(
             ` select po_detail_slno, req_slno, po_number,po_date,expected_delivery,supply_store,
-            sub_store_name, main_store_slno, main_store, store_code,store_recieve
+            sub_store_name, main_store_slno, main_store, store_code,store_recieve,store_recieve_fully
           from crm_purchase_po_details
           left join crm_store_master on crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store
                         where req_slno=? and po_status=1`,
@@ -410,15 +410,13 @@ module.exports = {
     getPOListSubStorewise: (id, callBack) => {
         pool.query(
             `select po_detail_slno,crm_request_master.req_slno, po_number,po_date,expected_delivery,
-            supply_store,sub_store_name, main_store_slno, main_store, store_code,store_recieve,
-            store_receive_user,store_receive_date,
+            supply_store,sub_store_name, main_store_slno, main_store,store_code,store_recieve,
+            store_recieve_fully,
             R.sec_name as req_deptsec,U.sec_name as user_deptsection,
-            sub_store_recieve,sub_store_recieve_user,sub_store_date,actual_requirement,
+            sub_store_recieve,actual_requirement,
             needed,expected_date,crm_request_master.create_date as req_date
-
           from crm_purchase_po_details
-          
-          left join crm_store_master on crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store
+                    left join crm_store_master on crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store
           left join crm_request_master on crm_request_master.req_slno=crm_purchase_po_details.req_slno
           left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
           left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec

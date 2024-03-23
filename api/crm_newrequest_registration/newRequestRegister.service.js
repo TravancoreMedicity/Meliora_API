@@ -472,7 +472,7 @@ module.exports = {
             left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
 
             left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
-                          where user_deptsec=?   ORDER BY crm_request_master.req_slno DESC`,
+                                     where user_deptsec=?   ORDER BY crm_request_master.req_slno DESC`,
             [
                 id
             ],

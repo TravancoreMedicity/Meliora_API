@@ -114,7 +114,7 @@ module.exports = {
             if (results.length == 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Diet Plan under Selected Nursing Station"
+                    message: "No Department section"
                 });
             }
 

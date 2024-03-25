@@ -77,7 +77,6 @@ module.exports = {
     },
     EndoscopyQiUpdate: async (req, res) => {
         const body = req.body;
-        console.log(body);
         EndoscopyQiUpdate(body).then(results => {
             return res.status(200).json({
                 success: 1,

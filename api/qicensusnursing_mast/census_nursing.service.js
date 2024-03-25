@@ -80,7 +80,7 @@ module.exports = {
                   census_ns_name,
                   census_ns_code
              FROM
-               qi_census_nursing_mast where nursing_status=1 order by census_ns_slno`, [],
+               qi_census_nursing_mast where nursing_status=1 order by census_ns_name`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);

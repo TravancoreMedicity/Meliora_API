@@ -4,7 +4,7 @@ const { getItemListApproval, MaxItemSlno, InactiveItemDetail, updateInchargeAppr
     updateMSApproval, updateMOApproval, updateSMOApproval, updateGMApproval,
     updateMDApproval, updateEDApproval, CrfDeptDataCollectInsert, DataCollectComplete, getDataCollectList,
     CrfDataCollactnSave, getAllForPdfView, getFinalItemListApproval, getMaxItemSlno,
-    AddMoreItemsDetails, updateUserAck
+    AddMoreItemsDetails, updateUserAck, DetailItemReject, DetailItemOnHold
 
 } = require('../crm_req_approval/crmreq_approval.service');
 
@@ -1262,7 +1262,51 @@ module.exports = {
             });
         });
     },
-
-
+    DetailItemReject: (req, res) => {
+        const body = req.body;
+        DetailItemReject(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Item Rejected successfully"
+            });
+        });
+    },
+    DetailItemOnHold: (req, res) => {
+        const body = req.body;
+        DetailItemOnHold(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Item On-hold successfully"
+            });
+        });
+    },
 }
 

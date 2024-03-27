@@ -37,4 +37,140 @@ module.exports = {
         )
     },
 
+    ImageInsertHODStatusUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE crm_request_approval SET 
+            hod_image=1
+            WHERE 
+            req_slno=?`,
+            [
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    ImageInsertDMSStatusUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE crm_request_approval SET 
+            dms_image=1
+            WHERE 
+            req_slno=?`,
+            [
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    ImageInsertMSStatusUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE crm_request_approval SET 
+            ms_image=1
+            WHERE 
+            req_slno=?`,
+            [
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    ImageInsertMOStatusUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE crm_request_approval SET 
+            mo_image=1
+            WHERE 
+            req_slno=?`,
+            [
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    ImageInsertSMOStatusUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE crm_request_approval SET 
+            smo_image=1
+            WHERE 
+            req_slno=?`,
+            [
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    ImageInsertGMStatusUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE crm_request_approval SET 
+            gm_image=1
+            WHERE 
+            req_slno=?`,
+            [
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    ImageInsertMDStatusUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE crm_request_approval SET 
+            md_image=1
+            WHERE 
+            req_slno=?`,
+            [
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    ImageInsertEDStatusUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE crm_request_approval SET 
+            ed_image=1
+            WHERE 
+            req_slno=?`,
+            [
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
 }

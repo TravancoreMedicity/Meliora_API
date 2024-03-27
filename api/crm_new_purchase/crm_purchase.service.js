@@ -19,8 +19,8 @@ module.exports = {
                        QC.em_name as quatation_user,quatation_negotiation,quatation_negotiation_date,
                        QN.em_name as quatation_neguser,quatation_fixing,quatation_fixing_date,
                        QF.em_name as quatation_fixuser,po_prepartion,po_complete,po_approva_level_one,
-                       po_approva_level_two,po_to_supplier,store_receive
-
+                       po_approva_level_two,po_to_supplier,store_receive,
+                       hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image
 
                          from crm_request_master
                          left join crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno

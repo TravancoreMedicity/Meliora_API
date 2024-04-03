@@ -1,10 +1,6 @@
 const {
-    EndoscopyQiInsert,
-    EndoDetailsAlreadyInsert,
-    getPatientList,
-    EndoscopyPatientUpdate,
-    getEndoscopyPatientList,
-    EndoscopyQiUpdate
+    EndoscopyQiInsert, EndoDetailsAlreadyInsert, getPatientList, EndoscopyPatientUpdate,
+    getEndoscopyPatientList, EndoscopyQiUpdate, getLastUpdatedDate, UpdateLastImportedDate
 } = require('./qi_daily.service')
 module.exports = {
 
@@ -152,48 +148,44 @@ module.exports = {
     },
 
 
-    // getQualityInicatorList: (req, res) => {
-    //     const id = req.params.id;
-    //     getQualityInicatorList(id, (err, results) => {
-    //         if (err) {
-    //             return res.status(200).json({
-    //                 success: 0,
-    //                 message: err
-    //             })
-    //         }
-    //         if (Object.keys(results).length === 0) {
-    //             return res.status(200).json({
-    //                 success: 2,
-    //                 message: "No Data Found",
-    //                 data: []
-    //             })
-    //         }
-    //         return res.status(200).json({
-    //             success: 1,
-    //             data: results
-    //         })
-    //     })
-    // },
-    // getQIReportEndoscopy: (req, res) => {
-    //     const body = req.body;
-    //     getQIReportEndoscopy(body, (err, results) => {
-    //         if (err) {
-    //             return res.status(200).json({
-    //                 success: 0,
-    //                 message: err
-    //             })
-    //         }
-    //         if (Object.keys(results).length === 0) {
-    //             return res.status(200).json({
-    //                 success: 2,
-    //                 message: "No Data Found",
-    //                 data: []
-    //             })
-    //         }
-    //         return res.status(200).json({
-    //             success: 1,
-    //             data: results
-    //         })
-    //     })
-    // },
+    getLastUpdatedDate: (req, res) => {
+        const id = req.params.id;
+        getLastUpdatedDate(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+
+    UpdateLastImportedDate: (req, res) => {
+        const body = req.body;
+        UpdateLastImportedDate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: 'Last Date Updated'
+            });
+        });
+    },
+
+
 }

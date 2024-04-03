@@ -182,10 +182,12 @@ const newCRFRegisterImages = require('./api/crm_new_file_upload/crm_fileupload.r
 const CRFRegisterApproval = require('./api/crm_req_approval/crmreq_approval.router')
 const newCRFPurchase = require('./api/crm_new_purchase/crm_purchase.router')
 const InchHODAuthorization = require('./api/co_inchhod_authriztn/inchhod_authoriztn.router')
+
 const qideptmast = require('./api/qi_dept_mast/qi_dept.router')
 const qiendoscopy = require('./api/qi_dailydetailsEndoscopy/qi_daily.router')
 const newCRFStore = require('./api/crm_store_functns/crm_store.router')
 
+const incidentMast = require('./api/incident_mast/incident.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -336,6 +338,7 @@ app.use('/api/InchHODAuthorization', InchHODAuthorization)
 app.use('/api/qidepartment', qideptmast)
 app.use('/api/qiendoscopy', qiendoscopy)
 app.use('/api/newCRFStore', newCRFStore)
+app.use('/api/incidentMaster', incidentMast)
 
 
 server.listen(process.env.APP_PORT, () =>

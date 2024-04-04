@@ -179,7 +179,7 @@ module.exports = {
             left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
 
             left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
-                          where user_deptsec IN (?)  ORDER BY crm_request_master.req_slno DESC`,
+                          where user_deptsec IN (?) and user_acknldge is null ORDER BY crm_request_master.req_slno DESC`,
             [
                 data
             ],
@@ -357,7 +357,8 @@ module.exports = {
             left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
 
             left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
-                          where incharge_approve=1 and user_acknldge is null ORDER BY crm_request_master.req_slno DESC`,
+            where incharge_approve=1 
+            and user_acknldge is null ORDER BY crm_request_master.req_slno DESC`,
             [],
             (error, results, fields) => {
                 if (error) {
@@ -476,7 +477,7 @@ module.exports = {
             left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
 
             left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
-                                     where user_deptsec=?   ORDER BY crm_request_master.req_slno DESC`,
+                                     where user_deptsec=? and user_acknldge is null  ORDER BY crm_request_master.req_slno DESC`,
             [
                 id
             ],

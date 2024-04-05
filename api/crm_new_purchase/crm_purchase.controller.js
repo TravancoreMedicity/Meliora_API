@@ -292,7 +292,7 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,

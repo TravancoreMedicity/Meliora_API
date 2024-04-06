@@ -65,48 +65,29 @@ module.exports = {
     },
     updateDept: (req, res) => {
         const body = req.body;
-        const body_result = validateDeptSec.validate(body);
-        body.sec_name = body_result.value.sec_name;
-        if (body_result.error) {
-            logger.logwindow(body_result.error.details[0].message)
-            return res.status(200).json({
-                success: 3,
-                message: body_result.error.details[0].message
-            });
-        }
-        checkUpdateVal(body, (err, results) => {
-            const value = JSON.parse(JSON.stringify(results))
-            if (Object.keys(value).length === 0) {
-                updateDept(body, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
-                        return res.status(200).json({
-                            success: 0,
-                            message: err
-                        });
-                    }
-                    if (!results) {
-                        logger.infologwindow("Record Not Found")
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Record Not Found"
-                        });
-                    }
-
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Departmentsection Updated Successfully"
-                    });
-
-                });
-            } else {
-                logger.infologwindow("Departmentsection  Already Exist")
+        updateDept(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
                 return res.status(200).json({
-                    success: 7,
-                    message: "Departmentsection Already Exist"
-                })
+                    success: 0,
+                    message: err
+                });
             }
-        })
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "Record Not Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: "Departmentsection Updated Successfully"
+            });
+
+        });
+
     },
     deleteDept: (req, res) => {
         const body = req.body;

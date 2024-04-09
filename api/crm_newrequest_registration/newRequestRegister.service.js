@@ -158,7 +158,7 @@ module.exports = {
                        hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
                      store_receive,
                      ack_remarks,quatation_calling_date,quatation_negotiation_date,quatation_fixing_date,
-                     po_complete_date
+                     po_complete_date,TD.dept_name,TD.dept_type
 
                          from crm_request_master
                          left join crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
@@ -177,7 +177,8 @@ module.exports = {
             left join co_employee_master GM on GM.em_id=crm_request_approval.gm_user
             left join co_employee_master ED on ED.em_id=crm_request_approval.ed_user
             left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
-
+            left join co_deptsec_mast T on T.sec_id=crm_request_master.request_deptsec_slno
+            left join co_department_mast TD on TD.dept_id=T.dept_id
             left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
                           where user_deptsec IN (?) and user_acknldge is null ORDER BY crm_request_master.req_slno DESC`,
             [
@@ -336,7 +337,7 @@ module.exports = {
                        hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
                      store_receive,
                      ack_remarks,quatation_calling_date,quatation_negotiation_date,quatation_fixing_date,
-                     po_complete_date
+                     po_complete_date, TD.dept_name,TD.dept_type
 
                          from crm_request_master
                          left join crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
@@ -355,7 +356,8 @@ module.exports = {
             left join co_employee_master GM on GM.em_id=crm_request_approval.gm_user
             left join co_employee_master ED on ED.em_id=crm_request_approval.ed_user
             left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
-
+            left join co_deptsec_mast T on T.sec_id=crm_request_master.request_deptsec_slno
+            left join co_department_mast TD on TD.dept_id=T.dept_id
             left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
             where incharge_approve=1 
             and user_acknldge is null ORDER BY crm_request_master.req_slno DESC`,

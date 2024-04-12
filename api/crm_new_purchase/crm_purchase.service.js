@@ -39,7 +39,7 @@ module.exports = {
                         left join co_employee_master QF on QF.em_id=crm_purchase_mast.quatation_fixing_user
 
 
-                          where md_approve=1 and ed_approve=1 and user_acknldge is null ORDER BY crm_request_master.req_slno DESC`,
+                          where md_approve=1 and ed_approve=1 and po_to_supplier=0 and user_acknldge is null ORDER BY crm_request_master.req_slno DESC`,
             [],
             (error, results, feilds) => {
                 if (error) {

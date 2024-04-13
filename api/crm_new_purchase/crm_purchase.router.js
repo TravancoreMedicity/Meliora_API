@@ -1,11 +1,13 @@
 const router = require('express').Router();
 const { checkToken } = require("../../authentication/token_validation");
-const { InsertPurchaseAck, getAllApprovedForPurchase, QuatationCalling, QuatationNegotiation,
+const { getPurchaseAckPending, InsertPurchaseAck, getAllApprovedForPurchase, QuatationCalling, QuatationNegotiation,
     QuatationFixing, InsertinglePO, InsertMultiplePO, getPOList, PoComplete,
     PoFinals, getAllApprovedForStore, storedataUpdate, getSubstores, getMainStore,
     storeReciverdataUpdate, getPOListSubStorewise, SubstoreReciverdataUpdate
 
 } = require('../crm_new_purchase/crm_purchase.controller')
+
+router.get("/getPurchaseAckPending", checkToken, getPurchaseAckPending);
 
 router.get("/getAllApprovedForPurchase", checkToken, getAllApprovedForPurchase);
 router.post("/InsertPurchaseAck", checkToken, InsertPurchaseAck);

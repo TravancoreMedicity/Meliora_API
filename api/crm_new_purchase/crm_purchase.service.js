@@ -1,5 +1,41 @@
 const { pool } = require('../../config/database')
 module.exports = {
+    getPurchaseAckPending: (callBack) => {
+        pool.query(
+            `
+            select crm_request_master.req_slno,crm_request_master.actual_requirement,
+              crm_request_master.needed,
+              R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,
+               crf_close,crf_close_remark,crf_closed_one,close_date,C.em_name as closed_user,
+               crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
+               crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
+               rm_ndrf,category,image_status,emergency_flag,emer_slno,crm_request_master.create_date,
+               total_approx_cost,user_deptsec,req_status,                           
+               ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date, ED.em_name as  ed_user,
+               md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,MD.em_name as md_user,
+                ed_image,md_image
+            from crm_request_approval        
+                                
+                left join crm_request_master on crm_request_master.req_slno=crm_request_approval.req_slno
+                left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
+                left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
+                left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
+                left join co_employee_master CR on CR.em_id=crm_request_master.create_user           
+                left join co_employee_master C on C.em_id=crm_request_approval.crf_close_user           
+                left join co_employee_master ED on ED.em_id=crm_request_approval.ed_user
+                left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
+            where ed_approve=1 and md_approve=1 and user_acknldge is null and
+            crm_request_approval.req_slno not in (select req_slno from crm_purchase_mast )
+            ORDER BY crm_request_master.req_slno DESC`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
 
 
     getAllApprovedForPurchase: (callBack) => {

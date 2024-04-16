@@ -2,7 +2,7 @@ const { getPurchaseAckPending, getAllApprovedForPurchase, InsertPurchaseAck, Qua
     QuatationNegotiation, QuatationFixing, InsertinglePO, updatePOAdd,
     InsertMultiplePO, getPOList, PoComplete, PoFinals, getAllApprovedForStore,
     storedataUpdate, getSubstores, getMainStore, storeReciverdataUpdate,
-    getPOListSubStorewise, SubstoreReciverdataUpdate
+    getPOListSubStorewise, SubstoreReciverdataUpdate, PurchsDataCollectionPending
 } = require('../crm_new_purchase/crm_purchase.service');
 
 const logger = require('../../logger/logger');
@@ -472,5 +472,29 @@ module.exports = {
             });
         });
     },
+
+    PurchsDataCollectionPending: (req, res) => {
+        PurchsDataCollectionPending((err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
 }
 

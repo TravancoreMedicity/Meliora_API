@@ -3,7 +3,8 @@ const { checkToken } = require("../../authentication/token_validation");
 const { getPurchaseAckPending, InsertPurchaseAck, getAllApprovedForPurchase, QuatationCalling, QuatationNegotiation,
     QuatationFixing, InsertinglePO, InsertMultiplePO, getPOList, PoComplete,
     PoFinals, getAllApprovedForStore, storedataUpdate, getSubstores, getMainStore,
-    storeReciverdataUpdate, getPOListSubStorewise, SubstoreReciverdataUpdate
+    storeReciverdataUpdate, getPOListSubStorewise, SubstoreReciverdataUpdate,
+    PurchsDataCollectionPending
 
 } = require('../crm_new_purchase/crm_purchase.controller')
 
@@ -26,7 +27,7 @@ router.get("/getMainStore/:id", checkToken, getMainStore);
 router.patch("/storeReciverdataUpdate", checkToken, storeReciverdataUpdate);
 router.get("/getPOListSubStorewise/:id", checkToken, getPOListSubStorewise);
 router.patch("/SubstoreReciverdataUpdate", checkToken, SubstoreReciverdataUpdate);
-
+router.get("/PurchsDataCollectionPending", checkToken, PurchsDataCollectionPending);
 
 
 

@@ -343,14 +343,12 @@ module.exports = {
                        QF.em_name as quatation_fixuser,po_prepartion,po_complete,po_approva_level_one,
                        po_approva_level_two,po_to_supplier,store_receive,SA.em_name as storeack_user,
                        store_receive_date
-
                          from crm_request_master
                          left join crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
                          left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
                           left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
-                                                    left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
+                        left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
                           left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
-
                           left join co_employee_master CR on CR.em_id=crm_request_master.create_user           
                           left join co_employee_master C on C.em_id=crm_request_approval.crf_close_user           
                           left join co_employee_master ED on ED.em_id=crm_request_approval.ed_user
@@ -360,7 +358,6 @@ module.exports = {
                         left join co_employee_master QN on QN.em_id=crm_purchase_mast.quatation_negotiation_user
                         left join co_employee_master QF on QF.em_id=crm_purchase_mast.quatation_fixing_user
                         left join co_employee_master SA on SA.em_id=crm_purchase_mast.store_receive_user
-
                           where crm_purchase_mast.po_to_supplier=1
                           and user_acknldge is null  ORDER BY crm_request_master.req_slno DESC`,
             [],

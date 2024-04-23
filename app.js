@@ -185,7 +185,7 @@ const InchHODAuthorization = require('./api/co_inchhod_authriztn/inchhod_authori
 const qideptmast = require('./api/qi_dept_mast/qi_dept.router')
 const qiendoscopy = require('./api/qi_dailydetailsEndoscopy/qi_daily.router')
 const newCRFStore = require('./api/crm_store_functns/crm_store.router')
-
+const CrmNewApprovals = require('./api/crm_new_approvals/newReqApprovalsList.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -336,7 +336,7 @@ app.use('/api/InchHODAuthorization', InchHODAuthorization)
 app.use('/api/qidepartment', qideptmast)
 app.use('/api/qiendoscopy', qiendoscopy)
 app.use('/api/newCRFStore', newCRFStore)
-
+app.use('/api/CrmNewApprovals', CrmNewApprovals)
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

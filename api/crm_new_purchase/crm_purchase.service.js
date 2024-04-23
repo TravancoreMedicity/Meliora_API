@@ -361,7 +361,8 @@ module.exports = {
                         left join co_employee_master QF on QF.em_id=crm_purchase_mast.quatation_fixing_user
                         left join co_employee_master SA on SA.em_id=crm_purchase_mast.store_receive_user
 
-                          where crm_purchase_mast.po_to_supplier=1 ORDER BY crm_request_master.req_slno DESC`,
+                          where crm_purchase_mast.po_to_supplier=1
+                          and user_acknldge is null  ORDER BY crm_request_master.req_slno DESC`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -540,7 +541,8 @@ module.exports = {
                         left join co_employee_master RU on RU.em_id=crm_data_collection.req_user           
                         left join co_employee_master SU on SU.em_id=crm_data_collection.save_user
                         left join co_deptsec_mast RE on RE.sec_id=crm_data_collection.crf_req_collect_dept
-where crf_dept_status is null and crm_purchase_mast.req_slno = crm_data_collection.crf_requst_slno
+                where crf_dept_status is null and crm_purchase_mast.req_slno = crm_data_collection.crf_requst_slno
+                group by req_slno
             `,
             [],
             (error, results, feilds) => {

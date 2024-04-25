@@ -148,7 +148,7 @@ module.exports = {
     complaintTypeById: (id, callBack) => {
         pool.query(
             `select complaint_type_slno,complaint_type_name from cm_complaint_type
-            where complaint_dept_slno=?`,
+            where complaint_dept_slno=? and complaint_type_status=1`,
             [
                 id
             ],

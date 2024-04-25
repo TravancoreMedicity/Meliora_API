@@ -171,7 +171,7 @@ const amReport = require('./api/am_reports/am_reports.router')
 const crmEmergncyType = require('./api/crm_emergncytype_mast/emergncy_tpe.router')
 const assetInternalTrans = require('./api/am_asset_internaltrans/asset_internaltrans.router')
 const qltyindicator = require('./api/qi_master/qltyIndicator.router')
-const qidetails = require('./api/qi_dailydetailsEndoscopy/qi_daily.router')
+
 const emergencyqi = require('./api/qi_dailydetailsEmergency/qi_emergency.router')
 const dailycensus = require('./api/qi_daily_census/daily_census.router')
 const censusNursMast = require('./api/qicensusnursing_mast/census_nursing.router')
@@ -191,6 +191,11 @@ const ItBillAdd = require('./api/it_bill_management/bill.router')
 const ItBillVieww = require('./api/it_bill_vieww/bill_view.router')
 const ItBillSuppDetails = require('./api/it_bill_supplier_detail_master/supp_detail.router')
 const ItBillSupplierList = require('./api/it_select_components/devicetypeSelect.router')
+const qideptmast = require('./api/qi_dept_mast/qi_dept.router')
+const qiendoscopy = require('./api/qi_dailydetailsEndoscopy/qi_daily.router')
+const newCRFStore = require('./api/crm_store_functns/crm_store.router')
+const CrmNewApprovals = require('./api/crm_new_approvals/newReqApprovalsList.router')
+
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -332,7 +337,6 @@ app.use('/api/tmReport', TmReport)
 app.use('/api/newCRFRegister', newCRFRegister)
 app.use('/api/newCRFRegisterImages', newCRFRegisterImages)
 app.use('/api/qualityindicator', qltyindicator)
-app.use('/api/qiendoscopy', qidetails)
 app.use('/api/qiemergency', emergencyqi)
 app.use('/api/qidailycensus', dailycensus)
 app.use('/api/censusNursingStat', censusNursMast)
@@ -348,6 +352,10 @@ app.use('/api/ItBillAdd', ItBillAdd)
 app.use('/api/ItBillVieww', ItBillVieww)
 app.use('/api/ItBillSuppDetails', ItBillSuppDetails)
 app.use('/api/ItBillType', ItBillSupplierList)
+app.use('/api/qidepartment', qideptmast)
+app.use('/api/qiendoscopy', qiendoscopy)
+app.use('/api/newCRFStore', newCRFStore)
+app.use('/api/CrmNewApprovals', CrmNewApprovals)
 
 
 server.listen(process.env.APP_PORT, () =>

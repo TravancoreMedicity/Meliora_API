@@ -3,7 +3,8 @@ const { getItemListApproval, MaxItemSlno, InactiveItemDetail, updateInchargeAppr
     DetailOldItemInactive, updateCrfClose, updateMasterCrfClose, updateHODApproval, updateDMSApproval,
     updateMSApproval, updateMOApproval, updateSMOApproval, updateGMApproval,
     updateMDApproval, updateEDApproval, CrfDeptDataCollectInsert, DataCollectComplete, getDataCollectList,
-    CrfDataCollactnSave, getAllForPdfView, getFinalItemListApproval
+    CrfDataCollactnSave, getAllForPdfView, getFinalItemListApproval, getMaxItemSlno,
+    AddMoreItemsDetails, updateUserAck, DetailItemReject, DetailItemOnHold
 
 } = require('../crm_req_approval/crmreq_approval.service');
 
@@ -1194,5 +1195,118 @@ module.exports = {
         });
     },
 
+    getMaxItemSlno: (req, res) => {
+        const id = req.params.id
+        getMaxItemSlno(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    succes: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    succes: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                succes: 1,
+                dataa: results
+            });
+        });
+    },
+
+    AddMoreItemsDetails: (req, res) => {
+        const body = req.body;
+        AddMoreItemsDetails(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                message: "New Item inserted Successfully",
+
+            });
+        });
+    },
+
+
+    updateUserAck: (req, res) => {
+        const body = req.body;
+
+        updateUserAck(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "User Acknowledged successfully"
+            });
+        });
+    },
+    DetailItemReject: (req, res) => {
+        const body = req.body;
+        DetailItemReject(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Item Rejected successfully"
+            });
+        });
+    },
+    DetailItemOnHold: (req, res) => {
+        const body = req.body;
+        DetailItemOnHold(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Item On-hold successfully"
+            });
+        });
+    },
 }
 

@@ -1,9 +1,9 @@
 
-const { DeviceTypeInsert, DeviceTypeView, DeviceTypeUpdate } = require('../it_communication_device_type/device_type.services')
+const { SimTypeInsert, SimTypeView, SimtypeUpdate } = require('../it_sim_type_master/sim_type.service')
 module.exports = {
-    DeviceTypeInsert: (req, res) => {
+    SimTypeInsert: (req, res) => {
         const body = req.body;
-        DeviceTypeInsert(body, (err, result) => {
+        SimTypeInsert(body, (err, result) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -12,13 +12,13 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Device type inserted successfully"
+                message: "Sim type inserted successfully"
             })
         })
     },
-    DeviceTypeView: (req, res) => {
+    SimTypeView: (req, res) => {
 
-        DeviceTypeView((err, results) => {
+        SimTypeView((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -38,10 +38,10 @@ module.exports = {
 
         })
     },
-    DeviceTypeUpdate: (req, res) => {
+    SimtypeUpdate: (req, res) => {
         const body = req.body;
 
-        DeviceTypeUpdate(body, (err, results) => {
+        SimtypeUpdate(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -57,7 +57,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Device type Updated successfully"
+                message: "Sim type Updated successfully"
             })
         })
     },

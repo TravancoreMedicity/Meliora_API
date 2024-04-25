@@ -14,6 +14,7 @@ module.exports = {
             am_group.group_name,
             am_item_name_creation.item_name,
             co_deptsec_mast.sec_name,
+            am_item_map_slno,
              item_asset_no,
             item_asset_no_only
             from am_asset_item_map_master

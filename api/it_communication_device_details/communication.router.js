@@ -7,11 +7,6 @@ router.post('/insert', checkToken, CommunicationDeviceInsert)
 router.get('/view', checkToken, CommunicationDeviceView)
 router.patch('/update', checkToken, CommunicationDeviceUpdate)
 
-
-
-
-
-
 router.post('/siminsert', checkToken, SimMastInsert)
 router.get('/simDetailView', checkToken, SimMastView)
 router.patch('/simUpdate', checkToken, SimMastUpdate)

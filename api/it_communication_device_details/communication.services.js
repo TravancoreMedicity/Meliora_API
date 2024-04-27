@@ -142,7 +142,7 @@ module.exports = {
             it_sim_tariff,
             it_sim_tariff_amount,
             it_sim_status,
-            it_sim_category,
+            it_sim_type,
             it_sim_dept,
             it_sim_deptsec,
             it_sim_recie_empid,
@@ -161,7 +161,7 @@ module.exports = {
                 data.it_sim_tariff,
                 data.it_sim_tariff_amount,
                 data.it_sim_status,
-                data.it_sim_category,
+                data.it_sim_type,
                 data.it_sim_dept,
                 data.it_sim_deptsec,
                 data.it_sim_recie_empid,
@@ -191,7 +191,8 @@ module.exports = {
             it_sim_tariff, 
             it_sim_tariff_amount,
             it_sim_status,
-            it_sim_category,
+            it_sim_type,
+            it_sim_type_name,
             it_sim_dept,
             it_sim_deptsec,
             it_sim_recie_empid,
@@ -203,7 +204,8 @@ module.exports = {
             FROM
             it_sim_detail_mast
             left join co_department_mast on co_department_mast.dept_id=it_sim_detail_mast.it_sim_dept
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=it_sim_detail_mast.it_sim_deptsec`, [],
+            left join co_deptsec_mast on co_deptsec_mast.sec_id=it_sim_detail_mast.it_sim_deptsec
+            left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_sim_detail_mast.it_sim_type`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -225,7 +227,7 @@ module.exports = {
             it_sim_tariff=?,
             it_sim_tariff_amount=?,
             it_sim_status=?,
-            it_sim_category=?,
+            it_sim_type=?,
             it_sim_dept=?,
             it_sim_deptsec=?,
             it_sim_recie_empid=?,
@@ -243,7 +245,7 @@ module.exports = {
                 data.it_sim_tariff,
                 data.it_sim_tariff_amount,
                 data.it_sim_status,
-                data.it_sim_category,
+                data.it_sim_type,
                 data.it_sim_dept,
                 data.it_sim_deptsec,
                 data.it_sim_recie_empid,

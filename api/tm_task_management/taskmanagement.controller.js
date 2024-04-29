@@ -287,23 +287,110 @@ module.exports = {
 
     UpdateSubTask: (req, res) => {
         const body = req.body;
-        UpdateSubTask(body, (err, results) => {
+        UpdateSubTask(body, (err, result) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
+                });
+            }
+            if (body.tm_task_status === 1 || body.tm_task_status === 2) {
+                const id = body.main_task_slno
+                GetTaskSlno(id, (err, results) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    if (!results) {
+                        return res.status(200).json({
+                            success: 1,
+                            message: "No Data"
+                        });
+                    }
+                    const status = JSON.parse(JSON.stringify(results[0])).tm_task_status
+                    if (status === 0) {
+                        const updateDta = {
+                            tm_task_slno: body.main_task_slno
+                        }
+                        UpdateStatus(updateDta, (err, results) => {
+                            if (err) {
+                                return res.status(200).json({
+                                    success: 0,
+                                    message: err
+                                })
+                            }
+                            if (results === 0) {
+                                return res.status(200).json({
+                                    success: 1,
+                                    message: "No record found"
+
+                                })
+                            }
+                            UpdateSubTask(body, (err, results) => {
+                                if (err) {
+                                    return res.status(200).json({
+                                        success: 0,
+                                        message: err
+                                    })
+                                }
+                                if (results === 0) {
+                                    return res.status(200).json({
+                                        success: 1,
+                                        message: "No record found"
+                                    })
+                                }
+                                return res.status(200).json({
+                                    success: 2,
+                                    message: "Subtask Updated successfully"
+                                })
+                            })
+
+                        })
+                    }
+                    else {
+                        UpdateSubTask(body, (err, results) => {
+                            if (err) {
+                                return res.status(200).json({
+                                    success: 0,
+                                    message: err
+                                })
+                            }
+                            if (results === 0) {
+                                return res.status(200).json({
+                                    success: 1,
+                                    message: "No record found"
+                                })
+                            }
+                            return res.status(200).json({
+                                success: 2,
+                                message: "Subtask Updated successfully"
+                            })
+                        })
+                    }
                 })
             }
-            if (results === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: "No record found"
+            else {
+                UpdateSubTask(body, (err, results) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        })
+                    }
+                    if (results === 0) {
+                        return res.status(200).json({
+                            success: 1,
+                            message: "No record found"
+                        })
+                    }
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Subtask Updated successfully"
+                    })
                 })
             }
-            return res.status(200).json({
-                success: 2,
-                message: "Subtask Updated successfully"
-            })
         })
     },
 
@@ -580,7 +667,6 @@ module.exports = {
                         success: 1,
                     })
                 })
-
             }
             else {
                 const id = body.main_task_slno

@@ -277,6 +277,7 @@ module.exports = {
             co_employee_master.em_name,
             tm_onhold_remarks,
             tm_pending_remark,
+            tm_complete_date,
             tm_new_task_mast.create_date,
             tm_completed_remarks,
             tm_task_description
@@ -312,6 +313,7 @@ module.exports = {
             tm_assigne_emp,
             main_task_slno,
             tm_task_status,
+            tm_complete_date,
             co_employee_master.em_name,
             tm_pending_remark,
             tm_onhold_remarks,
@@ -579,6 +581,7 @@ module.exports = {
             tm_completed_remarks,
             tm_task_description,
             tm_task_status,
+            tm_complete_date,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
             GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name  
             FROM meliora.tm_new_task_mast            

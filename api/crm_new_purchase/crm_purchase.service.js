@@ -358,7 +358,7 @@ module.exports = {
                         left join co_employee_master QN on QN.em_id=crm_purchase_mast.quatation_negotiation_user
                         left join co_employee_master QF on QF.em_id=crm_purchase_mast.quatation_fixing_user
                         left join co_employee_master SA on SA.em_id=crm_purchase_mast.store_receive_user
-                          where crm_purchase_mast.po_to_supplier=1
+                          where crm_purchase_mast.po_to_supplier=1 and store_receive is null
                           and user_acknldge is null  ORDER BY crm_request_master.req_slno DESC`,
             [],
             (error, results, feilds) => {

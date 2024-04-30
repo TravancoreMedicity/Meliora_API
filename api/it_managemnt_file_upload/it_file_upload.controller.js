@@ -251,7 +251,7 @@ module.exports = {
     },
     getMonthlyBillImages: (req, res) => {
         const id = req.params.id
-        const folderPath = `D:/MelioraDoc/MonthlyBill/${id}`;
+        const folderPath = `D:/DocMeliora/Meliora/Bills/MonthlyBill/${id}`;
         fs.readdir(folderPath, (err, files) => {
 
             if (err) {
@@ -271,7 +271,7 @@ module.exports = {
     getQuaterlyBillImages: (req, res) => {
 
         const id = req.params.id
-        const folderPath = `D:/DocMeliora/Meliora/Bills/QuarterltyBill/${id}`;
+        const folderPath = `D:/DocMeliora/Meliora/Bills/QuarterlyBill/${id}`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
                 return res.status(200).json({
@@ -345,7 +345,7 @@ module.exports = {
                 try {
                     const files = req.files;
                     const id = body.id;
-                    const em_id_folder = path.join('D:/DocMeliora/Meliora/Bills/QuarterltyBill', `${id}`);
+                    const em_id_folder = path.join('D:/DocMeliora/Meliora/Bills/QuarterlyBill', `${id}`);
 
                     // Create the em_id folder if it doesn't exist
                     if (!fs.existsSync(em_id_folder)) {

@@ -12,7 +12,7 @@ router.post("/uploadFile/Others", uploadOtherFile)
 router.get("/uploadFile/getMonthlyBillImages/:id", getMonthlyBillImages)
 router.get("/uploadFile/getQuaterlyBillImages/:id", getQuaterlyBillImages)
 router.get("/uploadFile/getYearlyBillImages/:id", getYearlyBillImages)
-router.get("/uploadFile/getYearlyBillImages/:id", getOtherBillImages)
+router.get("/uploadFile/getOtherBillImages/:id", getOtherBillImages)
 
 
 router.get('/teleMonthlyBills', checkToken, TeleMonthlyBills)

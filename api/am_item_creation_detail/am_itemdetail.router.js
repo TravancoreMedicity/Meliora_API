@@ -9,7 +9,10 @@ const { checkDetailInsertOrNot, GRNDetailsInsert, GRNDetailsUpdate, BillDetailsI
     LeaseDetailsInsertSpare, LeaseDetailsUpdateSpare, WarentGraruntyInsertSpare,
     WarentGraruntyUpdateSpare, AmcPmInsertSpare, AmcPmUpdateSpare, getdeptsecBsedonCustdept,
     getdeptsecBsedonCustdeptSpare, SpecificationInsertOrNot, SpecificationInsert, SepcifiDelete,
-    GetFreespareList, SpareDetailsInsert, SpareDetailsInsertOrNot, SpareDelete
+    GetFreespareList, SpareDetailsInsert, SpareDetailsInsertOrNot, SpareDelete,
+    AmcCMCInsert, AmcCmcview, AmcCmcUpdate, AmcCmcviewSelect, BillMasterInsert,
+    BillMasterview, BillMasterUpdate, BillMasterviewSelect, GetBillMasterById,
+    GetAmcCmcMasterById
 } = require('../am_item_creation_detail/am_itemdetail.controller');
 
 router.get("/checkDetailInsertOrNot/:id", checkToken, checkDetailInsertOrNot)
@@ -67,5 +70,19 @@ router.post("/GetFreespareList", checkToken, GetFreespareList);
 router.post("/SpareDetailsInsert", checkToken, SpareDetailsInsert);
 router.get("/SpareDetailsInsertOrNot/:id", checkToken, SpareDetailsInsertOrNot)
 router.patch("/SpareDelete", checkToken, SpareDelete);
+
+router.post('/AmcCMCInsert', checkToken, AmcCMCInsert)
+router.get('/AmcCmcview', checkToken, AmcCmcview)
+router.patch('/AmcCmcUpdate', checkToken, AmcCmcUpdate)
+router.get('/AmcCmcviewSelect', checkToken, AmcCmcviewSelect)
+
+
+router.post('/BillMasterInsert', checkToken, BillMasterInsert)
+router.get('/BillMasterview', checkToken, BillMasterview)
+router.patch('/BillMasterUpdate', checkToken, BillMasterUpdate)
+router.get('/BillMasterviewSelect', checkToken, BillMasterviewSelect)
+router.get("/GetBillMasterById/:id", checkToken, GetBillMasterById)
+router.get("/GetAmcCmcMasterById/:id", checkToken, GetAmcCmcMasterById)
+
 
 module.exports = router

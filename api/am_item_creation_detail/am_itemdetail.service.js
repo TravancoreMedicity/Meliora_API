@@ -195,20 +195,12 @@ module.exports = {
     BillDetailsUpdate: (data, callback) => {
         pool.query(
             `UPDATE am_item_map_details SET 
-            am_bill_no=?,
-            am_bill_date=?,
-            am_bill_amount=?,
-            am_bill_vendor_detail=?,
-            am_bill_image=?,
+            am_bill_mast_slno=?,           
             edit_user=?
             WHERE 
             am_item_map_slno=?`,
             [
-                data.am_bill_no,
-                data.am_bill_date,
-                data.am_bill_amount,
-                data.am_bill_vendor_detail,
-                data.am_bill_image,
+                data.am_bill_mast_slno,
                 data.edit_user,
                 data.am_item_map_slno,
             ],
@@ -254,20 +246,12 @@ module.exports = {
     BillDetailsUpdateSpare: (data, callback) => {
         pool.query(
             `UPDATE am_item_map_details SET 
-            am_bill_no=?,
-            am_bill_date=?,
-            am_bill_amount=?,
-            am_bill_vendor_detail=?,
-            am_bill_image=?,
+            am_bill_mast_slno=?,
             edit_user=?
             WHERE 
             am_spare_item_map_slno=?`,
             [
-                data.am_bill_no,
-                data.am_bill_date,
-                data.am_bill_amount,
-                data.am_bill_vendor_detail,
-                data.am_bill_image,
+                data.am_bill_mast_slno,
                 data.edit_user,
                 data.am_spare_item_map_slno,
             ],
@@ -746,8 +730,13 @@ module.exports = {
 
     AmcPmInsertOrNot: (id, callBack) => {
         pool.query(
-            `SELECT *           
+            `SELECT am_item_amcpm_slno, am_item_map_slno, am_item_map_amcpm_detail.amc_status, am_item_map_amcpm_detail.cmc_status, 
+            pm_status, 
+          instalation_date, due_date,  amc_slno ,
+           am_amc_cmc_master.contact_address, am_amc_cmc_master.amc_status as amc,
+            am_amc_cmc_master.cmc_status as cmc, from_date, to_date,image_upload
             FROM am_item_map_amcpm_detail
+            left join am_amc_cmc_master on am_amc_cmc_master.amccmc_slno=am_item_map_amcpm_detail.amc_slno
             WHERE am_item_map_slno=?`,
             [id],
             (error, results, fields) => {
@@ -782,27 +771,21 @@ module.exports = {
             am_item_map_slno,
             amc_status,
             cmc_status,
-            amc_from,
-            amc_to,
-            contact_address,
-            amc_file_status,
-            instalation_date,
+           instalation_date,
             due_date,
             pm_status,
+            amc_slno,
             create_user
           )
-          VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?)`,
             [
                 data.am_item_map_slno,
                 data.amc_status,
                 data.cmc_status,
-                data.amc_from,
-                data.amc_to,
-                data.contact_address,
-                data.amc_file_status,
                 data.instalation_date,
                 data.due_date,
                 data.pm_status,
+                data.amc_slno,
                 data.create_user
             ],
 
@@ -818,27 +801,21 @@ module.exports = {
         pool.query(
             `UPDATE am_item_map_amcpm_detail SET 
             amc_status=?,
-            cmc_status=?,
-            amc_from=?,
-            amc_to=?,
-            contact_address=?,
-            amc_file_status=?,
+            cmc_status=?,           
             instalation_date=?,
             due_date=?,
             pm_status=?,
+            amc_slno=?,
             edit_user=?
             WHERE 
             am_item_map_slno=?`,
             [
                 data.amc_status,
                 data.cmc_status,
-                data.amc_from,
-                data.amc_to,
-                data.contact_address,
-                data.amc_file_status,
                 data.instalation_date,
                 data.due_date,
                 data.pm_status,
+                data.amc_slno,
                 data.edit_user,
                 data.am_item_map_slno,
             ],
@@ -1102,4 +1079,214 @@ module.exports = {
             }
         );
     },
+
+    AmcCMCInsert: (data, callback) => {
+
+        pool.query(
+            `INSERT INTO am_amc_cmc_master
+          ( 
+            contact_address,
+            amc_status,
+            cmc_status,
+            from_date,
+            to_date,
+            create_user
+          )
+          VALUES(?,?,?,?,?,?)`,
+            [
+                data.contact_address,
+                data.amc_status,
+                data.cmc_status,
+                data.from_date,
+                data.to_date,
+                data.create_user
+            ],
+
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    AmcCmcview: (callback) => {
+        pool.query(
+            `SELECT
+            amccmc_slno,contact_address,amc_status,
+            cmc_status,from_date,to_date,
+            if(amc_status=1,'AMC','CMC')status,image_upload
+            FROM
+            am_amc_cmc_master`, [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
+    AmcCmcUpdate: (data, callback) => {
+        pool.query(
+
+            `UPDATE am_amc_cmc_master SET 
+            contact_address=?,
+            amc_status=?,
+            cmc_status=?,
+            from_date= ?,
+            to_date=?,
+            edit_user=?
+            WHERE 
+            amccmc_slno=?`,
+
+            [
+
+                data.contact_address,
+                data.amc_status,
+                data.cmc_status,
+                data.from_date,
+                data.to_date,
+                data.edit_user,
+                data.amccmc_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    AmcCmcviewSelect: (callback) => {
+        pool.query(
+            `SELECT
+            amccmc_slno,contact_address
+            FROM
+            am_amc_cmc_master`, [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
+
+    BillMasterInsert: (data, callback) => {
+
+        pool.query(
+            `INSERT INTO am_bill_master
+          ( 
+            am_bill_no,
+            am_bill_date,
+            am_bill_amount,
+            am_bill_vendor_detail,           
+            create_user
+          )
+          VALUES(?,?,?,?,?)`,
+            [
+                data.am_bill_no,
+                data.am_bill_date,
+                data.am_bill_amount,
+                data.am_bill_vendor_detail,
+                data.create_user
+            ],
+
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    BillMasterview: (callback) => {
+        pool.query(
+            `SELECT
+            am_bill_mastslno,am_bill_no,am_bill_date,
+            am_bill_amount,am_bill_vendor_detail,am_bill_image
+            FROM
+            am_bill_master`, [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    BillMasterUpdate: (data, callback) => {
+        pool.query(
+
+            `UPDATE am_bill_master SET 
+            am_bill_no=?,
+            am_bill_date=?,
+            am_bill_amount=?,
+            am_bill_vendor_detail= ?,
+            edit_user=?
+            WHERE 
+            am_bill_mastslno=?`,
+            [
+                data.am_bill_no,
+                data.am_bill_date,
+                data.am_bill_amount,
+                data.am_bill_vendor_detail,
+                data.edit_user,
+                data.am_bill_mastslno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    BillMasterviewSelect: (callback) => {
+        pool.query(
+            `SELECT
+            am_bill_mastslno,am_bill_no
+            FROM
+            am_bill_master`, [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
+
+    GetBillMasterById: (id, callBack) => {
+        pool.query(
+            `SELECT *           
+            FROM am_bill_master
+            WHERE am_bill_mastslno=?`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    callBack(error)
+                }
+                return callBack(null, results)
+            }
+        );
+    },
+    GetAmcCmcMasterById: (id, callBack) => {
+        pool.query(
+            `SELECT *           
+            FROM am_amc_cmc_master
+            WHERE amccmc_slno=?`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    callBack(error)
+                }
+                return callBack(null, results)
+            }
+        );
+    },
+
 }

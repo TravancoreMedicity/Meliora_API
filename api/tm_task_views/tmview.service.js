@@ -928,7 +928,7 @@ module.exports = {
                            left join co_deptsec_mast DS on DS.sec_id=T.tm_task_dept_sec
                            where tm_detail_status=1 and T.tm_task_status=1
                               GROUP BY emslno ) AA
-                           where    AA.emslno in (select em_id from co_employee_master where em_department=1 and em_status=1)
+                           where    AA.emslno in (select em_id from co_employee_master where em_department=? and em_status=1)
                            group by emslno`,
             [id],
             (error, results, fields) => {

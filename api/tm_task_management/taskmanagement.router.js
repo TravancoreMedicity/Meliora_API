@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { CreateTaskInsert, CreateTaskDetailInsert, CreateTaskView, CreateSubTaskInsert, CreateTaskSubTaskDetailInsert, SubTaskviewByid, MasterTaskviewBySecid,
     MasterEmpByid, UpdateMasterTask, UpdateSubTask, SubtaskviewByidForEdit, MasterTaskviewByidForEdit, employeeInactive, DeptSearch, GoalView, ProgressInsert,
-    ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptView, GoalDeptUpdate, ProjectDeptView, ProjectDeptSearch, TaskDateInserT, ProgressView,
+    ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptView, GoalDeptUpdate, ProjectDeptView, ProjectDeptSearch, ProgressView, getAllDueDates,
     GoalDeptSearch, ProgressUpdate, SubProgressView, SearchProjectAndEmployee, } = require('../tm_task_management/taskmanagement.controller');
 
 router.post('/insertTask', checkToken, CreateTaskInsert)
@@ -11,20 +11,16 @@ router.get('/viewMasterTaskBySecid/:id', checkToken, MasterTaskviewBySecid)
 router.get('/viewMasterTaskByid/:id', checkToken, MasterTaskviewByidForEdit)
 router.patch('/updateMasterTask', checkToken, UpdateMasterTask)
 
-router.post('/insertDateInLogTable', checkToken, TaskDateInserT)
-
 router.post('/searchDeptAndSec', checkToken, DeptSearch)
 router.post('/searchGoalDeptAndSec', checkToken, GoalDeptSearch)
 router.post('/searchProjectDeptAndSec', checkToken, ProjectDeptSearch)
 
 router.post('/insertDetail', checkToken, CreateTaskDetailInsert)
 router.get('/viewMasterEmpByid/:id', checkToken, MasterEmpByid)
-
 router.post('/insertSubTask', checkToken, CreateSubTaskInsert)
 router.get('/subtaskviewByid/:id', checkToken, SubTaskviewByid)
 router.patch('/updateSubTask', checkToken, UpdateSubTask)
 router.get('/subtaskviewByidForEdit/:id', checkToken, SubtaskviewByidForEdit)
-
 router.post('/insertSubtaskDetail', checkToken, CreateTaskSubTaskDetailInsert)
 router.post("/employeeInactive", checkToken, employeeInactive);
 
@@ -44,5 +40,6 @@ router.post('/viewSubProgress', checkToken, SubProgressView)
 router.patch('/updateProgress', checkToken, ProgressUpdate)
 
 router.post('/searchProjectAndEmployee', checkToken, SearchProjectAndEmployee)
+router.get('/getAllDueDates/:id', checkToken, getAllDueDates)
 
 module.exports = router

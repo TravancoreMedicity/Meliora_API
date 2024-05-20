@@ -85,7 +85,7 @@ module.exports = {
             if(am_item_name_creation.item_creation_status = 1 ,'Yes','No') status
             from am_item_name_creation
             left join am_asset_type on am_asset_type.asset_type_slno=am_item_name_creation.item_asset_type_slno
-            left join am_item_type on am_item_type.item_type_slno=am_item_name_creation.item_asset_type_slno
+            left join am_item_type on am_item_type.item_type_slno=am_item_name_creation.item_type_slno
 			left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno
             left join am_subcategory on am_subcategory.subcategory_slno=am_item_name_creation.item_subcategory_slno
 			left join am_group on am_group.group_slno=am_item_name_creation.item_group_slno

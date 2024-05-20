@@ -138,7 +138,7 @@ module.exports = {
             crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
                         crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
                         rm_ndrf,category,image_status,emergency_flag,emer_slno,crm_request_master.create_date,
-                        total_approx_cost,user_deptsec,req_status,
+                        total_approx_cost,user_deptsec,req_status,crm_request_master.create_date as req_date,
                         req_approv_slno,           
                        incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date,
                         I.em_name as incharge_user,
@@ -155,8 +155,10 @@ module.exports = {
                        crf_close,crf_close_remark,crf_close_user,crf_closed_one,close_date,
                        ack_status,quatation_calling_status,quatation_negotiation,quatation_fixing,
                        po_prepartion,po_complete,po_approva_level_one,po_approva_level_two,po_to_supplier,
-
-                     store_receive
+                       hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
+                     store_receive,
+                     ack_remarks,quatation_calling_date,quatation_negotiation_date,quatation_fixing_date,
+                     po_complete_date,TD.dept_name,TD.dept_type
 
                          from crm_request_master
                          left join crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
@@ -175,9 +177,10 @@ module.exports = {
             left join co_employee_master GM on GM.em_id=crm_request_approval.gm_user
             left join co_employee_master ED on ED.em_id=crm_request_approval.ed_user
             left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
-
+            left join co_deptsec_mast T on T.sec_id=crm_request_master.request_deptsec_slno
+            left join co_department_mast TD on TD.dept_id=T.dept_id
             left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
-                          where user_deptsec IN (?)  ORDER BY crm_request_master.req_slno DESC`,
+                          where user_deptsec IN (?) and user_acknldge is null ORDER BY crm_request_master.req_slno DESC`,
             [
                 data
             ],
@@ -314,7 +317,7 @@ module.exports = {
             crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
                         crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
                         rm_ndrf,category,image_status,emergency_flag,emer_slno,crm_request_master.create_date,
-                        total_approx_cost,user_deptsec,req_status,
+                        total_approx_cost,user_deptsec,req_status,crm_request_master.create_date as req_date,
                         req_approv_slno,           
                        incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date,
                         I.em_name as incharge_user,
@@ -331,8 +334,10 @@ module.exports = {
                        crf_close,crf_close_remark,crf_close_user,crf_closed_one,close_date,
                        ack_status,quatation_calling_status,quatation_negotiation,quatation_fixing,
                        po_prepartion,po_complete,po_approva_level_one,po_approva_level_two,po_to_supplier,
-                      
-                     store_receive
+                       hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
+                     store_receive,
+                     ack_remarks,quatation_calling_date,quatation_negotiation_date,quatation_fixing_date,
+                     po_complete_date, TD.dept_name,TD.dept_type
 
                          from crm_request_master
                          left join crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
@@ -351,9 +356,11 @@ module.exports = {
             left join co_employee_master GM on GM.em_id=crm_request_approval.gm_user
             left join co_employee_master ED on ED.em_id=crm_request_approval.ed_user
             left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
-
+            left join co_deptsec_mast T on T.sec_id=crm_request_master.request_deptsec_slno
+            left join co_department_mast TD on TD.dept_id=T.dept_id
             left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
-                          where incharge_approve=1 and user_acknldge is null ORDER BY crm_request_master.req_slno DESC`,
+            where incharge_approve=1 
+            and user_acknldge is null ORDER BY crm_request_master.req_slno DESC`,
             [],
             (error, results, fields) => {
                 if (error) {
@@ -426,7 +433,7 @@ module.exports = {
     getAllReqBasedDeptreq: (id, callBack) => {
         pool.query(
             `select crm_request_master.req_slno,crm_request_master.actual_requirement,
-            crm_request_master.needed,crm_request_master.request_dept_slno,co_department_mast.dept_name,
+            crm_request_master.needed,
             R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,
             crf_close,crf_close_remark,crf_closed_one,close_date,C.em_name as closed_user,
             crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
@@ -449,13 +456,13 @@ module.exports = {
                        crf_close,crf_close_remark,crf_close_user,crf_closed_one,close_date,
                        ack_status,quatation_calling_status,quatation_negotiation,quatation_fixing,
                        po_prepartion,po_complete,po_approva_level_one,po_approva_level_two,po_to_supplier,
-                       sub_store_recieve,user_acknldge,
+                       user_acknldge,
+                       hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
                      store_receive
 
                          from crm_request_master
                          left join crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
                          left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
-                          left join co_department_mast on co_department_mast.dept_id=crm_request_master.request_dept_slno
                           left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
                           left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
                           
@@ -472,7 +479,7 @@ module.exports = {
             left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
 
             left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
-                                     where user_deptsec=?   ORDER BY crm_request_master.req_slno DESC`,
+                                     where user_deptsec=? and user_acknldge is null  ORDER BY crm_request_master.req_slno DESC`,
             [
                 id
             ],

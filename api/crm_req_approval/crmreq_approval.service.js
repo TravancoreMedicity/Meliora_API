@@ -785,4 +785,83 @@ module.exports = {
             }
         );
     },
+
+    DetailItemReject: (data, callback) => {
+        pool.query(
+            `UPDATE crm_request_mast_detail 
+                SET approve_item_desc = ? ,
+                approve_item_brand=?  ,
+                approve_item_unit=?,
+                item_qnty_approved=?  ,
+                approve_item_specification=?,
+                approve_item_unit_price=?  ,
+                approve_aprox_cost=?,
+                approve_item_status=?,
+                item_status_approved=?,
+                reject_remarks=?,
+                reject_user=?,
+                reject_date=?
+                WHERE req_detl_slno =?`,
+            [
+                data.approve_item_desc,
+                data.approve_item_brand,
+                data.approve_item_unit,
+                data.item_qnty_approved,
+                data.approve_item_specification,
+                data.approve_item_unit_price,
+                data.approve_aprox_cost,
+                data.approve_item_status,
+                data.item_status_approved,
+                data.reject_remarks,
+                data.reject_user,
+                data.reject_date,
+                data.req_detl_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    DetailItemOnHold: (data, callback) => {
+        pool.query(
+            `UPDATE crm_request_mast_detail 
+                SET approve_item_desc = ? ,
+                approve_item_brand=?  ,
+                approve_item_unit=?,
+                item_qnty_approved=?  ,
+                approve_item_specification=?,
+                approve_item_unit_price=?  ,
+                approve_aprox_cost=?,
+                approve_item_status=?,
+                item_status_approved=?,
+                hold_remarks=?,
+                hold_user=?,
+                hold_date=?
+                WHERE req_detl_slno =?`,
+            [
+                data.approve_item_desc,
+                data.approve_item_brand,
+                data.approve_item_unit,
+                data.item_qnty_approved,
+                data.approve_item_specification,
+                data.approve_item_unit_price,
+                data.approve_aprox_cost,
+                data.approve_item_status,
+                data.item_status_approved,
+                data.hold_remarks,
+                data.hold_user,
+                data.hold_date,
+                data.req_detl_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 }

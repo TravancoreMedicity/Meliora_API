@@ -1,64 +1,22 @@
-const { getDeviceType, getDeviceTypePassword, getPasswordCredential, getSimType, getBillType, getBillCategory, getSupplierList } = require('../it_select_components/devicetypeSelect.service')
+const { getClosedReqList, getAllReqListNotAck, getRejectedReqList, getOnHoldReqList, getMOAppvalPending,
+    getSMOAppvalPending, getGMAppvalPending, getMDAppvalPending, getEDAppvalPending
+} = require('../crm_new_approvals/newReqApprovalsList.service');
+
+const logger = require('../../logger/logger');
+
 module.exports = {
-
-    getDeviceType: (req, res) => {
-        getDeviceType((err, results) => {
+    getClosedReqList: (req, res) => {
+        getClosedReqList((err, results) => {
             if (err) {
-                logger.logwindow(err)
                 return res.status(200).json({
                     success: 2,
                     message: err
                 });
             }
             if (!results) {
-                logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,
-                    message: "No Results Found"
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                data: results
-            });
-        });
-    },
-    getDeviceTypePassword: (req, res) => {
-        getDeviceTypePassword((err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 2,
-                    message: err
-                });
-            }
-            if (!results) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Results Found"
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                data: results
-            });
-        });
-    },
-    getPasswordCredential: (req, res) => {
-        getPasswordCredential((err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 2,
-                    message: err
-                });
-            }
-            if (!results) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Results Found"
+                    message: "No results found"
                 });
             }
             return res.status(200).json({
@@ -68,20 +26,18 @@ module.exports = {
         });
     },
 
-    getSimType: (req, res) => {
-        getSimType((err, results) => {
+    getAllReqListNotAck: (req, res) => {
+        getAllReqListNotAck((err, results) => {
             if (err) {
-                logger.logwindow(err)
                 return res.status(200).json({
                     success: 2,
                     message: err
                 });
             }
             if (!results) {
-                logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,
-                    message: "No Results Found"
+                    message: "No results found"
                 });
             }
             return res.status(200).json({
@@ -91,20 +47,18 @@ module.exports = {
         });
     },
 
-    getBillType: (req, res) => {
-        getBillType((err, results) => {
+    getRejectedReqList: (req, res) => {
+        getRejectedReqList((err, results) => {
             if (err) {
-                logger.logwindow(err)
                 return res.status(200).json({
                     success: 2,
                     message: err
                 });
             }
             if (!results) {
-                logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,
-                    message: "No Results Found"
+                    message: "No results found"
                 });
             }
             return res.status(200).json({
@@ -114,20 +68,18 @@ module.exports = {
         });
     },
 
-    getBillCategory: (req, res) => {
-        getBillCategory((err, results) => {
+    getOnHoldReqList: (req, res) => {
+        getOnHoldReqList((err, results) => {
             if (err) {
-                logger.logwindow(err)
                 return res.status(200).json({
                     success: 2,
                     message: err
                 });
             }
             if (!results) {
-                logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,
-                    message: "No Results Found"
+                    message: "No results found"
                 });
             }
             return res.status(200).json({
@@ -136,20 +88,101 @@ module.exports = {
             });
         });
     },
-    getSupplierList: (req, res) => {
-        getSupplierList((err, results) => {
+
+    getMOAppvalPending: (req, res) => {
+        getMOAppvalPending((err, results) => {
             if (err) {
-                logger.logwindow(err)
                 return res.status(200).json({
                     success: 2,
                     message: err
                 });
             }
             if (!results) {
-                logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,
-                    message: "No Results Found"
+                    message: "No results found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getSMOAppvalPending: (req, res) => {
+        getSMOAppvalPending((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "No results found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    getGMAppvalPending: (req, res) => {
+        getGMAppvalPending((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "No results found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    getMDAppvalPending: (req, res) => {
+        getMDAppvalPending((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "No results found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getEDAppvalPending: (req, res) => {
+        getEDAppvalPending((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "No results found"
                 });
             }
             return res.status(200).json({
@@ -159,3 +192,4 @@ module.exports = {
         });
     },
 }
+

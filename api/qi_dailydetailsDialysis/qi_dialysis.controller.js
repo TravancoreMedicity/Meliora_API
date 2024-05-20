@@ -1,12 +1,12 @@
-const { EmergencyQiInsert, getPatientList, EmergencyQiUpdate }
-    = require('./qi_emergency.service')
+const { DialysisQiInsert, getPatientList, EmergencyQiUpdate }
+    = require('./qi_dialysis.service')
 
 const { getLastUpdatedDate, qiLastUpdateDateInsert, UpdateLastImportedDate }
     = require('../qi_dailydetailsEndoscopy/qi_daily.service');
 const { format } = require('date-fns');
 
 module.exports = {
-    EmergencyQiInsert: (req, res) => {
+    DialysisQiInsert: (req, res) => {
         const body = req.body;
         const data = body?.map((val) => {
             return [
@@ -20,7 +20,7 @@ module.exports = {
             qi_dept_no: qi_dept_no,
             last_updatedate: format(new Date(), 'yyyy-MM-dd HH:mm:ss')
         }
-        EmergencyQiInsert(data, (err, result) => {
+        DialysisQiInsert(data, (err, result) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -100,4 +100,3 @@ module.exports = {
         })
     },
 }
-

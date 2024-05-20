@@ -1,5 +1,5 @@
 
-const { qualityIndicatorInsert, qualityIndicatorView, qualityIndicatorUpdate } = require('./qltyIndicator.service')
+const { qualityIndicatorInsert, qualityIndicatorView, qualityIndicatorUpdate, getQualityIndicatorsDeptWise } = require('./qltyIndicator.service')
 module.exports = {
     qualityIndicatorInsert: (req, res) => {
         const body = req.body;
@@ -59,5 +59,28 @@ module.exports = {
                 message: "Updated successfully"
             })
         })
-    }
+    },
+
+    getQualityIndicatorsDeptWise: (req, res) => {
+        const id = req.params.id;
+        getQualityIndicatorsDeptWise(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            })
+        })
+    },
 }

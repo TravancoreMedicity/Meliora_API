@@ -1,8 +1,8 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
-const { EmergencyQiInsert, getPatientList, EmergencyQiUpdate } = require('./qi_emergency.controller');
+const { DialysisQiInsert, getPatientList, EmergencyQiUpdate } = require('./qi_dialysis.controller');
 
-router.post('/insertData', checkToken, EmergencyQiInsert);
+router.post('/insertData', checkToken, DialysisQiInsert);
 router.post('/viewList', checkToken, getPatientList);
 router.patch('/qiupdate', checkToken, EmergencyQiUpdate);
 

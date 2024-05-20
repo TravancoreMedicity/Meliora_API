@@ -1,12 +1,10 @@
 
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
-
-const { e } = require('./incident.controller');
-
-// router.patch('/update', checkToken, EndoscopyPatientUpdate);
-// router.post('/view', checkToken, getEndoscopyPatientList);
-// router.get('/getlast/:id', checkToken, getLastUpdatedDate);
-
-
+const { IncidetDetailInsert, IncidentDetailsUpdate, UpdateMarkedIncidentDetails,
+    SearchIncidentDetails } = require('./incident.controller');
+router.post('/incidentsave', checkToken, IncidetDetailInsert);
+router.patch('/incidentUpdate', checkToken, IncidentDetailsUpdate);
+router.patch('/markIncident', checkToken, UpdateMarkedIncidentDetails);
+router.post('/search', checkToken, SearchIncidentDetails);
 module.exports = router;

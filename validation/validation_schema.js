@@ -1253,12 +1253,26 @@ const validateQiDepartment = Joi.object({
             'string.max': 'Department Name length must be less than or equal to 45 characters long'
         }),
     qi_dept_code: Joi.string().trim().uppercase().required(),
+    qi_co_deptsec_slno: Joi.number().required(),
+    qi_list_type: Joi.number().required(),
     qi_dept_no: Joi.number().optional(),
     qi_dept_status: Joi.number().min(0).max(1).required(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional()
 });
 
+const validateQiTypeList = Joi.object({
+    qi_list_type_name: Joi.string().trim().uppercase().min(2).max(45).required()
+        .messages({
+            'string.empty': 'QI Type Required',
+            'string.min': 'QI Type length must be at least 2 characters long',
+            'string.max': 'QI Type length must be less than or equal to 45 characters long'
+        }),
+    qi_list_type: Joi.number().optional(),
+    qi_type_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional()
+});
 
 const validateCRMRequestRegister = Joi.object({
     // request_dept_slno: Joi.number().min(1).required().messages({
@@ -1361,6 +1375,7 @@ module.exports = {
     validateEmergncyType,
     validateCensusNursingStation,
     validateCRMRequestRegister,
-    validateQiDepartment
+    validateQiDepartment,
+    validateQiTypeList,
 
 }

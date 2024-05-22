@@ -1,8 +1,8 @@
 const { CreateTaskInsert, CreateTaskDetailInsert, CreateTaskView, CreateSubTaskInsert, CreateTaskSubTaskDetailInsert, SubTaskviewByid, MasterTaskviewBySecid,
     MasterEmpByid, UpdateMasterTask, UpdateSubTask, SubtaskviewByidForEdit, employeeInactive, updateSubTaskDetail, MasterTaskviewByidForEdit, DeptSearch,
-    GoalView, ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptView, GoalDeptUpdate, TaskDateInserT, ProgressInsert, ProgressView, ProgressUpdate,
+    GoalView, ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptView, GoalDeptUpdate, ProgressInsert, ProgressView, ProgressUpdate,
     ProjectDeptView, GoalDeptSearch, ProjectDeptSearch, SubProgressView, taskStatusUpdate, SearchProjectAndEmployee, GetTaskSlno,
-    UpdateStatus } = require('../tm_task_management/taskmanagement.service')
+    UpdateStatus, InsertDueDate, getCurrentDueDate, getAllDueDates } = require('../tm_task_management/taskmanagement.service')
 
 const logger = require('../../logger/logger');
 module.exports = {
@@ -16,31 +16,28 @@ module.exports = {
                     message: err
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                message: "Task Created successfully",
-                insertId: result.insertId,
-            })
-        })
-    },
-
-    TaskDateInserT: (req, res) => {
-        const body = req.body;
-        TaskDateInserT(body, (err, result) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
+            const postdata = {
+                tm_task_slno: result.insertId,
+                tm_duedate: body.tm_task_due_date,
+                create_user: body.create_user
             }
-            return res.status(200).json({
-                success: 1,
-                message: "Task Created successfully",
-                insertId: result.insertId,
+            InsertDueDate(postdata, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    message: "Task Created successfully",
+                    insertId: result.insertId,
+                })
+
             })
         })
     },
-
     CreateTaskDetailInsert: (req, res) => {
         const body = req.body;
         const data = body && body.map((val) => {
@@ -48,7 +45,6 @@ module.exports = {
             val.tm_assigne_emp,
             val.tm_detail_status,
             val.tm_detl_create
-
             ]
         })
         CreateTaskDetailInsert(data, (err, result) => {
@@ -64,7 +60,6 @@ module.exports = {
             })
         })
     },
-
     CreateTaskView: (req, res) => {
         CreateTaskView((err, results) => {
             if (err) {
@@ -85,7 +80,6 @@ module.exports = {
             })
         })
     },
-
     DeptSearch: (req, res) => {
         const body = req.body;
         DeptSearch(body, (err, results) => {
@@ -107,7 +101,6 @@ module.exports = {
             })
         })
     },
-
     GoalDeptSearch: (req, res) => {
         const body = req.body;
         GoalDeptSearch(body, (err, results) => {
@@ -129,7 +122,6 @@ module.exports = {
             })
         })
     },
-
 
     ProjectDeptSearch: (req, res) => {
         const body = req.body;
@@ -153,6 +145,7 @@ module.exports = {
         })
     },
 
+
     CreateSubTaskInsert: (req, res) => {
         const body = req.body;
         CreateSubTaskInsert(body, (err, result) => {
@@ -162,11 +155,24 @@ module.exports = {
                     message: err
                 });
             }
+            const postdata = {
+                tm_task_slno: result.insertId,
+                tm_duedate: body.tm_task_due_date,
+                create_user: body.create_user
+            }
+            InsertDueDate(postdata, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
 
-            return res.status(200).json({
-                success: 1,
-                message: "Subtask Created successfully",
-                insertId: result.insertId,
+                return res.status(200).json({
+                    success: 1,
+                    message: "Subtask Created successfully",
+                    insertId: result.insertId,
+                })
 
             })
         })
@@ -262,28 +268,7 @@ module.exports = {
         })
     },
 
-    UpdateMasterTask: (req, res) => {
-        const body = req.body;
-        UpdateMasterTask(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (results === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: "No record found"
 
-                })
-            }
-            return res.status(200).json({
-                success: 2,
-                message: "Task Updated successfully"
-            })
-        })
-    },
 
     UpdateSubTask: (req, res) => {
         const body = req.body;
@@ -328,28 +313,186 @@ module.exports = {
 
                                 })
                             }
-                            UpdateSubTask(body, (err, results) => {
+
+                            const { tm_task_due_date, tm_task_slno, edit_user } = body
+                            const id = tm_task_slno
+                            getCurrentDueDate(id, (err, results) => {
                                 if (err) {
                                     return res.status(200).json({
                                         success: 0,
                                         message: err
-                                    })
+                                    });
                                 }
-                                if (results === 0) {
+                                if (!results) {
                                     return res.status(200).json({
                                         success: 1,
-                                        message: "No record found"
+                                        message: "No Data"
+                                    });
+                                }
+                                const duedate = results[0].tm_task_due_date
+                                if (tm_task_due_date === duedate) {
+                                    UpdateSubTask(body, (err, results) => {
+                                        if (err) {
+                                            return res.status(200).json({
+                                                success: 0,
+                                                message: err
+                                            })
+                                        }
+                                        if (results === 0) {
+                                            return res.status(200).json({
+                                                success: 1,
+                                                message: "No record found"
+                                            })
+                                        }
+                                        return res.status(200).json({
+                                            success: 2,
+                                            message: "Subtask Updated successfully"
+                                        })
                                     })
                                 }
-                                return res.status(200).json({
-                                    success: 2,
-                                    message: "Subtask Updated successfully"
-                                })
+                                else {
+                                    const updateDta = {
+                                        tm_task_slno: tm_task_slno,
+                                        tm_duedate: tm_task_due_date,
+                                        create_user: edit_user
+                                    }
+                                    InsertDueDate(updateDta, (err, result) => {
+                                        if (err) {
+                                            return res.status(200).json({
+                                                success: 0,
+                                                message: err
+                                            });
+                                        }
+                                        if (results === 0) {
+                                            return res.status(200).json({
+                                                success: 1,
+                                                message: "No record found"
+                                            })
+                                        }
+                                    })
+                                    UpdateSubTask(body, (err, results) => {
+                                        if (err) {
+                                            return res.status(200).json({
+                                                success: 0,
+                                                message: err
+                                            })
+                                        }
+                                        if (results === 0) {
+                                            return res.status(200).json({
+                                                success: 1,
+                                                message: "No record found"
+                                            })
+                                        }
+                                        return res.status(200).json({
+                                            success: 2,
+                                            message: "Subtask Updated successfully"
+                                        })
+                                    })
+
+
+                                }
                             })
 
                         })
                     }
                     else {
+                        const { tm_task_due_date, tm_task_slno, edit_user } = body
+                        const id = tm_task_slno
+                        getCurrentDueDate(id, (err, results) => {
+                            if (err) {
+                                return res.status(200).json({
+                                    success: 0,
+                                    message: err
+                                });
+                            }
+                            if (!results) {
+                                return res.status(200).json({
+                                    success: 1,
+                                    message: "No Data"
+                                });
+                            }
+                            const duedate = results[0].tm_task_due_date
+                            if (tm_task_due_date === duedate) {
+                                UpdateSubTask(body, (err, results) => {
+                                    if (err) {
+                                        return res.status(200).json({
+                                            success: 0,
+                                            message: err
+                                        })
+                                    }
+                                    if (results === 0) {
+                                        return res.status(200).json({
+                                            success: 1,
+                                            message: "No record found"
+                                        })
+                                    }
+                                    return res.status(200).json({
+                                        success: 2,
+                                        message: "Subtask Updated successfully"
+                                    })
+                                })
+                            }
+                            else {
+                                const updateDta = {
+                                    tm_task_slno: tm_task_slno,
+                                    tm_duedate: tm_task_due_date,
+                                    create_user: edit_user
+                                }
+                                InsertDueDate(updateDta, (err, result) => {
+                                    if (err) {
+                                        return res.status(200).json({
+                                            success: 0,
+                                            message: err
+                                        });
+                                    }
+                                    if (results === 0) {
+                                        return res.status(200).json({
+                                            success: 1,
+                                            message: "No record found"
+                                        })
+                                    }
+                                })
+                                UpdateSubTask(body, (err, results) => {
+                                    if (err) {
+                                        return res.status(200).json({
+                                            success: 0,
+                                            message: err
+                                        })
+                                    }
+                                    if (results === 0) {
+                                        return res.status(200).json({
+                                            success: 1,
+                                            message: "No record found"
+                                        })
+                                    }
+                                    return res.status(200).json({
+                                        success: 2,
+                                        message: "Subtask Updated successfully"
+                                    })
+                                })
+                            }
+                        })
+                    }
+                })
+            }
+            else {
+                const { tm_task_due_date, tm_task_slno, edit_user } = body
+                const id = tm_task_slno
+                getCurrentDueDate(id, (err, results) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    if (!results) {
+                        return res.status(200).json({
+                            success: 1,
+                            message: "No Data"
+                        });
+                    }
+                    const duedate = results[0].tm_task_due_date
+                    if (tm_task_due_date === duedate) {
                         UpdateSubTask(body, (err, results) => {
                             if (err) {
                                 return res.status(200).json({
@@ -369,26 +512,47 @@ module.exports = {
                             })
                         })
                     }
-                })
-            }
-            else {
-                UpdateSubTask(body, (err, results) => {
-                    if (err) {
-                        return res.status(200).json({
-                            success: 0,
-                            message: err
+                    else {
+                        const updateDta = {
+                            tm_task_slno: tm_task_slno,
+                            tm_duedate: tm_task_due_date,
+                            create_user: edit_user
+                        }
+                        InsertDueDate(updateDta, (err, result) => {
+                            if (err) {
+                                return res.status(200).json({
+                                    success: 0,
+                                    message: err
+                                });
+                            }
+                            if (results === 0) {
+                                return res.status(200).json({
+                                    success: 1,
+                                    message: "No record found"
+                                })
+                            }
                         })
-                    }
-                    if (results === 0) {
-                        return res.status(200).json({
-                            success: 1,
-                            message: "No record found"
+                        UpdateSubTask(body, (err, results) => {
+                            if (err) {
+                                return res.status(200).json({
+                                    success: 0,
+                                    message: err
+                                })
+                            }
+                            if (results === 0) {
+                                return res.status(200).json({
+                                    success: 1,
+                                    message: "No record found"
+                                })
+                            }
+                            return res.status(200).json({
+                                success: 2,
+                                message: "Subtask Updated successfully"
+                            })
                         })
+
+
                     }
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Subtask Updated successfully"
-                    })
                 })
             }
         })
@@ -837,6 +1001,115 @@ module.exports = {
             })
         })
     },
+
+    UpdateMasterTask: (req, res) => {
+        const body = req.body;
+        const { tm_task_due_date, tm_task_slno, edit_user } = body
+        const id = tm_task_slno
+        getCurrentDueDate(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            const duedate = results[0].tm_task_due_date
+            if (tm_task_due_date === duedate) {
+                UpdateMasterTask(body, (err, results) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        })
+                    }
+                    if (results === 0) {
+                        return res.status(200).json({
+                            success: 1,
+                            message: "No record found"
+
+                        })
+                    }
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Task Updated successfully"
+                    })
+                })
+            }
+            else {
+                const updateDta = {
+                    tm_task_slno: tm_task_slno,
+                    tm_duedate: tm_task_due_date,
+                    create_user: edit_user
+                }
+                InsertDueDate(updateDta, (err, result) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    if (results === 0) {
+                        return res.status(200).json({
+                            success: 1,
+                            message: "No record found"
+                        })
+                    }
+                })
+                UpdateMasterTask(body, (err, results) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        })
+                    }
+                    if (results === 0) {
+                        return res.status(200).json({
+                            success: 1,
+                            message: "No record found"
+
+                        })
+                    }
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Task Updated successfully"
+                    })
+                })
+
+
+            }
+        })
+
+    },
+
+    getAllDueDates: (req, res) => {
+        const id = req.params.id;
+        getAllDueDates(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+
+
 }
 
 

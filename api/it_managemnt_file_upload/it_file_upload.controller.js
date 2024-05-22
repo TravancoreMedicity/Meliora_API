@@ -2,20 +2,17 @@ const multer = require('multer');
 const path = require('path');
 const fs = require("fs")
 const logger = require('../../logger/logger')
-const { BillImageUpdateMonthly, BillImageUpdateQuaterly, BillImageUpdateYearly, OtherBillImageUpdate, TeleMonthlyBills } = require('../it_managemnt_file_upload/it_file_upload.service')
-
+const { BillImageUpdateMonthly, BillImageUpdateQuaterly, BillImageUpdateYearly, OtherBillImageUpdate,
+    TeleMonthlyBills } = require('../it_managemnt_file_upload/it_file_upload.service')
 
 // for monthly bill multiple file upload
 const monthlystorage = multer.diskStorage({
-
     destination: (req, file, cb) => {
         const id = req.body.id;
         const filepath = path.join('D:/DocMeliora/Meliora/Bills/MonthlyBill', `${id}`);
-
         if (!fs.existsSync(filepath)) {
             fs.mkdirSync(filepath, { recursive: true });
         }
-
         cb(null, filepath);
     },
     filename: function (req, file, cb) {
@@ -25,17 +22,14 @@ const monthlystorage = multer.diskStorage({
         const filename = 'bill' + uniqueSuffix + extension;
         cb(null, filename);
     },
-
 });
 const quaterlystorage = multer.diskStorage({
     destination: (req, file, cb) => {
         const id = req.body.id;
-        const filepath = path.join('D:/DocMeliora/Meliora/Bills/QuarterltyBill', `${id}`);
-
+        const filepath = path.join('D:/DocMeliora/Meliora/Bills/QuarterlyBill', `${id}`);
         if (!fs.existsSync(filepath)) {
             fs.mkdirSync(filepath, { recursive: true });
         }
-
         cb(null, filepath);
     },
     filename: function (req, file, cb) {
@@ -45,9 +39,7 @@ const quaterlystorage = multer.diskStorage({
         const filename = 'bill' + uniqueSuffix + extension;
         cb(null, filename);
     },
-
 });
-
 // for yearly bill multiple file upload
 const yearlystorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -57,7 +49,6 @@ const yearlystorage = multer.diskStorage({
         if (!fs.existsSync(filepath)) {
             fs.mkdirSync(filepath, { recursive: true });
         }
-
         cb(null, filepath);
     },
     filename: function (req, file, cb) {
@@ -67,7 +58,6 @@ const yearlystorage = multer.diskStorage({
         const filename = 'bill' + uniqueSuffix + extension;
         cb(null, filename);
     },
-
 });
 // for other bill multiple file upload
 const otherbillstorage = multer.diskStorage({
@@ -78,7 +68,6 @@ const otherbillstorage = multer.diskStorage({
         if (!fs.existsSync(filepath)) {
             fs.mkdirSync(filepath, { recursive: true });
         }
-
         cb(null, filepath);
     },
     filename: function (req, file, cb) {
@@ -88,12 +77,8 @@ const otherbillstorage = multer.diskStorage({
         const filename = 'bill' + uniqueSuffix + extension;
         cb(null, filename);
     },
-
 });
-
-
 const maxSize = 2 * 1024 * 1024
-
 // for monthly bill multiple file upload
 const uploadmonthly = multer({
     storage: monthlystorage,
@@ -169,11 +154,9 @@ const uploadotherbill = multer({
 }).array('files', 10);
 
 module.exports = {
-
     uploadFileMonthly: (req, res) => {
         uploadmonthly(req, res, async (err) => {
             const body = req.body;
-
             if (err instanceof multer.MulterError) {
                 return res.status(200).json({
                     status: 0,
@@ -191,19 +174,14 @@ module.exports = {
                     message: "Files are required!",
                 });
             } else {
-
                 try {
                     const files = req.files;
                     const id = body.id;
                     const em_id_folder = path.join('D:/DocMeliora/Meliora/Bills/MonthlyBill', `${id}`);
-
                     // Create the em_id folder if it doesn't exist
                     if (!fs.existsSync(em_id_folder)) {
                         fs.mkdirSync(em_id_folder, { recursive: true });
                     }
-
-
-
                     for (const file of files) {
                         // Process each file individually
                         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -218,9 +196,6 @@ module.exports = {
                     }
 
                     BillImageUpdateMonthly(data, (err, results) => {
-
-
-
                         if (err) {
                             return res.status(200).json({
                                 success: 0,
@@ -231,7 +206,6 @@ module.exports = {
                             return res.status(200).json({
                                 success: 2,
                                 message: "No record found"
-
                             })
                         }
                         return res.status(200).json({
@@ -253,7 +227,6 @@ module.exports = {
         const id = req.params.id
         const folderPath = `D:/DocMeliora/Meliora/Bills/MonthlyBill/${id}`;
         fs.readdir(folderPath, (err, files) => {
-
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -261,9 +234,7 @@ module.exports = {
                 });
             }
             return res.status(200).json({
-
                 success: 1,
-
                 data: files // Send the list of files
             });
         });
@@ -313,9 +284,7 @@ module.exports = {
                 });
             }
             return res.status(200).json({
-
                 success: 1,
-
                 data: files // Send the list of files
             });
         });
@@ -324,7 +293,6 @@ module.exports = {
     uploadFileQuaterly: (req, res) => {
         uploadquaterly(req, res, async (err) => {
             const body = req.body;
-
             if (err instanceof multer.MulterError) {
                 return res.status(200).json({
                     status: 0,
@@ -346,7 +314,6 @@ module.exports = {
                     const files = req.files;
                     const id = body.id;
                     const em_id_folder = path.join('D:/DocMeliora/Meliora/Bills/QuarterlyBill', `${id}`);
-
                     // Create the em_id folder if it doesn't exist
                     if (!fs.existsSync(em_id_folder)) {
                         fs.mkdirSync(em_id_folder, { recursive: true });

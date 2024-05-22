@@ -8,7 +8,9 @@ const { checkDetailInsertOrNot, GRNDetailsInsert, GRNDetailsUpdate, BillDetailsI
     LeaseDetailsUpdateSpare, WarentGraruntyInsertSpare, WarentGraruntyUpdateSpare, AmcPmInsertSpare,
     AmcPmUpdateSpare, getdeptsecBsedonCustdept, getdeptsecBsedonCustdeptSpare, SpecificationInsertOrNot,
     SpecificationInsert, SepcifiDelete, GetFreespareList, SpareDetailsInsert, SpareDetailsInsertOrNot,
-    SpareDelete
+    SpareDelete, AmcCMCInsert, AmcCmcview, AmcCmcUpdate, AmcCmcviewSelect, BillMasterInsert,
+    BillMasterview, BillMasterUpdate, BillMasterviewSelect, GetBillMasterById,
+    GetAmcCmcMasterById
 } = require('../am_item_creation_detail/am_itemdetail.service')
 module.exports = {
     checkDetailInsertOrNot: (req, res) => {
@@ -862,6 +864,230 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 message: "Item Removed successfully"
+            });
+        });
+    },
+
+    AmcCMCInsert: (req, res) => {
+        const body = req.body;
+        //validate category Instert function
+
+        AmcCMCInsert(body, (err, result) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                insertid: result.insertId,
+                message: "AMC/CMC inserted successfully"
+            })
+        })
+    },
+    AmcCmcview: (req, res) => {
+
+        AmcCmcview((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+
+        })
+    },
+
+    AmcCmcUpdate: (req, res) => {
+        const body = req.body;
+
+        AmcCmcUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "AMC CMC Updated successfully"
+            })
+        })
+    },
+
+    AmcCmcviewSelect: (req, res) => {
+
+        AmcCmcviewSelect((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+
+        })
+    },
+
+    BillMasterInsert: (req, res) => {
+        const body = req.body;
+        //validate category Instert function
+
+        BillMasterInsert(body, (err, result) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                insertid: result.insertId,
+                message: "Bill inserted successfully"
+            })
+        })
+    },
+    BillMasterview: (req, res) => {
+
+        BillMasterview((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+
+        })
+    },
+
+    BillMasterUpdate: (req, res) => {
+        const body = req.body;
+
+        BillMasterUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "AMC CMC Updated successfully"
+            })
+        })
+    },
+
+    BillMasterviewSelect: (req, res) => {
+
+        BillMasterviewSelect((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+
+        })
+    },
+
+    GetBillMasterById: (req, res) => {
+        const id = req.params.id;
+        GetBillMasterById(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    GetAmcCmcMasterById: (req, res) => {
+        const id = req.params.id;
+        GetAmcCmcMasterById(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
             });
         });
     },

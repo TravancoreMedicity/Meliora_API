@@ -196,7 +196,7 @@ const emergencyqi = require('./api/qi_dailydetailsEmergency/qi_emergency.router'
 const qitypeList = require('./api/qi_list_type_mast/list_type.router')
 const dialysisqi = require('./api/qi_dailydetailsDialysis/qi_dialysis.router')
 const CrmNewApprovals = require('./api/crm_new_approvals/newReqApprovalsList.router')
-
+const AssetFileUpload = require('./api/am_file_upload/am_fileupload.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -360,7 +360,7 @@ app.use('/api/incidentMaster', incidentMast)
 app.use('/api/qiTypeList', qitypeList)
 app.use('/api/qidialysis', dialysisqi)
 app.use('/api/CrmNewApprovals', CrmNewApprovals)
-
+app.use('/api/AssetFileUpload', AssetFileUpload)
 
 
 server.listen(process.env.APP_PORT, () =>

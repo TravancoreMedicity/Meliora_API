@@ -40,10 +40,11 @@ module.exports = {
             it_supplier_saleperson_second_mob_two,
             it_supplier_saleperson_second_email_one,
             it_supplier_saleperson_second_email_two,
+            supplier_status,
             create_user
          
           )
-          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.it_supplier_name,
                 data.it_supplier_land_one,
@@ -80,6 +81,7 @@ module.exports = {
                 data.it_supplier_saleperson_second_mob_two,
                 data.it_supplier_saleperson_second_email_one,
                 data.it_supplier_saleperson_second_email_two,
+                data.supplier_status,
                 data.create_user
 
             ],
@@ -131,7 +133,8 @@ module.exports = {
             it_supplier_saleperson_second_mob_one,
             it_supplier_saleperson_second_mob_two,
             it_supplier_saleperson_second_email_one,
-            it_supplier_saleperson_second_email_two        
+            it_supplier_saleperson_second_email_two,
+            supplier_status        
             FROM
             it_bill_supplier_details_mast`, [],
             (error, results, feilds) => {
@@ -182,6 +185,7 @@ module.exports = {
             it_supplier_saleperson_second_mob_two=?,
             it_supplier_saleperson_second_email_one=?,
             it_supplier_saleperson_second_email_two=?,
+            supplier_status=?,
             edit_user =?       
             WHERE 
             it_supplier_slno=?`,
@@ -221,6 +225,7 @@ module.exports = {
                 data.it_supplier_saleperson_second_mob_two,
                 data.it_supplier_saleperson_second_email_one,
                 data.it_supplier_saleperson_second_email_two,
+                data.supplier_status,
                 data.edit_user,
                 data.it_supplier_slno,
             ],

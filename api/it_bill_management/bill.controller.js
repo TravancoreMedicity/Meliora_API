@@ -1,11 +1,10 @@
-const { BillInsert, AllBillView, UpdateBill, CheckInsetMonthlyOrNot, MonthlyTarrifInsert, MonthlyTarrifView, getMonthData, OtherBillinsert, OtherBillView, UpdateOtherBill,
-    QuaterlyTarrifView, CheckInsetQuaterlyOrNot, QuaterlyTarrifInsert, getQuaterlyData, YearlyTarrifView, CheckInsetYearlyOrNot, YearlyTarrifInsert, getYearData,
-    BillMonthlyUpdate, BillQuaterlyUpdate, BillYearlyUpdate, OtherBillViewDash, getTeleMonthData, getTeleQuarterlyData, getTeleYearlyData, otherTeleBillViewinDash,
-    getSoftwareMonthData, getSoftwareQuaterlyData, getSoftwareYearlyData, otherSoftwareBillViewinDash, getServiceMonthData, getServiceQuarterlyData, getServiceYearlyData,
-    otherServiceBillViewinDash, getbilltype } = require('./bill.service')
+const { BillInsert, AllBillView, UpdateBill, MonthlyTarrifInsert, MonthlyTarrifView, OtherBillinsert, OtherBillView, UpdateOtherBill, QuaterlyTarrifView,
+    QuaterlyTarrifInsert, YearlyTarrifView, YearlyTarrifInsert, BillMonthlyUpdate, BillQuaterlyUpdate, BillYearlyUpdate, OtherBillViewDash, otherTeleBillViewinDash,
+    otherSoftwareBillViewinDash, otherServiceBillViewinDash, getbilltype, checkMonthlyInsert, getUnpaidMonthlyTeleBills, checkQuarterlyInsert, checkYearlyInsert,
+    getUnpaidQuarterlyTeleBills, getUnpaidYearlyTeleBills, getUnpaidMonthlySoftBills, getUnpaidQuarterlySoftBills, getUnpaidYearlySoftBills, getUnpaidBillsServMonthly,
+    getUnpaidBillsSerQuarter, getUnpaidBillsSerYear } = require('./bill.service')
 const logger = require('../../logger/logger');
 module.exports = {
-
 
     BillInsert: (req, res) => {
         const body = req.body;
@@ -65,37 +64,12 @@ module.exports = {
             })
         })
     },
-
-    CheckInsetMonthlyOrNot: (req, res) => {
-        const body = req.body;
-        CheckInsetMonthlyOrNot(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-
-                dataa: results
-            });
-        })
-    },
     MonthlyTarrifInsert: (req, res) => {
         const body = req.body;
-
-        MonthlyTarrifInsert(body, (err, result) => {
+        const data = body?.map((val) => {
+            return [val.bill_add_slno, val.monthly_bill_generate, val.create_user]
+        })
+        MonthlyTarrifInsert(data, (err, result) => {
             if (err) {
 
                 return res.status(200).json({
@@ -111,7 +85,6 @@ module.exports = {
 
         })
     },
-
     MonthlyTarrifView: (req, res) => {
         MonthlyTarrifView((err, results) => {
             if (err) {
@@ -132,32 +105,6 @@ module.exports = {
             })
         })
     },
-    getMonthData: (req, res) => {
-        const body = req.body;
-        getMonthData(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-                dataa: results
-            });
-        })
-    },
-
     OtherBillinsert: (req, res) => {
         const body = req.body;
         OtherBillinsert(body, (err, result) => {
@@ -237,36 +184,12 @@ module.exports = {
 
         })
     },
-    CheckInsetQuaterlyOrNot: (req, res) => {
-        const body = req.body;
-        CheckInsetQuaterlyOrNot(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-                dataa: results
-            });
-        })
-    },
-
     QuaterlyTarrifInsert: (req, res) => {
         const body = req.body;
-
-        QuaterlyTarrifInsert(body, (err, result) => {
+        const data = body?.map((val) => {
+            return [val.bill_add_slno, val.quaterly_bill_generate, val.create_user]
+        })
+        QuaterlyTarrifInsert(data, (err, result) => {
             if (err) {
 
                 return res.status(200).json({
@@ -276,39 +199,12 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-
                 message: " inserted successfully"
             })
 
         })
     },
-    getQuaterlyData: (req, res) => {
-        const body = req.body;
-        getQuaterlyData(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-                dataa: results
-            });
-        })
-    },
     YearlyTarrifView: (req, res) => {
-
         YearlyTarrifView((err, results) => {
             if (err) {
                 return res.status(200).json({
@@ -329,35 +225,14 @@ module.exports = {
 
         })
     },
-    CheckInsetYearlyOrNot: (req, res) => {
-        const body = req.body;
-        CheckInsetYearlyOrNot(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-                dataa: results
-            });
-        })
-    },
     YearlyTarrifInsert: (req, res) => {
         const body = req.body;
-        YearlyTarrifInsert(body, (err, result) => {
+        const data = body?.map((val) => {
+            return [val.bill_add_slno, val.yearly_bill_generate, val.create_user]
+        })
+        YearlyTarrifInsert(data, (err, result) => {
             if (err) {
+
                 return res.status(200).json({
                     success: 0,
                     message: err
@@ -365,34 +240,10 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
+
                 message: " inserted successfully"
             })
 
-        })
-    },
-    getYearData: (req, res) => {
-        const body = req.body;
-        getYearData(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-                dataa: results
-            });
         })
     },
     BillMonthlyUpdate: (req, res) => {
@@ -480,81 +331,6 @@ module.exports = {
             })
         })
     },
-    getTeleMonthData: (req, res) => {
-        const body = req.body;
-        getTeleMonthData(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-                dataa: results
-            });
-        })
-    },
-    getTeleQuarterlyData: (req, res) => {
-        const body = req.body;
-        getTeleQuarterlyData(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-                dataa: results
-            });
-        })
-    },
-    getTeleYearlyData: (req, res) => {
-        const body = req.body;
-        getTeleYearlyData(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-                dataa: results
-            });
-        })
-    },
     otherTeleBillViewinDash: (req, res) => {
         otherTeleBillViewinDash((err, results) => {
             if (err) {
@@ -573,79 +349,6 @@ module.exports = {
                 success: 2,
                 data: results
             })
-        })
-    },
-    getSoftwareMonthData: (req, res) => {
-        const body = req.body;
-        getSoftwareMonthData(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-                dataa: results
-            });
-        })
-    },
-    getSoftwareQuaterlyData: (req, res) => {
-        const body = req.body;
-        getSoftwareQuaterlyData(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-                dataa: results
-            });
-        })
-    },
-    getSoftwareYearlyData: (req, res) => {
-        const body = req.body;
-        getSoftwareYearlyData(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                dataa: results
-            });
         })
     },
     otherSoftwareBillViewinDash: (req, res) => {
@@ -668,81 +371,6 @@ module.exports = {
             })
         })
     },
-    getServiceMonthData: (req, res) => {
-        const body = req.body;
-        getServiceMonthData(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-                dataa: results
-            });
-        })
-    },
-    getServiceQuarterlyData: (req, res) => {
-        const body = req.body;
-        getServiceQuarterlyData(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-                dataa: results
-            });
-        })
-    },
-    getServiceYearlyData: (req, res) => {
-        const body = req.body;
-        getServiceYearlyData(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-
-            if (results.length == 0) {
-                logger.infologwindow("No Results Found")
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Record Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-                dataa: results
-            });
-        })
-    },
     otherServiceBillViewinDash: (req, res) => {
         otherServiceBillViewinDash((err, results) => {
             if (err) {
@@ -763,7 +391,6 @@ module.exports = {
             })
         })
     },
-
     getbilltype: (req, res) => {
         const id = req.params.id;
         getbilltype(id, (err, results) => {
@@ -785,6 +412,248 @@ module.exports = {
             });
         })
     },
-
+    checkMonthlyInsert: (req, res) => {
+        const id = req.params.id;
+        checkMonthlyInsert(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                dataa: results
+            });
+        })
+    },
+    checkYearlyInsert: (req, res) => {
+        const id = req.params.id;
+        checkYearlyInsert(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                dataa: results
+            });
+        })
+    },
+    getUnpaidMonthlyTeleBills: (req, res) => {
+        getUnpaidMonthlyTeleBills((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getUnpaidMonthlySoftBills: (req, res) => {
+        getUnpaidMonthlySoftBills((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getUnpaidQuarterlyTeleBills: (req, res) => {
+        getUnpaidQuarterlyTeleBills((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getUnpaidYearlyTeleBills: (req, res) => {
+        getUnpaidYearlyTeleBills((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    checkQuarterlyInsert: (req, res) => {
+        const id = req.params.id;
+        checkQuarterlyInsert(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                dataa: results
+            });
+        })
+    },
+    getUnpaidQuarterlySoftBills: (req, res) => {
+        getUnpaidQuarterlySoftBills((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getUnpaidYearlySoftBills: (req, res) => {
+        getUnpaidYearlySoftBills((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getUnpaidBillsServMonthly: (req, res) => {
+        getUnpaidBillsServMonthly((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getUnpaidBillsSerQuarter: (req, res) => {
+        getUnpaidBillsSerQuarter((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getUnpaidBillsSerYear: (req, res) => {
+        getUnpaidBillsSerYear((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
 
 }

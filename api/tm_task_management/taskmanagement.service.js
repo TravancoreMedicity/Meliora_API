@@ -42,31 +42,6 @@ module.exports = {
         );
     },
 
-    TaskDateInserT: (data, callback) => {
-        pool.query(
-            `INSERT INTO tm_task_mast_log
-          (           
-            tm_task_slno,
-            tm_task_status,
-            tm_task_due_date,                
-            tm_change_user
-          )
-          VALUES(?,?,?,?)`,
-            [
-                data.tm_task_slno,
-                data.tm_task_status,
-                data.tm_task_due_date,
-                data.tm_change_user
-            ],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
-
     CreateTaskDetailInsert: (data, callback) => {
         pool.query(
             `INSERT INTO tm_new_task_mast_detl
@@ -919,7 +894,7 @@ module.exports = {
             FROM meliora.tm_task_progress_detl            
             left join co_employee_master on co_employee_master.em_id=tm_task_progress_detl.progress_emp
             where tm_task_slno=?
-            order by tm_progres_date desc `,
+            order by tm_progres_date desc`,
             [
                 data.tm_task_slno
             ],
@@ -1087,6 +1062,68 @@ module.exports = {
             }
         )
     },
+    InsertDueDate: (data, callback) => {
+        pool.query(
+            `INSERT INTO tm_duedate_logtable
+          ( 
+            tm_task_slno,
+            tm_duedate,            
+            create_user         
+          )
+          VALUES(?,?,?)`,
+            [
+                data.tm_task_slno,
+                data.tm_duedate,
+                data.create_user
+            ],
 
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
 
+            }
+        );
+    },
+
+    getCurrentDueDate: (id, callback) => {
+        pool.query(
+            `SELECT 
+            tm_task_due_date      
+            FROM meliora.tm_new_task_mast           
+            WHERE tm_new_task_mast.tm_task_slno=?`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+
+    getAllDueDates: (id, callback) => {
+        pool.query(
+            `SELECT 
+                     tm_log_slno,  
+                     tm_task_slno,
+                     tm_duedate,
+                     co_employee_master.em_name,
+                     tm_duedate_logtable.create_user,
+                     tm_duedate_logtable.create_date            
+                     FROM meliora.tm_duedate_logtable            
+                     left join co_employee_master on co_employee_master.em_id=tm_duedate_logtable.create_user
+                     where tm_task_slno=?`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
 }

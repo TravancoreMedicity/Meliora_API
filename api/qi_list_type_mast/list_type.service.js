@@ -1,20 +1,15 @@
 const { pool } = require('../../config/database')
 module.exports = {
-
-    qualityIndicatorInsert: (data, callback) => {
+    qiTypeListInsert: (data, callback) => {
         pool.query(
-            `INSERT INTO qi_indicator_mast
-          ( 
-             qi_name,
-             qi_dept_slno,
-             qi_status,
-             create_user
+            `INSERT INTO qi_list_type_mast
+          (
+             qi_list_type_name,qi_type_status,create_user
           )
-          VALUES(?,?,?,?)`,
+             VALUES(?,?,?)`,
             [
-                data.qi_name,
-                data.qi_dept_slno,
-                data.qi_status,
+                data.qi_list_type_name,
+                data.qi_type_status,
                 data.create_user
             ],
             (error, results, fields) => {
@@ -25,19 +20,12 @@ module.exports = {
             }
         );
     },
-
-    qualityIndicatorView: (callBack) => {
+    QITypeView: (callBack) => {
         pool.query(
             `SELECT 
-                   qi_slno, 
-                   qi_name,
-                   qi_indicator_mast.qi_dept_slno,
-                   qi_dept_mast.qi_dept_desc,
-                   if(qi_status=1,'Yes','No') status
+                   qi_list_type,qi_list_type_name,if(qi_type_status=1,'Yes','No') status
               FROM
-                 qi_indicator_mast
-              LEFT JOIN qi_dept_mast on qi_dept_mast.qi_dept_no=qi_indicator_mast.qi_dept_slno
-                `, [],
+                   qi_list_type_mast`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -46,24 +34,21 @@ module.exports = {
             }
         );
     },
-
-    qualityIndicatorUpdate: (data, callback) => {
+    QITypeUpdate: (data, callback) => {
         pool.query(
             `UPDATE 
-                qi_indicator_mast 
+                  qi_list_type_mast 
              SET 
-                  qi_name=?,
-                  qi_dept_slno=?,
-                  qi_status=?,
+                  qi_list_type_name=?,
+                  qi_type_status=?,
                   edit_user=?
             WHERE 
-                  qi_slno=?`,
+                  qi_list_type=?`,
             [
-                data.qi_name,
-                data.qi_dept_slno,
-                data.qi_status,
+                data.qi_list_type_name,
+                data.qi_type_status,
                 data.edit_user,
-                data.qi_slno
+                data.qi_list_type
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -73,11 +58,15 @@ module.exports = {
             }
         )
     },
-
-    getQualityIndicatorsDeptWise: (id, callBack) => {
+    getQITypeActive: (callBack) => {
         pool.query(
-            `SELECT qi_slno, qi_name FROM qi_indicator_mast WHERE qi_status=1 and qi_dept_slno=? order by qi_slno`,
-            [id],
+            `SELECT 
+                  qi_list_type, 
+                  qi_list_type_name
+             FROM
+                   qi_list_type_mast
+             WHERE 
+                   qi_type_status=1 order by qi_list_type`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);

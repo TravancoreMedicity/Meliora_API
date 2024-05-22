@@ -35,5 +35,21 @@ module.exports = {
             }
         )
     },
-
+    LeaseMstImageUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE am_lease_detail_mast SET 
+            lease_image=1
+            WHERE 
+            am_lease_mastslno=?`,
+            [
+                data.am_lease_mastslno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
 }

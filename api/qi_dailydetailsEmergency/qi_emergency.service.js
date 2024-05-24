@@ -28,7 +28,7 @@ module.exports = {
             `SELECT 
                    qi_slno, patient_arrived_date, ptno, ptname, ptsex, ptage, ptaddrs1, ptaddrs2, ptaddrs3, ptaddrs4,
                    ptmobile, doctor_name, visit_token, qi_dept_no, qi_status,triage_time,assess_time,return_status,
-                   sumof_service_time,qi_save_status
+                   sumof_service_time,qi_save_status,assessment_benchmark_flag,initial_assessment_reason
              FROM  
                    qi_details_emergency
              WHERE 
@@ -53,7 +53,9 @@ module.exports = {
                  return_status=?,
                  edit_user=?,
                  sumof_service_time=?,
-                 qi_save_status=?
+                 qi_save_status=?,
+                 initial_assessment_reason=?,
+                 assessment_benchmark_flag=?
             WHERE 
                  qi_slno=?`,
             [
@@ -64,6 +66,8 @@ module.exports = {
                 data.edit_user,
                 data.sumof_service_time,
                 data.qi_save_status,
+                data.initial_assessment_reason,
+                data.assessment_benchmark_flag,
                 data.qi_slno
             ],
             (error, results, feilds) => {
@@ -74,6 +78,53 @@ module.exports = {
             }
         )
     },
+
+    searchPatients: (data, callBack) => {
+        const fromDate = data.from;
+        const toDate = data.to;
+        pool.query(
+            `SELECT 
+                   qi_slno, patient_arrived_date, ptno, ptname, ptsex, ptage, ptaddrs1, ptaddrs2, ptaddrs3, ptaddrs4,
+                   ptmobile, doctor_name, visit_token, qi_dept_no, qi_status,triage_time,assess_time,return_status,
+                   sumof_service_time,qi_save_status,assessment_benchmark_flag,initial_assessment_reason
+             FROM  
+                   qi_details_emergency
+             WHERE 
+                   patient_arrived_date between ('${fromDate}') and ('${toDate}') and ptname like ? order by patient_arrived_date`,
+            [
+                '%' + data.ptname + '%'
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    AseessmentExceededList: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                   qi_slno,patient_arrived_date,ptno,ptname,ptsex,ptage,doctor_name,qi_status,sumof_service_time,
+                   triage_time,assess_time,initial_assessment_reason,assessment_benchmark_flag
+             FROM  
+                   qi_details_emergency
+             WHERE 
+                   patient_arrived_date between ? and ? and assessment_benchmark_flag=1 order by patient_arrived_date`,
+            [
+                data.from,
+                data.to
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+
 }
 
 

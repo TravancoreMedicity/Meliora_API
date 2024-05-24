@@ -36,7 +36,9 @@ module.exports = {
                    incident_falls_slno,incident_nearmisses_slno,incident_sentinel_slno,incident_error_date, incident_redos_date,
                    incident_falls_date,incident_nearmisses_date, incident_sentinel_date, redos_details, incidence_ident_reason,
                    falls_details,falls_reason, sentinel_details,sentinel_reason, nearmisses_details, nearmisses_reason,
-                   incidence_ident_slno, incidence_ident_date,initial_assessment_reason,assessment_benchmark_flag
+                   incidence_ident_slno, incidence_ident_date,initial_assessment_reason,assessment_benchmark_flag,
+                   error_incident_type,redos_incident_type,falls_incident_type,ident_error_incident_type,
+                   nearmiss_incident_type,sentinel_incident_type
             FROM  
                    qi_details_endoscopy
             WHERE 
@@ -85,7 +87,9 @@ module.exports = {
                    incidence_ident_reason,incidence_ident_action,incidence_ident_date,falls_status,falls_details,
                    falls_reason,incident_falls_date,sentinel_events_status,sentinel_details,sentinel_reason,
                    incident_sentinel_date,near_misses_status,nearmisses_details,nearmisses_reason,incident_nearmisses_date,
-                   sumof_service_time,initial_assessment_reason,assessment_benchmark_flag,qi_status   
+                   sumof_service_time,initial_assessment_reason,assessment_benchmark_flag,qi_status, error_incident_type,
+                   redos_incident_type,falls_incident_type,ident_error_incident_type,nearmiss_incident_type,
+                   sentinel_incident_type
              FROM  
                   qi_details_endoscopy 
              WHERE

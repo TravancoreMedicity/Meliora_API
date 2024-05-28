@@ -89,11 +89,11 @@ module.exports = {
                    incident_sentinel_date,near_misses_status,nearmisses_details,nearmisses_reason,incident_nearmisses_date,
                    sumof_service_time,initial_assessment_reason,assessment_benchmark_flag,qi_status, error_incident_type,
                    redos_incident_type,falls_incident_type,ident_error_incident_type,nearmiss_incident_type,
-                   sentinel_incident_type
+                   sentinel_incident_type,qi_save_status
              FROM  
                   qi_details_endoscopy 
              WHERE
-                  patient_arrived_date between ('${fromDate}') and ('${toDate}') and qi_status=1 order by patient_arrived_date`,
+                  patient_arrived_date between ('${fromDate}') and ('${toDate}') and qi_status=1 and qi_save_status=1 order by patient_arrived_date`,
             {},
             (err, results, fields) => {
                 if (err) {
@@ -212,7 +212,7 @@ module.exports = {
                     falls_details, falls_reason,incident_sentinel_slno,incident_sentinel_date,sentinel_details,
                     sentinel_reason,incident_nearmisses_slno,incident_nearmisses_date,nearmisses_details,
                     nearmisses_reason,error_incident_type,redos_incident_type,falls_incident_type,
-                    ident_error_incident_type,nearmiss_incident_type,sentinel_incident_type
+                    ident_error_incident_type,nearmiss_incident_type,sentinel_incident_type,qi_save_status
              FROM     
                     qi_details_endoscopy
              WHERE
@@ -266,10 +266,55 @@ module.exports = {
                    qi_details_endoscopy
              WHERE 
                    patient_arrived_date between ? and ? and qi_status=1 and
-                   assessment_benchmark_flag=1 order by patient_arrived_date`,
+                   assessment_benchmark_flag=1 and qi_save_status=1 order by patient_arrived_date`,
             [
                 data.from,
                 data.to
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    InchargeApprovalSave: (data, callback) => {
+        pool.query(
+            `INSERT INTO qi_endoscopy_approval_details
+                (qi_dept_no, qi_endo_date, endo_incharge_apprv_status, endo_incharge_remarks,
+                 endo_incharge_id, endo_Incharge_apprv_date)
+                 VALUES (?,?,?,?,?,?)`,
+            [
+                data.qi_dept_no,
+                data.qi_endo_date,
+                data.endo_incharge_apprv_status,
+                data.endo_incharge_remarks,
+                data.endo_incharge_id,
+                data.endo_Incharge_apprv_date
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    InchargeApprvlView: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                   apprv_slno, qi_dept_no, qi_endo_date, endo_incharge_apprv_status, endo_incharge_remarks,
+                   endo_incharge_id, endo_Incharge_apprv_date
+            FROM  
+                   qi_endoscopy_approval_details
+            WHERE 
+                   qi_endo_date =? and qi_dept_no=?`,
+            [
+                data.qi_endo_date,
+                data.qi_dept_no
             ],
             (error, results, feilds) => {
                 if (error) {

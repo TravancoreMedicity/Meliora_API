@@ -130,7 +130,7 @@ module.exports = {
             am_asset_item_map_master.am_item_map_slno,  am_asset_item_map_master.item_creation_slno,item_dept_slno,item_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,item_custodian_dept,
             am_custodian_name,am_manufacture_no,am_category.category_name,
-            am_item_name_creation.item_name,item_asset_no,item_asset_no_only,due_date,am_bill_image
+            am_item_name_creation.item_name,item_asset_no,item_asset_no_only,due_date
           FROM
           am_asset_item_map_master
          left join co_department_mast on co_department_mast.dept_id=am_asset_item_map_master.item_dept_slno
@@ -413,7 +413,7 @@ module.exports = {
             am_asset_item_map_master.am_item_map_slno,  am_asset_item_map_master.item_creation_slno,item_dept_slno,item_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,item_custodian_dept,
             am_custodian_name,am_manufacture_no,am_category.category_name,
-            am_item_name_creation.item_name,item_asset_no,item_asset_no_only,due_date,am_bill_image
+            am_item_name_creation.item_name,item_asset_no,item_asset_no_only,due_date
           FROM
           am_asset_item_map_master
          left join co_department_mast on co_department_mast.dept_id=am_asset_item_map_master.item_dept_slno
@@ -444,7 +444,7 @@ module.exports = {
             am_asset_item_map_master.am_item_map_slno,  am_asset_item_map_master.item_creation_slno,item_dept_slno,item_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,item_custodian_dept,
             am_custodian_name,am_manufacture_no,am_category.category_name,
-            am_item_name_creation.item_name,item_asset_no,item_asset_no_only,due_date,am_bill_image
+            am_item_name_creation.item_name,item_asset_no,item_asset_no_only,due_date
           FROM
           am_asset_item_map_master
          left join co_department_mast on co_department_mast.dept_id=am_asset_item_map_master.item_dept_slno

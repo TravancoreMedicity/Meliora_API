@@ -470,5 +470,36 @@ module.exports = {
             }
         )
     },
-
+    getDataBySerialNo: (data, callBack) => {
+        pool.query(
+            `SELECT 
+            am_asset_item_map_master.am_item_map_slno,  am_asset_item_map_master.item_creation_slno,item_dept_slno,item_deptsec_slno,
+            co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,item_custodian_dept,
+            am_custodian_name,am_manufacture_no,am_category.category_name,
+            am_item_name_creation.item_name,item_asset_no,item_asset_no_only,due_date
+          FROM
+          am_asset_item_map_master
+         left join co_department_mast on co_department_mast.dept_id=am_asset_item_map_master.item_dept_slno
+          left join co_deptsec_mast on co_deptsec_mast.sec_id=am_asset_item_map_master.item_deptsec_slno
+           left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
+           left join am_custodian_department on am_custodian_department.am_custodian_slno=am_asset_item_map_master.item_custodian_dept
+           left join am_item_map_amcpm_detail on am_item_map_amcpm_detail.am_item_map_slno=am_asset_item_map_master.am_item_map_slno
+           left join am_item_map_details on am_item_map_details.am_item_map_slno=am_asset_item_map_master.am_item_map_slno
+           left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno
+           WHERE
+         am_manufacture_no like ?
+           ORDER BY am_asset_item_map_master.am_item_map_slno DESC`,
+            [
+                '%' + data.am_manufacture_no + '%'
+                // data.am_bill_supplier,
+                // data.am_bill_date
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 }

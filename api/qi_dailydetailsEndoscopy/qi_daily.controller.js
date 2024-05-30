@@ -1,8 +1,8 @@
 const { format } = require('date-fns');
 const {
-    EndoscopyQiInsert, getPatientList, EndoscopyPatientUpdate, getEndoscopyMonthlyView,
+    EndoscopyQiInsert, getPatientList, EndoscopyPatientUpdate, getEndoscopyMonthlyView, InchargeApprvlView,
     EndoscopyQiUpdate, getLastUpdatedDate, UpdateLastImportedDate, qiLastUpdateDateInsert,
-    getIncidentDetailsForEndoscopy, searchPatients, AseessmentExceededList
+    getIncidentDetailsForEndoscopy, searchPatients, AseessmentExceededList, InchargeApprovalSave
 } = require('./qi_daily.service')
 
 module.exports = {
@@ -237,6 +237,42 @@ module.exports = {
                     success: 2,
                     message: "No Report Found",
                     data: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+    InchargeApprovalSave: (req, res) => {
+        const body = req.body;
+        InchargeApprovalSave(body, (err, result) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Approval Done"
+            })
+        })
+    },
+    InchargeApprvlView: (req, res) => {
+        const body = req.body;
+        InchargeApprvlView(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No record found"
                 })
             }
             return res.status(200).json({

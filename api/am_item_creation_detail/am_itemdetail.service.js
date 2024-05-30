@@ -7,7 +7,7 @@ module.exports = {
             am_grn_no, am_grn_date, am_bill_mast_slno, am_primary_custodian, am_secondary_custodian,
             am_manufacture_no, am_asset_no, am_asset_old_no, am_lease_status, am_lease_from, am_lease_to,
             am_lease_amount, am_lease_image, am_bill_mastslno, am_bill_master.am_bill_no,
-            am_bill_master.am_bill_date, am_bill_master.am_bill_amount,am_bill_master.am_bill_image,
+            am_bill_master.am_bill_date, am_item_map_details.am_bill_amount,am_bill_master.am_bill_image,
             am_bill_supplier,B.it_supplier_name as bill_supplier_name,am_lease_mast_slno,
             L.it_supplier_name as lease_suppliername,
             am_lease_mastslno, lease_suppler_slno, lease_fromdate, lease_todate, lease_amount, lease_status, lease_image
@@ -32,7 +32,7 @@ module.exports = {
             am_grn_no, am_grn_date, am_bill_mast_slno, am_primary_custodian, am_secondary_custodian,
             am_manufacture_no, am_asset_no, am_asset_old_no, am_lease_status, am_lease_from, am_lease_to,
             am_lease_amount, am_lease_image, am_bill_mastslno, am_bill_master.am_bill_no,
-            am_bill_master.am_bill_date, am_bill_master.am_bill_amount,am_bill_master.am_bill_image,
+            am_bill_master.am_bill_date, am_item_map_details.am_bill_amount,am_bill_master.am_bill_image,
             am_bill_supplier,B.it_supplier_name as bill_supplier_name,am_lease_mast_slno,
             L.it_supplier_name as lease_suppliername,
             am_lease_mastslno, lease_suppler_slno, lease_fromdate, lease_todate, lease_amount, lease_status, lease_image
@@ -217,12 +217,14 @@ module.exports = {
     BillDetailsUpdate: (data, callback) => {
         pool.query(
             `UPDATE am_item_map_details SET 
-            am_bill_mast_slno=?,           
+            am_bill_mast_slno=?,
+            am_bill_amount=?,        
             edit_user=?
             WHERE 
             am_item_map_slno=?`,
             [
                 data.am_bill_mast_slno,
+                data.am_bill_amount,
                 data.edit_user,
                 data.am_item_map_slno,
             ],
@@ -269,11 +271,13 @@ module.exports = {
         pool.query(
             `UPDATE am_item_map_details SET 
             am_bill_mast_slno=?,
+            am_bill_amount=?,
             edit_user=?
             WHERE 
             am_spare_item_map_slno=?`,
             [
                 data.am_bill_mast_slno,
+                data.am_bill_amount,
                 data.edit_user,
                 data.am_spare_item_map_slno,
             ],
@@ -1121,7 +1125,6 @@ module.exports = {
           ( 
             am_bill_no,
             am_bill_date,
-            am_bill_amount,
             am_bill_supplier,           
             create_user
           )
@@ -1129,7 +1132,6 @@ module.exports = {
             [
                 data.am_bill_no,
                 data.am_bill_date,
-                data.am_bill_amount,
                 data.am_bill_supplier,
                 data.create_user
             ],
@@ -1146,7 +1148,7 @@ module.exports = {
         pool.query(
             `SELECT
             am_bill_mastslno,am_bill_no,am_bill_date,
-            am_bill_amount,am_bill_image,it_supplier_name,
+            am_bill_image,it_supplier_name,
             am_bill_supplier
             FROM
             am_bill_master
@@ -1165,15 +1167,13 @@ module.exports = {
             `UPDATE am_bill_master SET 
             am_bill_no=?,
             am_bill_date=?,
-            am_bill_amount=?,
-            am_bill_supplier= ?,
+             am_bill_supplier= ?,
             edit_user=?
             WHERE 
             am_bill_mastslno=?`,
             [
                 data.am_bill_no,
                 data.am_bill_date,
-                data.am_bill_amount,
                 data.am_bill_supplier,
                 data.edit_user,
                 data.am_bill_mastslno
@@ -1249,7 +1249,7 @@ module.exports = {
 
     GetBillBySupplNDate: (data, callBack) => {
         pool.query(
-            `select am_bill_mastslno, am_bill_no, am_bill_date, am_bill_amount,
+            `select am_bill_mastslno, am_bill_no, am_bill_date, 
             am_bill_image, am_bill_supplier,it_supplier_name         
             from am_bill_master
             left join it_bill_supplier_details_mast on it_bill_supplier_details_mast.it_supplier_slno=am_bill_master.am_bill_supplier

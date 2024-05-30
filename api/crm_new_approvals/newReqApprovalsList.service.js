@@ -175,9 +175,7 @@ module.exports = {
             left join co_deptsec_mast T on T.sec_id=crm_request_master.request_deptsec_slno
             left join co_department_mast TD on TD.dept_id=T.dept_id
             left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
-            where incharge_approve=2 or hod_approve=2 or dms_approve=2 or
-            ms_approve=2 or manag_operation_approv=2 or senior_manage_approv=2 or
-            gm_approve=2 or md_approve=2 or ed_approve=2 or
+            where 
             req_status = "R"
             and user_acknldge is null ORDER BY crm_request_master.req_slno DESC`,
             [],
@@ -241,10 +239,7 @@ module.exports = {
             left join co_deptsec_mast T on T.sec_id=crm_request_master.request_deptsec_slno
             left join co_department_mast TD on TD.dept_id=T.dept_id
             left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
-            where incharge_approve=3 or hod_approve=3 or dms_approve=3 or
-            ms_approve=3 or manag_operation_approv=3 or senior_manage_approv=3 or
-            gm_approve=3 or md_approve=3 or ed_approve=3 or
-            req_status = "P" 
+            where req_status = "P" 
             and user_acknldge is null ORDER BY crm_request_master.req_slno DESC`,
             [],
             (error, results, fields) => {

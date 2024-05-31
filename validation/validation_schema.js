@@ -1252,13 +1252,15 @@ const validateQiDepartment = Joi.object({
             'string.min': 'Department Name length must be at least 3 characters long',
             'string.max': 'Department Name length must be less than or equal to 45 characters long'
         }),
-    qi_dept_code: Joi.string().trim().uppercase().required(),
+    qi_dept_code: Joi.string().trim().uppercase().required().messages({ 'string.empty': 'Departemnt Code Required' }),
     qi_co_deptsec_slno: Joi.number().required(),
     qi_list_type: Joi.number().required(),
     qi_dept_no: Joi.number().optional(),
     qi_dept_status: Joi.number().min(0).max(1).required(),
     create_user: Joi.number().optional(),
-    edit_user: Joi.number().optional()
+    edit_user: Joi.number().optional(),
+    qi_outlet_code: Joi.string().trim().uppercase().required()
+        .messages({ 'string.empty': 'Outlet Code Required' }),
 });
 
 const validateQiTypeList = Joi.object({
@@ -1297,7 +1299,22 @@ const validateCRMRequestRegister = Joi.object({
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
     req_slno: Joi.number().optional()
-})
+});
+// equip_no, equip_name, procedure_names, asset_no, equip_status, create_user, edit_user, create_date, update_date
+const validateQiEquipment = Joi.object({
+    equip_no: Joi.number().optional(),
+    equip_name: Joi.string().trim().uppercase().min(3).max(45).required()
+        .messages({
+            'string.empty': 'Equipment Name Required',
+            'string.min': 'Equipment Name length must be at least 3 characters long',
+            'string.max': 'Equipment Name length must be less than or equal to 45 characters long'
+        }),
+    procedure_names: Joi.optional(),
+    asset_no: Joi.optional(),
+    equip_status: Joi.number().min(0).max(1).required(),
+    create_user: Joi.number().optional(),
+    edit_user: Joi.number().optional(),
+});
 
 module.exports = {
     validateFloors,
@@ -1377,5 +1394,6 @@ module.exports = {
     validateCRMRequestRegister,
     validateQiDepartment,
     validateQiTypeList,
+    validateQiEquipment,
 
 }

@@ -49,7 +49,7 @@ module.exports = {
                     } else {
                         return res.status(200).json({
                             success: 1,
-                            message: "Registered as Incident",
+                            message: "Incident Registered",
                         })
                     }
                 });
@@ -89,7 +89,7 @@ module.exports = {
                     } else {
                         return res.status(200).json({
                             success: 1,
-                            message: "Registered as Incident",
+                            message: "Incident Registered",
                         })
                     }
                 });
@@ -129,7 +129,7 @@ module.exports = {
                     } else {
                         return res.status(200).json({
                             success: 1,
-                            message: "Registered as Incident",
+                            message: "Incident Registered",
                         })
                     }
                 });
@@ -169,7 +169,7 @@ module.exports = {
                     } else {
                         return res.status(200).json({
                             success: 1,
-                            message: "Registered as Incident",
+                            message: "Incident Registered",
                         })
                     }
                 });
@@ -209,7 +209,7 @@ module.exports = {
                     } else {
                         return res.status(200).json({
                             success: 1,
-                            message: "Registered as Incident",
+                            message: "Incident Registered",
                         })
                     }
                 });
@@ -249,7 +249,7 @@ module.exports = {
                     } else {
                         return res.status(200).json({
                             success: 1,
-                            message: "Registered as Incident",
+                            message: "Incident Registered",
                         })
                     }
                 });

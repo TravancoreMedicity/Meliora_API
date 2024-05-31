@@ -1128,7 +1128,7 @@ module.exports = {
             am_bill_supplier,           
             create_user
           )
-          VALUES(?,?,?,?,?)`,
+          VALUES(?,?,?,?)`,
             [
                 data.am_bill_no,
                 data.am_bill_date,

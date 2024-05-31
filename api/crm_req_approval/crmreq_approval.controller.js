@@ -313,7 +313,7 @@ module.exports = {
                 const dataupdate = {
                     req_slno: body.req_slno
                 }
-                if (body.incharge_approve === 3) {
+                if (body.hod_approve === 3) {
                     updateReqMstHold(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -335,7 +335,7 @@ module.exports = {
                         });
                     });
                 }
-                else if (body.incharge_approve === 2) {
+                else if (body.hod_approve === 2) {
                     updateReqMstReject(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -407,7 +407,7 @@ module.exports = {
                 const dataupdate = {
                     req_slno: body.req_slno
                 }
-                if (body.incharge_approve === 3) {
+                if (body.dms_approve === 3) {
                     updateReqMstHold(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -429,7 +429,7 @@ module.exports = {
                         });
                     });
                 }
-                else if (body.incharge_approve === 2) {
+                else if (body.dms_approve === 2) {
                     updateReqMstReject(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -500,7 +500,7 @@ module.exports = {
                 const dataupdate = {
                     req_slno: body.req_slno
                 }
-                if (body.incharge_approve === 3) {
+                if (body.ms_approve === 3) {
                     updateReqMstHold(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -522,7 +522,7 @@ module.exports = {
                         });
                     });
                 }
-                else if (body.incharge_approve === 2) {
+                else if (body.ms_approve === 2) {
                     updateReqMstReject(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -594,7 +594,7 @@ module.exports = {
                 const dataupdate = {
                     req_slno: body.req_slno
                 }
-                if (body.incharge_approve === 3) {
+                if (body.manag_operation_approv === 3) {
                     updateReqMstHold(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -616,7 +616,7 @@ module.exports = {
                         });
                     });
                 }
-                else if (body.incharge_approve === 2) {
+                else if (body.manag_operation_approv === 2) {
                     updateReqMstReject(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -689,7 +689,7 @@ module.exports = {
                 const dataupdate = {
                     req_slno: body.req_slno
                 }
-                if (body.incharge_approve === 3) {
+                if (body.senior_manage_approv === 3) {
                     updateReqMstHold(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -711,7 +711,7 @@ module.exports = {
                         });
                     });
                 }
-                else if (body.incharge_approve === 2) {
+                else if (body.senior_manage_approv === 2) {
                     updateReqMstReject(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -784,7 +784,7 @@ module.exports = {
                 const dataupdate = {
                     req_slno: body.req_slno
                 }
-                if (body.incharge_approve === 3) {
+                if (body.gm_approve === 3) {
                     updateReqMstHold(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -806,7 +806,7 @@ module.exports = {
                         });
                     });
                 }
-                else if (body.incharge_approve === 2) {
+                else if (body.gm_approve === 2) {
                     updateReqMstReject(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -879,7 +879,7 @@ module.exports = {
                 const dataupdate = {
                     req_slno: body.req_slno
                 }
-                if (body.incharge_approve === 3) {
+                if (body.md_approve === 3) {
                     updateReqMstHold(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -901,7 +901,7 @@ module.exports = {
                         });
                     });
                 }
-                else if (body.incharge_approve === 2) {
+                else if (body.md_approve === 2) {
                     updateReqMstReject(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -974,7 +974,7 @@ module.exports = {
                 const dataupdate = {
                     req_slno: body.req_slno
                 }
-                if (body.incharge_approve === 3) {
+                if (body.ed_approve === 3) {
                     updateReqMstHold(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)
@@ -996,7 +996,7 @@ module.exports = {
                         });
                     });
                 }
-                else if (body.incharge_approve === 2) {
+                else if (body.ed_approve === 2) {
                     updateReqMstReject(dataupdate, (err, results) => {
                         if (err) {
                             logger.logwindow(err)

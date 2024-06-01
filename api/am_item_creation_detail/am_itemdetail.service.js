@@ -942,12 +942,11 @@ module.exports = {
             spare_asset_no,spare_asset_no_only
             from am_spare_item_map_master
             left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_spare_item_map_master.spare_creation_slno
-            where spare_dept_slno=? and spare_deptsec_slno=? and
+            where spare_custodian_dept=1  and
                am_spare_item_map_slno not in
                (select am_spare_item_map_slno from am_asset_spare_details where spare_status=1 )`,
             [
-                data.spare_dept_slno,
-                data.spare_deptsec_slno
+                data.spare_custodian_dept
             ],
             (error, results, feilds) => {
                 if (error) {

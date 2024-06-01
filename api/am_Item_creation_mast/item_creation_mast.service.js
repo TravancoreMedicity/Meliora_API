@@ -80,7 +80,8 @@ module.exports = {
             am_item_map_slno,  am_asset_item_map_master.item_creation_slno,item_dept_slno,item_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,
             am_item_name_creation.item_name,rm_newroom_creation.rm_room_name,
-            IFNULL(rm_subroom_master.subroom_name,"Not Subroom" ) subroom_name
+            IFNULL(rm_subroom_master.subroom_name,"Not Subroom" ) subroom_name,
+            item_asset_no,item_asset_no_only
           FROM
           am_asset_item_map_master
          left join co_department_mast on co_department_mast.dept_id=am_asset_item_map_master.item_dept_slno
@@ -266,7 +267,8 @@ module.exports = {
             am_spare_item_map_slno,  am_spare_item_map_master.spare_creation_slno,spare_dept_slno,spare_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,
             am_item_name_creation.item_name,rm_newroom_creation.rm_room_name,
-            IFNULL(rm_subroom_master.subroom_name,"Not Subroom" ) subroom_name
+            IFNULL(rm_subroom_master.subroom_name,"Not Subroom" ) subroom_name,
+            spare_asset_no,spare_asset_no_only
           FROM
           am_spare_item_map_master
          left join co_department_mast on co_department_mast.dept_id=am_spare_item_map_master.spare_dept_slno

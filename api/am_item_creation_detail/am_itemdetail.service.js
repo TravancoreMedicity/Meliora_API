@@ -944,7 +944,8 @@ module.exports = {
             left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_spare_item_map_master.spare_creation_slno
             where spare_custodian_dept=1  and
                am_spare_item_map_slno not in
-               (select am_spare_item_map_slno from am_asset_spare_details where spare_status=1 )`,
+               (select am_spare_item_map_slno from am_asset_spare_details where spare_status=1 )
+               and spare_condamtn=0 and spare_service=0`,
             [
                 data.spare_custodian_dept
             ],
@@ -1456,6 +1457,39 @@ module.exports = {
             }
         )
     },
-
+    spareContamination: (data, callback) => {
+        pool.query(
+            `UPDATE am_spare_item_map_master SET
+            spare_condamtn=1
+                       WHERE 
+                       am_spare_item_map_slno=?`,
+            [
+                data.am_spare_item_map_slno,
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    spareService: (data, callback) => {
+        pool.query(
+            `UPDATE am_spare_item_map_master SET
+            spare_service=1
+            WHERE 
+            am_spare_item_map_slno=?`,
+            [
+                data.am_spare_item_map_slno,
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
 
 }

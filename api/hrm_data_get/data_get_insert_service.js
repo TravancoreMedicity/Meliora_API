@@ -36,7 +36,7 @@ module.exports = {
 
     getdepartmentMeli: (callback) => {
         pool.query(
-            `select * from meliora.co_department_mast`,
+            `select * from co_department_mast`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -62,7 +62,7 @@ module.exports = {
     },
     getdepartmentSecMeli: (callback) => {
         pool.query(
-            `select * from meliora.co_deptsec_mast`,
+            `select * from co_deptsec_mast`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -108,7 +108,7 @@ module.exports = {
 
     getemployeemasterMeli: (callback) => {
         pool.query(
-            `select * from meliora.co_employee_master`,
+            `select * from co_employee_master`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -164,7 +164,7 @@ module.exports = {
 
     getemployeeuserPassMeli: (callback) => {
         pool.query(
-            `select * from meliora.co_employee`,
+            `select * from co_employee`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -214,7 +214,7 @@ module.exports = {
     },
     getauthorizationMeli: (callback) => {
         pool.query(
-            `select * from meliora.co_emp_authorization_assign`,
+            `select * from co_emp_authorization_assign`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -251,7 +251,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             data.map((val) => {
                 pool.query(
-                    `update meliora.co_employee_master
+                    `update co_employee_master
                     set em_department=?,
                     em_dept_section=?,
                     em_no=?
@@ -279,7 +279,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             data.map((val) => {
                 pool.query(
-                    `update meliora.co_department_mast
+                    `update co_department_mast
                     set dept_status=?,
                     dept_type=?
                     where dept_id=? `,
@@ -305,7 +305,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             data.map((val) => {
                 pool.query(
-                    `update meliora.co_deptsec_mast
+                    `update co_deptsec_mast
                     set dept_id=?,
                     sec_status=?
                     where sec_id=? `,
@@ -341,7 +341,7 @@ module.exports = {
 
     getdesignationMeli: (callback) => {
         pool.query(
-            `select * from meliora.co_designation`,
+            `select * from co_designation`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -389,7 +389,7 @@ module.exports = {
 
     getbranchMeli: (callback) => {
         pool.query(
-            `select * from meliora.co_designation`,
+            `select * from co_designation`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -435,7 +435,7 @@ module.exports = {
 
     getSalutationMeli: (callback) => {
         pool.query(
-            `select * from meliora.co_salutation`,
+            `select * from co_salutation`,
             [],
             (error, results, feilds) => {
                 if (error) {

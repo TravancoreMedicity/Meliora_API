@@ -3,7 +3,7 @@ module.exports = {
 
     getdepartment: (callback) => {
         hrpool.query(
-            `select * from medi_hrm.hrm_department`,
+            `select * from hrm_department`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -50,7 +50,7 @@ module.exports = {
 
     getdepartmentSection: (callback) => {
         hrpool.query(
-            `select * from medi_hrm.hrm_dept_section`,
+            `select * from hrm_dept_section`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -95,7 +95,7 @@ module.exports = {
     },
     getemployeemasterHrm: (callback) => {
         hrpool.query(
-            `select * from medi_hrm.hrm_emp_master`,
+            `select * from hrm_emp_master`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -151,7 +151,7 @@ module.exports = {
     },
     getemployeeuserPassHrm: (callback) => {
         hrpool.query(
-            `select * from medi_hrm.hrm_employee`,
+            `select * from hrm_employee`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -202,7 +202,7 @@ module.exports = {
     },
     getauthorization: (callback) => {
         hrpool.query(
-            `select * from medi_hrm.hrm_authorization_assign`,
+            `select * from hrm_authorization_assign`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -328,7 +328,7 @@ module.exports = {
     },
     getdesignation: (callback) => {
         hrpool.query(
-            `select * from medi_hrm.designation`,
+            `select * from designation`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -376,7 +376,7 @@ module.exports = {
 
     getbranch: (callback) => {
         hrpool.query(
-            `select * from medi_hrm.hrm_branch`,
+            `select * from hrm_branch`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -422,7 +422,7 @@ module.exports = {
     },
     getSalutation: (callback) => {
         hrpool.query(
-            `select * from medi_hrm.hrm_salutation`,
+            `select * from hrm_salutation`,
             [],
             (error, results, feilds) => {
                 if (error) {

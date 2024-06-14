@@ -33,7 +33,8 @@ module.exports = {
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             where CAST( tm_new_task_mast.tm_task_due_date as DATE)=current_date() AND tm_task_dept_sec=?
             AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) ||(tm_new_task_mast.tm_task_status=2)
-            ||(tm_new_task_mast.tm_task_status=3)||(tm_new_task_mast.tm_task_status=4)|| (tm_new_task_mast.tm_task_status iS NULL ))
+            ||(tm_new_task_mast.tm_task_status=3)||(tm_new_task_mast.tm_task_status=4)|| (tm_new_task_mast.tm_task_status iS NULL )
+             AND  tm_detail_status=1)
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -76,7 +77,9 @@ module.exports = {
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             where yearweek(tm_task_due_date,1)=yearweek(current_date(),1)+1 AND tm_task_dept_sec=?            
-            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) ||(tm_new_task_mast.tm_task_status=2)|| (tm_new_task_mast.tm_task_status iS NULL ))
+            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0) ||(tm_new_task_mast.tm_task_status=2)||
+             (tm_new_task_mast.tm_task_status iS NULL ))
+            AND (tm_detail_status=1)
             group by tm_new_task_mast.tm_task_slno
             order By tm_task_due_date asc`,
             [id],
@@ -123,6 +126,7 @@ module.exports = {
             Or(year(tm_task_due_date) = year(current_date()) + 1 AND month(tm_task_due_date) = 1))       
             And (tm_task_status!=1)
             And(tm_task_dept_sec=?)
+            And(tm_detail_status=1)
             )
             group by tm_new_task_mast.tm_task_slno`,
             [id],
@@ -142,6 +146,7 @@ module.exports = {
             tm_new_task_mast.tm_task_slno,
             tm_task_name,
             tm_task_dept,
+            tm_task_file,
             tm_task_dept_sec,
             co_department_mast.dept_name,
             co_deptsec_mast.sec_name,
@@ -166,7 +171,8 @@ module.exports = {
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             where tm_new_task_mast_detl.tm_assigne_emp=?
-            AND (tm_new_task_mast.tm_task_status=2)            
+            AND (tm_new_task_mast.tm_task_status=2)
+            AND ( tm_detail_status=1)        
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -185,6 +191,7 @@ module.exports = {
             tm_new_task_mast.tm_task_slno,
             tm_task_name,
             tm_task_dept,
+            tm_task_file,
             tm_task_dept_sec,
             co_department_mast.dept_name,
             co_deptsec_mast.sec_name,
@@ -207,7 +214,8 @@ module.exports = {
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             where tm_new_task_mast_detl.tm_assigne_emp=?
-            AND (tm_new_task_mast.tm_task_status =4)       
+            AND (tm_new_task_mast.tm_task_status =4)
+            AND (tm_detail_status=1)       
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -225,6 +233,7 @@ module.exports = {
             `SELECT 
             tm_new_task_mast.tm_task_slno,
             tm_task_name,
+            tm_task_file,
             tm_task_dept,
             tm_task_dept_sec,
             co_department_mast.dept_name,
@@ -248,7 +257,8 @@ module.exports = {
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             where tm_new_task_mast_detl.tm_assigne_emp=?           
-            AND ((tm_new_task_mast.tm_task_status=3))
+            AND (tm_new_task_mast.tm_task_status=3)
+            AND (tm_detail_status=1)
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -265,6 +275,7 @@ module.exports = {
             tm_new_task_mast.tm_task_slno,
             tm_task_name,
             tm_task_dept,
+            tm_task_file,
             tm_task_dept_sec,
             co_department_mast.dept_name,
             co_deptsec_mast.sec_name,
@@ -287,7 +298,9 @@ module.exports = {
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
-            where  tm_new_task_mast.tm_task_status=1 AND tm_new_task_mast_detl.tm_assigne_emp=?
+            where  tm_new_task_mast.tm_task_status=1
+            AND tm_new_task_mast_detl.tm_assigne_emp=?
+            AND (tm_detail_status=1)
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -314,6 +327,7 @@ module.exports = {
             main_task_slno,
             tm_task_status,
             tm_complete_date,
+            tm_task_file,
             co_employee_master.em_name,
             tm_pending_remark,
             tm_onhold_remarks,
@@ -328,7 +342,9 @@ module.exports = {
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
-            where  (tm_new_task_mast_detl.tm_assigne_emp=? and tm_new_task_mast.tm_task_status!=1)
+            where  (tm_new_task_mast_detl.tm_assigne_emp=?
+            AND tm_new_task_mast.tm_task_status!=1)
+            AND (tm_detail_status=1)
             group by tm_new_task_mast.tm_task_slno
             ORDER BY tm_new_task_mast.tm_task_status DESC`,
             [id],
@@ -367,6 +383,7 @@ module.exports = {
             tm_new_task_mast.tm_task_slno,
             tm_task_name,
             tm_task_dept,
+            tm_task_file,
             tm_task_dept_sec,
             co_department_mast.dept_name,
             co_deptsec_mast.sec_name,
@@ -390,6 +407,7 @@ module.exports = {
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             where tm_new_task_mast_detl.tm_assigne_emp=?           
             AND (tm_new_task_mast.tm_task_status=0)
+            AND (tm_detail_status=1)
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -411,6 +429,7 @@ module.exports = {
             co_deptsec_mast.sec_name,
             tm_task_due_date, 
             tm_assigne_emp,
+            tm_task_file,
             main_task_slno,
             tm_task_status,
             tm_new_task_mast.tm_project_slno,
@@ -427,7 +446,8 @@ module.exports = {
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             where tm_new_task_mast_detl.tm_assigne_emp=? AND tm_task_due_date < current_date()
-            AND ((tm_new_task_mast.tm_task_status =0)||(tm_new_task_mast.tm_task_status =2)||(tm_new_task_mast.tm_task_status iS NULL))
+            AND (tm_new_task_mast.tm_task_status !=1)
+            AND (tm_detail_status=1)
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -469,6 +489,7 @@ module.exports = {
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno
             WHERE tm_new_task_mast.tm_task_dept_sec =? AND (tm_new_task_mast.tm_task_due_date >=current_date())
             AND (tm_new_task_mast.tm_task_status =2)
+            AND (tm_detail_status=1)
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -508,7 +529,8 @@ module.exports = {
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             WHERE tm_new_task_mast.tm_task_dept_sec =? 
-            AND (tm_new_task_mast.tm_task_status =4) 
+            AND (tm_new_task_mast.tm_task_status =4)
+            AND (tm_detail_status=1) 
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -549,7 +571,8 @@ module.exports = {
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             WHERE tm_new_task_mast.tm_task_dept_sec =? 
-            AND (tm_new_task_mast.tm_task_status =3) 
+            AND (tm_new_task_mast.tm_task_status =3)
+            AND (tm_detail_status=1) 
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -576,6 +599,7 @@ module.exports = {
             tm_new_task_mast.create_date,
             tm_new_task_mast.tm_project_slno,
             tm_project_name,
+            tm_task_file,
             tm_pending_remark,
             tm_onhold_remarks,
             tm_completed_remarks,
@@ -590,7 +614,9 @@ module.exports = {
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno = tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id = tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
-            WHERE tm_new_task_mast.tm_task_dept_sec =? AND tm_new_task_mast.tm_task_status = 1 
+            WHERE tm_new_task_mast.tm_task_dept_sec =?
+            AND tm_new_task_mast.tm_task_status = 1
+            AND (tm_detail_status=1)
             group by tm_new_task_mast.tm_task_slno
             order By tm_task_due_date desc`,
             [id],
@@ -633,6 +659,7 @@ module.exports = {
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             WHERE ((tm_new_task_mast.tm_task_dept_sec =?)
             AND (tm_new_task_mast.tm_task_status=0))
+            AND (tm_detail_status=1)
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -660,6 +687,8 @@ module.exports = {
             tm_onhold_remarks,
             tm_completed_remarks,
             tm_task_status,
+            tm_task_file,
+            tm_project_mast.tm_project_duedate,
             tm_new_task_mast.tm_project_slno,
             tm_project_name,
             tm_new_task_mast.create_date,
@@ -673,7 +702,9 @@ module.exports = {
             left join co_employee_master on co_employee_master.em_id = tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             WHERE tm_new_task_mast.tm_task_dept_sec =? AND tm_task_due_date < current_date()
-            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0)|| (tm_new_task_mast.tm_task_status=2) || (tm_new_task_mast.tm_task_status iS NULL ))
+            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0)|| (tm_new_task_mast.tm_task_status=2)
+             || (tm_new_task_mast.tm_task_status iS NULL ))
+            AND (tm_detail_status=1)
             group by tm_new_task_mast.tm_task_slno
             order By tm_task_due_date desc`,
             [id],
@@ -692,18 +723,19 @@ module.exports = {
             `SELECT 
             tm_project_mast.tm_project_slno,
             tm_project_name,
-            tm_project_dept,
-            co_department_mast.dept_name,        
-            tm_project_deptsec, 
-            co_deptsec_mast.sec_name,
             tm_project_duedate,
-            tm_project_status,                     
-			tm_project_description,
-            FROM meliora.tm_project_mast            
-            left join co_department_mast on co_department_mast.dept_id=tm_project_mast.tm_project_dept
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_project_mast.tm_project_deptsec        
-            WHERE tm_project_mast.tm_project_deptsec =? AND tm_project_mast.tm_project_status is NULL or tm_project_mast.tm_project_status=0
-            group by tm_project_mast.tm_project_slno`,
+            tm_project_description,
+            tm_project_status,
+            tm_task_dept_sec,
+            tm_project_cmpltedate,
+            tm_goal_slno,
+            tm_project_duedate,
+            tm_project_mast.create_date,
+            tm_goal_name
+            FROM tm_goal_mast  
+            left join tm_project_mast on tm_project_mast.tm_goal_slno=tm_goal_mast.tm_goals_slno
+            left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
+            where tm_task_dept_sec=?  and tm_project_status =2 group by tm_project_slno`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -719,18 +751,19 @@ module.exports = {
             `SELECT 
             tm_project_mast.tm_project_slno,
             tm_project_name,
-            tm_project_dept,
-            co_department_mast.dept_name,        
-            tm_project_deptsec, 
-            co_deptsec_mast.sec_name,
             tm_project_duedate,
-            tm_project_status,                   
-			tm_project_description
-            FROM meliora.tm_project_mast            
-            left join co_department_mast on co_department_mast.dept_id=tm_project_mast.tm_project_dept
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_project_mast.tm_project_deptsec        
-            WHERE tm_project_mast.tm_project_deptsec =? AND tm_project_mast.tm_project_status =1
-            group by tm_project_mast.tm_project_slno`,
+            tm_project_description,
+            tm_project_status,
+            tm_task_dept_sec,
+            tm_project_cmpltedate,
+            tm_goal_slno,
+            tm_project_duedate,
+            tm_project_mast.create_date,
+            tm_goal_name
+            FROM tm_goal_mast  
+            left join tm_project_mast on tm_project_mast.tm_goal_slno=tm_goal_mast.tm_goals_slno
+            left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
+            where tm_task_dept_sec=?  and tm_project_status =1 group by tm_project_slno`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -743,20 +776,21 @@ module.exports = {
     ProjectInCompleted: (id, callback) => {
         pool.query(
             `SELECT 
-            tm_project_mast.tm_project_slno,
+            tm_goals_slno,
+            tm_goal_name,
+            tm_goal_duedate,
+            tm_goal_description,
+            tm_goal_status,
+            tm_project_status,
+            tm_task_dept_sec,
             tm_project_name,
-            tm_project_dept,
-            co_department_mast.dept_name,        
-            tm_project_deptsec, 
-            co_deptsec_mast.sec_name,
-            tm_project_duedate,
-            tm_project_status,                   
-			tm_project_description
-            FROM meliora.tm_project_mast            
-            left join co_department_mast on co_department_mast.dept_id=tm_project_mast.tm_project_dept
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_project_mast.tm_project_deptsec        
-            WHERE tm_project_mast.tm_project_deptsec =? AND (tm_project_mast.tm_project_status !=1)
-            group by tm_project_mast.tm_project_slno`,
+            tm_goal_fromdate,
+            tm_project_description,
+            tm_project_duedate
+            FROM tm_goal_mast  
+            left join tm_project_mast on tm_project_mast.tm_goal_slno=tm_goal_mast.tm_goals_slno
+            left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
+            where tm_task_dept_sec=? and tm_project_status!=1 group by tm_project_mast.tm_project_slno`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -772,18 +806,18 @@ module.exports = {
             `SELECT 
             tm_project_mast.tm_project_slno,
             tm_project_name,
-            tm_project_dept,
-            co_department_mast.dept_name,        
-            tm_project_deptsec, 
-            co_deptsec_mast.sec_name,
             tm_project_duedate,
-            tm_project_status,                     
-			tm_project_description
-            FROM meliora.tm_project_mast            
-            left join co_department_mast on co_department_mast.dept_id=tm_project_mast.tm_project_dept
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_project_mast.tm_project_deptsec        
-            WHERE tm_project_mast.tm_project_deptsec =? AND tm_project_duedate < current_date() AND (tm_project_mast.tm_project_status=0 OR tm_project_mast.tm_project_status is NULL)
-            group by tm_project_mast.tm_project_slno`,
+            tm_project_description,
+            tm_project_status,
+            tm_task_dept_sec,
+            tm_project_cmpltedate,
+            tm_goal_slno,            
+            tm_project_mast.create_date,
+            tm_goal_name
+            FROM tm_goal_mast  
+            left join tm_project_mast on tm_project_mast.tm_goal_slno=tm_goal_mast.tm_goals_slno
+            left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
+            where tm_task_dept_sec=?  AND tm_project_duedate < current_date() AND (tm_project_mast.tm_project_status=0 OR tm_project_mast.tm_project_status is NULL) group by tm_project_slno`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -797,20 +831,18 @@ module.exports = {
     GoalsOnProgress: (id, callback) => {
         pool.query(
             `SELECT 
-            tm_goal_mast.tm_goals_slno,
+            tm_goals_slno,
             tm_goal_name,
-            tm_goal_dept,
-            co_department_mast.dept_name,        
-            tm_goal_deptsec, 
-            co_deptsec_mast.sec_name,
             tm_goal_duedate,
-            tm_goal_status,                   
-			tm_goal_description
-            FROM meliora.tm_goal_mast            
-            left join co_department_mast on co_department_mast.dept_id=tm_goal_mast.tm_goal_dept
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_goal_mast.tm_goal_dept        
-            WHERE (tm_goal_mast.tm_goal_deptsec=? AND tm_goal_mast.tm_goal_status =2)
-            group by tm_goal_mast.tm_goals_slno`,
+            tm_goal_description,
+            tm_goal_status,
+            tm_task_dept_sec,
+            tm_project_name,
+            tm_goal_fromdate
+            FROM tm_goal_mast  
+            left join tm_project_mast on tm_project_mast.tm_goal_slno=tm_goal_mast.tm_goals_slno
+            left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
+            where tm_task_dept_sec=? and tm_goal_status=2  group by tm_goals_slno`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -824,20 +856,19 @@ module.exports = {
     GoalsCompleted: (id, callback) => {
         pool.query(
             `SELECT 
-            tm_goal_mast.tm_goals_slno,
+            tm_goals_slno,
             tm_goal_name,
-            tm_goal_dept,
-            co_department_mast.dept_name,        
-            tm_goal_deptsec, 
-            co_deptsec_mast.sec_name,
             tm_goal_duedate,
-            tm_goal_status,                    
-			tm_goal_description
-            FROM meliora.tm_goal_mast            
-            left join co_department_mast on co_department_mast.dept_id=tm_goal_mast.tm_goal_dept
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_goal_mast.tm_goal_dept        
-            WHERE tm_goal_mast.tm_goal_deptsec =? AND tm_goal_mast.tm_goal_status =1
-            group by tm_goal_mast.tm_goals_slno`,
+            tm_goal_description,
+            tm_goal_status,
+            tm_task_dept_sec,
+            tm_project_name,
+            tm_project_duedate,
+            tm_goal_fromdate
+            FROM tm_goal_mast  
+            left join tm_project_mast on tm_project_mast.tm_goal_slno=tm_goal_mast.tm_goals_slno
+            left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
+            where tm_task_dept_sec=? and tm_goal_status=1  group by tm_goals_slno`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -849,21 +880,19 @@ module.exports = {
     },
     GoalsInCompleted: (id, callback) => {
         pool.query(
-            `SELECT 
-            tm_goal_mast.tm_goals_slno,
-            tm_goal_name,
-            tm_goal_dept,
-            co_department_mast.dept_name,        
-            tm_goal_deptsec, 
-            co_deptsec_mast.sec_name,
-            tm_goal_duedate,
-            tm_goal_status,                    
-			tm_goal_description
-            FROM meliora.tm_goal_mast            
-            left join co_department_mast on co_department_mast.dept_id=tm_goal_mast.tm_goal_dept
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_goal_mast.tm_goal_dept        
-            WHERE tm_goal_mast.tm_goal_deptsec =? AND tm_goal_mast.tm_goal_status !=1
-            group by tm_goal_mast.tm_goals_slno`,
+            ` SELECT 
+                        tm_goals_slno,
+                        tm_goal_name,
+                        tm_goal_duedate,
+                        tm_goal_description,
+                        tm_goal_status,
+                        tm_task_dept_sec,
+                        tm_project_name,
+                        tm_goal_fromdate
+                        FROM tm_goal_mast  
+                        left join tm_project_mast on tm_project_mast.tm_goal_slno=tm_goal_mast.tm_goals_slno
+                        left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
+                        where tm_task_dept_sec=? and tm_goal_status!=1  group by tm_goals_slno`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -877,20 +906,18 @@ module.exports = {
     GoalsOverDue: (id, callback) => {
         pool.query(
             `SELECT 
-            tm_goal_mast.tm_goals_slno,
+            tm_goals_slno,
             tm_goal_name,
-            tm_goal_dept,
-            co_department_mast.dept_name,        
-            tm_goal_deptsec, 
-            co_deptsec_mast.sec_name,
             tm_goal_duedate,
-            tm_goal_status,                     
-			tm_goal_description
-            FROM meliora.tm_goal_mast            
-            left join co_department_mast on co_department_mast.dept_id=tm_goal_mast.tm_goal_dept
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_goal_mast.tm_goal_dept        
-            WHERE tm_goal_mast.tm_goal_deptsec =? AND tm_goal_duedate < current_date() AND (tm_goal_mast.tm_goal_status=0 OR tm_goal_mast.tm_goal_status is NULL)
-            group by tm_goal_mast.tm_goals_slno`,
+            tm_goal_description,
+            tm_goal_status,
+            tm_task_dept_sec,
+            tm_project_name,
+            tm_goal_fromdate
+            FROM tm_goal_mast  
+            left join tm_project_mast on tm_project_mast.tm_goal_slno=tm_goal_mast.tm_goals_slno
+            left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
+            where tm_task_dept_sec=? AND tm_goal_duedate < current_date() AND (tm_goal_mast.tm_goal_status=0 OR tm_goal_mast.tm_goal_status is NULL)`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -1002,35 +1029,7 @@ module.exports = {
         );
     },
 
-    AllProjectUnderSection: (id, callback) => {
-        pool.query(
-            `SELECT 
-            tm_new_task_mast.tm_task_slno,
-        	tm_project_mast.tm_project_duedate,
-            tm_project_mast.create_date,
-     		tm_project_name,
-			tm_new_task_mast.tm_project_slno,
-            tm_project_dept,
-            tm_project_deptsec,
-            tm_task_status,
-            tm_assigne_emp
-			FROM meliora.tm_new_task_mast         
-            left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
-            left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp 
-            left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
-            left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec  
-            where ((tm_project_deptsec=?)and(tm_new_task_mast.tm_project_slno IS NOT NULL))
-			group by tm_new_task_mast.tm_project_slno`,
-            [id],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
+
 
     AllEmployeeProject: (id, callback) => {
 
@@ -1175,7 +1174,8 @@ module.exports = {
             tm_new_task_mast.tm_task_name,
             tm_new_task_mast.tm_task_status,
             tm_new_task_mast.create_date,
-            tm_new_task_mast.create_user,        
+            tm_new_task_mast.create_user,
+            main_task_slno,        
             tm_assigne_emp,        
          T.em_name as task_empname,
          C.em_name as create_empname
@@ -1184,7 +1184,7 @@ module.exports = {
 			left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master T on T.em_id=tm_new_task_mast_detl.tm_assigne_emp
             left join co_employee_master C on C.em_id=tm_new_task_mast.create_user
-            where ((tm_project_mast.tm_project_slno=?) and (tm_new_task_mast.main_task_slno is null))`,
+            where ((tm_project_mast.tm_project_slno=?) and (tm_new_task_mast.main_task_slno is null) AND (tm_detail_status=1))`,
             [
                 data.tm_project_slno,
             ],
@@ -1216,7 +1216,11 @@ module.exports = {
              left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
              left join co_employee_master C on C.em_id=tm_new_task_mast.create_user
-            where ((tm_new_task_mast_detl.tm_assigne_emp=?) and (tm_new_task_mast.tm_project_slno is NULL))`,
+            where (
+            (tm_new_task_mast_detl.tm_assigne_emp=?)
+            AND (tm_new_task_mast.tm_project_slno is NULL)
+            AND (tm_detail_status=1)
+            )`,
             [
                 data.tm_assigne_emp,
                 data.tm_assigne_emp,
@@ -1254,7 +1258,8 @@ module.exports = {
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
             left join co_employee_master C on C.em_id=tm_new_task_mast.create_user
-            where (tm_new_task_mast.main_task_slno=?)`,
+            where (tm_new_task_mast.main_task_slno=?)
+              AND (tm_detail_status=1)`,
             [
 
                 data.main_task_slno,
@@ -1269,6 +1274,28 @@ module.exports = {
 
         );
 
+    },
+    getAllProjects: (callback) => {
+        pool.query(
+            `select tm_project_slno,
+            tm_project_name,
+            tm_project_dept,
+            tm_project_deptsec,
+            tm_goal_slno,
+            tm_project_duedate,
+            tm_project_description,
+            tm_project_status
+            from meliora.tm_project_mast
+            ORDER BY 
+            tm_project_name ASC`
+            , [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
     },
 
 }

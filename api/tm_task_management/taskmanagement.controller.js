@@ -1,8 +1,9 @@
 const { CreateTaskInsert, CreateTaskDetailInsert, CreateTaskView, CreateSubTaskInsert, CreateTaskSubTaskDetailInsert, SubTaskviewByid, MasterTaskviewBySecid,
     MasterEmpByid, UpdateMasterTask, UpdateSubTask, SubtaskviewByidForEdit, employeeInactive, updateSubTaskDetail, MasterTaskviewByidForEdit, DeptSearch,
-    GoalView, ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptView, GoalDeptUpdate, ProgressInsert, ProgressView, ProgressUpdate,
+    ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptUpdate, ProgressInsert, ProgressView, ProgressUpdate,
     ProjectDeptView, GoalDeptSearch, ProjectDeptSearch, SubProgressView, taskStatusUpdate, SearchProjectAndEmployee, GetTaskSlno,
-    UpdateStatus, InsertDueDate, getCurrentDueDate, getAllDueDates } = require('../tm_task_management/taskmanagement.service')
+    UpdateStatus, InsertDueDate, getCurrentDueDate, getAllDueDates, AllTaskListProjectz, getDeptGoals, getDeptProjects, subtaskUnderdepSec,
+    getAllGoals } = require('../tm_task_management/taskmanagement.service')
 
 const logger = require('../../logger/logger');
 module.exports = {
@@ -62,6 +63,7 @@ module.exports = {
     },
     CreateTaskView: (req, res) => {
         CreateTaskView((err, results) => {
+
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -638,26 +640,6 @@ module.exports = {
         })
     },
 
-    GoalView: (req, res) => {
-        GoalView((err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (results === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: "No Records"
-                })
-            }
-            return res.status(200).json({
-                success: 2,
-                data: results
-            })
-        })
-    },
 
     ProjectInsert: (req, res) => {
         const body = req.body;
@@ -733,28 +715,6 @@ module.exports = {
                 message: "Goal Created successfully",
                 insertId: result.insertId,
             })
-        })
-    },
-
-    GoalDeptView: (req, res) => {
-        const id = req.params.id;
-        GoalDeptView(id, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (!results) {
-                return res.status(200).json({
-                    success: 1,
-                    message: "No Data"
-                });
-            }
-            return res.status(200).json({
-                success: 2,
-                data: results
-            });
         })
     },
 
@@ -1109,7 +1069,118 @@ module.exports = {
         })
     },
 
+    AllTaskListProjectz: (req, res) => {
+        const body = req.body;
+        AllTaskListProjectz(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+
+
+    getAllGoals: (req, res) => {
+        getAllGoals((err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    getDeptGoals: (req, res) => {
+        const id = req.params.id;
+        getDeptGoals(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+
+    getDeptProjects: (req, res) => {
+        const id = req.params.id;
+        getDeptProjects(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+
+
+    subtaskUnderdepSec: (req, res) => {
+        const body = req.body;
+        subtaskUnderdepSec(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
 
 }
-
 

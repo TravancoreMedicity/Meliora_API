@@ -1214,6 +1214,7 @@ const validateAssetRackMaster = Joi.object({
 
     am_rack_name: Joi.string().trim().uppercase().required(),
     am_rack_status: Joi.number().optional(),
+    am_rack_deptsec: Joi.number().optional(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
     am_rack_slno: Joi.number().optional()

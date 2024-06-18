@@ -1,8 +1,8 @@
 const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnProgress, EmployeeCompleted, EmployeeAllTask, EmployeeOnHold,
     EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue, EmployeeName, EmployeeOnPending,
     ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted, DepartmentOnHold, DepartmentPending, ViewAllEmployeeTask,
-    GoalsOverDue, ProjectInCompleted, GoalsInCompleted, EmpProjectTask, EmpTaskCount, AllProjectUnderSection, AllEmployeeProject, AllTaskUnderProject,
-    TTCTcountUnderProject, EmployeeTTCTcount, AllEmployeeTask, EmpTaskCountWithoutProject, SubTaskUnderTask, } = require('../tm_task_views/tmview.service')
+    GoalsOverDue, ProjectInCompleted, GoalsInCompleted, EmpProjectTask, EmpTaskCount, AllEmployeeProject, AllTaskUnderProject,
+    TTCTcountUnderProject, EmployeeTTCTcount, AllEmployeeTask, EmpTaskCountWithoutProject, SubTaskUnderTask, getAllProjects } = require('../tm_task_views/tmview.service')
 module.exports = {
 
     ViewOverDueToday: (req, res) => {
@@ -645,27 +645,6 @@ module.exports = {
         })
     },
 
-    AllProjectUnderSection: (req, res) => {
-        const id = req.params.id;
-        AllProjectUnderSection(id, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (!results) {
-                return res.status(200).json({
-                    success: 1,
-                    message: "No Data"
-                });
-            }
-            return res.status(200).json({
-                success: 2,
-                data: results
-            });
-        })
-    },
     AllEmployeeProject: (req, res) => {
         const id = req.params.id;
         AllEmployeeProject(id, (err, results) => {
@@ -802,6 +781,26 @@ module.exports = {
                 })
             }
             if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getAllProjects: (req, res) => {
+        getAllProjects((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
                 return res.status(200).json({
                     success: 1,
                     message: "No Records"

@@ -69,6 +69,7 @@ module.exports = {
             tm_new_task_mast.tm_task_slno,
             tm_task_name,
             tm_task_dept,
+            tm_detail_status,
             tm_task_dept_sec,
             co_department_mast.dept_name,
             co_deptsec_mast.sec_name,
@@ -76,9 +77,11 @@ module.exports = {
             tm_assigne_emp,
             co_employee_master.em_name,
             main_task_slno,
+            tm_task_file,
 			tm_task_description,
             tm_task_status, 
 			tm_project_name,
+            tm_project_mast.tm_project_duedate,
             tm_new_task_mast.create_date,
             tm_detail_status,
             tm_onhold_remarks,
@@ -93,6 +96,7 @@ module.exports = {
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp 
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
+            WHERE tm_detail_status=1
 			group by tm_new_task_mast.tm_task_slno
 			ORDER BY tm_task_slno DESC`
             , [],
@@ -294,8 +298,10 @@ module.exports = {
             tm_assigne_emp,
             co_employee_master.em_name,
             main_task_slno,
+            tm_task_file,
 			tm_task_description,
             tm_new_task_mast.tm_project_slno,
+            tm_project_mast.tm_project_duedate,
             tm_project_name,
             tm_pending_remark,
             tm_onhold_remarks,
@@ -305,13 +311,16 @@ module.exports = {
             tm_complete_date,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
             GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
-            FROM meliora.tm_new_task_mast            
-            left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
+            FROM meliora.tm_new_task_mast              
+            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec 
+            left join co_department_mast on co_department_mast.dept_id=co_deptsec_mast.dept_id
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
-            WHERE ((tm_new_task_mast.tm_task_dept_sec=?) And (tm_new_task_mast.tm_task_status!=1))
+            WHERE (
+            (tm_new_task_mast.tm_task_dept_sec=?)
+             And (tm_new_task_mast.tm_task_status!=1)
+             And( tm_detail_status=1) )
             group by tm_new_task_mast.tm_task_slno
 			ORDER BY tm_task_slno DESC`,
             [id],
@@ -398,7 +407,7 @@ module.exports = {
             left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
-            WHERE tm_new_task_mast.main_task_slno=? 
+            WHERE tm_new_task_mast.main_task_slno=?  and  tm_detail_status=1
             group by tm_new_task_mast.tm_task_slno`,
             [id],
             (error, results, fields) => {
@@ -563,34 +572,6 @@ module.exports = {
         )
     },
 
-    GoalView: (callback) => {
-        pool.query(
-            `SELECT 
-            tm_goals_slno,
-            tm_goal_name,
-            tm_goal_dept,
-            dept_name,
-            sec_name,
-            tm_goal_deptsec,
-            tm_goal_fromdate, 
-            tm_goal_duedate,
-            tm_goal_status,
-            tm_goal_cmpledate,
-            tm_goal_mast.create_date,
-            tm_goal_description          
-            FROM meliora.tm_goal_mast            
-            left join co_department_mast on co_department_mast.dept_id=tm_goal_mast.tm_goal_dept
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_goal_mast.tm_goal_deptsec            
-            ORDER BY tm_goal_duedate DESC`, [],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
-
     ProjectInsert: (data, callback) => {
         pool.query(
             `INSERT INTO tm_project_mast
@@ -629,23 +610,26 @@ module.exports = {
     ProjectView: (callback) => {
         pool.query(
             `SELECT 
-            tm_project_slno,
+            tm_project_mast.tm_project_slno,
             tm_project_name,
-            tm_project_dept,
-            dept_name,
-            sec_name,
-            tm_project_deptsec, 
             tm_project_duedate,
+            tm_project_description,
             tm_project_status,
-            tm_project_mast.tm_goal_slno,
-            tm_goal_name,
             tm_project_cmpltedate,
-            tm_project_description          
-            FROM meliora.tm_project_mast            
-            left join co_department_mast on co_department_mast.dept_id=tm_project_mast.tm_project_dept
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_project_mast.tm_project_deptsec
-            left join tm_goal_mast on tm_goal_mast.tm_goals_slno=tm_project_mast.tm_goal_slno              
-            ORDER BY tm_project_duedate DESC`, [],
+            tm_goal_slno,
+            tm_goal_duedate,
+            tm_project_mast.create_date,
+            tm_new_task_mast.tm_task_dept,
+            tm_new_task_mast.tm_task_dept_sec,
+            co_department_mast.dept_name,
+            co_deptsec_mast.sec_name,            
+            tm_goal_name
+            FROM tm_project_mast            
+            left join tm_goal_mast on tm_goal_mast.tm_goals_slno=tm_project_mast.tm_goal_slno
+            left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
+            left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
+            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
+            group by tm_project_slno`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -694,9 +678,7 @@ module.exports = {
         pool.query(
             `INSERT INTO tm_goal_mast
             (            
-                tm_goal_name,
-                tm_goal_dept,
-                tm_goal_deptsec,
+                tm_goal_name,             
                 tm_goal_fromdate,
                 tm_goal_duedate,
                 tm_goal_description,
@@ -704,11 +686,9 @@ module.exports = {
                 tm_goal_cmpledate,
                 tm_goal_createuser            
             )
-            VALUES (?,?,?,?,?,?,?,?,?)`,
+            VALUES (?,?,?,?,?,?,?)`,
             [
                 data.tm_goal_name,
-                data.tm_goal_dept,
-                data.tm_goal_deptsec,
                 data.tm_goal_fromdate,
                 data.tm_goal_duedate,
                 data.tm_goal_description,
@@ -759,9 +739,7 @@ module.exports = {
     GoalDeptUpdate: (data, callback) => {
         pool.query(
             `UPDATE tm_goal_mast SET                 
-            tm_goal_name=?,
-            tm_goal_dept=?,
-            tm_goal_deptsec=?,
+            tm_goal_name=?,          
             tm_goal_fromdate=?,
             tm_goal_duedate=?,                 
             tm_goal_description=?,
@@ -772,8 +750,6 @@ module.exports = {
              tm_goals_slno=?`,
             [
                 data.tm_goal_name,
-                data.tm_goal_dept,
-                data.tm_goal_deptsec,
                 data.tm_goal_fromdate,
                 data.tm_goal_duedate,
                 data.tm_goal_description,
@@ -791,36 +767,6 @@ module.exports = {
         )
     },
 
-    GoalDeptView: (id, callback) => {
-        pool.query(
-            `SELECT 
-                     tm_goals_slno,
-                     tm_goal_name,
-                     tm_goal_dept,
-                     dept_name,
-                     sec_name,
-                     tm_goal_deptsec,
-                     tm_goal_fromdate,
-                     tm_goal_duedate,
-                     tm_goal_mast.create_date,
-                     tm_goal_status,
-                     tm_goal_cmpledate,
-                     tm_goal_description          
-                     FROM meliora.tm_goal_mast            
-                     left join co_department_mast on co_department_mast.dept_id=tm_goal_mast.tm_goal_dept
-                     left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_goal_mast.tm_goal_deptsec
-                     WHERE tm_goal_mast.tm_goal_deptsec=?             
-                     ORDER BY tm_goal_duedate DESC`,
-            [id],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-
-        );
-    },
     ProjectDeptView: (id, callback) => {
         pool.query(
             `SELECT 
@@ -1124,6 +1070,180 @@ module.exports = {
                 return callback(null, results);
             }
 
+        );
+    },
+    AllTaskListProjectz: (data, callback) => {
+        pool.query(
+            `SELECT 
+            tm_new_task_mast.tm_task_slno,
+            tm_task_name,
+            tm_task_dept,
+            tm_task_dept_sec,
+            co_department_mast.dept_id,
+            co_department_mast.dept_name,
+            co_deptsec_mast.sec_name,
+			tm_task_due_date, 
+            tm_assigne_emp,
+            co_employee_master.em_name,
+            main_task_slno,
+            tm_task_file,
+			tm_task_description,
+            tm_task_status, 
+			tm_project_name,
+            tm_project_mast.tm_project_duedate,
+            tm_new_task_mast.create_date,
+            tm_detail_status,
+            tm_onhold_remarks,
+            tm_pending_remark,
+            tm_completed_remarks,    
+            tm_new_task_mast.tm_project_slno,
+            GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
+            FROM meliora.tm_new_task_mast            
+            left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
+            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
+            left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
+            left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp 
+            left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
+            where tm_new_task_mast.tm_project_slno=?
+            AND tm_detail_status=1
+			group by tm_new_task_mast.tm_task_slno`,
+            [
+                data.tm_project_slno,
+            ],
+
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+
+    },
+
+
+
+
+    getAllGoals: (callBack) => {
+        pool.query(
+            `SELECT 
+            tm_goals_slno,
+            tm_goal_name,
+            tm_goal_duedate,
+            tm_goal_description,
+            tm_goal_status,
+            tm_goal_cmpledate,
+            tm_goal_fromdate
+            FROM tm_goal_mast
+            group by tm_goals_slno
+            order by tm_goal_name ASC`,
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getDeptGoals: (id, callback) => {
+        pool.query(
+            `SELECT 
+            tm_goals_slno,
+            tm_goal_name,
+            tm_goal_duedate,
+            tm_goal_description,
+            tm_goal_status,
+            tm_task_dept_sec,
+            tm_project_name,
+            tm_goal_fromdate
+            FROM tm_goal_mast  
+            left join tm_project_mast on tm_project_mast.tm_goal_slno=tm_goal_mast.tm_goals_slno
+            left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
+            where tm_task_dept_sec=? group by tm_goals_slno`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+    getDeptProjects: (id, callback) => {
+        pool.query(
+            `SELECT 
+            tm_project_mast.tm_project_slno,
+            tm_project_name,
+            tm_project_duedate,
+            tm_project_description,
+            tm_project_status,
+            tm_task_dept_sec,
+            tm_project_cmpltedate,
+            tm_goal_slno,
+            tm_goal_duedate,
+            tm_project_mast.create_date,
+            tm_goal_name
+            FROM tm_goal_mast  
+            left join tm_project_mast on tm_project_mast.tm_goal_slno=tm_goal_mast.tm_goals_slno
+            left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
+            where tm_task_dept_sec=? group by tm_project_slno`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+
+    subtaskUnderdepSec: (data, callback) => {
+        pool.query(
+            `SELECT 
+            tm_new_task_mast.tm_task_slno,
+            tm_task_name,
+            tm_task_dept,
+            co_department_mast.dept_name,        
+            tm_task_dept_sec, 
+            co_deptsec_mast.sec_name,
+            tm_task_due_date,           
+            tm_assigne_emp,
+            tm_task_status,
+            tm_pending_remark,
+            tm_onhold_remarks,
+            tm_completed_remarks,
+            tm_new_task_mast.create_date,          
+			tm_task_description,
+            tm_complete_date,
+            tm_new_task_mast.tm_project_slno,
+            main_task_slno,
+            GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
+            GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
+            FROM meliora.tm_new_task_mast            
+            left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
+            left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
+            left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
+            left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
+            left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
+            WHERE
+            tm_new_task_mast.main_task_slno=?
+             and  tm_task_dept_sec=?
+             AND tm_detail_status=1
+            group by tm_new_task_mast.tm_task_slno`,
+            [
+                data.main_task_slno,
+                data.tm_task_dept_sec
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
         );
     },
 }

@@ -3,8 +3,8 @@ const { checkToken } = require("../../authentication/token_validation");
 const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnProgress, EmployeeCompleted, EmployeeOnHold, DepartmentPending, ViewAllEmployeeTask,
     EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue, DepartmentOnHold,
     ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted, GoalsOverDue, EmployeeAllTask, EmployeeName, EmployeeOnPending,
-    ProjectInCompleted, GoalsInCompleted, EmpProjectTask, EmpTaskCount, AllProjectUnderSection, AllEmployeeProject, TTCTcountUnderProject,
-    EmployeeTTCTcount, AllEmployeeTask, AllTaskUnderProject, EmpTaskCountWithoutProject, SubTaskUnderTask } = require('../tm_task_views/tmview.controller');
+    ProjectInCompleted, GoalsInCompleted, EmpProjectTask, EmpTaskCount, AllEmployeeProject, TTCTcountUnderProject,
+    EmployeeTTCTcount, AllEmployeeTask, AllTaskUnderProject, EmpTaskCountWithoutProject, SubTaskUnderTask, getAllProjects } = require('../tm_task_views/tmview.controller');
 
 router.get('/ViewOverDueToday/:id', checkToken, ViewOverDueToday)
 router.get('/ViewOverDueNextWeek/:id', checkToken, ViewOverDueNextWeek)
@@ -40,7 +40,7 @@ router.get('/goalsOverDue/:id', checkToken, GoalsOverDue)
 
 router.get('/EmpProjectTask/:id', checkToken, EmpProjectTask)
 router.post('/EmpTaskCountUnderProject', checkToken, EmpTaskCount)
-router.get('/allProjectUnderSection/:id', checkToken, AllProjectUnderSection)
+
 router.get('/allEmployeeProject/:id', checkToken, AllEmployeeProject)
 router.post('/TTCTcountUnderProject', checkToken, TTCTcountUnderProject)
 router.post('/EmployeeTTCTcount', checkToken, EmployeeTTCTcount)
@@ -48,5 +48,12 @@ router.get('/allEmployeeTaskList/:id', checkToken, AllEmployeeTask)
 router.post('/allTaskUnderProject', checkToken, AllTaskUnderProject)
 router.post('/subTaskUnderTask', checkToken, SubTaskUnderTask)
 router.post('/EmpTaskCountWithoutProject', checkToken, EmpTaskCountWithoutProject)
+
+router.get('/getAllProjects', checkToken, getAllProjects)
+
+
+
+
+
 
 module.exports = router

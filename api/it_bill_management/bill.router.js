@@ -3,8 +3,8 @@ const { checkToken } = require("../../authentication/token_validation");
 const { BillInsert, AllBillView, UpdateBill, MonthlyTarrifInsert, MonthlyTarrifView, OtherBillinsert, OtherBillView, UpdateOtherBill, QuaterlyTarrifView,
     QuaterlyTarrifInsert, YearlyTarrifView, YearlyTarrifInsert, BillMonthlyUpdate, BillQuaterlyUpdate, BillYearlyUpdate, OtherBillViewDash, otherTeleBillViewinDash,
     otherSoftwareBillViewinDash, otherServiceBillViewinDash, getbilltype, checkMonthlyInsert, getUnpaidMonthlyTeleBills, checkQuarterlyInsert, checkYearlyInsert,
-    getUnpaidQuarterlyTeleBills, getUnpaidYearlyTeleBills, getUnpaidMonthlySoftBills, getUnpaidQuarterlySoftBills, getUnpaidYearlySoftBills, getUnpaidBillsServMonthly,
-    getUnpaidBillsSerQuarter, getUnpaidBillsSerYear } = require('../it_bill_management/bill.controller');
+    getUnpaidQuarterlyTeleBills, getUnpaidYearlyTeleBills, getUnpaidMonthlySoftBills, getUnpaidQuarterlySoftBills, getUnpaidYearlySoftBills,
+    getAssetDetails } = require('../it_bill_management/bill.controller');
 
 router.get('/getbilltype/:id', checkToken, getbilltype)
 router.post('/insertBill', checkToken, BillInsert)
@@ -40,9 +40,7 @@ router.get('/getUnpaidQuarterlySoftBills', checkToken, getUnpaidQuarterlySoftBil
 router.get('/getUnpaidYearlySoftBills', checkToken, getUnpaidYearlySoftBills)
 router.get('/otherSoftwareBillViewinDash', checkToken, otherSoftwareBillViewinDash)
 
-router.get('/getUnpaidBillsServMonthly', checkToken, getUnpaidBillsServMonthly)
-router.get('/getUnpaidBillsSerQuarter', checkToken, getUnpaidBillsSerQuarter)
-router.get('/getUnpaidBillsSerYear', checkToken, getUnpaidBillsSerYear)
 router.get('/otherServiceBillViewinDash', checkToken, otherServiceBillViewinDash)
+router.get('/getAssetDetails/:id', checkToken, getAssetDetails)
 
 module.exports = router

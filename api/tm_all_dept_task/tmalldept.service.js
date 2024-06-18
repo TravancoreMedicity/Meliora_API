@@ -108,12 +108,17 @@ module.exports = {
             tm_new_task_mast.create_user,
             tm_new_task_mast.main_task_slno,
             tm_task_file,
+            tm_query_remark,
             tm_create_detl_slno,
             tm_task_description,                       
-  		     tm_assigne_emp, 
+  		     tm_assigne_emp,
+             tm_query_reply,
+             tm_query_reply_date,
              tm_detail_status,
+             tm_query_reply_user,
             T.em_name as task_empname,
-            C.em_name as create_empname
+            C.em_name as create_empname,
+            R.em_name as reply_empname
 			FROM meliora.tm_new_task_mast 
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno     
 			left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
@@ -121,6 +126,7 @@ module.exports = {
              left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
              left join co_employee_master C on C.em_id=tm_new_task_mast.create_user
+            left join co_employee_master R on R.em_id=tm_new_task_mast.tm_query_reply_user
             where tm_new_task_mast_detl.tm_assigne_emp=?  and tm_detail_status!=1`,
             [
                 data.tm_assigne_emp,
@@ -168,6 +174,7 @@ module.exports = {
             tm_assigne_emp,
             co_employee_master.em_name,
             main_task_slno,
+            tm_query_remark,
 			tm_task_description,
             tm_task_status,
             tm_task_file, 
@@ -177,7 +184,11 @@ module.exports = {
             tm_detail_status,
             tm_onhold_remarks,
             tm_pending_remark,
-            tm_completed_remarks,    
+            tm_completed_remarks,
+            tm_query_reply,
+            tm_query_remark_date,
+            tm_query_reply_user,
+            tm_query_reply_date,   
             tm_new_task_mast.tm_project_slno,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
             GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
@@ -327,5 +338,29 @@ module.exports = {
             }
 
         );
+    },
+    AskQuery: (data, callback) => {
+
+        pool.query(
+            `UPDATE tm_new_task_mast_detl SET                 
+            tm_detail_status=?,
+            tm_query_remark=?,
+            tm_query_remark_date=?               
+           			WHERE 
+             tm_create_detl_slno=?`,
+            [
+                data.tm_detail_status,
+                data.tm_query_remark,
+                data.tm_query_remark_date,
+                data.tm_create_detl_slno
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
     },
 }

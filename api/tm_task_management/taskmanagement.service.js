@@ -433,6 +433,9 @@ module.exports = {
             tm_onhold_remarks=?,
             tm_completed_remarks=?,
             tm_complete_date=?,
+            tm_query_reply=?,
+            tm_query_reply_user=?,
+            tm_query_reply_date=?,
             edit_user=?  
  			WHERE 
              tm_task_slno=?`,
@@ -448,6 +451,9 @@ module.exports = {
                 data.tm_onhold_remarks,
                 data.tm_completed_remarks,
                 data.tm_complete_date,
+                data.tm_query_reply,
+                data.tm_query_reply_user,
+                data.tm_query_reply_date,
                 data.edit_user,
                 data.tm_task_slno
             ],
@@ -576,9 +582,7 @@ module.exports = {
         pool.query(
             `INSERT INTO tm_project_mast
             (            
-                tm_project_name,
-                tm_project_dept,
-                tm_project_deptsec,
+                tm_project_name,           
                 tm_project_duedate,
                 tm_project_description,
                 tm_project_status,
@@ -586,11 +590,9 @@ module.exports = {
                 tm_goal_slno,
                 tm_project_create_user            
             )
-            VALUES (?,?,?,?,?,?,?,?,?)`,
+            VALUES (?,?,?,?,?,?,?)`,
             [
                 data.tm_project_name,
-                data.tm_project_dept,
-                data.tm_project_deptsec,
                 data.tm_project_duedate,
                 data.tm_project_description,
                 data.tm_project_status,
@@ -642,9 +644,7 @@ module.exports = {
     ProjectUpdate: (data, callback) => {
         pool.query(
             `UPDATE tm_project_mast SET                 
-            tm_project_name=?,
-            tm_project_dept=?,
-            tm_project_deptsec=?,
+            tm_project_name=?,        
             tm_project_duedate=?,                 
             tm_project_description=?,
             tm_project_status=?,
@@ -655,8 +655,6 @@ module.exports = {
              tm_project_slno=?`,
             [
                 data.tm_project_name,
-                data.tm_project_dept,
-                data.tm_project_deptsec,
                 data.tm_project_duedate,
                 data.tm_project_description,
                 data.tm_project_status,

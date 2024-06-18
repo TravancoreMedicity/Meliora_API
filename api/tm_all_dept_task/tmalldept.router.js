@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
-const { TaskInsertAllDept, getAssignedTask, AcceptTask, getRejectedTask, getprojectundergoal, getTaskunderProject, subtaskviewByidPending, getPendingAssignedTask
+const { TaskInsertAllDept, getAssignedTask, AcceptTask, getRejectedTask, getprojectundergoal, getTaskunderProject, subtaskviewByidPending, getPendingAssignedTask,
+    AskQuery
 } = require('./tmalldept.controller');
 
 router.post('/insertTask', checkToken, TaskInsertAllDept)
@@ -15,5 +16,9 @@ router.get('/getprojectundergoal/:id', checkToken, getprojectundergoal)
 router.get('/getTaskunderProject/:id', checkToken, getTaskunderProject)
 
 router.get('/subtaskviewByidPending/:id', checkToken, subtaskviewByidPending)
+
+router.patch('/askQuery', checkToken, AskQuery)
+
+
 
 module.exports = router;

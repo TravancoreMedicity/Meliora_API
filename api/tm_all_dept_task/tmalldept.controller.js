@@ -1,5 +1,5 @@
 const { taskMast, CreateTaskDetailInsert, InsertDueDate, getAssignedTask, AcceptTask, getRejectedTask, getprojectundergoal, getPendingAssignedTask, subtaskviewByidPending,
-    getTaskunderProject
+    getTaskunderProject, AskQuery
 } = require('./tmalldept.service')
 module.exports = {
 
@@ -207,6 +207,27 @@ module.exports = {
             });
         })
     },
+    AskQuery: (req, res) => {
+        const body = req.body;
+        AskQuery(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
 
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Raised a Query Successfully"
+            })
+        })
+    },
 
 }

@@ -4,7 +4,7 @@ const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign, getcomplai
     AssistantRecieved, checkInsertVal, TransferDept, assignedListNotRectifiedOnly, rectifiedListForVErify,
     AssistMultiple, getALLAssignedComList, EmployeeInactive, beforAssignHold, empTransInactive,
     sendMeassageUser, ReadMeassageUser, AssistReqListAll, getAssistRequestEmps, assistTransInactive,
-    AssisttransferInsert, SupervsrVerifyPending, SupervsrVerify
+    AssisttransferInsert, SupervsrVerifyPending, SupervsrVerify, ReopenComplaintInsert
 } = require('../complaint_assign/complaintAssign.service');
 const logger = require('../../logger/logger');
 const { default: Expo } = require('expo-server-sdk');
@@ -693,11 +693,30 @@ module.exports = {
                     message: "No Complaints"
                 });
             }
-            req.io.emit("message", `New Complaint For Supervisor Verification Pending ! Please Check`)
-            return res.status(200).json({
-                success: 1,
-                message: "Supervisor Verify Update Successfully"
-            });
+            if (body.verify_spervsr === 2) {
+
+                ReopenComplaintInsert(body, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(400).json({
+                            success: 2,
+                            message: err
+                        });
+                    }
+                    req.io.emit("message", `New Complaint  Supervisor Not Verified ! Please Check`)
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Supervisor Verify Update Successfully"
+                    });
+                });
+            } else {
+                req.io.emit("message", `New Complaint  Supervisor Not Verified ! Please Check`)
+                return res.status(200).json({
+                    success: 1,
+                    message: "Supervisor Verify Update Successfully"
+                });
+
+            }
         });
     },
 }

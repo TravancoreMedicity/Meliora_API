@@ -150,7 +150,8 @@ module.exports = {
                 approve_item_unit_price=?  ,
                 approve_aprox_cost=?,
                 approve_item_status=?,
-                item_status_approved=?
+                item_status_approved=?,
+                edit_user=?
                 WHERE req_detl_slno =?`,
             [
                 data.approve_item_desc,
@@ -162,6 +163,7 @@ module.exports = {
                 data.approve_aprox_cost,
                 data.approve_item_status,
                 data.item_status_approved,
+                data.edit_user,
                 data.req_detl_slno
             ],
             (error, results, feilds) => {

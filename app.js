@@ -196,9 +196,12 @@ const emergencyqi = require('./api/qi_dailydetailsEmergency/qi_emergency.router'
 const qitypeList = require('./api/qi_list_type_mast/list_type.router')
 const dialysisqi = require('./api/qi_dailydetailsDialysis/qi_dialysis.router')
 const CrmNewApprovals = require('./api/crm_new_approvals/newReqApprovalsList.router')
+const TmAllDeptTask = require('./api/tm_all_dept_task/tmalldept.router')
 const AssetFileUpload = require('./api/am_file_upload/am_fileupload.router')
 const qiEquipment = require('./api/qi_equipment_mast/equipment.router')
 const qiInpatients = require('./api/qi_detailsIP/qi_ip.router')
+const CrfReports = require('./api/crm_reports/crm_reports.router')
+
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -362,9 +365,12 @@ app.use('/api/incidentMaster', incidentMast)
 app.use('/api/qiTypeList', qitypeList)
 app.use('/api/qidialysis', dialysisqi)
 app.use('/api/CrmNewApprovals', CrmNewApprovals)
+app.use('/api/TmAllDeptTask', TmAllDeptTask)
 app.use('/api/AssetFileUpload', AssetFileUpload)
 app.use('/api/equipMast', qiEquipment)
 app.use('/api/qiInpatients', qiInpatients)
+app.use('/api/CrfReports', CrfReports)
+
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

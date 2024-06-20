@@ -12,7 +12,7 @@ const { checkDetailInsertOrNot, GRNDetailsInsert, GRNDetailsUpdate, BillDetailsI
     BillMasterview, BillMasterUpdate, BillMasterviewSelect, GetBillMasterById,
     GetAmcCmcMasterById, GetSupplierSelect, GetBillBySupplNDate, SupplierAdding, GetAMCBySupplNDate,
     GetCMCBySupplNDate, LeaseMasterInsert, LeaseMasterview, GetLeaseBySupplNDate,
-    leaseMasterUpdate, AMLeaseDetailsUpdate
+    leaseMasterUpdate, AMLeaseDetailsUpdate, spareContamination, spareService
 } = require('../am_item_creation_detail/am_itemdetail.service')
 module.exports = {
     checkDetailInsertOrNot: (req, res) => {
@@ -787,29 +787,6 @@ module.exports = {
         });
     },
 
-    SpareDelete: (req, res) => {
-        const body = req.body;
-        SpareDelete(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (!results) {
-                logger.infologwindow("Record Not Found")
-                return res.status(200).json({
-                    success: 2,
-                    message: "Record Not Found"
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "Item Removed successfully"
-            });
-        });
-    },
 
     AmcCMCInsert: (req, res) => {
         const body = req.body;
@@ -1256,6 +1233,83 @@ module.exports = {
                 message: "Lease Details Updated successfully"
             })
         })
+    },
+
+    spareContamination: (req, res) => {
+        const body = req.body;
+        SpareDelete(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            spareContamination(body, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    })
+                }
+                if (results === 0) {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "No record found"
+
+                    })
+                }
+                return res.status(200).json({
+                    success: 1,
+                    message: "Spare transfer condaminatiobn list successfully"
+                })
+            })
+        });
+    },
+    spareService: (req, res) => {
+        const body = req.body;
+        SpareDelete(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            spareService(body, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    })
+                }
+                if (results === 0) {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "No record found"
+
+                    })
+                }
+                return res.status(200).json({
+                    success: 1,
+                    message: "Spare transfer to service list successfully"
+                })
+            })
+        });
     },
 
 }

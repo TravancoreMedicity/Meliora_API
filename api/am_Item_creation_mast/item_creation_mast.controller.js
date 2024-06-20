@@ -3,7 +3,7 @@ const { ItemcreationdeptInsert, insertItemAdditional, getInsertData, getItemsFro
     getCustdyBasedLastAssetNo, ItemcreationdeptInsertSpare, getCustdyBasedLastSpareNo,
     insertSpareItemAdditional, getInsertSpareData, itemInactiveSpare, getSpareItemsFronList,
     getItemsFronListonlydept, getItemsFronListdeptandsec, getSpareItemsFronListonlydept,
-    getSpareItemsFronListdeptandsec, getDataBySerialNo
+    getSpareItemsFronListdeptandsec, getDataBySerialNoAsset, getdataBySerailNoSpare
 } = require('../am_Item_creation_mast/item_creation_mast.service')
 module.exports = {
     ItemcreationdeptInsert: (req, res) => {
@@ -471,9 +471,32 @@ module.exports = {
         }
 
     },
-    getDataBySerialNo: (req, res) => {
+    getDataBySerialNoAsset: (req, res) => {
         const body = req.body
-        getDataBySerialNo(body, (err, results) => {
+        getDataBySerialNoAsset(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Record Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Record Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getdataBySerailNoSpare: (req, res) => {
+        const body = req.body
+        getdataBySerailNoSpare(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(400).json({

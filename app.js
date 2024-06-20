@@ -198,6 +198,7 @@ const dialysisqi = require('./api/qi_dailydetailsDialysis/qi_dialysis.router')
 const CrmNewApprovals = require('./api/crm_new_approvals/newReqApprovalsList.router')
 const AssetFileUpload = require('./api/am_file_upload/am_fileupload.router')
 const qiEquipment = require('./api/qi_equipment_mast/equipment.router')
+const qiInpatients = require('./api/qi_detailsIP/qi_ip.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -363,6 +364,7 @@ app.use('/api/qidialysis', dialysisqi)
 app.use('/api/CrmNewApprovals', CrmNewApprovals)
 app.use('/api/AssetFileUpload', AssetFileUpload)
 app.use('/api/equipMast', qiEquipment)
+app.use('/api/qiInpatients', qiInpatients)
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

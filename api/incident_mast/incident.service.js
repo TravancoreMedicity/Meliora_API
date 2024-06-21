@@ -250,7 +250,7 @@ module.exports = {
             }
         )
     },
-    NearMissesslIncidentUpdate: (data, callback) => {
+    NearMissessIncidentUpdate: (data, callback) => {
         pool.query(
             `UPDATE 
                    qi_details_endoscopy 
@@ -306,4 +306,203 @@ module.exports = {
             }
         );
     },
+
+    IncidentApprovalChecks: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                   endo_incharge_apprv_status,endo_hod_apprv_status
+             FROM
+                   qi_endoscopy_approval_details
+             WHERE
+                   qi_endoscopy_approval_details.qi_endo_date=? and qi_endoscopy_approval_details.qi_dept_no=?`,
+            [
+                data.qi_endo_date,
+                data.qi_dept_no
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    // from endoscopy Ip patients, update each incidents
+    IPErrorIncidentUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE 
+                   qi_endoscopy_iplist 
+             SET
+                  error_status=1,
+                  incident_error_slno=?,
+                  incident_error_date=?,
+                  error_details=?,
+                  error_reason=?,
+                  error_incident_type=?
+            WHERE 
+                  qi_endo_ip_slno=?`,
+            [
+                data.incident_error_slno,
+                data.incident_error_date,
+                data.error_details,
+                data.error_reason,
+                data.error_incident_type,
+                data.qi_endo_ip_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
+    IPRedosIncidentUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE 
+                   qi_endoscopy_iplist 
+             SET
+                  redo_status=1,
+                  incident_redos_slno=?,
+                  incident_redos_date=?,
+                  redos_details=?,
+                  redos_reason=?,
+                  redos_incident_type=?
+            WHERE 
+                  qi_endo_ip_slno=?`,
+            [
+                data.incident_redos_slno,
+                data.incident_redos_date,
+                data.redos_details,
+                data.redos_reason,
+                data.redos_incident_type,
+                data.qi_endo_ip_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    IPIdentifErrorIncidentUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE 
+                   qi_endoscopy_iplist 
+             SET
+                  incidence_ident_error_status=1,
+                  incidence_ident_slno=?,
+                  incidence_ident_date=?,
+                  incidence_ident_description=?,
+                  incidence_ident_reason=?,
+                  ident_error_incident_type=?
+            WHERE 
+                  qi_endo_ip_slno=?`,
+            [
+                data.incidence_ident_slno,
+                data.incidence_ident_date,
+                data.incidence_ident_description,
+                data.incidence_ident_reason,
+                data.ident_error_incident_type,
+                data.qi_endo_ip_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    IPFallsIncidentUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE 
+                   qi_endoscopy_iplist 
+             SET
+                  falls_status=1,
+                  incident_falls_slno=?,
+                  incident_falls_date=?,
+                  falls_details=?,
+                  falls_reason=?,
+                  falls_incident_type=?
+            WHERE 
+                  qi_endo_ip_slno=?`,
+            [
+                data.incident_falls_slno,
+                data.incident_falls_date,
+                data.falls_details,
+                data.falls_reason,
+                data.falls_incident_type,
+                data.qi_endo_ip_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    IPSentinelIncidentUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE 
+                   qi_endoscopy_iplist 
+             SET
+                  sentinel_events_status=1,
+                  incident_sentinel_slno=?,
+                  incident_sentinel_date=?,
+                  sentinel_details=?,
+                  sentinel_reason=?,
+                  sentinel_incident_type=?
+            WHERE 
+                  qi_endo_ip_slno=?`,
+            [
+                data.incident_sentinel_slno,
+                data.incident_sentinel_date,
+                data.sentinel_details,
+                data.sentinel_reason,
+                data.sentinel_incident_type,
+                data.qi_endo_ip_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    IPNearMissessIncidentUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE 
+                   qi_endoscopy_iplist 
+             SET
+                  near_misses_status=1,
+                  incident_nearmisses_slno=?,
+                  incident_nearmisses_date=?,
+                  nearmisses_details=?,
+                  nearmisses_reason=?,
+                  nearmiss_incident_type=?
+            WHERE 
+                  qi_endo_ip_slno=?`,
+            [
+                data.incident_nearmisses_slno,
+                data.incident_nearmisses_date,
+                data.nearmisses_details,
+                data.nearmisses_reason,
+                data.nearmiss_incident_type,
+                data.qi_endo_ip_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
 }

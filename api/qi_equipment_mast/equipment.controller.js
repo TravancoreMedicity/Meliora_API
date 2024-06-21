@@ -1,7 +1,7 @@
 
 const logger = require('../../logger/logger');
 const { validateQiEquipment } = require('../../validation/validation_schema');
-const { EquipmentInsert, EquipmentViews, EquipmentUpdate } = require('./equipment.service')
+const { EquipmentInsert, EquipmentViews, EquipmentUpdate, EquipmentActive, GetProcedureList } = require('./equipment.service')
 module.exports = {
     EquipmentInsert: (req, res) => {
         const body = req.body;
@@ -79,5 +79,46 @@ module.exports = {
             })
         })
     },
-
+    EquipmentActive: (req, res) => {
+        const id = req.params.id;
+        EquipmentActive(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data Found",
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+    GetProcedureList: (req, res) => {
+        const id = req.params.id;
+        GetProcedureList(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data Found",
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
 }

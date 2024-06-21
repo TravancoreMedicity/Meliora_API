@@ -313,7 +313,7 @@ module.exports = {
         const data = body?.map((val) => {
             return [val.ip_no, val.ipd_date, val.ptno, val.ptname, val.ptsex, val.ptage, val.ptaddrs1,
             val.ptaddrs2, val.ptaddrs3, val.ptaddrs4, val.ptmobile, val.ip_bed, val.doctor_name,
-            val.ip_nurstation, val.qi_dept_no, val.create_user
+            val.ip_nurstation, val.qi_dept_no, val.create_user, val.endo_arrival_time
             ]
         })
         const { ip_no } = body[0]

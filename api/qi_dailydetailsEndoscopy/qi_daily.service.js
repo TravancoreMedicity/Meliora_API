@@ -371,7 +371,7 @@ module.exports = {
             `INSERT INTO qi_endoscopy_iplist
           (
             ip_no, ipd_date, ptno, ptname, ptsex, ptage, ptaddrs1, ptaddrs2, ptaddrs3, ptaddrs4, ptmobile,
-            ip_bed, doctor_name, ip_nurstation, qi_dept_no, create_user
+            ip_bed, doctor_name, ip_nurstation, qi_dept_no,create_user,endo_arrival_time
           )
          VALUES ?`,
             [

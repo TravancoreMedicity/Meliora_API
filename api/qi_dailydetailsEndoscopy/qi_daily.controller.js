@@ -162,7 +162,6 @@ module.exports = {
             })
         })
     },
-
     UpdateLastImportedDate: (req, res) => {
         const body = req.body;
         UpdateLastImportedDate(body, (err, results) => {
@@ -178,7 +177,6 @@ module.exports = {
             });
         });
     },
-
     getIncidentDetailsForEndoscopy: (req, res) => {
         const body = req.body;
         getIncidentDetailsForEndoscopy(body, (err, results) => {
@@ -201,7 +199,6 @@ module.exports = {
             })
         })
     },
-
     searchPatients: (req, res) => {
         const body = req.body;
         searchPatients(body, (err, results) => {
@@ -224,7 +221,6 @@ module.exports = {
             })
         })
     },
-
     AseessmentExceededList: (req, res) => {
         const body = req.body;
         AseessmentExceededList(body, (err, results) => {
@@ -283,7 +279,6 @@ module.exports = {
             })
         })
     },
-
     IPEndoscopyInsert: (req, res) => {
         const body = req.body;
         const data = body?.map((val) => {
@@ -317,7 +312,6 @@ module.exports = {
             }
         })
     },
-
     ViewIpPatientsView: (req, res) => {
         ViewIpPatientsView((err, results) => {
             if (err) {
@@ -339,7 +333,6 @@ module.exports = {
             })
         })
     },
-
     IPEndoscopyQIUpdate: (req, res) => {
         const body = req.body;
         IPEndoscopyQIUpdate(body, (err, results) => {
@@ -355,7 +348,6 @@ module.exports = {
             })
         })
     },
-
     getIPIncidentForEndoscopy: (req, res) => {
         const body = req.body;
         getIPIncidentForEndoscopy(body, (err, results) => {
@@ -418,7 +410,6 @@ module.exports = {
             });
         })
     },
-
     OPequipmentDetailExist: (req, res) => {
         const id = req.params.id;
         OPequipmentDetailExist(id, (err, results) => {
@@ -482,7 +473,6 @@ module.exports = {
             })
         })
     },
-
     IPdeleteEquipment: (req, res) => {
         const id = req.params.id;
         IPdeleteEquipment(id, (err, results) => {
@@ -504,7 +494,6 @@ module.exports = {
             })
         })
     },
-
     getTotalTestPerformed: (req, res) => {
         const body = req.body;
         getTotalTestPerformed(body, (err, results) => {
@@ -527,7 +516,6 @@ module.exports = {
             })
         })
     },
-
     IPAseessExceededList: (req, res) => {
         const body = req.body;
         IPAseessExceededList(body, (err, results) => {
@@ -550,7 +538,6 @@ module.exports = {
             })
         })
     },
-
     HODApprovalSave: (req, res) => {
         const body = req.body;
         HODApprovalSave(body, (err, result) => {

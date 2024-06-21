@@ -2,7 +2,6 @@ const { format } = require('date-fns');
 const { pool } = require('../../config/database')
 module.exports = {
     EndoscopyQiInsert: (data, callback) => {
-
         pool.query(
             `INSERT INTO qi_details_endoscopy
           (
@@ -73,7 +72,6 @@ module.exports = {
             }
         )
     },
-
     getEndoscopyMonthlyView: (data, callBack) => {
         const fromDate = data.from;
         const toDate = data.to;
@@ -189,7 +187,6 @@ module.exports = {
             }
         );
     },
-
     getLastUpdatedDate: (id, callBack) => {
         pool.query(
             `SELECT last_updatedate FROM qi_hs_lastupdate WHERE qi_dept_no=?
@@ -203,7 +200,6 @@ module.exports = {
             }
         );
     },
-
     UpdateLastImportedDate: (data, callBack) => {
         pool.query(
             `update qi_hs_lastupdate set last_updatedate = ? where qi_dept_no=?`,
@@ -219,7 +215,6 @@ module.exports = {
             }
         )
     },
-
     getIncidentDetailsForEndoscopy: (data, callBack) => {
         pool.query(
             `SELECT 
@@ -245,7 +240,6 @@ module.exports = {
             }
         );
     },
-
     searchPatients: (data, callBack) => {
         const fromDate = data.from;
         const toDate = data.to;
@@ -274,7 +268,6 @@ module.exports = {
             }
         );
     },
-
     AseessmentExceededList: (data, callBack) => {
         pool.query(
             `SELECT 
@@ -297,7 +290,6 @@ module.exports = {
             }
         );
     },
-
     InchargeApprovalSave: (data, callback) => {
         pool.query(
             `INSERT INTO qi_endoscopy_approval_details
@@ -320,7 +312,6 @@ module.exports = {
             }
         );
     },
-
     InchargeApprvlView: (data, callBack) => {
         pool.query(
             `SELECT 
@@ -346,7 +337,6 @@ module.exports = {
             }
         );
     },
-
     IPEndoscopyInsert: (data, callback) => {
         pool.query(
             `INSERT INTO qi_endoscopy_iplist
@@ -366,7 +356,6 @@ module.exports = {
             }
         );
     },
-
     IPEndoscopyExist: (data, callBack) => {
         pool.query(
             `select ptno from qi_endoscopy_iplist where ip_no=?`,
@@ -476,7 +465,6 @@ module.exports = {
             }
         )
     },
-
     getIPIncidentForEndoscopy: (data, callBack) => {
         pool.query(
             `SELECT 
@@ -535,7 +523,6 @@ module.exports = {
         )
     },
     EquipmentDetailsInsert: (data, callback) => {
-
         pool.query(
             `INSERT INTO qi_endoscopy_equipment_details
             ( 
@@ -661,7 +648,6 @@ module.exports = {
             }
         );
     },
-
     getTotalTestPerformed: (data, callBack) => {
         const fromDate = data.from;
         const toDate = data.to;
@@ -725,7 +711,6 @@ module.exports = {
             }
         );
     },
-
     HODApprovalUpdate: (data, callBack) => {
         pool.query(
             `update

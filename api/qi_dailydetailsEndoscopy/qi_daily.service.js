@@ -347,25 +347,6 @@ module.exports = {
         );
     },
 
-    getEmployeeList: (id, callBack) => {
-        pool.query(
-            `SELECT
-                   em_id,em_name,em_no
-             FROM
-                   co_employee_master
-             LEFT JOIN qi_dept_mast ON qi_dept_mast.qi_co_deptsec_slno=co_employee_master.em_dept_section
-             WHERE
-                   qi_dept_mast.qi_dept_no=? `,
-            [id],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
-
     IPEndoscopyInsert: (data, callback) => {
         pool.query(
             `INSERT INTO qi_endoscopy_iplist

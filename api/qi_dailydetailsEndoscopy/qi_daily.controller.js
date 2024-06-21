@@ -2,7 +2,7 @@ const { format } = require('date-fns');
 const {
     EndoscopyQiInsert, getPatientList, EndoscopyPatientUpdate, getEndoscopyMonthlyView, InchargeApprvlView,
     EndoscopyQiUpdate, getLastUpdatedDate, UpdateLastImportedDate, qiLastUpdateDateInsert, getIncidentDetailsForEndoscopy,
-    searchPatients, AseessmentExceededList, InchargeApprovalSave, getEmployeeList, IPEndoscopyInsert, IPEndoscopyExist,
+    searchPatients, AseessmentExceededList, InchargeApprovalSave, IPEndoscopyInsert, IPEndoscopyExist,
     ViewIpPatientsView, IPEndoscopyQIUpdate, getIPIncidentForEndoscopy, getInpatientEndoscopyMonthlyView, EquipmentDetailsInsert,
     OPequipmentDetailExist, OPdeleteEquipment, IPequipmentDetailExist, IPdeleteEquipment, getTotalTestPerformed, IPAseessExceededList,
     HODApprovalSave, HODApprovalUpdate } = require('./qi_daily.service')
@@ -280,30 +280,6 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 data: results
-            })
-        })
-    },
-
-    getEmployeeList: (req, res) => {
-        const id = req.params.id;
-        getEmployeeList(id, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Data Found",
-                    data: []
-                })
-            }
-            return res.status(200).json({
-                success: 1,
-                data: results,
-                message: "Data Exist",
             })
         })
     },

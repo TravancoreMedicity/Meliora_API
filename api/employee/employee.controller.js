@@ -349,6 +349,7 @@ module.exports = {
             }
 
             updateEmployeeCo(body, (err, results) => {
+
                 if (err) {
                     logger.logwindow(err)
                     return res.status(400).json({
@@ -364,11 +365,29 @@ module.exports = {
                             message: res.err
                         });
                     }
+                    if (!results) {
+                        employeemoduleGroup(body, (err, results) => {
+                            if (err) {
+                                logger.logwindow(err.message)
+                                return res.status(400).json({
+                                    success: 0,
+                                    message: err.message
+                                });
+                            }
+                            return res.status(200).json({
+                                success: 2,
+                                message: "Updated Successfully"
+                            });
 
+                        })
+
+
+                    }
                     return res.status(200).json({
                         success: 2,
                         message: "Updated Successfully"
                     });
+
                 })
             })
 

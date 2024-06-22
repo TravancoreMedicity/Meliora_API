@@ -11,15 +11,18 @@ module.exports = {
                crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
                rm_ndrf,category,image_status,emergency_flag,emer_slno,crm_request_master.create_date,
                total_approx_cost,user_deptsec,req_status,                           
-               ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date, ED.em_name as  ed_user,
-               md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,MD.em_name as md_user,
-                ed_image,md_image
+               ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date,
+                ED.em_name as  ed_user,ed_user as edid,md_user as mdid,
+               md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,
+               MD.em_name as md_user,
+                ed_image,md_image, co_department_mast.dept_name
             from crm_request_approval        
                                 
                 left join crm_request_master on crm_request_master.req_slno=crm_request_approval.req_slno
                 left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
                 left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
                 left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
+                left join co_department_mast on co_department_mast.dept_id=R.dept_id
                 left join co_employee_master CR on CR.em_id=crm_request_master.create_user           
                 left join co_employee_master C on C.em_id=crm_request_approval.crf_close_user           
                 left join co_employee_master ED on ED.em_id=crm_request_approval.ed_user
@@ -55,9 +58,10 @@ module.exports = {
                        QC.em_name as quatation_user,quatation_negotiation,quatation_negotiation_date,
                        QN.em_name as quatation_neguser,quatation_fixing,quatation_fixing_date,
                        QF.em_name as quatation_fixuser,po_prepartion,po_complete,po_approva_level_one,
-                       po_approva_level_two,po_to_supplier,store_receive,
+                       po_approva_level_two,po_to_supplier,store_receive,ed_user as edid,md_user as mdid,
                        hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
-                       quatation_calling_remarks,quatation_negotiation_remarks,quatation_fixing_remarks
+                       quatation_calling_remarks,quatation_negotiation_remarks,quatation_fixing_remarks,
+                       co_department_mast.dept_name
 
                          from crm_request_master
                          left join crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
@@ -65,7 +69,7 @@ module.exports = {
                           left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
                           left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
                           left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
-
+                            left join co_department_mast on co_department_mast.dept_id=R.dept_id
                           left join co_employee_master CR on CR.em_id=crm_request_master.create_user           
                           left join co_employee_master C on C.em_id=crm_request_approval.crf_close_user           
                           left join co_employee_master ED on ED.em_id=crm_request_approval.ed_user

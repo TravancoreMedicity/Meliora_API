@@ -2,7 +2,7 @@ const { format } = require('date-fns');
 const {
     EndoscopyQiInsert, getPatientList, EndoscopyPatientUpdate, getEndoscopyMonthlyView, InchargeApprvlView,
     EndoscopyQiUpdate, getLastUpdatedDate, UpdateLastImportedDate, qiLastUpdateDateInsert, getIncidentDetailsForEndoscopy,
-    searchPatients, AseessmentExceededList, InchargeApprovalSave, getEmployeeList, IPEndoscopyInsert, IPEndoscopyExist,
+    searchPatients, AseessmentExceededList, InchargeApprovalSave, IPEndoscopyInsert, IPEndoscopyExist,
     ViewIpPatientsView, IPEndoscopyQIUpdate, getIPIncidentForEndoscopy, getInpatientEndoscopyMonthlyView, EquipmentDetailsInsert,
     OPequipmentDetailExist, OPdeleteEquipment, IPequipmentDetailExist, IPdeleteEquipment, getTotalTestPerformed, IPAseessExceededList,
     HODApprovalSave, HODApprovalUpdate } = require('./qi_daily.service')
@@ -162,7 +162,6 @@ module.exports = {
             })
         })
     },
-
     UpdateLastImportedDate: (req, res) => {
         const body = req.body;
         UpdateLastImportedDate(body, (err, results) => {
@@ -178,7 +177,6 @@ module.exports = {
             });
         });
     },
-
     getIncidentDetailsForEndoscopy: (req, res) => {
         const body = req.body;
         getIncidentDetailsForEndoscopy(body, (err, results) => {
@@ -201,7 +199,6 @@ module.exports = {
             })
         })
     },
-
     searchPatients: (req, res) => {
         const body = req.body;
         searchPatients(body, (err, results) => {
@@ -224,7 +221,6 @@ module.exports = {
             })
         })
     },
-
     AseessmentExceededList: (req, res) => {
         const body = req.body;
         AseessmentExceededList(body, (err, results) => {
@@ -283,31 +279,6 @@ module.exports = {
             })
         })
     },
-
-    getEmployeeList: (req, res) => {
-        const id = req.params.id;
-        getEmployeeList(id, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Data Found",
-                    data: []
-                })
-            }
-            return res.status(200).json({
-                success: 1,
-                data: results,
-                message: "Data Exist",
-            })
-        })
-    },
-
     IPEndoscopyInsert: (req, res) => {
         const body = req.body;
         const data = body?.map((val) => {
@@ -341,7 +312,6 @@ module.exports = {
             }
         })
     },
-
     ViewIpPatientsView: (req, res) => {
         ViewIpPatientsView((err, results) => {
             if (err) {
@@ -363,7 +333,6 @@ module.exports = {
             })
         })
     },
-
     IPEndoscopyQIUpdate: (req, res) => {
         const body = req.body;
         IPEndoscopyQIUpdate(body, (err, results) => {
@@ -379,7 +348,6 @@ module.exports = {
             })
         })
     },
-
     getIPIncidentForEndoscopy: (req, res) => {
         const body = req.body;
         getIPIncidentForEndoscopy(body, (err, results) => {
@@ -442,7 +410,6 @@ module.exports = {
             });
         })
     },
-
     OPequipmentDetailExist: (req, res) => {
         const id = req.params.id;
         OPequipmentDetailExist(id, (err, results) => {
@@ -506,7 +473,6 @@ module.exports = {
             })
         })
     },
-
     IPdeleteEquipment: (req, res) => {
         const id = req.params.id;
         IPdeleteEquipment(id, (err, results) => {
@@ -528,7 +494,6 @@ module.exports = {
             })
         })
     },
-
     getTotalTestPerformed: (req, res) => {
         const body = req.body;
         getTotalTestPerformed(body, (err, results) => {
@@ -551,7 +516,6 @@ module.exports = {
             })
         })
     },
-
     IPAseessExceededList: (req, res) => {
         const body = req.body;
         IPAseessExceededList(body, (err, results) => {
@@ -574,7 +538,6 @@ module.exports = {
             })
         })
     },
-
     HODApprovalSave: (req, res) => {
         const body = req.body;
         HODApprovalSave(body, (err, result) => {

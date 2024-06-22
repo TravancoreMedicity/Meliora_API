@@ -824,5 +824,24 @@ module.exports = {
             }
         );
     },
-
+    ReopenComplaintInsert: (data, callBack) => {
+        pool.query(
+            `INSERT INTO cm_reopen_complaint_log
+            (
+                reopen_complaint_slno,
+                create_user              
+            ) 
+            VALUES(?,?)`,
+            [
+                data.complaint_slno,
+                data.verify_spervsr_user
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 }

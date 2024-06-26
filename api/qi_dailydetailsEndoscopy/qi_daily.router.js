@@ -4,7 +4,7 @@ const { checkToken } = require("../../authentication/token_validation");
 const { EndoscopyQiInsert, getPatientList, EndoscopyPatientUpdate, getEndoscopyMonthlyView,
     EndoscopyQiUpdate, getLastUpdatedDate, UpdateLastImportedDate, InchargeApprovalSave,
     searchPatients, getIncidentDetailsForEndoscopy, AseessmentExceededList, InchargeApprvlView,
-    getEmployeeList, IPEndoscopyInsert, ViewIpPatientsView, IPEndoscopyQIUpdate, getIPIncidentForEndoscopy,
+    IPEndoscopyInsert, ViewIpPatientsView, IPEndoscopyQIUpdate, getIPIncidentForEndoscopy,
     getInpatientEndoscopyMonthlyView, EquipmentDetailsInsert, OPequipmentDetailExist, OPdeleteEquipment,
     IPequipmentDetailExist, IPdeleteEquipment, getTotalTestPerformed, IPAseessExceededList, HODApprovalSave,
     HODApprovalUpdate } = require('./qi_daily.controller');
@@ -22,7 +22,6 @@ router.post('/searchbyPatient', checkToken, searchPatients);
 router.post('/viewAssess', checkToken, AseessmentExceededList);
 router.post('/inchrgeapprv', checkToken, InchargeApprovalSave);
 router.post('/apprvView', checkToken, InchargeApprvlView);
-router.get('/empList/:id', checkToken, getEmployeeList);
 router.post('/hodapprv', checkToken, HODApprovalSave);
 router.patch('/hodapprvUpdate', checkToken, HODApprovalUpdate);
 // ip endoscopy

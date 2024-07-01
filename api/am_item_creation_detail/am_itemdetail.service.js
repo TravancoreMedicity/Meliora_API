@@ -3,20 +3,21 @@ module.exports = {
 
     checkDetailInsertOrNot: (id, callBack) => {
         pool.query(
-            `select am_item_map_detl_slno, am_item_map_slno, am_spare_item_map_slno,
+            `select am_item_map_detl_slno, am_item_map_details.am_item_map_slno, am_spare_item_map_slno,
             am_grn_no, am_grn_date, am_bill_mast_slno, am_primary_custodian, am_secondary_custodian,
             am_manufacture_no, am_asset_no, am_asset_old_no, am_lease_status, am_lease_from, am_lease_to,
             am_lease_amount, am_lease_image, am_bill_mastslno, am_bill_master.am_bill_no,
             am_bill_master.am_bill_date, am_item_map_details.am_bill_amount,am_bill_master.am_bill_image,
             am_bill_supplier,B.it_supplier_name as bill_supplier_name,am_lease_mast_slno,
-            L.it_supplier_name as lease_suppliername,
+            L.it_supplier_name as lease_suppliername,am_asset_item_map_master.item_rack_slno as rack,
             am_lease_mastslno, lease_suppler_slno, lease_fromdate, lease_todate, lease_amount, lease_status, lease_image
             FROM am_item_map_details
             left join am_bill_master on am_bill_master.am_bill_mastslno =am_item_map_details.am_bill_mast_slno
             left join am_lease_detail_mast on am_lease_detail_mast.am_lease_mastslno=am_item_map_details.am_lease_mast_slno
              left join it_bill_supplier_details_mast B  on B.it_supplier_slno=am_bill_master.am_bill_supplier
              left join it_bill_supplier_details_mast L on L.it_supplier_slno=am_lease_detail_mast.lease_suppler_slno
-            WHERE am_item_map_slno=?`,
+             left join am_asset_item_map_master on am_asset_item_map_master.am_item_map_slno =am_item_map_details.am_item_map_slno
+            WHERE am_item_map_details.am_item_map_slno=?`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -28,20 +29,21 @@ module.exports = {
     },
     checkDetailInsertOrNotSpare: (id, callBack) => {
         pool.query(
-            `select am_item_map_detl_slno, am_item_map_slno, am_spare_item_map_slno,
+            `select am_item_map_detl_slno, am_item_map_slno, am_item_map_details.am_spare_item_map_slno,
             am_grn_no, am_grn_date, am_bill_mast_slno, am_primary_custodian, am_secondary_custodian,
             am_manufacture_no, am_asset_no, am_asset_old_no, am_lease_status, am_lease_from, am_lease_to,
             am_lease_amount, am_lease_image, am_bill_mastslno, am_bill_master.am_bill_no,
             am_bill_master.am_bill_date, am_item_map_details.am_bill_amount,am_bill_master.am_bill_image,
             am_bill_supplier,B.it_supplier_name as bill_supplier_name,am_lease_mast_slno,
-            L.it_supplier_name as lease_suppliername,
+            L.it_supplier_name as lease_suppliername,S.spare_rack_slno as rack,
             am_lease_mastslno, lease_suppler_slno, lease_fromdate, lease_todate, lease_amount, lease_status, lease_image
             FROM am_item_map_details
             left join am_bill_master on am_bill_master.am_bill_mastslno =am_item_map_details.am_bill_mast_slno
             left join am_lease_detail_mast on am_lease_detail_mast.am_lease_mastslno=am_item_map_details.am_lease_mast_slno
              left join it_bill_supplier_details_mast B  on B.it_supplier_slno=am_bill_master.am_bill_supplier
              left join it_bill_supplier_details_mast L on L.it_supplier_slno=am_lease_detail_mast.lease_suppler_slno
-            WHERE am_spare_item_map_slno=?`,
+             left join am_spare_item_map_master S on S.am_spare_item_map_slno=am_item_map_details.am_spare_item_map_slno
+            WHERE am_item_map_details.am_spare_item_map_slno=?`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -392,7 +394,26 @@ module.exports = {
             }
         )
     },
-
+    DeviceRackUpdateAsset: (data, callback) => {
+        pool.query(
+            `UPDATE am_asset_item_map_master SET 
+            item_rack_slno=?,
+            edit_user=?
+             WHERE 
+            am_item_map_slno=?`,
+            [
+                data.item_rack_slno,
+                data.edit_user,
+                data.am_item_map_slno,
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
     DeviceDetailsInsertSpare: (data, callback) => {
 
         pool.query(
@@ -434,6 +455,26 @@ module.exports = {
                 data.am_manufacture_no,
                 data.am_asset_no,
                 data.am_asset_old_no,
+                data.edit_user,
+                data.am_spare_item_map_slno,
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    DeviceRackUpdateSpare: (data, callback) => {
+        pool.query(
+            `UPDATE am_spare_item_map_master SET 
+            spare_rack_slno=?,
+             edit_user=?
+             WHERE 
+            am_spare_item_map_slno=?`,
+            [
+                data.spare_rack_slno,
                 data.edit_user,
                 data.am_spare_item_map_slno,
             ],

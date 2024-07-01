@@ -12,7 +12,9 @@ const { checkDetailInsertOrNot, GRNDetailsInsert, GRNDetailsUpdate, BillDetailsI
     BillMasterview, BillMasterUpdate, BillMasterviewSelect, GetBillMasterById,
     GetAmcCmcMasterById, GetSupplierSelect, GetBillBySupplNDate, SupplierAdding, GetAMCBySupplNDate,
     GetCMCBySupplNDate, LeaseMasterInsert, LeaseMasterview, GetLeaseBySupplNDate,
-    leaseMasterUpdate, AMLeaseDetailsUpdate, spareContamination, spareService
+    leaseMasterUpdate, AMLeaseDetailsUpdate, spareContamination, spareService, DeviceRackUpdateAsset,
+    DeviceRackUpdateSpare
+
 } = require('../am_item_creation_detail/am_itemdetail.service')
 module.exports = {
     checkDetailInsertOrNot: (req, res) => {
@@ -292,9 +294,24 @@ module.exports = {
 
                 })
             }
-            return res.status(200).json({
-                success: 2,
-                message: "Device Details Updated successfully"
+            DeviceRackUpdateAsset(body, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    })
+                }
+                if (results === 0) {
+                    return res.status(200).json({
+                        success: 1,
+                        message: "No record found"
+
+                    })
+                }
+                return res.status(200).json({
+                    success: 2,
+                    message: "Device Details Updated successfully"
+                })
             })
         })
     },
@@ -332,9 +349,24 @@ module.exports = {
 
                 })
             }
-            return res.status(200).json({
-                success: 2,
-                message: "Device Details Updated successfully"
+            DeviceRackUpdateSpare(body, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    })
+                }
+                if (results === 0) {
+                    return res.status(200).json({
+                        success: 1,
+                        message: "No record found"
+
+                    })
+                }
+                return res.status(200).json({
+                    success: 2,
+                    message: "Device Details Updated successfully"
+                })
             })
         })
     },

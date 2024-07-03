@@ -300,7 +300,9 @@ module.exports = {
     updateHODApproval: (data, callback) => {
         pool.query(
             `UPDATE crm_request_approval 
-            SET hod_approve = ?,
+            SET
+            incharge_approve=1,
+            hod_approve = ?,
             hod_remarks = ?,
             hod_detial_analysis=?,
             hod_approve_date = ?,

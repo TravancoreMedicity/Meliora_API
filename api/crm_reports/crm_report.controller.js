@@ -1,5 +1,5 @@
-const { getCRFNoBased, getdataUserAcknldged
-
+const { getCRFNoBased, getdataUserAcknldged, getdataUserNotAcknldged, getdataAllCRF,
+    getPurchaseCRFData
 } = require('../crm_reports/crm_report.service');
 const logger = require('../../logger/logger');
 
@@ -53,4 +53,75 @@ module.exports = {
             });
         });
     },
+    getdataUserNotAcknldged: (req, res) => {
+        const body = req.body
+        getdataUserNotAcknldged(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Results Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    getdataAllCRF: (req, res) => {
+        const body = req.body
+        getdataAllCRF(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Results Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getPurchaseCRFData: (req, res) => {
+        const body = req.body
+        getPurchaseCRFData(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Results Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
 }

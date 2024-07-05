@@ -36,19 +36,28 @@ module.exports = {
                     return [value.dept_id, value.dept_name, value.dept_alias, value.dept_status
                     ]
                 })
-                createDept(a1, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+
+                if (a1.length !== 0) {
+                    createDept(a1, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 1,
+                            message: "Department Inserted Successfully"
                         });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Department Inserted Successfully"
                     });
-                });
+                } else {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Noting to insert already uptodate"
+                    });
+                }
+
             })
         });
     },
@@ -83,19 +92,27 @@ module.exports = {
                     value.sect_status
                     ]
                 })
-                createDeptSec(a1, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+                if (a1.length !== 0) {
+                    createDeptSec(a1, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 1,
+                            message: "Department Section Inserted Successfully"
                         });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Department Section Inserted Successfully"
                     });
-                });
+                } else {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Noting to insert already uptodate"
+                    });
+                }
+
             })
         });
     },
@@ -130,19 +147,28 @@ module.exports = {
                     value.em_designation, value.em_status
                     ]
                 })
-                creategetemployeemaster(a1, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+                if (a1.length !== 0) {
+                    creategetemployeemaster(a1, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 1,
+                            message: "Employee Master Inserted Successfully"
                         });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Employee Master Inserted Successfully"
                     });
-                });
+                } else {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Noting to insert already uptodate"
+                    });
+                }
+
+
             })
         });
     },
@@ -175,19 +201,28 @@ module.exports = {
                     value.emp_status, value.emp_id, value.emp_no, value.emp_created, value.emp_updated,
                     ]
                 })
-                creategetemployeeuserPass(a1, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+                if (a1.length !== 0) {
+                    creategetemployeeuserPass(a1, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 1,
+                            message: "Employee Inserted Successfully"
                         });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Employee Inserted Successfully"
                     });
-                });
+                } else {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Noting to insert already uptodate"
+                    });
+                }
+
+
             })
         });
     },
@@ -309,8 +344,10 @@ module.exports = {
                             values.dept_status === value.dept_status
                     })
                 })
-
-                const result = updateDepartment(newmeli)
+                var a1 = newmeli.map((value, index) => {
+                    return [value.dept_status, value.dept_type, value.dept_id]
+                })
+                const result = updateDepartment(a1)
                     .then((r) => {
 
                         return res.status(200).json({
@@ -401,19 +438,28 @@ module.exports = {
                     value.edit_user
                     ]
                 })
-                createdesignation(a1, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+                if (a1.length !== 0) {
+                    createdesignation(a1, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 1,
+                            message: "Designation Inserted Successfully"
                         });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Designation Inserted Successfully"
                     });
-                });
+                } else {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Noting to insert already uptodate"
+                    });
+                }
+
+
             })
         });
     },

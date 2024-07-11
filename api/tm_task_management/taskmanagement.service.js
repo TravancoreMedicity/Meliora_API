@@ -15,7 +15,7 @@ module.exports = {
             tm_onhold_remarks,
             tm_pending_remark,
             tm_completed_remarks,
-            tm_complete_date,        
+            tm_complete_date,                    
             create_user
           )
           VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
@@ -86,7 +86,8 @@ module.exports = {
             tm_detail_status,
             tm_onhold_remarks,
             tm_pending_remark,
-            tm_completed_remarks,    
+            tm_completed_remarks,
+            tm_mast_duedate_count,    
             tm_new_task_mast.tm_project_slno,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
             GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
@@ -309,6 +310,7 @@ module.exports = {
             tm_new_task_mast.create_date,
             tm_task_status,
             tm_complete_date,
+            tm_mast_duedate_count,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
             GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast              
@@ -399,6 +401,7 @@ module.exports = {
             tm_complete_date,
             tm_new_task_mast.tm_project_slno,
             main_task_slno,
+            tm_mast_duedate_count,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
             GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
@@ -436,6 +439,7 @@ module.exports = {
             tm_query_reply=?,
             tm_query_reply_user=?,
             tm_query_reply_date=?,
+            tm_mast_duedate_count=?,
             edit_user=?  
  			WHERE 
              tm_task_slno=?`,
@@ -454,6 +458,7 @@ module.exports = {
                 data.tm_query_reply,
                 data.tm_query_reply_user,
                 data.tm_query_reply_date,
+                data.tm_mast_duedate_count,
                 data.edit_user,
                 data.tm_task_slno
             ],
@@ -479,6 +484,7 @@ module.exports = {
             tm_task_description=?,
             tm_task_status=?,
             tm_complete_date=?,
+            tm_mast_duedate_count=?,
             edit_user=?    
  			WHERE 
              tm_task_slno=?`,
@@ -493,6 +499,7 @@ module.exports = {
                 data.tm_task_description,
                 data.tm_task_status,
                 data.tm_complete_date,
+                data.tm_mast_duedate_count,
                 data.edit_user,
                 data.tm_task_slno
             ],
@@ -1093,7 +1100,8 @@ module.exports = {
             tm_detail_status,
             tm_onhold_remarks,
             tm_pending_remark,
-            tm_completed_remarks,    
+            tm_completed_remarks,
+            tm_mast_duedate_count,   
             tm_new_task_mast.tm_project_slno,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
             GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
@@ -1184,8 +1192,8 @@ module.exports = {
             tm_goal_duedate,
             tm_project_mast.create_date,
             tm_goal_name
-            FROM tm_goal_mast  
-            left join tm_project_mast on tm_project_mast.tm_goal_slno=tm_goal_mast.tm_goals_slno
+            FROM tm_project_mast  
+            left join tm_goal_mast on tm_goal_mast.tm_goals_slno=tm_project_mast.tm_goal_slno
             left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
             where tm_task_dept_sec=? group by tm_project_slno`,
             [id],
@@ -1219,6 +1227,7 @@ module.exports = {
             tm_complete_date,
             tm_new_task_mast.tm_project_slno,
             main_task_slno,
+            tm_mast_duedate_count,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
             GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            

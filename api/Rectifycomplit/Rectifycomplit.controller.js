@@ -1,5 +1,5 @@
 
-const { getRectifycomplt, Updatecomplit, UpdateVerify, getAssignEmps, updateassignDetail
+const { getRectifycomplt, Updatecomplit, UpdateVerify, getAssignEmps, updateassignDetail, ReopenComplaintInsert
 } = require('../Rectifycomplit/Rectifycomplit.service')
 const logger = require('../../logger/logger');
 module.exports = {
@@ -57,7 +57,7 @@ module.exports = {
         req.io.emit("message", `New Complaint Registed ! Please Check`)
         UpdateVerify(body, (err, results) => {
             if (err) {
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: err
                 });
@@ -69,10 +69,31 @@ module.exports = {
                     message: "Record Not Found"
                 })
             }
-            return res.status(200).json({
-                success: 2,
-                message: "Verified complaint successfully"
-            })
+            if (body.cm_rectify_status === 'Z') {
+
+                ReopenComplaintInsert(body, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 1,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Verified complaint successfully"
+                    })
+                });
+
+
+
+            } else {
+                return res.status(200).json({
+                    success: 2,
+                    message: "Verified complaint successfully"
+                })
+            }
+
 
         })
 

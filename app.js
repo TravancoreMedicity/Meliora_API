@@ -201,7 +201,7 @@ const AssetFileUpload = require('./api/am_file_upload/am_fileupload.router')
 const qiEquipment = require('./api/qi_equipment_mast/equipment.router')
 const qiInpatients = require('./api/qi_detailsIP/qi_ip.router')
 const CrfReports = require('./api/crm_reports/crm_reports.router')
-
+const SpareCondemService = require('./api/am_spare_condemnation/am_spare_condemnation.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -370,7 +370,7 @@ app.use('/api/AssetFileUpload', AssetFileUpload)
 app.use('/api/equipMast', qiEquipment)
 app.use('/api/qiInpatients', qiInpatients)
 app.use('/api/CrfReports', CrfReports)
-
+app.use('/api/SpareCondemService', SpareCondemService)
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

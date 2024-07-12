@@ -1,5 +1,6 @@
 
-const { getRectifycomplt, Updatecomplit, UpdateVerify, getAssignEmps, updateassignDetail, ReopenComplaintInsert
+const { getRectifycomplt, Updatecomplit, UpdateVerify, getAssignEmps, updateassignDetail,
+    ReopenComplaintInsert, getlocationbsedAsset, AssetMappComplaint, AssetDetailsGet
 } = require('../Rectifycomplit/Rectifycomplit.service')
 const logger = require('../../logger/logger');
 module.exports = {
@@ -121,5 +122,66 @@ module.exports = {
                 data: results
             });
         });
-    }
+    },
+    getlocationbsedAsset: (req, res) => {
+        const id = req.params.id
+        getlocationbsedAsset(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    AssetMappComplaint: (req, res) => {
+        const body = req.body;
+        AssetMappComplaint(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Asset Added Successfully"
+            });
+        });
+    },
+    AssetDetailsGet: (req, res) => {
+        const id = req.params.id
+        AssetDetailsGet(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
 }

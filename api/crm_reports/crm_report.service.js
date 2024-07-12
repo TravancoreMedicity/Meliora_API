@@ -158,6 +158,34 @@ module.exports = {
             }
         )
     },
+    getPurchaseCRFData: (data, callBack) => {
+        pool.query(
+            `SELECT crm_purchase_slno, req_slno, ack_status, ack_remarks, quatation_calling_status,
+            quatation_calling_remarks, quatation_calling_user, quatation_calling_date, quatation_negotiation,
+            quatation_negotiation_remarks, quatation_negotiation_user, quatation_negotiation_date,
+             quatation_fixing, quatation_fixing_remarks, quatation_fixing_user, quatation_fixing_date,
+             po_prepartion, po_complete, po_complete_user, po_complete_date, po_approva_level_one,
+            po_approva_level_two, po_to_supplier, store_receive, store_receive_user, store_receive_date,
+            create_user, edit_user, create_date, edit_date, sub_store_recieve
+ 
+             FROM meliora.crm_purchase_mast
+ 
+             where date(crm_purchase_mast.create_date) between ? and ?
+                 group by req_slno
+             `,
+
+            [
+                data.start_date,
+                data.end_date
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
     getPurchaseDetails: (id, callBack) => {
         pool.query(
             `SELECT  req_slno, ack_status, ack_remarks,AC.em_name as ack_user,crm_purchase_mast.create_date as ack_date,

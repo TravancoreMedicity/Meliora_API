@@ -93,40 +93,40 @@ module.exports = {
         );
     },
 
-    // changEmpStatus: (data, callback) => {
-    //     pool.query(
-    //         `INSERT INTO tm_duedate_logtable
-    //       (
-    //         tm_task_slno,
-    //         tm_duedate,
-    //         create_user
-    //       )
-    //       VALUES(?,?,?)`,
-    //         [
-    //             data.tm_task_slno,
-    //             data.tm_duedate,
-    //             data.create_user
-    //         ],
-
-    //         (error, results, fields) => {
-    //             if (error) {
-    //                 return callback(error);
-    //             }
-    //             return callback(null, results);
-
-    //         }
-    //     );
-    // },
     changEmpStatus: (data, callback) => {
         pool.query(
             `UPDATE 
              tm_new_task_mast_detl
              SET
-             tm_detail_status=? 
+             tm_detail_status=?,
+             tm_query_status=?
              WHERE 
             tm_task_slno=? and tm_assigne_emp =?`,
             [
                 data.tm_detail_status,
+                data.tm_query_status,
+                data.tm_task_slno,
+                data.tm_assigne_emp
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
+    changeQueryStatus: (data, callback) => {
+        pool.query(
+            `UPDATE 
+             tm_new_task_mast_detl
+             SET            
+             tm_query_status=?
+             WHERE 
+            tm_task_slno=? and tm_assigne_emp =?`,
+            [
+                data.tm_query_status,
                 data.tm_task_slno,
                 data.tm_assigne_emp
             ],
@@ -160,6 +160,7 @@ module.exports = {
              tm_query_reply,
              tm_query_reply_date,
              tm_detail_status,
+             tm_query_status,
              tm_query_reply_user,
             T.em_name as task_empname,
             C.em_name as create_empname           
@@ -186,19 +187,22 @@ module.exports = {
         pool.query(
             `select 
             tm_query_details_slno,
-            tm_task_slno, 
-            tm_query_remark, 
-            tm_query_remark_date,
+            tm_query_details.tm_task_slno, 
+            tm_query_details.tm_query_remark, 
+            tm_query_details.tm_query_remark_date,
             tm_query_remark_user,
-            tm_query_reply,
-            tm_query_reply_date,
+            tm_query_details.tm_query_reply,
+            tm_assigne_emp,
+            tm_query_details.tm_query_reply_date,
             Q.em_name as query_user,
             R.em_name as reply_user,
-            tm_query_reply_user
+            tm_query_details.tm_query_reply_user
             from tm_query_details
             left join co_employee_master Q on Q.em_id=tm_query_details.tm_query_remark_user
             left join co_employee_master R on R.em_id=tm_query_details.tm_query_reply_user
-             where tm_task_slno=?
+            left join tm_new_task_mast on tm_new_task_mast.tm_task_slno=tm_query_details.tm_task_slno
+            left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
+             where tm_query_details.tm_task_slno=?
             `,
             [
                 data.tm_task_slno,
@@ -260,6 +264,7 @@ module.exports = {
             tm_detail_status,
             tm_onhold_remarks,
             tm_pending_remark,
+            tm_query_status,
             tm_completed_remarks,
             tm_query_reply,
             tm_query_remark_date,
@@ -511,13 +516,15 @@ module.exports = {
                 tm_task_slno,           
                 tm_query_reply,
                 tm_query_reply_date,
+                tm_aasiigned_emplo,
                 tm_query_reply_user           
             )
-            VALUES (?,?,?,?)`,
+            VALUES (?,?,?,?,?)`,
             [
                 data.tm_task_slno,
                 data.tm_query_reply,
                 data.tm_query_reply_date,
+                data.tm_aasiigned_emplo,
                 data.tm_query_reply_user
             ],
             (error, results, fields) => {

@@ -1,6 +1,6 @@
 const { taskMast, CreateTaskDetailInsert, InsertDueDate, getAssignedTask, AcceptTask, getRejectedTask, getprojectundergoal, getPendingAssignedTask, subtaskviewByidPending,
     getTaskunderProject, AskQuery, postDuedateCount, getDuedateCount, postCutoffPercentage, getCutoffPercentages, getQuery,
-    TruncatePercentage, replyQuery, changEmpStatus
+    TruncatePercentage, replyQuery, changEmpStatus, changeQueryStatus
 
 } = require('./tmalldept.service')
 module.exports = {
@@ -290,7 +290,8 @@ module.exports = {
                 const postdata = {
                     tm_task_slno: body.tm_task_slno,
                     tm_assigne_emp: body.tm_query_remark_user,
-                    tm_detail_status: 2
+                    tm_detail_status: 2,
+                    tm_query_status: 1
                 }
                 changEmpStatus(postdata, (err, resl) => {
                     if (err) {
@@ -318,11 +319,27 @@ module.exports = {
                     message: err
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                message: "Replied Added",
 
-            })
+            if (result) {
+                const postdata = {
+                    tm_task_slno: body.tm_task_slno,
+                    tm_assigne_emp: body.tm_aasiigned_emplo,
+                    tm_query_status: 2
+                }
+                changeQueryStatus(postdata, (err, resl) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Replied Added",
+
+                    })
+                })
+            }
         })
     },
 

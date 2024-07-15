@@ -1,5 +1,5 @@
 const { getCRFNoBased, getdataUserAcknldged, getdataUserNotAcknldged, getdataAllCRF,
-    getPurchaseCRFData, getPurchaseDetails, getPOdetailStores
+    getPurchaseCRFData, getPurchaseDetails, getPOdetailStores, getdataAllCRFWithPO
 } = require('../crm_reports/crm_report.service');
 const logger = require('../../logger/logger');
 
@@ -163,6 +163,29 @@ module.exports = {
                     message: "No Results Found"
                 });
             }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getdataAllCRFWithPO: (req, res) => {
+        const body = req.body
+        getdataAllCRFWithPO(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Results Found"
+                });
+            }
+
             return res.status(200).json({
                 success: 1,
                 data: results

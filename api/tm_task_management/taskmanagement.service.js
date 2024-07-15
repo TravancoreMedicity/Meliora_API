@@ -15,7 +15,7 @@ module.exports = {
             tm_onhold_remarks,
             tm_pending_remark,
             tm_completed_remarks,
-            tm_complete_date,        
+            tm_complete_date,                    
             create_user
           )
           VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
@@ -86,7 +86,8 @@ module.exports = {
             tm_detail_status,
             tm_onhold_remarks,
             tm_pending_remark,
-            tm_completed_remarks,    
+            tm_completed_remarks,
+            tm_mast_duedate_count,    
             tm_new_task_mast.tm_project_slno,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
             GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
@@ -309,6 +310,7 @@ module.exports = {
             tm_new_task_mast.create_date,
             tm_task_status,
             tm_complete_date,
+            tm_mast_duedate_count,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
             GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast              
@@ -399,6 +401,7 @@ module.exports = {
             tm_complete_date,
             tm_new_task_mast.tm_project_slno,
             main_task_slno,
+            tm_mast_duedate_count,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
             GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            
@@ -433,6 +436,10 @@ module.exports = {
             tm_onhold_remarks=?,
             tm_completed_remarks=?,
             tm_complete_date=?,
+            tm_query_reply=?,
+            tm_query_reply_user=?,
+            tm_query_reply_date=?,
+            tm_mast_duedate_count=?,
             edit_user=?  
  			WHERE 
              tm_task_slno=?`,
@@ -448,6 +455,10 @@ module.exports = {
                 data.tm_onhold_remarks,
                 data.tm_completed_remarks,
                 data.tm_complete_date,
+                data.tm_query_reply,
+                data.tm_query_reply_user,
+                data.tm_query_reply_date,
+                data.tm_mast_duedate_count,
                 data.edit_user,
                 data.tm_task_slno
             ],
@@ -473,6 +484,7 @@ module.exports = {
             tm_task_description=?,
             tm_task_status=?,
             tm_complete_date=?,
+            tm_mast_duedate_count=?,
             edit_user=?    
  			WHERE 
              tm_task_slno=?`,
@@ -487,6 +499,7 @@ module.exports = {
                 data.tm_task_description,
                 data.tm_task_status,
                 data.tm_complete_date,
+                data.tm_mast_duedate_count,
                 data.edit_user,
                 data.tm_task_slno
             ],
@@ -576,9 +589,7 @@ module.exports = {
         pool.query(
             `INSERT INTO tm_project_mast
             (            
-                tm_project_name,
-                tm_project_dept,
-                tm_project_deptsec,
+                tm_project_name,           
                 tm_project_duedate,
                 tm_project_description,
                 tm_project_status,
@@ -586,11 +597,9 @@ module.exports = {
                 tm_goal_slno,
                 tm_project_create_user            
             )
-            VALUES (?,?,?,?,?,?,?,?,?)`,
+            VALUES (?,?,?,?,?,?,?)`,
             [
                 data.tm_project_name,
-                data.tm_project_dept,
-                data.tm_project_deptsec,
                 data.tm_project_duedate,
                 data.tm_project_description,
                 data.tm_project_status,
@@ -642,9 +651,7 @@ module.exports = {
     ProjectUpdate: (data, callback) => {
         pool.query(
             `UPDATE tm_project_mast SET                 
-            tm_project_name=?,
-            tm_project_dept=?,
-            tm_project_deptsec=?,
+            tm_project_name=?,        
             tm_project_duedate=?,                 
             tm_project_description=?,
             tm_project_status=?,
@@ -655,8 +662,6 @@ module.exports = {
              tm_project_slno=?`,
             [
                 data.tm_project_name,
-                data.tm_project_dept,
-                data.tm_project_deptsec,
                 data.tm_project_duedate,
                 data.tm_project_description,
                 data.tm_project_status,
@@ -1095,7 +1100,8 @@ module.exports = {
             tm_detail_status,
             tm_onhold_remarks,
             tm_pending_remark,
-            tm_completed_remarks,    
+            tm_completed_remarks,
+            tm_mast_duedate_count,   
             tm_new_task_mast.tm_project_slno,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
             GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
@@ -1186,8 +1192,8 @@ module.exports = {
             tm_goal_duedate,
             tm_project_mast.create_date,
             tm_goal_name
-            FROM tm_goal_mast  
-            left join tm_project_mast on tm_project_mast.tm_goal_slno=tm_goal_mast.tm_goals_slno
+            FROM tm_project_mast  
+            left join tm_goal_mast on tm_goal_mast.tm_goals_slno=tm_project_mast.tm_goal_slno
             left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
             where tm_task_dept_sec=? group by tm_project_slno`,
             [id],
@@ -1221,6 +1227,7 @@ module.exports = {
             tm_complete_date,
             tm_new_task_mast.tm_project_slno,
             main_task_slno,
+            tm_mast_duedate_count,
             GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
             GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
             FROM meliora.tm_new_task_mast            

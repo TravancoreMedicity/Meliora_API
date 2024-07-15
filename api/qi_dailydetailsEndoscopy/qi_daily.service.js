@@ -177,7 +177,7 @@ module.exports = {
              VALUES(?,?)`,
             [
                 data.qi_dept_no,
-                data.last_updatedate,
+                data.last_updatedate
             ],
             (error, results, fields) => {
                 if (error) {
@@ -736,4 +736,24 @@ module.exports = {
         )
     },
 
+    UpdateServiceTimeOfEndoPatients: (body) => {
+        return Promise.all(body.map((val) => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    `update qi_details_endoscopy set sumof_service_time = ? where patient_arrived_date=? and ptno=?`,
+                    [
+                        val.sumof_service_time,
+                        val.patient_arrived_date,
+                        val.ptno
+                    ],
+                    (error, results, fields) => {
+                        if (error) {
+                            return reject(error)
+                        }
+                        return resolve(results)
+                    }
+                )
+            })
+        }))
+    },
 }

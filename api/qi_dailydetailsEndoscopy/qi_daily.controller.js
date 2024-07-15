@@ -5,7 +5,7 @@ const {
     searchPatients, AseessmentExceededList, InchargeApprovalSave, IPEndoscopyInsert, IPEndoscopyExist,
     ViewIpPatientsView, IPEndoscopyQIUpdate, getIPIncidentForEndoscopy, getInpatientEndoscopyMonthlyView, EquipmentDetailsInsert,
     OPequipmentDetailExist, OPdeleteEquipment, IPequipmentDetailExist, IPdeleteEquipment, getTotalTestPerformed, IPAseessExceededList,
-    HODApprovalSave, HODApprovalUpdate } = require('./qi_daily.service')
+    HODApprovalSave, HODApprovalUpdate, UpdateServiceTimeOfEndoPatients } = require('./qi_daily.service')
 
 module.exports = {
     EndoscopyQiInsert: (req, res) => {
@@ -567,6 +567,22 @@ module.exports = {
                 message: "Approval Done"
             });
         });
+    },
+
+
+    UpdateServiceTimeOfEndoPatients: async (req, res) => {
+        const body = req.body;
+        UpdateServiceTimeOfEndoPatients(body).then(results => {
+            return res.status(200).json({
+                success: 1,
+                message: "Data Updated"
+            });
+        }).catch(err => {
+            return res.status(200).json({
+                success: 0,
+                message: err
+            });
+        })
     },
 
 }

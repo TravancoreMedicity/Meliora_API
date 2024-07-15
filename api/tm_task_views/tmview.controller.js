@@ -2,7 +2,8 @@ const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnP
     EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue, EmployeeName, EmployeeOnPending,
     ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted, DepartmentOnHold, DepartmentPending, ViewAllEmployeeTask,
     GoalsOverDue, ProjectInCompleted, GoalsInCompleted, EmpProjectTask, EmpTaskCount, AllEmployeeProject, AllTaskUnderProject,
-    TTCTcountUnderProject, EmployeeTTCTcount, AllEmployeeTask, EmpTaskCountWithoutProject, SubTaskUnderTask, getAllProjects } = require('../tm_task_views/tmview.service')
+    TTCTcountUnderProject, EmployeeTTCTcount, AllEmployeeTask, EmpTaskCountWithoutProject, SubTaskUnderTask, getAllProjects, AllTaskEmp, AllComplaintsEmp
+} = require('../tm_task_views/tmview.service')
 module.exports = {
 
     ViewOverDueToday: (req, res) => {
@@ -148,6 +149,48 @@ module.exports = {
 
         EmployeeAllTask(id, (err, results) => {
 
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+    AllTaskEmp: (req, res) => {
+        const id = req.params.id;
+        AllTaskEmp(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+    AllComplaintsEmp: (req, res) => {
+        const id = req.params.id;
+        AllComplaintsEmp(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,

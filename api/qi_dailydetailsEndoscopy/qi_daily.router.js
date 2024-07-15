@@ -7,12 +7,14 @@ const { EndoscopyQiInsert, getPatientList, EndoscopyPatientUpdate, getEndoscopyM
     IPEndoscopyInsert, ViewIpPatientsView, IPEndoscopyQIUpdate, getIPIncidentForEndoscopy,
     getInpatientEndoscopyMonthlyView, EquipmentDetailsInsert, OPequipmentDetailExist, OPdeleteEquipment,
     IPequipmentDetailExist, IPdeleteEquipment, getTotalTestPerformed, IPAseessExceededList, HODApprovalSave,
-    HODApprovalUpdate } = require('./qi_daily.controller');
+    HODApprovalUpdate, UpdateServiceTimeOfEndoPatients } = require('./qi_daily.controller');
 router.post('/save', checkToken, EndoscopyQiInsert);
 // date view
 router.post('/viewList', checkToken, getPatientList);
 router.patch('/update', checkToken, EndoscopyPatientUpdate);
 router.post('/getIncident', checkToken, getIncidentDetailsForEndoscopy);
+// initial Assessment Update
+router.patch('/updateTime', checkToken, UpdateServiceTimeOfEndoPatients);
 // for monthly Report
 router.post('/view', checkToken, getEndoscopyMonthlyView);
 router.patch('/qiupdate', checkToken, EndoscopyQiUpdate);

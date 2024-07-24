@@ -1,8 +1,8 @@
 const { BillInsert, AllBillView, UpdateBill, MonthlyTarrifInsert, MonthlyTarrifView, OtherBillinsert, OtherBillView, UpdateOtherBill, QuaterlyTarrifView,
     QuaterlyTarrifInsert, YearlyTarrifView, YearlyTarrifInsert, BillMonthlyUpdate, BillQuaterlyUpdate, BillYearlyUpdate, OtherBillViewDash, otherTeleBillViewinDash,
     otherSoftwareBillViewinDash, otherServiceBillViewinDash, getbilltype, checkMonthlyInsert, getUnpaidMonthlyTeleBills, checkQuarterlyInsert, checkYearlyInsert,
-    getUnpaidQuarterlyTeleBills, getUnpaidYearlyTeleBills, getUnpaidMonthlySoftBills, getUnpaidQuarterlySoftBills, getUnpaidYearlySoftBills, getUnpaidBillsServMonthly,
-    getUnpaidBillsSerQuarter, getUnpaidBillsSerYear } = require('./bill.service')
+    getUnpaidQuarterlyTeleBills, getUnpaidYearlyTeleBills, getUnpaidMonthlySoftBills, getUnpaidQuarterlySoftBills, getUnpaidYearlySoftBills,
+    getAssetDetails } = require('./bill.service')
 const logger = require('../../logger/logger');
 module.exports = {
 
@@ -595,64 +595,25 @@ module.exports = {
             })
         })
     },
-    getUnpaidBillsServMonthly: (req, res) => {
-        getUnpaidBillsServMonthly((err, results) => {
+    getAssetDetails: (req, res) => {
+        const id = req.params.id;
+        getAssetDetails(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
-                })
+                });
             }
-            if (results === 0) {
+            if (results.length === 0) {
                 return res.status(200).json({
                     success: 1,
-                    message: "No Records"
-                })
+                    message: "No Data"
+                });
             }
             return res.status(200).json({
                 success: 2,
-                data: results
-            })
-        })
-    },
-    getUnpaidBillsSerQuarter: (req, res) => {
-        getUnpaidBillsSerQuarter((err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (results === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: "No Records"
-                })
-            }
-            return res.status(200).json({
-                success: 2,
-                data: results
-            })
-        })
-    },
-    getUnpaidBillsSerYear: (req, res) => {
-        getUnpaidBillsSerYear((err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (results === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: "No Records"
-                })
-            }
-            return res.status(200).json({
-                success: 2,
-                data: results
-            })
+                dataa: results
+            });
         })
     },
 

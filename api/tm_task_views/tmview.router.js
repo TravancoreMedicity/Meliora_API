@@ -4,7 +4,8 @@ const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnP
     EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue, DepartmentOnHold,
     ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted, GoalsOverDue, EmployeeAllTask, EmployeeName, EmployeeOnPending,
     ProjectInCompleted, GoalsInCompleted, EmpProjectTask, EmpTaskCount, AllEmployeeProject, TTCTcountUnderProject,
-    EmployeeTTCTcount, AllEmployeeTask, AllTaskUnderProject, EmpTaskCountWithoutProject, SubTaskUnderTask, getAllProjects } = require('../tm_task_views/tmview.controller');
+    EmployeeTTCTcount, AllEmployeeTask, AllTaskUnderProject, EmpTaskCountWithoutProject, SubTaskUnderTask, getAllProjects, AllTaskEmp, AllComplaintsEmp
+} = require('../tm_task_views/tmview.controller');
 
 router.get('/ViewOverDueToday/:id', checkToken, ViewOverDueToday)
 router.get('/ViewOverDueNextWeek/:id', checkToken, ViewOverDueNextWeek)
@@ -48,9 +49,10 @@ router.get('/allEmployeeTaskList/:id', checkToken, AllEmployeeTask)
 router.post('/allTaskUnderProject', checkToken, AllTaskUnderProject)
 router.post('/subTaskUnderTask', checkToken, SubTaskUnderTask)
 router.post('/EmpTaskCountWithoutProject', checkToken, EmpTaskCountWithoutProject)
-
 router.get('/getAllProjects', checkToken, getAllProjects)
 
+router.get('/AllTaskEmp/:id', checkToken, AllTaskEmp)
+router.get('/AllComplaintsEmp/:id', checkToken, AllComplaintsEmp)
 
 
 

@@ -16,7 +16,6 @@ router.get("/departmentSecUpdate", checkToken, departmentSecUpdate)
 router.get("/designation", checkToken, getdesignation)
 router.get("/branch", checkToken, getbranch)
 router.get("/salutation", checkToken, getSalutation)
-
 router.get("/emploginUpdate", checkToken, emploginUpdate)
 
 module.exports = router;

@@ -4,7 +4,7 @@ const { BillInsert, AllBillView, UpdateBill, MonthlyTarrifInsert, MonthlyTarrifV
     QuaterlyTarrifInsert, YearlyTarrifView, YearlyTarrifInsert, BillMonthlyUpdate, BillQuaterlyUpdate, BillYearlyUpdate, OtherBillViewDash, otherTeleBillViewinDash,
     otherSoftwareBillViewinDash, otherServiceBillViewinDash, getbilltype, checkMonthlyInsert, getUnpaidMonthlyTeleBills, checkQuarterlyInsert, checkYearlyInsert,
     getUnpaidQuarterlyTeleBills, getUnpaidYearlyTeleBills, getUnpaidMonthlySoftBills, getUnpaidQuarterlySoftBills, getUnpaidYearlySoftBills,
-    getAssetDetails } = require('../it_bill_management/bill.controller');
+    getAssetDetails, getmonthlychargedAmount } = require('../it_bill_management/bill.controller');
 
 router.get('/getbilltype/:id', checkToken, getbilltype)
 router.post('/insertBill', checkToken, BillInsert)
@@ -42,5 +42,7 @@ router.get('/otherSoftwareBillViewinDash', checkToken, otherSoftwareBillViewinDa
 
 router.get('/otherServiceBillViewinDash', checkToken, otherServiceBillViewinDash)
 router.get('/getAssetDetails/:id', checkToken, getAssetDetails)
+
+router.post('/getmonthlychargedAmount', checkToken, getmonthlychargedAmount)
 
 module.exports = router

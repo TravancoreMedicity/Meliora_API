@@ -161,7 +161,8 @@ module.exports = {
             from cm_complaint_mast
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
             left join cm_reopen_complaint_log on cm_reopen_complaint_log.reopen_complaint_slno=cm_complaint_mast.complaint_slno
-            where assigned_emp=('${employeee}') and assign_status=1
+            where assigned_emp=('${employeee}')
+            and assign_status=1
             and cm_complaint_mast.compalint_date between ('${fromDate}') and ('${toDate}')
 			group by cm_complaint_mast.complaint_slno`,
             {},
@@ -178,7 +179,7 @@ module.exports = {
 
         const fromDate = data.from;
         const toDate = data.to;
-        const empdept = data.complaint_dept_secslno;
+        const empdept = data.complaint_deptslno;
 
         pool.query(
             ` select
@@ -244,7 +245,7 @@ module.exports = {
             left join co_department_mast on co_department_mast.dept_id=co_employee_master.em_department
             left join co_deptsec_mast on co_deptsec_mast.sec_id=co_employee_master.em_dept_section
             left join co_designation on co_designation.desg_slno=co_employee_master.em_designation
-            WHERE  co_deptsec_mast.sec_id =? `,
+            WHERE  co_deptsec_mast.sec_id = ? and em_status=1`,
             [
                 data.sec_id,
             ],
@@ -259,19 +260,26 @@ module.exports = {
 
     EmployeePendingcompl: (id, callback) => {
         pool.query(
-            `select
-            cm_complaint_mast.complaint_slno,
-            complaint_desc,
-            compalint_date,
-            cm_rectify_time,
-            reopen_cm_slno,
-            cm_rectify_status
-            from cm_complaint_mast
-            left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
-            left join cm_reopen_complaint_log on cm_reopen_complaint_log.reopen_complaint_slno=cm_complaint_mast.complaint_slno
-            where assigned_emp=? and assign_status= 1
-            and cm_complaint_mast.cm_rectify_status !='R'
-			group by cm_complaint_mast.complaint_slno
+            `SELECT
+    cm_complaint_mast.complaint_slno,
+    complaint_desc,
+    cm_complaint_mast.compalint_date,
+    cm_rectify_time,
+    reopen_cm_slno,
+    cm_complaint_detail.assigned_emp,
+    cm_rectify_status
+    FROM cm_complaint_mast
+    LEFT JOIN cm_complaint_detail ON cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
+    LEFT JOIN cm_reopen_complaint_log ON cm_reopen_complaint_log.reopen_complaint_slno = cm_complaint_mast.complaint_slno
+    WHERE 
+    cm_complaint_detail.assigned_emp = ?
+    AND cm_complaint_detail.assign_status = 1
+    AND (
+        cm_complaint_mast.cm_rectify_status != 'R'
+        AND cm_complaint_mast.cm_rectify_status != 'V'
+        OR cm_complaint_mast.cm_rectify_status IS NULL
+    )
+    GROUP BY cm_complaint_mast.complaint_slno;
            `,
             [id],
             (error, results, fields) => {
@@ -318,7 +326,7 @@ module.exports = {
             from cm_complaint_mast
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
             left join cm_reopen_complaint_log on cm_reopen_complaint_log.reopen_complaint_slno=cm_complaint_mast.complaint_slno
-            where complaint_dept_secslno=(select complaint_dept_slno from cm_complaint_dept
+            where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
                        where department_slno=?)
             and cm_complaint_mast.cm_rectify_status ='O'
 			group by cm_complaint_mast.complaint_slno`,
@@ -343,10 +351,33 @@ module.exports = {
             from cm_complaint_mast
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
             left join cm_reopen_complaint_log on cm_reopen_complaint_log.reopen_complaint_slno=cm_complaint_mast.complaint_slno
-            where complaint_dept_secslno=(select complaint_dept_slno from cm_complaint_dept
+            where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
                        where department_slno=?)
-            and cm_complaint_mast.cm_rectify_status !='R'
-			group by cm_complaint_mast.complaint_slno`,
+            AND (
+            cm_complaint_mast.cm_rectify_status != 'R'
+            AND cm_complaint_mast.cm_rectify_status != 'V'
+            OR cm_complaint_mast.cm_rectify_status IS NULL
+    )
+    group by cm_complaint_mast.complaint_slno`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getprojectduedate: (id, callback) => {
+
+        pool.query(
+            `SELECT 
+            tm_project_slno,
+            tm_project_status,
+            tm_project_duedate
+            FROM tm_project_mast
+            where tm_project_slno=? `,
             [id],
             (error, results, fields) => {
                 if (error) {

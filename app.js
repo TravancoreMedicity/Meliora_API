@@ -202,6 +202,8 @@ const qiEquipment = require('./api/qi_equipment_mast/equipment.router')
 const TmGraph = require('./api/tm_graph_charts/tm_graph.router')
 const qiInpatients = require('./api/qi_detailsIP/qi_ip.router')
 const CrfReports = require('./api/crm_reports/crm_reports.router')
+const SpareCondemService = require('./api/am_spare_condemnation/am_spare_condemnation.router')
+const opAseessment = require('./api/qi_initial_assessment_details/assessment.router')
 
 
 app.use(express.json({ limit: '50mb' }));
@@ -372,7 +374,8 @@ app.use('/api/equipMast', qiEquipment)
 app.use('/api/TmGraph', TmGraph)
 app.use('/api/qiInpatients', qiInpatients)
 app.use('/api/CrfReports', CrfReports)
-
+app.use('/api/SpareCondemService', SpareCondemService)
+app.use('/api/InitialAsessment', opAseessment)
 
 
 server.listen(process.env.APP_PORT, () =>

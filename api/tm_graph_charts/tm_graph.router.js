@@ -2,7 +2,8 @@ const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { getAlltaskfromtodate, getEmployeeDetails, getAllComplaintsfromtodate, getAllEmployees,
     getDeptComplaintsfromtodate, getDepttaskfromtodate,
-    getProjectsfromtodate, getEmployeeImage, EmployeePendingcompl, EmployeeOnholdcompl, DeptOnholdcompl, DeptPendingcompl } = require('./tm_graph.controller');
+    getProjectsfromtodate, getEmployeeImage, EmployeePendingcompl, EmployeeOnholdcompl, DeptOnholdcompl, DeptPendingcompl,
+    getprojectduedate } = require('./tm_graph.controller');
 
 
 
@@ -22,6 +23,9 @@ router.get('/employeeOnholdcompl/:id', checkToken, EmployeeOnholdcompl)
 
 router.get('/deptOnholdcompl/:id', checkToken, DeptOnholdcompl)
 router.get('/deptPendingcompl/:id', checkToken, DeptPendingcompl)
+
+
+router.get('/projectduedate/:id', checkToken, getprojectduedate)
 
 
 

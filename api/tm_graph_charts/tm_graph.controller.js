@@ -2,7 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require("fs")
 const { getAlltaskfromtodate, getEmployeeDetails, getAllComplaintsfromtodate, getAllEmployees, getDepttaskfromtodate, getDeptComplaintsfromtodate, getProjectsfromtodate,
-    EmployeePendingcompl, EmployeeOnholdcompl, DeptOnholdcompl, DeptPendingcompl } = require('./tm_graph.service')
+    EmployeePendingcompl, EmployeeOnholdcompl, DeptOnholdcompl, DeptPendingcompl, getprojectduedate } = require('./tm_graph.service')
 const logger = require('../../logger/logger');
 
 
@@ -257,6 +257,28 @@ module.exports = {
     DeptPendingcompl: (req, res) => {
         const id = req.params.id;
         DeptPendingcompl(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+    getprojectduedate: (req, res) => {
+        const id = req.params.id;
+        getprojectduedate(id, (err, results) => {
 
             if (err) {
                 return res.status(200).json({

@@ -34,7 +34,7 @@ module.exports = {
     },
     AllBillView: (callback) => {
         pool.query(
-            `SELECT 
+            ` SELECT 
             bill_add_slno,
             bill_category,
             bill_tariff,
@@ -42,10 +42,12 @@ module.exports = {
             bill_cug_status,
             it_sim_type_name,
             it_bill_category_name,
+            it_bill_type_name,          
             bill_cug_simtype             
             FROM meliora.it_bill_add
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category
-            left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype  `
+            left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
+            left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype   `
             , [],
             (error, results, feilds) => {
                 if (error) {
@@ -790,6 +792,34 @@ module.exports = {
             left join am_group on am_group.group_slno=am_item_name_creation.item_group_slno
             where am_item_map_slno=?`,
             [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+
+    getmonthlychargedAmount: (data, callback) => {
+        const fromDate = data.from;
+        const toDate = data.to;
+        pool.query(
+            `Select
+                    monthly_slno,                          
+                    bill_category,
+                    bill_amount,                    
+                    bill_paid_date,                                                         
+                    it_bill_category_mast.it_bill_category_name
+
+            From  it_bill_monthly_tariff
+
+                   left join it_bill_add on it_bill_add.bill_add_slno=it_bill_monthly_tariff.bill_add_slno
+                   left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category     
+            where
+                  monthly_bill_generate between ('${fromDate}') and ('${toDate}')`,
+            {},
             (error, results, fields) => {
                 if (error) {
                     return callback(error);

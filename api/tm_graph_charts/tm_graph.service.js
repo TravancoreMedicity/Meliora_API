@@ -279,7 +279,7 @@ module.exports = {
         AND cm_complaint_mast.cm_rectify_status != 'V'
         OR cm_complaint_mast.cm_rectify_status IS NULL
     )
-    GROUP BY cm_complaint_mast.complaint_slno;
+    GROUP BY cm_complaint_mast.complaint_slno
            `,
             [id],
             (error, results, fields) => {

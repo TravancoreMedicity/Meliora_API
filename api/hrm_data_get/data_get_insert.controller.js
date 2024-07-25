@@ -4,7 +4,7 @@ const { getdepartment, createDept, getdepartmentMeli, getdepartmentSection, getd
     getemployeeuserPassHrm, getemployeeuserPassMeli, getauthorization, getauthorizationMeli, createAuthorization,
     updateEmpMaster, updateDepartment, updateDepartmentSec, getdesignation, getdesignationMeli,
     createdesignation, getbranch, getbranchMeli, createbranch, getSalutation, getSalutationMeli,
-    createSalutation
+    createSalutation, emploginUpdate
 } = require("../hrm_data_get/data_get_insert_service")
 module.exports = {
 
@@ -54,7 +54,7 @@ module.exports = {
                 } else {
                     return res.status(200).json({
                         success: 2,
-                        message: "Noting to insert already uptodate"
+                        message: "Noting to insert, already uptodate"
                     });
                 }
 
@@ -109,7 +109,7 @@ module.exports = {
                 } else {
                     return res.status(200).json({
                         success: 2,
-                        message: "Noting to insert already uptodate"
+                        message: "Noting to insert, already uptodate"
                     });
                 }
 
@@ -164,7 +164,7 @@ module.exports = {
                 } else {
                     return res.status(200).json({
                         success: 2,
-                        message: "Noting to insert already uptodate"
+                        message: "Noting to insert, already uptodate"
                     });
                 }
 
@@ -197,8 +197,8 @@ module.exports = {
                     })
                 })
                 var a1 = newmeli.map((value, index) => {
-                    return [value.empdtl_slno, value.emp_email, value.emp_username, value.emp_password,
-                    value.emp_status, value.emp_id, value.emp_no, value.emp_created, value.emp_updated,
+                    return [value.emp_slno, value.emp_email, value.emp_username, value.emp_password,
+                    value.emp_status, value.emp_id, value.emp_no, value.emp_created, value.emp_update
                     ]
                 })
                 if (a1.length !== 0) {
@@ -218,7 +218,7 @@ module.exports = {
                 } else {
                     return res.status(200).json({
                         success: 2,
-                        message: "Noting to insert already uptodate"
+                        message: "Noting to insert, already uptodate"
                     });
                 }
 
@@ -297,7 +297,9 @@ module.exports = {
                         return values.em_id === value.em_id &&
                             values.em_department === value.em_department &&
                             values.em_dept_section === value.em_dept_section &&
-                            values.em_no === value.em_no
+                            values.em_no === value.em_no &&
+                            values.em_designation === value.em_designation &&
+                            values.em_status === value.em_status
                     })
                 })
 
@@ -455,7 +457,7 @@ module.exports = {
                 } else {
                     return res.status(200).json({
                         success: 2,
-                        message: "Noting to insert already uptodate"
+                        message: "Noting to insert, already uptodate"
                     });
                 }
 
@@ -552,4 +554,48 @@ module.exports = {
             })
         });
     },
+
+    emploginUpdate: (req, res) => {
+        getemployeeuserPassHrm((err, results) => {
+            const employeeHr = [...results]
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            getemployeeuserPassMeli((err, results) => {
+                const meliemployee = [...results]
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 2,
+                        message: err
+                    });
+                }
+                let newmeli = employeeHr.filter(value => {
+                    return !meliemployee.find(values => {
+                        return values.emp_status === value.emp_status &&
+                            values.emp_no === value.emp_no
+                    })
+                })
+
+                const result = emploginUpdate(newmeli)
+                    .then((r) => {
+
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Update Successfully"
+                        });
+                    }).catch((e) => {
+                        return res.status(200).json({
+                            success: 0,
+                            message: e.sqlMessage
+                        });
+                    })
+            })
+        });
+    },
+
 }

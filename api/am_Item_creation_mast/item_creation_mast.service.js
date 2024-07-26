@@ -489,10 +489,11 @@ module.exports = {
            left join am_item_map_details on am_item_map_details.am_item_map_slno=am_asset_item_map_master.am_item_map_slno
            left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno
            WHERE
-         am_manufacture_no like ?
+         am_manufacture_no like ? and am_asset_item_map_master.item_custodian_dept_sec=?
            ORDER BY am_asset_item_map_master.am_item_map_slno DESC`,
             [
-                '%' + data.am_manufacture_no + '%'
+                '%' + data.am_manufacture_no + '%',
+                data.item_custodian_dept_sec
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -517,10 +518,11 @@ module.exports = {
                      left join am_item_map_details on am_item_map_details.am_spare_item_map_slno=am_spare_item_map_master.am_spare_item_map_slno
            left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno
            WHERE
-         am_manufacture_no like ?
+         am_manufacture_no like ? and am_spare_item_map_master.spare_custodian_dept_sec=?
            ORDER BY am_spare_item_map_master.am_spare_item_map_slno DESC`,
             [
-                '%' + data.am_manufacture_no + '%'
+                '%' + data.am_manufacture_no + '%',
+                data.item_custodian_dept_sec
             ],
             (error, results, feilds) => {
                 if (error) {

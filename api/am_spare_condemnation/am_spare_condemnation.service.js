@@ -48,7 +48,8 @@ module.exports = {
     pmDueOverList: (id, callBack) => {
         pool.query(
             `
-                select  ROW_NUMBER() over (order by am_item_amcpm_slno) as slno ,am_asset_item_map_master.am_item_map_slno,instalation_date,due_date,
+                select  ROW_NUMBER() over (order by am_item_amcpm_slno) as slno ,
+                am_asset_item_map_master.am_item_map_slno,instalation_date,due_date,
                 item_asset_no,item_asset_no_only,item_dept_slno,item_deptsec_slno,am_manufacture_no,
                 item_name,dept_name,sec_name,rm_newroom_creation.rm_room_name,rm_subroom_master.subroom_name
             from am_item_map_amcpm_detail

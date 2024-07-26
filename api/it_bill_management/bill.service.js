@@ -829,4 +829,74 @@ module.exports = {
 
         );
     },
+    getQuarterlychargedAmount: (data, callback) => {
+        const fromDate = data.from;
+        const toDate = data.to;
+        pool.query(
+            `Select
+                    quaterly_slno,                          
+                    bill_category,
+                    bill_amount,                    
+                    bill_paid_date,                                                         
+                    it_bill_category_mast.it_bill_category_name
+
+            From  it_quaterly_tarrif_details
+
+                   left join it_bill_add on it_bill_add.bill_add_slno=it_quaterly_tarrif_details.bill_add_slno
+                   left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category     
+            where
+                  quaterly_bill_generate between ('${fromDate}') and ('${toDate}')`,
+            {},
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+    getOtherchargedAmount: (data, callback) => {
+        const fromDate = data.from;
+        const toDate = data.to;
+        pool.query(
+            `  Select
+                other_bill_slno,                          
+                bill_category,
+                bill_amount                                                    
+                  
+            From  it_other_bills  
+            where
+                  bill_date between ('${fromDate}') and ('${toDate}')`,
+            {},
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+    getYearlychargedAmount: (data, callback) => {
+        const fromDate = data.from;
+        const toDate = data.to;
+        pool.query(
+            `		Select    
+					yearly_slno,                         
+                     bill_amount                  
+             From  it_yearly_tarrif_details                   
+            where
+                  yearly_bill_generate between ('${fromDate}') and ('${toDate}')`,
+            {},
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+
 }

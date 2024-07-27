@@ -2,7 +2,8 @@ const logger = require('../../logger/logger');
 const { validateQiDepartment } = require('../../validation/validation_schema');
 validateQiDepartment
 
-const { qiDeptListInsert, DepartmentListView, DepartmentUpdate, getDepartmentActive } = require('./qi_dept.service')
+const { qiDeptListInsert, DepartmentListView, DepartmentUpdate, getDepartmentActive, getAllActiveDepartment
+} = require('./qi_dept.service')
 module.exports = {
     qiDeptListInsert: (req, res) => {
         const body = req.body;
@@ -81,7 +82,8 @@ module.exports = {
     },
 
     getDepartmentActive: (req, res) => {
-        getDepartmentActive((err, results) => {
+        const id = req.params.id;
+        getDepartmentActive(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -100,5 +102,25 @@ module.exports = {
             })
         })
     },
-
+    getAllActiveDepartment: (req, res) => {
+        getAllActiveDepartment((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
 }

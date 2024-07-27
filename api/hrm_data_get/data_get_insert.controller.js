@@ -4,7 +4,7 @@ const { getdepartment, createDept, getdepartmentMeli, getdepartmentSection, getd
     getemployeeuserPassHrm, getemployeeuserPassMeli, getauthorization, getauthorizationMeli, createAuthorization,
     updateEmpMaster, updateDepartment, updateDepartmentSec, getdesignation, getdesignationMeli,
     createdesignation, getbranch, getbranchMeli, createbranch, getSalutation, getSalutationMeli,
-    createSalutation
+    createSalutation, emploginUpdate
 } = require("../hrm_data_get/data_get_insert_service")
 module.exports = {
 
@@ -36,19 +36,28 @@ module.exports = {
                     return [value.dept_id, value.dept_name, value.dept_alias, value.dept_status
                     ]
                 })
-                createDept(a1, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+
+                if (a1.length !== 0) {
+                    createDept(a1, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 1,
+                            message: "Department Inserted Successfully"
                         });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Department Inserted Successfully"
                     });
-                });
+                } else {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Noting to insert, already uptodate"
+                    });
+                }
+
             })
         });
     },
@@ -83,19 +92,27 @@ module.exports = {
                     value.sect_status
                     ]
                 })
-                createDeptSec(a1, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+                if (a1.length !== 0) {
+                    createDeptSec(a1, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 1,
+                            message: "Department Section Inserted Successfully"
                         });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Department Section Inserted Successfully"
                     });
-                });
+                } else {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Noting to insert, already uptodate"
+                    });
+                }
+
             })
         });
     },
@@ -130,19 +147,28 @@ module.exports = {
                     value.em_designation, value.em_status
                     ]
                 })
-                creategetemployeemaster(a1, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+                if (a1.length !== 0) {
+                    creategetemployeemaster(a1, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 1,
+                            message: "Employee Master Inserted Successfully"
                         });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Employee Master Inserted Successfully"
                     });
-                });
+                } else {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Noting to insert, already uptodate"
+                    });
+                }
+
+
             })
         });
     },
@@ -171,23 +197,32 @@ module.exports = {
                     })
                 })
                 var a1 = newmeli.map((value, index) => {
-                    return [value.empdtl_slno, value.emp_email, value.emp_username, value.emp_password,
-                    value.emp_status, value.emp_id, value.emp_no, value.emp_created, value.emp_updated,
+                    return [value.emp_slno, value.emp_email, value.emp_username, value.emp_password,
+                    value.emp_status, value.emp_id, value.emp_no, value.emp_created, value.emp_update
                     ]
                 })
-                creategetemployeeuserPass(a1, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+                if (a1.length !== 0) {
+                    creategetemployeeuserPass(a1, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 1,
+                            message: "Employee Inserted Successfully"
                         });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Employee Inserted Successfully"
                     });
-                });
+                } else {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Noting to insert, already uptodate"
+                    });
+                }
+
+
             })
         });
     },
@@ -262,7 +297,9 @@ module.exports = {
                         return values.em_id === value.em_id &&
                             values.em_department === value.em_department &&
                             values.em_dept_section === value.em_dept_section &&
-                            values.em_no === value.em_no
+                            values.em_no === value.em_no &&
+                            values.em_designation === value.em_designation &&
+                            values.em_status === value.em_status
                     })
                 })
 
@@ -309,8 +346,10 @@ module.exports = {
                             values.dept_status === value.dept_status
                     })
                 })
-
-                const result = updateDepartment(newmeli)
+                var a1 = newmeli.map((value, index) => {
+                    return [value.dept_status, value.dept_type, value.dept_id]
+                })
+                const result = updateDepartment(a1)
                     .then((r) => {
 
                         return res.status(200).json({
@@ -401,19 +440,28 @@ module.exports = {
                     value.edit_user
                     ]
                 })
-                createdesignation(a1, (err, results) => {
-                    if (err) {
-                        logger.logwindow(err)
+                if (a1.length !== 0) {
+                    createdesignation(a1, (err, results) => {
+                        if (err) {
+                            logger.logwindow(err)
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
                         return res.status(200).json({
-                            success: 0,
-                            message: err
+                            success: 1,
+                            message: "Designation Inserted Successfully"
                         });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Designation Inserted Successfully"
                     });
-                });
+                } else {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Noting to insert, already uptodate"
+                    });
+                }
+
+
             })
         });
     },
@@ -506,4 +554,48 @@ module.exports = {
             })
         });
     },
+
+    emploginUpdate: (req, res) => {
+        getemployeeuserPassHrm((err, results) => {
+            const employeeHr = [...results]
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            getemployeeuserPassMeli((err, results) => {
+                const meliemployee = [...results]
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 2,
+                        message: err
+                    });
+                }
+                let newmeli = employeeHr.filter(value => {
+                    return !meliemployee.find(values => {
+                        return values.emp_status === value.emp_status &&
+                            values.emp_no === value.emp_no
+                    })
+                })
+
+                const result = emploginUpdate(newmeli)
+                    .then((r) => {
+
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Update Successfully"
+                        });
+                    }).catch((e) => {
+                        return res.status(200).json({
+                            success: 0,
+                            message: e.sqlMessage
+                        });
+                    })
+            })
+        });
+    },
+
 }

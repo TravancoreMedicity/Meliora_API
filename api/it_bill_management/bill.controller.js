@@ -1,8 +1,8 @@
 const { BillInsert, AllBillView, UpdateBill, MonthlyTarrifInsert, MonthlyTarrifView, OtherBillinsert, OtherBillView, UpdateOtherBill, QuaterlyTarrifView,
     QuaterlyTarrifInsert, YearlyTarrifView, YearlyTarrifInsert, BillMonthlyUpdate, BillQuaterlyUpdate, BillYearlyUpdate, OtherBillViewDash, otherTeleBillViewinDash,
     otherSoftwareBillViewinDash, otherServiceBillViewinDash, getbilltype, checkMonthlyInsert, getUnpaidMonthlyTeleBills, checkQuarterlyInsert, checkYearlyInsert,
-    getUnpaidQuarterlyTeleBills, getUnpaidYearlyTeleBills, getUnpaidMonthlySoftBills, getUnpaidQuarterlySoftBills, getUnpaidYearlySoftBills, getUnpaidBillsServMonthly,
-    getUnpaidBillsSerQuarter, getUnpaidBillsSerYear } = require('./bill.service')
+    getUnpaidQuarterlyTeleBills, getUnpaidYearlyTeleBills, getUnpaidMonthlySoftBills, getUnpaidQuarterlySoftBills, getUnpaidYearlySoftBills,
+    getAssetDetails, getmonthlychargedAmount, getQuarterlychargedAmount, getOtherchargedAmount, getYearlychargedAmount } = require('./bill.service')
 const logger = require('../../logger/logger');
 module.exports = {
 
@@ -595,18 +595,42 @@ module.exports = {
             })
         })
     },
-    getUnpaidBillsServMonthly: (req, res) => {
-        getUnpaidBillsServMonthly((err, results) => {
+    getAssetDetails: (req, res) => {
+        const id = req.params.id;
+        getAssetDetails(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                dataa: results
+            });
+        })
+    },
+
+    getmonthlychargedAmount: (req, res) => {
+        const body = req.body;
+        getmonthlychargedAmount(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
                 })
             }
-            if (results === 0) {
+            if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 1,
-                    message: "No Records"
+                    message: "No Data Found",
+                    data: []
                 })
             }
             return res.status(200).json({
@@ -615,18 +639,20 @@ module.exports = {
             })
         })
     },
-    getUnpaidBillsSerQuarter: (req, res) => {
-        getUnpaidBillsSerQuarter((err, results) => {
+    getQuarterlychargedAmount: (req, res) => {
+        const body = req.body;
+        getQuarterlychargedAmount(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
                 })
             }
-            if (results === 0) {
+            if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 1,
-                    message: "No Records"
+                    message: "No Data Found",
+                    data: []
                 })
             }
             return res.status(200).json({
@@ -635,18 +661,43 @@ module.exports = {
             })
         })
     },
-    getUnpaidBillsSerYear: (req, res) => {
-        getUnpaidBillsSerYear((err, results) => {
+    getOtherchargedAmount: (req, res) => {
+        const body = req.body;
+        getOtherchargedAmount(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
                 })
             }
-            if (results === 0) {
+            if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 1,
-                    message: "No Records"
+                    message: "No Data Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+
+    getYearlychargedAmount: (req, res) => {
+        const body = req.body;
+        getYearlychargedAmount(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data Found",
+                    data: []
                 })
             }
             return res.status(200).json({

@@ -5,7 +5,7 @@ module.exports = {
         pool.query(
             `select cm_complaint_mast.complaint_slno,complaint_desc,assigned_date,complaint_dept_name,req_type_name,complaint_type_name,
             assigned_emp,em_name,compalint_status,cm_rectify_status,rectify_pending_hold_remarks,verify_remarks,
-            S.sec_name as sec_name,  IFNULL( L.sec_name,"Nill" ) location,complaint_remark,
+            S.sec_name as sec_name,  IFNULL( L.sec_name,"Nill" ) location,complaint_remark,cm_location,
                         (case when verify_remarks is null then " User Verified" else verify_remarks end ) as verify_remarks1,
                         (case when rectify_pending_hold_remarks is null then "not updated" else rectify_pending_hold_remarks end ) as rectify_pending_hold_remarks1,
                         (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" else "Rectified" end ) as compalint_status1,
@@ -139,6 +139,66 @@ module.exports = {
             [
                 data.complaint_slno,
                 data.create_user
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getlocationbsedAsset: (id, callBack) => {
+        pool.query(
+            `select am_asset_item_map_master.am_item_map_slno,item_name,am_asset_no
+            from am_asset_item_map_master
+            left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
+            left join am_item_map_details on am_item_map_details.am_item_map_slno=am_asset_item_map_master.am_item_map_slno
+            where item_deptsec_slno=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    AssetMappComplaint: (data, callback) => {
+        pool.query(
+            `INSERT INTO cm_comasset_mapping
+            (
+                cm_complait_slno,
+                cm_am_assetmap_slno,
+                create_user
+                ) 
+                VALUES(?,?,?)`,
+            [
+                data.cm_complait_slno,
+                data.cm_am_assetmap_slno,
+                data.create_user
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            });
+    },
+    AssetDetailsGet: (id, callBack) => {
+        pool.query(
+            `select comasset_mapping_slno, cm_complait_slno, cm_am_assetmap_slno,
+            item_name,am_asset_no
+            from cm_comasset_mapping
+            left join am_asset_item_map_master on am_asset_item_map_master.am_item_map_slno=cm_comasset_mapping.cm_am_assetmap_slno
+            left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
+            left join am_item_map_details on am_item_map_details.am_item_map_slno=am_asset_item_map_master.am_item_map_slno
+            where cm_complait_slno=?`,
+            [
+                id
             ],
             (error, results, feilds) => {
                 if (error) {

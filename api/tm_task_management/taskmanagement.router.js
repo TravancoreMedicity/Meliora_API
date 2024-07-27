@@ -26,7 +26,6 @@ router.get('/subtaskviewByidForEdit/:id', checkToken, SubtaskviewByidForEdit)
 router.post('/insertSubtaskDetail', checkToken, CreateTaskSubTaskDetailInsert)
 router.post("/employeeInactive", checkToken, employeeInactive);
 
-
 router.get('/viewDeptProject/:id', checkToken, ProjectDeptView)
 
 router.post('/insertDeptGoal', checkToken, GoalDeptInsert)

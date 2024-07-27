@@ -34,7 +34,7 @@ module.exports = {
     },
     AllBillView: (callback) => {
         pool.query(
-            `SELECT 
+            ` SELECT 
             bill_add_slno,
             bill_category,
             bill_tariff,
@@ -42,10 +42,12 @@ module.exports = {
             bill_cug_status,
             it_sim_type_name,
             it_bill_category_name,
+            it_bill_type_name,          
             bill_cug_simtype             
             FROM meliora.it_bill_add
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category
-            left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype  `
+            left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
+            left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype   `
             , [],
             (error, results, feilds) => {
                 if (error) {
@@ -172,6 +174,7 @@ module.exports = {
             bill_name,
             bill_amount,
             bill_number,
+            file_upload_status,
             bill_date,
             bill_due_date,
             bill_paid_date,
@@ -498,6 +501,7 @@ module.exports = {
             bill_paid_date,
             file_upload_status,        
             bill_description,
+            am_item_map_slno,
             it_bill_type_mast.it_bill_type_slno,
             it_bill_type_mast.it_bill_type_name
             FROM meliora.it_other_bills
@@ -560,6 +564,7 @@ module.exports = {
             bill_date,
             bill_paid_date,
             bill_number,
+            file_upload_status,
             bill_due_date,            
             it_bill_type_mast.it_bill_type_name,
             it_bill_category_mast.it_bill_category_name
@@ -591,6 +596,7 @@ module.exports = {
             bill_paid_date,
             bill_number,
             bill_due_date,
+            file_upload_status,
             it_sim_type_master.it_sim_type_name,
             it_bill_type_mast.it_bill_type_name,
             it_bill_category_mast.it_bill_category_name
@@ -681,6 +687,7 @@ module.exports = {
             bill_date,
             bill_paid_date,
             bill_number,
+            file_upload_status,
             bill_due_date,            
             it_bill_type_mast.it_bill_type_name,
             it_bill_category_mast.it_bill_category_name
@@ -712,6 +719,7 @@ module.exports = {
             bill_paid_date,
             bill_number,
             bill_due_date,
+             file_upload_status,
             it_sim_type_master.it_sim_type_name,
             it_bill_type_mast.it_bill_type_name,
             it_bill_category_mast.it_bill_category_name
@@ -761,97 +769,134 @@ module.exports = {
             }
         );
     },
-    getUnpaidBillsServMonthly: (callback) => {
+
+    getAssetDetails: (id, callback) => {
         pool.query(
-            `SELECT
-            monthly_slno,
-            it_bill_add.bill_tariff,            
-            it_sim_type_master.it_sim_type_name,
-            it_bill_add.bill_name,
-            bill_category,
-            monthly_bill_generate,
-            bill_amount,
-            bill_date,
-            bill_paid_date,
-            bill_number,
-            bill_due_date,            
-            it_bill_type_mast.it_bill_type_name,
-            it_bill_category_mast.it_bill_category_name
-            FROM  it_bill_monthly_tariff                        
-            left join it_bill_add on it_bill_add.bill_add_slno=it_bill_monthly_tariff.bill_add_slno             
-            left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category
-            left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
-            left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype
-            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=3)`, [],
-            (error, results, feilds) => {
+            `select
+            item_name,
+            am_item_name_creation.item_creation_slno,
+            item_deptsec_slno,
+            am_item_name_creation.item_category_slno,
+            am_item_name_creation.item_group_slno,
+            am_category.category_name,
+            am_group.group_name,
+            am_item_name_creation.item_name,
+            co_deptsec_mast.sec_name,
+            am_item_map_slno,
+             item_asset_no,
+            item_asset_no_only
+            from am_asset_item_map_master
+            left join co_deptsec_mast on co_deptsec_mast.sec_id =am_asset_item_map_master.item_deptsec_slno
+            left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
+            left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno
+            left join am_group on am_group.group_slno=am_item_name_creation.item_group_slno
+            where am_item_map_slno=?`,
+            [id],
+            (error, results, fields) => {
                 if (error) {
                     return callback(error);
                 }
                 return callback(null, results);
             }
+
         );
     },
-    getUnpaidBillsSerQuarter: (callback) => {
+
+    getmonthlychargedAmount: (data, callback) => {
+        const fromDate = data.from;
+        const toDate = data.to;
         pool.query(
-            `SELECT
-            quaterly_slno,
-            it_bill_add.bill_add_slno,
-            it_bill_add.bill_tariff, 
-            it_bill_add.bill_name,
-            bill_category,
-            quaterly_bill_generate,
-            bill_amount,
-            bill_date,
-            bill_paid_date,
-            bill_number,
-            bill_due_date,
-            it_sim_type_master.it_sim_type_name,
-            it_bill_type_mast.it_bill_type_name,
-            it_bill_category_mast.it_bill_category_name
-            FROM  it_quaterly_tarrif_details              
-            left join it_bill_add on it_bill_add.bill_add_slno=it_quaterly_tarrif_details.bill_add_slno             
-            left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category
-            left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
-            left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype
-            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=3)`, [],
-            (error, results, feilds) => {
+            `Select
+                    monthly_slno,                          
+                    bill_category,
+                    bill_amount,                    
+                    bill_paid_date,                                                         
+                    it_bill_category_mast.it_bill_category_name
+
+            From  it_bill_monthly_tariff
+
+                   left join it_bill_add on it_bill_add.bill_add_slno=it_bill_monthly_tariff.bill_add_slno
+                   left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category     
+            where
+                  monthly_bill_generate between ('${fromDate}') and ('${toDate}')`,
+            {},
+            (error, results, fields) => {
                 if (error) {
                     return callback(error);
                 }
                 return callback(null, results);
             }
+
         );
     },
-    getUnpaidBillsSerYear: (callback) => {
+    getQuarterlychargedAmount: (data, callback) => {
+        const fromDate = data.from;
+        const toDate = data.to;
         pool.query(
-            `SELECT
-            yearly_slno,
-            yearly_bill_generate,
-            it_bill_add.bill_add_slno,
-            it_bill_add.bill_name,            
-            bill_category,
-            bill_amount,
-            bill_date,
-            bill_paid_date,
-            bill_number,
-            bill_due_date,
-            file_upload_status,
-            it_bill_add.bill_tariff, 
-            it_bill_type_mast.it_bill_type_name,
-            it_sim_type_master.it_sim_type_name,
-            it_bill_category_mast.it_bill_category_name
-            FROM  it_yearly_tarrif_details              
-            left join it_bill_add on it_bill_add.bill_add_slno = it_yearly_tarrif_details.bill_add_slno             
-            left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno = it_bill_add.bill_category
-            left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno = it_bill_category_mast.it_bill_type_slno
-            left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype
-            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=3)`, [],
-            (error, results, feilds) => {
+            `Select
+                    quaterly_slno,                          
+                    bill_category,
+                    bill_amount,                    
+                    bill_paid_date,                                                         
+                    it_bill_category_mast.it_bill_category_name
+
+            From  it_quaterly_tarrif_details
+
+                   left join it_bill_add on it_bill_add.bill_add_slno=it_quaterly_tarrif_details.bill_add_slno
+                   left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category     
+            where
+                  quaterly_bill_generate between ('${fromDate}') and ('${toDate}')`,
+            {},
+            (error, results, fields) => {
                 if (error) {
                     return callback(error);
                 }
                 return callback(null, results);
             }
+
         );
     },
+    getOtherchargedAmount: (data, callback) => {
+        const fromDate = data.from;
+        const toDate = data.to;
+        pool.query(
+            `  Select
+                other_bill_slno,                          
+                bill_category,
+                bill_amount                                                    
+                  
+            From  it_other_bills  
+            where
+                  bill_date between ('${fromDate}') and ('${toDate}')`,
+            {},
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+    getYearlychargedAmount: (data, callback) => {
+        const fromDate = data.from;
+        const toDate = data.to;
+        pool.query(
+            `		Select    
+					yearly_slno,                         
+                     bill_amount                  
+             From  it_yearly_tarrif_details                   
+            where
+                  yearly_bill_generate between ('${fromDate}') and ('${toDate}')`,
+            {},
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+
 }

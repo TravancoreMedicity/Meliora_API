@@ -50,12 +50,13 @@ module.exports = {
            left join rm_newroom_creation on rm_newroom_creation.rm_room_slno=am_asset_item_map_master.item_room_slno
            left join rm_subroom_master on rm_subroom_master.subroom_slno=am_asset_item_map_master.item_subroom_slno
           WHERE
-           item_dept_slno =? and item_deptsec_slno=?
-           and  item_create_status=1
+           item_dept_slno =? and item_deptsec_slno=? and item_custodian_dept_sec=?
+           and  item_create_status=1 
            ORDER BY am_asset_item_map_master.am_item_map_slno DESC`,
             [
                 data.item_dept_slno,
-                data.item_deptsec_slno
+                data.item_deptsec_slno,
+                data.item_custodian_dept_sec
             ],
             (error, results, feilds) => {
                 if (error) {

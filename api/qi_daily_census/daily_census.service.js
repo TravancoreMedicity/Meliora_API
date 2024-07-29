@@ -173,17 +173,15 @@ module.exports = {
             }
         )
     },
-    GetCensusBargraphReport: (body, callBack) => {
-        const fromDate = body.from;
-        const toDate = body.to;
+    GetCensusBargraphReport: (data, callBack) => {
         pool.query(
             `SELECT
                   census_slno,census_date,total_admission,total_discharge,census_total
              FROM 
                   qi_daily_census 
              WHERE
-                  census_date between ('${fromDate}') and ('${toDate}') order by census_date`,
-            {},
+                  census_date between ? and ? order by census_date`,
+            [data.from, data.to],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);

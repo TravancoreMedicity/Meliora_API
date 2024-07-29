@@ -22,9 +22,6 @@ module.exports = {
     },
 
     getPatientList: (data, callBack) => {
-        const fromDate = data.from;
-        const toDate = data.to;
-        const qidept = data.qidept
         pool.query(
             `SELECT 
                    qi_slno, ip_no, ipd_date, ptno, ptname, ptsex, ptage, ptaddrs1, ptaddrs2, ptmobile, ip_bed,
@@ -32,8 +29,12 @@ module.exports = {
              FROM  
                    qi_details_inpatients
              WHERE 
-                   ipd_date between ('${fromDate}') and ('${toDate}') and qi_dept_no=('${qidept}') and discharge_date is null order by ipd_date`,
-            {},
+                   ipd_date between ? and ? and qi_dept_no=? and discharge_date is null order by ipd_date`,
+            [
+                data.from,
+                data.to,
+                data.qidept
+            ],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -44,9 +45,6 @@ module.exports = {
     },
 
     searchPatientsbyName: (data, callBack) => {
-        const fromDate = data.from;
-        const toDate = data.to;
-        const qidept = data.qidept
         pool.query(
             `SELECT 
                    qi_slno, ip_no, ipd_date, ptno, ptname, ptsex, ptage, ptaddrs1, ptaddrs2, ptmobile, ip_bed,
@@ -54,8 +52,11 @@ module.exports = {
              FROM  
                    qi_details_inpatients
             WHERE 
-                   ipd_date between ('${fromDate}') and ('${toDate}') and qi_dept_no=('${qidept}') and discharge_date is null and ptname like ? order by ipd_date`,
+                   ipd_date between ? and ? and qi_dept_no=? and discharge_date is null and ptname like ? order by ipd_date`,
             [
+                data.from,
+                data.to,
+                data.qidept,
                 '%' + data.ptname + '%'
             ],
             (error, results, feilds) => {

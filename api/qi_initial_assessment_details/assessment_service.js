@@ -56,9 +56,6 @@ module.exports = {
     },
 
     getAseesementReport: (data, callBack) => {
-        const fromDate = data.from;
-        const toDate = data.to;
-        const dpt = data.dpt
         pool.query(
             `SELECT
                     op_slno, patient_arrived_date, ptno, ptname, ptmobile,doctor_name, qi_dept_no,
@@ -68,9 +65,13 @@ module.exports = {
                    qi_op_initial_assessment_details 
 			 
              WHERE
-                  patient_arrived_date between ('${fromDate}') and ('${toDate}') and qi_dept_no=('${dpt}')
+                  patient_arrived_date between ? and ? and qi_dept_no=?
                   order by patient_arrived_date`,
-            {},
+            [
+                data.from,
+                data.to,
+                data.dpt
+            ],
             (err, results, fields) => {
                 if (err) {
                     return callBack(err)

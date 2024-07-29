@@ -23,8 +23,6 @@ module.exports = {
     },
 
     getPatientList: (data, callBack) => {
-        const fromDate = data.from;
-        const toDate = data.to;
         pool.query(
             `SELECT 
                    qi_slno, patient_arrived_date, ptno, ptname, ptsex, ptage, ptaddrs1, ptaddrs2, ptaddrs3, ptaddrs4,
@@ -32,8 +30,8 @@ module.exports = {
              FROM  
                    qi_details_dialysis
              WHERE 
-                   patient_arrived_date between ('${fromDate}') and ('${toDate}') order by patient_arrived_date`,
-            {},
+                   patient_arrived_date between ? and ? order by patient_arrived_date`,
+            [data.from, data.to],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);

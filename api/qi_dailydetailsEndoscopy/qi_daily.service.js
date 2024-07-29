@@ -541,35 +541,15 @@ module.exports = {
 
     OPequipmentDetailExist: (id, callBack) => {
         pool.query(
-            `WITH parsed_equipment AS (
-             SELECT 
-                   equip_no,equip_name,
-                   JSON_UNQUOTE(JSON_EXTRACT(procedure_names, CONCAT('$[', numbers.n, ']'))) AS pd_code_element
-             FROM 
-                   qi_equipment_mast
-             JOIN  (
-                   SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL
-                   SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
-                  ) numbers ON numbers.n < JSON_LENGTH(procedure_names)),
-                  extracted_data AS (
-             SELECT 
-                   equip_no,equip_name,
-                   JSON_UNQUOTE(JSON_EXTRACT(pd_code_element, '$.PD_CODE')) AS pd_code,
-                   JSON_UNQUOTE(JSON_EXTRACT(pd_code_element, '$.PDC_DESC')) AS PDC_DESC
-             FROM 
-                   parsed_equipment)
-             SELECT 
-                   ft.qi_slno,
-                   ft.equip_no,
-                   ed.equip_name,
-                   ft.procedure_name as PD_CODE,
-                   ed.PDC_DESC
-             FROM 
-                   qi_endoscopy_equipment_details ft
-             JOIN 
-                   extracted_data ed ON ft.equip_no = ed.equip_no AND ft.procedure_name = ed.pd_code
+            `SELECT 
+                   endo_equip_slno,qi_slno,qi_endoscopy_equipment_details.equip_no,
+                   qi_endoscopy_equipment_details.procedure_name as PD_CODE,qi_equipment_mast.equip_name,
+                   qi_equipment_mast.procedure_names
+             FROM   
+                   qi_endoscopy_equipment_details
+             left join qi_equipment_mast on qi_equipment_mast.equip_no=qi_endoscopy_equipment_details.equip_no
              WHERE
-                   ft.qi_slno=?`,
+                   qi_endoscopy_equipment_details.qi_slno=?`,
             [id],
             (err, results, fields) => {
                 if (err) {
@@ -596,35 +576,15 @@ module.exports = {
 
     IPequipmentDetailExist: (id, callBack) => {
         pool.query(
-            `WITH parsed_equipment AS (
-             SELECT 
-                   equip_no,equip_name,
-                   JSON_UNQUOTE(JSON_EXTRACT(procedure_names, CONCAT('$[', numbers.n, ']'))) AS pd_code_element
-             FROM 
-                   qi_equipment_mast
-             JOIN  (
-                   SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL
-                   SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
-                  ) numbers ON numbers.n < JSON_LENGTH(procedure_names)),
-                  extracted_data AS (
-             SELECT 
-                   equip_no,equip_name,
-                   JSON_UNQUOTE(JSON_EXTRACT(pd_code_element, '$.PD_CODE')) AS pd_code,
-                   JSON_UNQUOTE(JSON_EXTRACT(pd_code_element, '$.PDC_DESC')) AS PDC_DESC
-             FROM 
-                   parsed_equipment)
-             SELECT 
-                   ft.qi_slno,
-                   ft.equip_no,
-                   ed.equip_name,
-                   ft.procedure_name as PD_CODE,
-                   ed.PDC_DESC
-             FROM 
-                   qi_endoscopy_equipment_details ft
-             JOIN 
-                   extracted_data ed ON ft.equip_no = ed.equip_no AND ft.procedure_name = ed.pd_code
+            `SELECT 
+                   endo_equip_slno,qi_endo_ip_slno,qi_endoscopy_equipment_details.equip_no,
+                   qi_endoscopy_equipment_details.procedure_name as PD_CODE,qi_equipment_mast.equip_name,
+                   qi_equipment_mast.procedure_names
+             FROM   
+                   qi_endoscopy_equipment_details
+             left join qi_equipment_mast on qi_equipment_mast.equip_no=qi_endoscopy_equipment_details.equip_no
              WHERE
-                   ft.qi_endo_ip_slno=?`,
+                   qi_endoscopy_equipment_details.qi_endo_ip_slno=?`,
             [id],
             (err, results, fields) => {
                 if (err) {

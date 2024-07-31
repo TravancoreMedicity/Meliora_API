@@ -22,9 +22,7 @@ module.exports = {
         );
     },
         getPatientList: (data, callBack) => {
-        const fromDate = data.from;
-        const toDate = data.to;
-        pool.query(
+             pool.query(
             `SELECT 
                    qi_slno, patient_arrived_date, ptno, ptname, ptsex, ptage, ptaddrs1, ptaddrs2, ptaddrs3, ptaddrs4,
                    ptmobile, doctor_name, visit_token, qi_dept_no, qi_status,triage_time,assess_time,return_status,
@@ -32,8 +30,8 @@ module.exports = {
              FROM  
                    qi_details_emergency
              WHERE 
-                   patient_arrived_date between ('${fromDate}') and ('${toDate}') order by patient_arrived_date`,
-            {},
+                   patient_arrived_date between ? and ? order by patient_arrived_date`,
+                   [data.from, data.to],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -90,8 +88,10 @@ module.exports = {
              FROM  
                    qi_details_emergency
              WHERE 
-                   patient_arrived_date between ('${fromDate}') and ('${toDate}') and ptname like ? order by patient_arrived_date`,
+                   patient_arrived_date between ? and ? and ptname like ? order by patient_arrived_date`,
             [
+                data.from,
+                data.to,
                 '%' + data.ptname + '%'
             ],
             (error, results, feilds) => {

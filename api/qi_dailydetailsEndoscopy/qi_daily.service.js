@@ -1,4 +1,3 @@
-const { format } = require('date-fns');
 const { pool } = require('../../config/database')
 module.exports = {
     EndoscopyQiInsert: (data, callback) => {
@@ -22,8 +21,6 @@ module.exports = {
     },
 
     getPatientList: (data, callBack) => {
-        const fromDate = data.from;
-        const toDate = data.to;
         pool.query(
             `SELECT 
                    qi_slno,patient_arrived_date,ptno,ptname,ptsex,ptage,ptaddrs1,ptaddrs2,ptaddrs3,ptaddrs4,doctor_name,
@@ -41,8 +38,10 @@ module.exports = {
             FROM  
                    qi_details_endoscopy
             WHERE 
-                   patient_arrived_date between ('${fromDate}') and ('${toDate}') order by patient_arrived_date`,
-            {},
+                   patient_arrived_date between ? and ? order by patient_arrived_date`,
+            [
+                data.from, data.to
+            ],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -73,8 +72,6 @@ module.exports = {
         )
     },
     getEndoscopyMonthlyView: (data, callBack) => {
-        const fromDate = data.from;
-        const toDate = data.to;
         pool.query(
             `SELECT
                    qi_slno,patient_arrived_date,ptno,ptname,ptsex,ptage,ptaddrs1,ptaddrs2,ptaddrs3,ptaddrs4,
@@ -93,9 +90,11 @@ module.exports = {
                    qi_details_endoscopy 
 			 LEFT JOIN co_employee_master ON co_employee_master.em_id=qi_details_endoscopy.emp_id
              WHERE
-                  patient_arrived_date between ('${fromDate}') and ('${toDate}') and qi_status=1 and qi_save_status=1
+                  patient_arrived_date between ? and ? and qi_status=1 and qi_save_status=1
                   order by patient_arrived_date`,
-            {},
+            [
+                data.from, data.to
+            ],
             (err, results, fields) => {
                 if (err) {
                     return callBack(err)
@@ -241,8 +240,6 @@ module.exports = {
         );
     },
     searchPatients: (data, callBack) => {
-        const fromDate = data.from;
-        const toDate = data.to;
         pool.query(
             `SELECT 
                    qi_slno,patient_arrived_date,ptno,ptname,ptsex,ptage,ptaddrs1,ptaddrs2,ptaddrs3,ptaddrs4,doctor_name,
@@ -256,8 +253,10 @@ module.exports = {
             FROM  
                    qi_details_endoscopy
             WHERE 
-                   patient_arrived_date between ('${fromDate}') and ('${toDate}')and qi_status=0 and ptname like ? order by patient_arrived_date`,
+                   patient_arrived_date between ? and ? and qi_status=0 and ptname like ? order by patient_arrived_date`,
             [
+                data.from,
+                data.to,
                 '%' + data.ptname + '%'
             ],
             (error, results, feilds) => {
@@ -491,8 +490,6 @@ module.exports = {
         );
     },
     getInpatientEndoscopyMonthlyView: (data, callBack) => {
-        const fromDate = data.from;
-        const toDate = data.to;
         pool.query(
             `SELECT
                    qi_endo_ip_slno,ip_no,ipd_date,ptno,ptname,ptsex,ptage,ptaddrs1,ptaddrs2,ptaddrs3,ptaddrs4,
@@ -511,9 +508,9 @@ module.exports = {
                    qi_endoscopy_iplist 
 			 LEFT JOIN co_employee_master ON co_employee_master.em_id=qi_endoscopy_iplist.emp_id
              WHERE
-                  endo_arrival_time between ('${fromDate}') and ('${toDate}') and qi_save_status=1
+                  endo_arrival_time between ? and ? and qi_save_status=1
                   order by qi_endo_ip_slno`,
-            {},
+            [data.from, data.to],
             (err, results, fields) => {
                 if (err) {
                     return callBack(err)
@@ -541,35 +538,15 @@ module.exports = {
 
     OPequipmentDetailExist: (id, callBack) => {
         pool.query(
-            `WITH parsed_equipment AS (
-             SELECT 
-                   equip_no,equip_name,
-                   JSON_UNQUOTE(JSON_EXTRACT(procedure_names, CONCAT('$[', numbers.n, ']'))) AS pd_code_element
-             FROM 
-                   qi_equipment_mast
-             JOIN  (
-                   SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL
-                   SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
-                  ) numbers ON numbers.n < JSON_LENGTH(procedure_names)),
-                  extracted_data AS (
-             SELECT 
-                   equip_no,equip_name,
-                   JSON_UNQUOTE(JSON_EXTRACT(pd_code_element, '$.PD_CODE')) AS pd_code,
-                   JSON_UNQUOTE(JSON_EXTRACT(pd_code_element, '$.PDC_DESC')) AS PDC_DESC
-             FROM 
-                   parsed_equipment)
-             SELECT 
-                   ft.qi_slno,
-                   ft.equip_no,
-                   ed.equip_name,
-                   ft.procedure_name as PD_CODE,
-                   ed.PDC_DESC
-             FROM 
-                   qi_endoscopy_equipment_details ft
-             JOIN 
-                   extracted_data ed ON ft.equip_no = ed.equip_no AND ft.procedure_name = ed.pd_code
+            `SELECT 
+                   endo_equip_slno,qi_slno,qi_endoscopy_equipment_details.equip_no,
+                   qi_endoscopy_equipment_details.procedure_name as PD_CODE,qi_equipment_mast.equip_name,
+                   qi_equipment_mast.procedure_names
+             FROM   
+                   qi_endoscopy_equipment_details
+             left join qi_equipment_mast on qi_equipment_mast.equip_no=qi_endoscopy_equipment_details.equip_no
              WHERE
-                   ft.qi_slno=?`,
+                   qi_endoscopy_equipment_details.qi_slno=?`,
             [id],
             (err, results, fields) => {
                 if (err) {
@@ -596,35 +573,15 @@ module.exports = {
 
     IPequipmentDetailExist: (id, callBack) => {
         pool.query(
-            `WITH parsed_equipment AS (
-             SELECT 
-                   equip_no,equip_name,
-                   JSON_UNQUOTE(JSON_EXTRACT(procedure_names, CONCAT('$[', numbers.n, ']'))) AS pd_code_element
-             FROM 
-                   qi_equipment_mast
-             JOIN  (
-                   SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL
-                   SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
-                  ) numbers ON numbers.n < JSON_LENGTH(procedure_names)),
-                  extracted_data AS (
-             SELECT 
-                   equip_no,equip_name,
-                   JSON_UNQUOTE(JSON_EXTRACT(pd_code_element, '$.PD_CODE')) AS pd_code,
-                   JSON_UNQUOTE(JSON_EXTRACT(pd_code_element, '$.PDC_DESC')) AS PDC_DESC
-             FROM 
-                   parsed_equipment)
-             SELECT 
-                   ft.qi_slno,
-                   ft.equip_no,
-                   ed.equip_name,
-                   ft.procedure_name as PD_CODE,
-                   ed.PDC_DESC
-             FROM 
-                   qi_endoscopy_equipment_details ft
-             JOIN 
-                   extracted_data ed ON ft.equip_no = ed.equip_no AND ft.procedure_name = ed.pd_code
+            `SELECT 
+                   endo_equip_slno,qi_endo_ip_slno,qi_endoscopy_equipment_details.equip_no,
+                   qi_endoscopy_equipment_details.procedure_name as PD_CODE,qi_equipment_mast.equip_name,
+                   qi_equipment_mast.procedure_names
+             FROM   
+                   qi_endoscopy_equipment_details
+             left join qi_equipment_mast on qi_equipment_mast.equip_no=qi_endoscopy_equipment_details.equip_no
              WHERE
-                   ft.qi_endo_ip_slno=?`,
+                   qi_endoscopy_equipment_details.qi_endo_ip_slno=?`,
             [id],
             (err, results, fields) => {
                 if (err) {
@@ -649,16 +606,14 @@ module.exports = {
         );
     },
     getTotalTestPerformed: (data, callBack) => {
-        const fromDate = data.from;
-        const toDate = data.to;
         pool.query(
             `SELECT 
                     procedure_name,endo_date
              FROM
                    qi_endoscopy_equipment_details
              WHERE
-                    endo_date between ('${fromDate}') and ('${toDate}')       `,
-            {},
+                    endo_date between ? and ?`,
+            [data.from, data.to],
             (err, results, fields) => {
                 if (err) {
                     return callBack(err)

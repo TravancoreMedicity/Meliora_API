@@ -204,6 +204,8 @@ const qiInpatients = require('./api/qi_detailsIP/qi_ip.router')
 const CrfReports = require('./api/crm_reports/crm_reports.router')
 const SpareCondemService = require('./api/am_spare_condemnation/am_spare_condemnation.router')
 const opAseessment = require('./api/qi_initial_assessment_details/assessment.router')
+const feedbackdata = require('./api/feedback_module/feedback.router')
+const qideptAccess = require('./api/qi_dept_access_mast/dept_access_router')
 
 
 app.use(express.json({ limit: '50mb' }));
@@ -376,6 +378,8 @@ app.use('/api/qiInpatients', qiInpatients)
 app.use('/api/CrfReports', CrfReports)
 app.use('/api/SpareCondemService', SpareCondemService)
 app.use('/api/InitialAsessment', opAseessment)
+app.use('/api/feedback', feedbackdata)
+app.use('/api/qideptAccess', qideptAccess)
 
 
 server.listen(process.env.APP_PORT, () =>

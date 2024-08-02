@@ -222,20 +222,23 @@ module.exports = {
             }
         )
     },
-
     InsertMultiplePO: (data, callback) => {
         pool.query(
             `INSERT INTO crm_purchase_po_details (
-                req_slno,
-                po_number,
-                po_date,
-                po_status,supply_store,
-                expected_delivery,
-                create_user
-               )
-               values ?`,
+                req_slno,  po_number,po_date,po_status,supply_store, expected_delivery, create_user,
+                supplier_name, po_delivery, po_amount)
+               values (?,?,?,?,?,?,?,?,?,?)`,
             [
-                data
+                data.req_slno,
+                data.po_number,
+                data.po_date,
+                data.po_status,
+                data.supply_store,
+                data.expected_delivery,
+                data.create_user,
+                data.supplier_name,
+                data.po_delivery,
+                data.po_amount
             ],
             (error, results, fields) => {
 
@@ -249,11 +252,15 @@ module.exports = {
 
     getPOList: (id, callBack) => {
         pool.query(
-            ` select po_detail_slno, req_slno, po_number,po_date,expected_delivery,supply_store,
-            sub_store_name, main_store_slno, main_store, store_code,store_recieve,store_recieve_fully
-          from crm_purchase_po_details
-          left join crm_store_master on crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store
-                        where req_slno=? and po_status=1`,
+            ` SELECT
+                    po_detail_slno, req_slno, po_number,po_date,expected_delivery,supply_store,sub_store_name,
+                    main_store_slno, main_store, store_code,store_recieve,store_recieve_fully,supplier_name,
+                    po_delivery, po_amount
+              FROM
+                    crm_purchase_po_details
+              LEFT JOIN  crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store
+              WHERE
+                    req_slno=? and po_status=1`,
             [
                 id
             ],
@@ -266,19 +273,17 @@ module.exports = {
         );
     },
 
-    updatePOAdd: (data, callback) => {
+    updatePOAdd: (data, callBack) => {
         pool.query(
-            `UPDATE crm_purchase_mast 
-            SET po_prepartion=1            
-            WHERE req_slno=?`,
+            `UPDATE crm_purchase_mast SET po_prepartion=1 WHERE req_slno=?`,
             [
                 data.req_slno
             ],
             (error, results, fields) => {
                 if (error) {
-                    return callback(error);
+                    return callBack(error);
                 }
-                return callback(null, results);
+                return callBack(null, results);
             }
         );
     },
@@ -413,7 +418,7 @@ module.exports = {
     },
     getMainStore: (id, callBack) => {
         pool.query(
-            `  select main_store
+            `  select main_store,crs_store_code
             from crm_store_master 
                         where crm_store_master_slno=? `,
             [
@@ -528,15 +533,15 @@ module.exports = {
                 left join crm_purchase_mast on  crm_purchase_mast.req_slno = crm_data_collection.crf_requst_slno
                 left join crm_request_master on crm_request_master.req_slno=crm_purchase_mast.req_slno
                 left join crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
-                                                   left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
-                          left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
-                          left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
-                          left join co_employee_master CR on CR.em_id=crm_request_master.create_user           
-                          left join co_employee_master C on C.em_id=crm_request_approval.crf_close_user           
-                          left join co_employee_master ED on ED.em_id=crm_request_approval.ed_user
-                          left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
-                          left join co_employee_master PA on PA.em_id=crm_purchase_mast.create_user
-                          left join co_employee_master QC on QC.em_id=crm_purchase_mast.quatation_calling_user
+                left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
+                 left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
+                 left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
+                left join co_employee_master CR on CR.em_id=crm_request_master.create_user           
+                left join co_employee_master C on C.em_id=crm_request_approval.crf_close_user           
+               left join co_employee_master ED on ED.em_id=crm_request_approval.ed_user
+                left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
+                left join co_employee_master PA on PA.em_id=crm_purchase_mast.create_user
+                left join co_employee_master QC on QC.em_id=crm_purchase_mast.quatation_calling_user
                         left join co_employee_master QN on QN.em_id=crm_purchase_mast.quatation_negotiation_user
                         left join co_employee_master QF on QF.em_id=crm_purchase_mast.quatation_fixing_user
                         left join co_employee_master RU on RU.em_id=crm_data_collection.req_user           
@@ -553,6 +558,85 @@ module.exports = {
                 return callBack(null, results);
             }
         )
+    },
+
+    getCRSStores: (callBack) => {
+        pool.query(
+            `select 
+                   main_store_slno,crs_store_code,main_store
+             from 
+                  crm_store_master
+             group by crs_store_code`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+    },
+    CheckPOExist: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                    po_detail_slno
+             FROM
+                   crm_purchase_po_details
+             WHERE
+                    po_number=? and supply_store=?`,
+            [
+                data.po_number,
+                data.supply_store
+            ],
+            (err, results, fields) => {
+                if (err) {
+                    return callBack(err)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+
+    InsertPOItems: (data, callback) => {
+        pool.query(
+            `INSERT INTO
+                  crm_purchase_item_details
+                (
+                  po_detail_slno,item_code,item_name,item_qty,item_rate,item_mrp,tax,tax_amount,create_user
+                )
+            VALUES ?`,
+            [
+                data
+            ],
+            (error, results, fields) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getOPItemDetails: (id, callBack) => {
+        pool.query(
+            ` SELECT
+                   po_itm_slno, po_detail_slno, item_code, item_name, item_qty, item_rate,
+                   item_mrp, tax, tax_amount
+              FROM
+                    crm_purchase_item_details
+              WHERE
+                    po_detail_slno=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
     },
 
 }

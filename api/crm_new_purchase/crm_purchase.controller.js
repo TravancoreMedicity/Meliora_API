@@ -1,8 +1,8 @@
 const { getPurchaseAckPending, getAllApprovedForPurchase, InsertPurchaseAck, QuatationCalling,
-    QuatationNegotiation, QuatationFixing, InsertinglePO, updatePOAdd,
-    InsertMultiplePO, getPOList, PoComplete, PoFinals, getAllApprovedForStore,
-    storedataUpdate, getSubstores, getMainStore, storeReciverdataUpdate,
-    getPOListSubStorewise, SubstoreReciverdataUpdate, PurchsDataCollectionPending
+    QuatationNegotiation, QuatationFixing, InsertinglePO, updatePOAdd, InsertMultiplePO, getPOList,
+    PoComplete, PoFinals, getAllApprovedForStore, storedataUpdate, getSubstores, getMainStore, storeReciverdataUpdate,
+    getPOListSubStorewise, SubstoreReciverdataUpdate, PurchsDataCollectionPending, getCRSStores,
+    InsertPOItems, CheckPOExist, getOPItemDetails
 } = require('../crm_new_purchase/crm_purchase.service');
 
 const logger = require('../../logger/logger');
@@ -95,7 +95,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Quatation Calling updated successfully"
+                message: "Quotation Calling updated successfully"
             });
         });
     },
@@ -120,7 +120,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Quatation Negotation updated successfully"
+                message: "Quotation Negotiation updated successfully"
             });
         });
     },
@@ -144,7 +144,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Quatation Fixing Updated successfully"
+                message: "Quotation Fixing Updated successfully"
             });
         });
     },
@@ -183,52 +183,56 @@ module.exports = {
 
     InsertMultiplePO: (req, res) => {
         const body = req.body;
-        var a1 = body.map((value, index) => {
-            return [value.req_slno, value.po_number, value.po_date, value.po_status,
-            value.supply_store, value.expected_delivery, value.create_user
+        const no = body.find((value) => value.req_slno);
 
-            ]
-        })
-        var no = body.find((val) => {
-            return val.req_slno
-        })
-
-        InsertMultiplePO(a1, (err, results) => {
-
+        updatePOAdd(no, async (err, result) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
                 });
             }
-            else {
+            if (result) {
+                try {
+                    const promises = body.map((val) => {
+                        return new Promise((resolve, reject) => {
+                            InsertMultiplePO(val, (err, results) => {
+                                if (err) {
+                                    reject(err);
+                                } else {
+                                    const insert_id = results.insertId;
+                                    const create_user = val.create_user;
+                                    const items = val.items;
+                                    const itemData = items.map((value) => [
+                                        insert_id, value.item_code, value.item_name, value.item_qty,
+                                        value.item_rate, value.item_mrp, value.tax, value.tax_amount, create_user
+                                    ]);
 
-                const insertdata = {
-                    req_slno: no.req_slno
-                }
-                updatePOAdd(insertdata, (err, result) => {
-                    if (err) {
-                        // logger.logwindow(err)
-                        return res.status(200).json({
-                            success: 0,
-                            message: err
+                                    InsertPOItems(itemData, (err, result) => {
+                                        if (err) {
+                                            reject(err);
+                                        } else {
+                                            resolve();
+                                        }
+                                    });
+                                }
+                            });
                         });
-                    }
-                    if (!results) {
-                        return res.status(400).json({
-                            success: 2,
-                            message: "Record Not Found"
-                        })
-                    }
-                });
+                    });
 
-                return res.status(200).json({
-                    success: 1,
-                    message: "Multiple PO inserted Successfully",
-                });
+                    await Promise.all(promises);
+                    return res.status(200).json({
+                        success: 1,
+                        message: "PO inserted successfully"
+                    });
 
+                } catch (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
             }
-
         });
     },
 
@@ -276,7 +280,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "PO Enetering Complete updated successfully"
+                message: "PO Process Updated"
             });
         });
     },
@@ -496,5 +500,73 @@ module.exports = {
         });
     },
 
+    getCRSStores: (req, res) => {
+        getCRSStores((err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
+    CheckPOExist: (req, res) => {
+        const body = req.body;
+        CheckPOExist(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+                message: "Exist"
+            })
+        })
+    },
+    getOPItemDetails: (req, res) => {
+        const id = req.params.id;
+        getOPItemDetails(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            })
+        })
+    },
 }
 

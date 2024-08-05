@@ -403,13 +403,14 @@ module.exports = {
     getTaskunderProject: (id, callback) => {
         pool.query(
             `select 
-             tm_task_slno,
+             tm_new_task_mast.tm_task_slno,
              tm_task_name,
              tm_project_slno,
              tm_task_status
             from
-            tm_new_task_mast
-            where tm_project_slno=?`,
+            tm_new_task_mast           
+            left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
+            where tm_project_slno=? and tm_detail_status=1`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -461,30 +462,7 @@ module.exports = {
 
         );
     },
-    // AskQuery: (data, callback) => {
 
-    //     pool.query(
-    //         `UPDATE tm_new_task_mast_detl SET                 
-    //         tm_detail_status=?,
-    //         tm_query_remark=?,
-    //         tm_query_remark_date=?               
-    //        			WHERE 
-    //          tm_create_detl_slno=?`,
-    //         [
-    //             data.tm_detail_status,
-    //             data.tm_query_remark,
-    //             data.tm_query_remark_date,
-    //             data.tm_create_detl_slno
-
-    //         ],
-    //         (error, results, feilds) => {
-    //             if (error) {
-    //                 return callback(error);
-    //             }
-    //             return callback(null, results);
-    //         }
-    //     )
-    // },
     AskQuery: (data, callback) => {
         pool.query(
             `INSERT INTO tm_query_details
@@ -588,24 +566,7 @@ module.exports = {
             }
         );
     },
-    // TruncatePercentage: (body) => {
-    //     return Promise.all(body.map((data) => {
-    //         return new Promise((resolve, reject) => {
-    //             pool.query(
-    //                 `truncate co_setting_master`
-    //                 ,
 
-    //                 (error, results, fields) => {
-    //                     if (error) {
-    //                         return reject(error)
-    //                     }
-    //                     return resolve(results)
-    //                 }
-    //             )
-    //         })
-    //     })
-    //     )
-    // },
     TruncatePercentage: () => {
         return new Promise((resolve, reject) => {
             pool.query(

@@ -1,4 +1,6 @@
-const { getProjectList, getGoalsList, getMultDepSection, getMultHodInCharge, getNonGoalprojects, getProjectListWithGoal } = require('../tm_dropdowns/tm_list.service');
+const { getProjectList, getGoalsList, getMultDepSection, getMultHodInCharge, getNonGoalprojects, getProjectListWithGoal,
+    getprojectFrTaskCreation
+} = require('../tm_dropdowns/tm_list.service');
 const logger = require('../../logger/logger')
 
 module.exports = {
@@ -13,7 +15,7 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 return res.status(200).json({
                     success: 1,
                     message: "No Data"
@@ -114,6 +116,28 @@ module.exports = {
     },
     getProjectList: (req, res) => {
         getProjectList((err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getprojectFrTaskCreation: (req, res) => {
+        getprojectFrTaskCreation((err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({

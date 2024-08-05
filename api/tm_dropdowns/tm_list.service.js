@@ -8,7 +8,7 @@ module.exports = {
             tm_project_name,
             tm_project_duedate
             FROM tm_project_mast 
-            WHERE tm_goal_slno = ?
+            WHERE tm_goal_slno = ? and tm_project_status!=1
             order by tm_project_name ASC`,
             [id],
             (error, results, fields) => {
@@ -27,7 +27,9 @@ module.exports = {
             tm_goals_slno,
             tm_goal_name,
             tm_goal_duedate
-            FROM tm_goal_mast  order by tm_goal_name ASC`,
+            FROM tm_goal_mast
+            where tm_goal_status!=1
+            order by tm_goal_name ASC`,
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -98,7 +100,7 @@ module.exports = {
             tm_project_name,
             tm_project_duedate
             FROM tm_project_mast 
-            WHERE tm_goal_slno is NULL
+            WHERE tm_goal_slno is NULL and tm_project_status!=1
             order by tm_project_name ASC`,
             (error, results, feilds) => {
                 if (error) {
@@ -115,7 +117,25 @@ module.exports = {
             tm_project_slno,
             tm_project_name,
             tm_project_duedate
-            FROM tm_project_mast           
+            FROM tm_project_mast                  
+            order by tm_project_name ASC`,
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getprojectFrTaskCreation: (callBack) => {
+        pool.query(
+            `SELECT 
+            tm_project_slno,
+            tm_project_name,
+            tm_project_status,
+            tm_project_duedate
+            FROM tm_project_mast
+            where tm_project_status!=1                 
             order by tm_project_name ASC`,
             (error, results, feilds) => {
                 if (error) {

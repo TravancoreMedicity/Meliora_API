@@ -4,7 +4,7 @@ const { getPurchaseAckPending, InsertPurchaseAck, getAllApprovedForPurchase, Qua
     QuatationFixing, InsertMultiplePO, getPOList, PoComplete,
     PoFinals, getAllApprovedForStore, storedataUpdate, getSubstores, getMainStore,
     storeReciverdataUpdate, getPOListSubStorewise, SubstoreReciverdataUpdate,
-    PurchsDataCollectionPending, getCRSStores, CheckPOExist, getOPItemDetails
+    PurchsDataCollectionPending, getCRSStores, getOPItemDetails, getPendingPo
 
 } = require('../crm_new_purchase/crm_purchase.controller')
 
@@ -31,9 +31,10 @@ router.get("/PurchsDataCollectionPending", checkToken, PurchsDataCollectionPendi
 router.get("/crsStores", checkToken, getCRSStores);
 
 // router.post("/InsertPOItems", checkToken, InsertPOItems);
-router.post("/poExist", checkToken, CheckPOExist);
+// router.post("/poExist", checkToken, CheckPOExist);
 // router.patch("/postart", checkToken, updatePOAdd);
 router.get("/getitem/:id", checkToken, getOPItemDetails);
+router.get("/getPO", checkToken, getPendingPo);
 
 
 module.exports = router;

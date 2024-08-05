@@ -2,7 +2,7 @@ const { getPurchaseAckPending, getAllApprovedForPurchase, InsertPurchaseAck, Qua
     QuatationNegotiation, QuatationFixing, InsertinglePO, updatePOAdd, InsertMultiplePO, getPOList,
     PoComplete, PoFinals, getAllApprovedForStore, storedataUpdate, getSubstores, getMainStore, storeReciverdataUpdate,
     getPOListSubStorewise, SubstoreReciverdataUpdate, PurchsDataCollectionPending, getCRSStores,
-    InsertPOItems, CheckPOExist, getOPItemDetails
+    InsertPOItems, getOPItemDetails, getPendingPo
 } = require('../crm_new_purchase/crm_purchase.service');
 
 const logger = require('../../logger/logger');
@@ -523,29 +523,29 @@ module.exports = {
         });
     },
 
-    CheckPOExist: (req, res) => {
-        const body = req.body;
-        CheckPOExist(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (results.length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No record found"
+    // CheckPOExist: (req, res) => {
+    //     const body = req.body;
+    //     CheckPOExist(body, (err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (results.length === 0) {
+    //             return res.status(200).json({
+    //                 success: 2,
+    //                 message: "No record found"
 
-                })
-            }
-            return res.status(200).json({
-                success: 1,
-                data: results,
-                message: "Exist"
-            })
-        })
-    },
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: results,
+    //             message: "Exist"
+    //         })
+    //     })
+    // },
     getOPItemDetails: (req, res) => {
         const id = req.params.id;
         getOPItemDetails(id, (err, results) => {
@@ -560,6 +560,28 @@ module.exports = {
                     success: 2,
                     message: "No Data Found",
                     data: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            })
+        })
+    },
+
+    getPendingPo: (req, res) => {
+        getPendingPo((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No record found"
+
                 })
             }
             return res.status(200).json({

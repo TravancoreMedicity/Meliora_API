@@ -576,26 +576,26 @@ module.exports = {
             }
         )
     },
-    CheckPOExist: (data, callBack) => {
-        pool.query(
-            `SELECT 
-                    po_detail_slno
-             FROM
-                   crm_purchase_po_details
-             WHERE
-                    po_number=? and supply_store=?`,
-            [
-                data.po_number,
-                data.supply_store
-            ],
-            (err, results, fields) => {
-                if (err) {
-                    return callBack(err)
-                }
-                return callBack(null, results)
-            }
-        )
-    },
+    // CheckPOExist: (data, callBack) => {
+    //     pool.query(
+    //         `SELECT 
+    //                 po_detail_slno
+    //          FROM
+    //                crm_purchase_po_details
+    //          WHERE
+    //                 po_number=? and supply_store=?`,
+    //         [
+    //             data.po_number,
+    //             data.supply_store
+    //         ],
+    //         (err, results, fields) => {
+    //             if (err) {
+    //                 return callBack(err)
+    //             }
+    //             return callBack(null, results)
+    //         }
+    //     )
+    // },
 
     InsertPOItems: (data, callback) => {
         pool.query(
@@ -637,6 +637,23 @@ module.exports = {
                 return callBack(null, results);
             }
         );
+    },
+
+    getPendingPo: (callBack) => {
+        pool.query(
+            `SELECT  
+                  crm_purchase_po_details.po_number from crm_purchase_po_details
+                LEFT JOIN crm_purchase_mast ON crm_purchase_mast.req_slno=crm_purchase_po_details.req_slno
+             WHERE 
+                 crm_purchase_mast.po_complete=1 and crm_purchase_mast.po_to_supplier=0`,
+            [],
+            (err, results, fields) => {
+                if (err) {
+                    return callBack(err)
+                }
+                return callBack(null, results)
+            }
+        )
     },
 
 }

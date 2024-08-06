@@ -247,11 +247,9 @@ module.exports = {
     complaintRegistInsert: (req, res) => {
 
         // console.log(req.io)
-        // const body = req.body;
+        const body = req.body;
         //validate complaintdept Insert function
         const body_result = validateComplaintRegist.validate(body);
-
-        // console.log("body_result", body_result);
 
         if (body_result.error) {
             return res.status(200).json({

@@ -660,7 +660,46 @@ module.exports = {
 
     getALLAssignedComList: (id, callBack) => {
         pool.query(
-            `select complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
+            //     `select complaint_slno,complaint_desc,complaint_dept_name,req_type_name,
+            //     complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
+            //     S.sec_name as sec_name, priority_reason,complaint_hicslno,
+            //     IFNULL( L.sec_name,"Nil" ) location,C.em_name as comp_reg_emp,
+            //     cm_complaint_mast.create_user,C.em_department,
+            //     co_department_mast.dept_name as empdept,compalint_priority,
+            //     (case when compalint_priority='1' then "Level 1" when compalint_priority='2' then "Level 2"
+            //     when compalint_priority='3' then "Level 3" when compalint_priority='4' then "Level 4"
+            //      else  "Not Updated" end ) as priority, verify_spervsr,
+            //     date(compalint_date) as date,TIME_FORMAT(compalint_date,"%r") AS Time,
+            //     if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
+            //     (case when verify_remarks is null then "Not Updated" else verify_remarks end ) as verify_remarks1,
+            //     (case when cm_rectify_status='Z' then "Not Verified" when cm_rectify_status="R" then "Verified" end) as cm_rectify_status1,
+            //     compdept_message,compdept_message_flag,message_reply_emp,
+            //     M.em_name as msg_send_emp,R.em_name as msg_read_emp
+            //      from cm_complaint_mast
+            //               left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
+            //               left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
+            //               left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
+            //               left join cm_hic_policy on cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno
+            //               left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
+            //               left join co_employee_master C on C.em_id=cm_complaint_mast.create_user
+            //               left join co_employee_master M on M.em_id=cm_complaint_mast.message_send_emp
+            //               left join co_employee_master R on R.em_id=cm_complaint_mast.message_read_emp
+            //                  left join co_department_mast on co_department_mast.dept_id=C.em_department
+            //                left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+            //  left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
+            //    where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
+            //    where department_slno=?) AND compalint_status=1 ORDER BY complaint_slno DESC`,
+            `select 
+complaint_slno,
+complaint_desc,complaint_dept_name,req_type_name,
+                 cm_complaint_mast.rm_room_slno,
+				rm_room_name,
+				rm_newroom_creation.rm_roomtype_slno,
+				rm_room_floor_slno,
+				rm_insidebuilldblock_slno,
+				rm_insidebuildblock_name,
+				rm_floor_name,
+				rm_roomtype_name,
             complaint_type_name,compalint_date,cm_rectify_status,cm_not_verify_time,verify_remarks,
             S.sec_name as sec_name, priority_reason,complaint_hicslno,
             IFNULL( L.sec_name,"Nil" ) location,C.em_name as comp_reg_emp,
@@ -687,6 +726,10 @@ module.exports = {
                          left join co_department_mast on co_department_mast.dept_id=C.em_department
                        left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
          left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
+         left join rm_newroom_creation on rm_newroom_creation.rm_room_slno = cm_complaint_mast.rm_room_slno
+				LEFT JOIN rm_room_type_master ON rm_room_type_master.rm_roomtype_slno =rm_newroom_creation.rm_roomtype_slno
+				LEFT JOIN rm_floor_creation ON rm_floor_creation.rm_floor_slno =rm_newroom_creation.rm_room_floor_slno
+				LEFT JOIN rm_insidebuildblock_mast ON rm_insidebuildblock_mast.rm_insidebuildblock_slno =rm_newroom_creation.rm_insidebuilldblock_slno
            where complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept
            where department_slno=?) AND compalint_status=1 ORDER BY complaint_slno DESC`,
             [

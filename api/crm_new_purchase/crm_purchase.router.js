@@ -1,10 +1,9 @@
 const router = require('express').Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { getPurchaseAckPending, InsertPurchaseAck, getAllApprovedForPurchase, QuatationCalling, QuatationNegotiation,
-    QuatationFixing, InsertMultiplePO, getPOList, PoComplete,
-    PoFinals, getAllApprovedForStore, storedataUpdate, getSubstores, getMainStore,
-    storeReciverdataUpdate, getPOListSubStorewise, SubstoreReciverdataUpdate,
-    PurchsDataCollectionPending, getCRSStores, getOPItemDetails, getPendingPo
+    QuatationFixing, InsertMultiplePO, getPOList, PoComplete, PoFinals, getAllApprovedForStore, storedataUpdate,
+    getSubstores, getMainStore, storeReciverdataUpdate, getPOListSubStorewise, SubstoreReciverdataUpdate,
+    PurchsDataCollectionPending, getCRSStores, getOPItemDetails, getPendingPOItemDetails, getPendingPo, updatePoApprovals
 
 } = require('../crm_new_purchase/crm_purchase.controller')
 
@@ -35,6 +34,8 @@ router.get("/crsStores", checkToken, getCRSStores);
 // router.patch("/postart", checkToken, updatePOAdd);
 router.get("/getitem/:id", checkToken, getOPItemDetails);
 router.get("/getPO", checkToken, getPendingPo);
+router.get("/POPending", checkToken, getPendingPOItemDetails);
+router.post('/updateApprovalLevel', updatePoApprovals);
 
 
 module.exports = router;

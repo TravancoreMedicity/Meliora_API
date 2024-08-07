@@ -2,7 +2,7 @@ const { getPurchaseAckPending, getAllApprovedForPurchase, InsertPurchaseAck, Qua
     QuatationNegotiation, QuatationFixing, InsertinglePO, updatePOAdd, InsertMultiplePO, getPOList,
     PoComplete, PoFinals, getAllApprovedForStore, storedataUpdate, getSubstores, getMainStore, storeReciverdataUpdate,
     getPOListSubStorewise, SubstoreReciverdataUpdate, PurchsDataCollectionPending, getCRSStores,
-    InsertPOItems, getOPItemDetails, getPendingPo
+    InsertPOItems, getOPItemDetails, getPendingPOItemDetails, getPendingPo, updatePoApprovals
 } = require('../crm_new_purchase/crm_purchase.service');
 
 const logger = require('../../logger/logger');
@@ -205,7 +205,8 @@ module.exports = {
                                     const items = val.items;
                                     const itemData = items.map((value) => [
                                         insert_id, value.item_code, value.item_name, value.item_qty,
-                                        value.item_rate, value.item_mrp, value.tax, value.tax_amount, create_user
+                                        value.item_rate, value.item_mrp, value.tax, value.tax_amount,
+                                        create_user, value.net_amount
                                     ]);
 
                                     InsertPOItems(itemData, (err, result) => {
@@ -305,7 +306,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "PO Enetering Complete updated successfully"
+                message: "PO Moved to Supplier"
             });
         });
     },
@@ -590,5 +591,43 @@ module.exports = {
             })
         })
     },
+
+    getPendingPOItemDetails: (req, res) => {
+        getPendingPOItemDetails((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+
+    updatePoApprovals: async (req, res) => {
+        const body = req.body;
+        updatePoApprovals(body).then(results => {
+            return res.status(200).json({
+                success: 1,
+                message: "Updated"
+            });
+        }).catch(err => {
+            return res.status(200).json({
+                success: 0,
+                message: "Error Occured"
+            });
+        })
+    },
+
+
 }
 

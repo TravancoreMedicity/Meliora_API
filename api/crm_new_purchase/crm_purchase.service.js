@@ -226,8 +226,8 @@ module.exports = {
         pool.query(
             `INSERT INTO crm_purchase_po_details (
                 req_slno,  po_number,po_date,po_status,supply_store, expected_delivery, create_user,
-                supplier_name, po_delivery, po_amount)
-               values (?,?,?,?,?,?,?,?,?,?)`,
+                supplier_name, po_delivery, po_amount,po_to_supplier,approval_level,po_type,po_expiry)
+               values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.req_slno,
                 data.po_number,
@@ -238,7 +238,11 @@ module.exports = {
                 data.create_user,
                 data.supplier_name,
                 data.po_delivery,
-                data.po_amount
+                data.po_amount,
+                data.po_to_supplier,
+                data.approval_level,
+                data.po_type,
+                data.po_expiry
             ],
             (error, results, fields) => {
 
@@ -255,12 +259,12 @@ module.exports = {
             ` SELECT
                     po_detail_slno, req_slno, po_number,po_date,expected_delivery,supply_store,sub_store_name,
                     main_store_slno, main_store, store_code,store_recieve,store_recieve_fully,supplier_name,
-                    po_delivery, po_amount
+                    po_delivery, po_amount,po_to_supplier,approval_level
               FROM
                     crm_purchase_po_details
               LEFT JOIN  crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store
               WHERE
-                    req_slno=? and po_status=1`,
+                    req_slno=? and po_status=1 and po_to_supplier=0`,
             [
                 id
             ],
@@ -313,17 +317,18 @@ module.exports = {
 
     PoFinals: (data, callback) => {
         pool.query(
-            `UPDATE crm_purchase_mast 
-            SET         
-            po_approva_level_one = ?,
-            po_approva_level_two = ?,
-            po_to_supplier = ?                
-            WHERE crm_purchase_slno =?`,
+            `UPDATE
+                    crm_purchase_po_details
+               SET         
+                   po_to_supplier = 1,
+                   edit_user = ?
+             WHERE
+                 req_slno = ? and po_number=?`,
             [
-                data.po_approva_level_one,
-                data.po_approva_level_two,
-                data.po_to_supplier,
-                data.crm_purchase_slno
+                data.edit_user,
+                data.req_slno,
+                data.po_number
+
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -602,7 +607,7 @@ module.exports = {
             `INSERT INTO
                   crm_purchase_item_details
                 (
-                  po_detail_slno,item_code,item_name,item_qty,item_rate,item_mrp,tax,tax_amount,create_user
+                  po_detail_slno,item_code,item_name,item_qty,item_rate,item_mrp,tax,tax_amount,create_user,net_amount
                 )
             VALUES ?`,
             [
@@ -622,7 +627,7 @@ module.exports = {
         pool.query(
             ` SELECT
                    po_itm_slno, po_detail_slno, item_code, item_name, item_qty, item_rate,
-                   item_mrp, tax, tax_amount
+                   item_mrp, tax, tax_amount,net_amount
               FROM
                     crm_purchase_item_details
               WHERE
@@ -641,11 +646,12 @@ module.exports = {
 
     getPendingPo: (callBack) => {
         pool.query(
-            `SELECT  
-                  crm_purchase_po_details.po_number from crm_purchase_po_details
+            ` SELECT  
+                    crm_purchase_po_details.po_number,crm_store_master.crs_store_code from crm_purchase_po_details
                 LEFT JOIN crm_purchase_mast ON crm_purchase_mast.req_slno=crm_purchase_po_details.req_slno
+                LEFT JOIN  crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store  
              WHERE 
-                 crm_purchase_mast.po_complete=1 and crm_purchase_mast.po_to_supplier=0`,
+                 crm_purchase_mast.po_complete=1 and crm_purchase_po_details.po_to_supplier=0`,
             [],
             (err, results, fields) => {
                 if (err) {
@@ -656,4 +662,58 @@ module.exports = {
         )
     },
 
+    getPendingPOItemDetails: (callBack) => {
+        pool.query(
+            ` SELECT 
+                   crm_purchase_po_details.po_detail_slno, crm_purchase_po_details.req_slno, po_number,po_date, supply_store,
+                   expected_delivery,main_store,supplier_name,po_delivery, po_amount, approval_level, po_type, po_expiry,
+                   item_code, item_name, item_qty, item_rate, item_mrp, tax, tax_amount, net_amount
+              FROM 
+                   crm_purchase_po_details
+              LEFT JOIN  crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store   
+              LEFT JOIN crm_purchase_item_details ON crm_purchase_item_details.po_detail_slno=crm_purchase_po_details.po_detail_slno
+              LEFT JOIN crm_purchase_mast On crm_purchase_mast.req_slno=crm_purchase_po_details.req_slno
+              WHERE  
+                   crm_purchase_po_details.po_to_supplier=0 AND crm_purchase_mast.po_complete=1`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    updatePoApprovals: (body) => {
+        return Promise.all(body.map((val) => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    `UPDATE
+                         crm_purchase_po_details
+                     SET
+                         approval_level = ?, po_expiry = ?,expected_delivery = ?
+                    where
+                         po_number = ? and supply_store = ?`,
+                    [
+                        val.approval_level,
+                        val.po_expiry,
+                        val.expected_delivery,
+                        val.po_number,
+                        val.supply_store
+
+                    ],
+                    (error, results, fields) => {
+                        if (error) {
+                            return reject(error)
+                        }
+                        return resolve(results)
+                    }
+                )
+
+
+            })
+        })
+        )
+    },
 }

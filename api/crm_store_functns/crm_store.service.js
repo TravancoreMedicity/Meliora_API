@@ -4,23 +4,26 @@ module.exports = {
 
     getCRSStorePending: (callBack) => {
         pool.query(
-            `select crm_request_master.req_slno,crm_request_master.actual_requirement,
-            crm_request_master.needed,
-            R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,           
-            crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
-                        crm_request_master.request_deptsec_slno,
-                        category,crm_request_master.create_date,
-                        user_deptsec,req_status,store_receive,
-                       store_receive_date
-                         from crm_request_master
-                         left join crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
-                         left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
-                          left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
-                        left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
-                          left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
-                          left join co_employee_master CR on CR.em_id=crm_request_master.create_user           
-                       where crm_purchase_mast.po_to_supplier=1 and store_receive is null
-                          and user_acknldge is null  ORDER BY crm_request_master.req_slno DESC`,
+            ` SELECT 
+                    crm_request_master.req_slno,crm_request_master.actual_requirement,crm_request_master.needed,
+                    R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,
+                    crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
+			        crm_request_master.request_deptsec_slno,category,crm_request_master.create_date,
+                    user_deptsec,req_status,store_receive,store_receive_date,crm_purchase_po_details.expected_delivery
+              FROM
+                    crm_request_master
+                LEFT JOIN crm_request_approval ON crm_request_approval.req_slno=crm_request_master.req_slno
+                LEFT JOIN crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
+                LEFT JOIN crm_purchase_po_details on crm_purchase_po_details.req_slno=crm_request_master.req_slno
+                LEFT JOIN crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
+                LEFT JOIN co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
+                LEFT JOIN co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
+                LEFT JOIN co_employee_master CR on CR.em_id=crm_request_master.create_user           
+              WHERE
+                    crm_purchase_po_details.po_to_supplier=1
+                    AND store_receive is null
+                    AND user_acknldge is null
+              ORDER BY crm_request_master.req_slno DESC`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -33,23 +36,26 @@ module.exports = {
 
     getCrsReceiceAllList: (callBack) => {
         pool.query(
-            `select crm_request_master.req_slno,crm_request_master.actual_requirement,
-            crm_request_master.needed,
-            R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,           
-            crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
-                        crm_request_master.request_deptsec_slno,
-                        category,crm_request_master.create_date,
-                        user_deptsec,req_status,store_receive,
-                       store_receive_date
-                         from crm_request_master
-                         left join crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
-                         left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
-                          left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
-                        left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
-                          left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
-                          left join co_employee_master CR on CR.em_id=crm_request_master.create_user           
-                       where crm_purchase_mast.po_to_supplier=1 and store_receive =1
-                          and user_acknldge is null  ORDER BY crm_request_master.req_slno DESC`,
+            `SELECT
+                  crm_request_master.req_slno,crm_request_master.actual_requirement,crm_request_master.needed,
+                  R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,           
+                  crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
+                  crm_request_master.request_deptsec_slno,category,crm_request_master.create_date,
+                  user_deptsec,req_status,store_receive,store_receive_date,crm_purchase_po_details.expected_delivery
+             FROM
+                  crm_request_master
+               LEFT JOIN crm_request_approval ON crm_request_approval.req_slno=crm_request_master.req_slno
+               LEFT JOIN crm_purchase_mast ON crm_purchase_mast.req_slno=crm_request_master.req_slno
+               LEFT JOIN crm_purchase_po_details ON crm_purchase_po_details.req_slno=crm_request_master.req_slno
+               LEFT JOIN crm_emergencytype_mast ON crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
+               LEFT JOIN co_deptsec_mast R ON R.sec_id=crm_request_master.request_deptsec_slno
+               LEFT JOIN co_deptsec_mast U ON U.sec_id=crm_request_master.user_deptsec
+               LEFT JOIN co_employee_master CR ON CR.em_id=crm_request_master.create_user           
+            WHERE
+                 crm_purchase_po_details.po_to_supplier=1
+                 AND crm_purchase_mast.store_receive =1
+                 AND user_acknldge is null
+            ORDER BY crm_request_master.req_slno DESC`,
             [],
             (error, results, feilds) => {
                 if (error) {

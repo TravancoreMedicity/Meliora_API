@@ -3,8 +3,8 @@ const { checkToken } = require("../../authentication/token_validation");
 const { getPurchaseAckPending, InsertPurchaseAck, getAllApprovedForPurchase, QuatationCalling, QuatationNegotiation,
     QuatationFixing, InsertMultiplePO, getPOList, PoComplete, PoFinals, getAllApprovedForStore, storedataUpdate,
     getSubstores, getMainStore, storeReciverdataUpdate, getPOListSubStorewise, SubstoreReciverdataUpdate,
-    PurchsDataCollectionPending, getCRSStores, getOPItemDetails, getPendingPOItemDetails, getPendingPo, updatePoApprovals
-
+    PurchsDataCollectionPending, getCRSStores, getOPItemDetails, getPendingPOItemDetails, getPendingPo, updatePoApprovals,
+    getPODetailsForStore
 } = require('../crm_new_purchase/crm_purchase.controller')
 
 router.get("/getPurchaseAckPending", checkToken, getPurchaseAckPending);
@@ -36,6 +36,6 @@ router.get("/getitem/:id", checkToken, getOPItemDetails);
 router.get("/getPO", checkToken, getPendingPo);
 router.get("/POPending", checkToken, getPendingPOItemDetails);
 router.post('/updateApprovalLevel', updatePoApprovals);
-
+router.get("/potoStore/:id", checkToken, getPODetailsForStore);
 
 module.exports = router;

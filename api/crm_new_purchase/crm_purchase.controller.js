@@ -2,7 +2,7 @@ const { getPurchaseAckPending, getAllApprovedForPurchase, InsertPurchaseAck, Qua
     QuatationNegotiation, QuatationFixing, InsertinglePO, updatePOAdd, InsertMultiplePO, getPOList,
     PoComplete, PoFinals, getAllApprovedForStore, storedataUpdate, getSubstores, getMainStore, storeReciverdataUpdate,
     getPOListSubStorewise, SubstoreReciverdataUpdate, PurchsDataCollectionPending, getCRSStores,
-    InsertPOItems, getOPItemDetails, getPendingPOItemDetails, getPendingPo, updatePoApprovals
+    InsertPOItems, getOPItemDetails, getPendingPOItemDetails, getPendingPo, updatePoApprovals, getPODetailsForStore
 } = require('../crm_new_purchase/crm_purchase.service');
 
 const logger = require('../../logger/logger');
@@ -628,6 +628,29 @@ module.exports = {
         })
     },
 
+    getPODetailsForStore: (req, res) => {
+        const id = req.params.id
+        getPODetailsForStore(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
 
 }
 

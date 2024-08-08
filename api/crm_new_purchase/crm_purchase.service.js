@@ -716,4 +716,29 @@ module.exports = {
         })
         )
     },
+
+
+    getPODetailsForStore: (id, callBack) => {
+        pool.query(
+            ` SELECT
+                    po_detail_slno, req_slno, po_number,po_date,expected_delivery,supply_store,sub_store_name,
+                    main_store_slno, main_store, store_code,store_recieve,store_recieve_fully,supplier_name,
+                    po_delivery, po_amount,po_to_supplier,approval_level
+              FROM
+                    crm_purchase_po_details
+              LEFT JOIN  crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store
+              WHERE
+                    req_slno=? and po_status=1 and po_to_supplier=1`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
 }

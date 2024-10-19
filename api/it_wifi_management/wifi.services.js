@@ -55,17 +55,16 @@ module.exports = {
                 return callback(null, results);
             }
         )
-
     },
 
     wifiViewById: (id, callback) => {
         pool.query(
             `SELECT
-            in_patient_no,
-            patient,
-            bystander,
-            extra            
-            FROM it_wifi_management WHERE in_patient_no=?`,
+                   in_patient_no,patient,bystander,extra            
+             FROM
+                   it_wifi_management
+             WHERE
+                   in_patient_no=?`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -77,10 +76,12 @@ module.exports = {
     },
     checkCodeNdGet: (data, callback) => {
         pool.query(
-            `SELECT code FROM
-            it_wifi_qr_code_link                               
+            `SELECT
+                   code
+             FROM
+                   it_wifi_qr_code_link                               
             WHERE 
-            it_wifi_ipno=? and it_wifi_flg=?`,
+                   it_wifi_ipno=? AND it_wifi_flg=?  AND wifi_status=1`,
             [
                 data.it_wifi_ipno,
                 data.it_wifi_flg
@@ -96,12 +97,12 @@ module.exports = {
     },
     updateQrCode: (data, callback) => {
         pool.query(
-            `UPDATE it_wifi_qr_code_link SET                       
-            it_wifi_ipno=?,
-            it_wifi_flg=?,
-            updated_date=current_date()                                  
+            `UPDATE
+                    it_wifi_qr_code_link
+             SET
+                  it_wifi_ipno=?,it_wifi_flg=?,updated_date=current_date()                                  
             WHERE 
-            it_wifi_qrslno=?`,
+                  it_wifi_qrslno=? AND wifi_status=1`,
             [
                 data.it_wifi_ipno,
                 data.it_wifi_flg,
@@ -118,8 +119,12 @@ module.exports = {
 
     getfreeCodes: (callBack) => {
         pool.query(
-            `select it_wifi_qrslno      
-        from it_wifi_qr_code_link where it_wifi_ipno is null and it_wifi_flg is null`,
+            `SELECT
+                   it_wifi_qrslno
+             FROM
+                   it_wifi_qr_code_link
+             WHERE it_wifi_ipno is null and it_wifi_flg is null
+                 AND wifi_status=1`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -132,10 +137,10 @@ module.exports = {
 
     getAllowttedWiFi: (callBack) => {
         pool.query(
-            `select code from it_wifi_qr_code_link
-            where updated_date between
-            date_sub(current_date(),INTERVAL 5 DAY)
-             and current_date()`,
+            ` SELECt
+                    code from it_wifi_qr_code_link
+              WHERE
+                   updated_date BETWEEN date_sub(current_date(),INTERVAL 5 DAY) AND current_date()`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -144,6 +149,60 @@ module.exports = {
                 return callBack(null, results)
             }
         )
-    }
-
+    },
+    getCreatedDate: (id, callback) => {
+        pool.query(
+            `SELECT
+                   updated_date        
+    	     FROM 
+                  it_wifi_qr_code_link     
+            WHERE
+                 it_wifi_ipno=?
+                 AND wifi_status=1`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    deleteQrCode: (data, callback) => {
+        pool.query(
+            `UPDATE
+                   it_wifi_qr_code_link 
+             SET         
+                  wifi_status=0          
+             WHERE
+                   it_wifi_ipno = ?`,
+            [
+                data.it_wifi_ipno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    getExpiredWiFiDetails: (id, callback) => {
+        pool.query(
+            `SELECT 
+                   patient,bystander,extra,it_wifi_qr_code_link.updated_date,in_patient_no
+             FROM    
+                   it_wifi_management
+             LEFT JOIN it_wifi_qr_code_link ON it_wifi_qr_code_link.it_wifi_ipno=it_wifi_management.in_patient_no  
+             WHERE
+                   in_patient_no=? AND wifi_status=0;`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 }

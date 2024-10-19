@@ -47,7 +47,8 @@ module.exports = {
             FROM meliora.it_bill_add
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category
             left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
-            left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype   `
+            left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype
+            where bill_active_status=1   `
             , [],
             (error, results, feilds) => {
                 if (error) {
@@ -64,7 +65,8 @@ module.exports = {
             bill_tariff=?,
             bill_name=?,
             bill_cug_status=?,
-            bill_cug_simtype=?
+            bill_cug_simtype=?,
+            bill_active_status=?
  			WHERE 
              bill_add_slno=?`,
             [
@@ -73,6 +75,7 @@ module.exports = {
                 data.bill_name,
                 data.bill_cug_status,
                 data.bill_cug_simtype,
+                data.bill_active_status,
                 data.bill_add_slno
             ],
             (error, results, feilds) => {
@@ -112,7 +115,7 @@ module.exports = {
             FROM
             it_bill_add
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category
-            where bill_tariff=1`, [],
+            where bill_tariff=1 and bill_active_status=1 `, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -242,7 +245,7 @@ module.exports = {
             FROM
             it_bill_add
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category
-             where bill_tariff=2`, [],
+             where bill_tariff=2 and bill_active_status=1`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -279,7 +282,7 @@ module.exports = {
             FROM
             it_bill_add
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno = it_bill_add.bill_category
-             where bill_tariff = 3`, [],
+             where bill_tariff = 3 and bill_active_status=1`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);

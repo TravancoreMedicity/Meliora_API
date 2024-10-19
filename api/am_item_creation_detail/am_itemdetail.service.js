@@ -294,6 +294,8 @@ module.exports = {
 
 
     CustodianDetailsInsert: (data, callback) => {
+        console.log("data to check custody:", data);
+
 
         pool.query(
             `INSERT INTO am_item_map_details
@@ -983,7 +985,7 @@ module.exports = {
             spare_asset_no,spare_asset_no_only
             from am_spare_item_map_master
             left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_spare_item_map_master.spare_creation_slno
-            where spare_custodian_dept=1  and
+            where spare_custodian_dept=?  and
                am_spare_item_map_slno not in
                (select am_spare_item_map_slno from am_asset_spare_details where spare_status=1 )
                and spare_condamtn=0 and spare_service=0`,
@@ -1043,7 +1045,7 @@ module.exports = {
     SpareDelete: (data, callback) => {
         pool.query(
             `UPDATE am_asset_spare_details 
-                SET spare_status = 0,
+                SET spare_status = 2,
                 delete_user=?  
                 WHERE asset_spare_slno =?`,
             [
@@ -1501,11 +1503,12 @@ module.exports = {
     spareContamination: (data, callback) => {
         pool.query(
             `UPDATE am_spare_item_map_master SET
-            spare_condamtn=1
+            spare_condamtn=1,
+            spare_service=2
                        WHERE 
                        am_spare_item_map_slno=?`,
             [
-                data.am_spare_item_map_slno,
+                data.am_spare_item_map_slno
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -1522,7 +1525,32 @@ module.exports = {
             WHERE 
             am_spare_item_map_slno=?`,
             [
-                data.am_spare_item_map_slno,
+                data.am_spare_item_map_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    AssetService: (data, callback) => {
+
+        pool.query(
+            `UPDATE am_asset_item_map_master SET
+            asset_item_service=1,
+            asset_item_service_user=?,
+            item_dept_slno=?,
+            item_deptsec_slno=?
+            WHERE 
+            am_item_map_slno=?`,
+            [
+                data.asset_item_service_user,
+                data.item_dept_slno,
+                data.item_deptsec_slno,
+                data.am_item_map_slno,
+
             ],
             (error, results, feilds) => {
                 if (error) {

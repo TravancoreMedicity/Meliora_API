@@ -3,14 +3,14 @@ const path = require('path');
 const fs = require("fs")
 const logger = require('../../logger/logger')
 
-const { TaskFileUpload } = require('../tm_task_file_upload/task_file_upload.service')
+const { AssetServiceFileUpload } = require('./service_file_upload.service')
 
 
-const taskfilestorage = multer.diskStorage({
+const assetservicefilestorage = multer.diskStorage({
 
     destination: (req, file, cb) => {
         const id = req.body.id;
-        const filepath = path.join('D:/DocMeliora/Meliora/TaskManagement', `${id}`);
+        const filepath = path.join('D:/DocMeliora/Meliora/AssetService', `${id}`);
 
         if (!fs.existsSync(filepath)) {
             fs.mkdirSync(filepath, { recursive: true });
@@ -22,7 +22,7 @@ const taskfilestorage = multer.diskStorage({
         // Generate a unique filename using a timestamp
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const extension = path.extname(file.originalname);
-        const filename = 'task' + uniqueSuffix + extension;
+        const filename = 'service' + uniqueSuffix + extension;
         cb(null, filename);
     },
 
@@ -31,8 +31,8 @@ const taskfilestorage = multer.diskStorage({
 const maxSize = 3 * 1024 * 1024
 
 // for  multiple file upload
-const uploadtask = multer({
-    storage: taskfilestorage,
+const uploadAssetService = multer({
+    storage: assetservicefilestorage,
     fileFilter: (req, file, cb) => {
         if (
             file.mimetype == "image/png" ||
@@ -52,8 +52,8 @@ const uploadtask = multer({
 
 module.exports = {
 
-    uploadFileTask: (req, res) => {
-        uploadtask(req, res, async (err) => {
+    uploadFileAssetService: (req, res) => {
+        uploadAssetService(req, res, async (err) => {
             const body = req.body;
             if (err instanceof multer.MulterError) {
                 return res.status(200).json({
@@ -75,27 +75,27 @@ module.exports = {
                 try {
                     const files = req.files;
                     const id = body.id;
-                    const task_id_folder = path.join('D:/DocMeliora/Meliora/TaskManagement', `${id}`);
+                    const service_id_folder = path.join('D:/DocMeliora/Meliora/AssetService', `${id}`);
 
-                    if (!fs.existsSync(task_id_folder)) {
-                        fs.mkdirSync(task_id_folder, { recursive: true });
+                    if (!fs.existsSync(service_id_folder)) {
+                        fs.mkdirSync(service_id_folder, { recursive: true });
                     }
 
                     for (const file of files) {
                         // Process each file individually
                         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
                         const extension = path.extname(file.originalname);
-                        const filename = 'task' + uniqueSuffix + extension;
+                        const filename = 'service' + uniqueSuffix + extension;
                         // Move the file to the destination folder
-                        const destinationPath = path.join(task_id_folder, filename);
+                        const destinationPath = path.join(service_id_folder, filename);
                         fs.renameSync(file.path, destinationPath);
                     }
                     const data = {
-                        tm_task_slno: body.id
+                        am_service_details_slno: body.id
 
                     }
 
-                    TaskFileUpload(data, (err, results) => {
+                    AssetServiceFileUpload(data, (err, results) => {
                         if (err) {
                             return res.status(200).json({
                                 success: 0,
@@ -124,9 +124,9 @@ module.exports = {
             }
         });
     },
-    getTaskFile: (req, res) => {
+    getAssetServiceFile: (req, res) => {
         const id = req.params.id
-        const folderPath = `D:/DocMeliora/Meliora/TaskManagement/${id}`;
+        const folderPath = `D:/DocMeliora/Meliora/AssetService/${id}`;
         fs.readdir(folderPath, (err, files) => {
 
             if (err) {

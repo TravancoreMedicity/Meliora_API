@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { getRectifycomplt, Updatecomplit, UpdateVerify, getAssignEmps,
-    getlocationbsedAsset, AssetMappComplaint, AssetDetailsGet
+    getlocationbsedAsset, AssetMappComplaint, AssetDetailsGet, updateHoldProgress, getEmplHoldList, getEmplRectfiedList, getEmplVerifiedList, getUserEndRectfiedList,
+    getUserEndVerifiedList, getDepartmentPendingList, getDepartmentRectfiedList, getDepartmentVerifiedList, getAuthorization
 } = require('../Rectifycomplit/Rectifycomplit.controller')
 
 router.get('/getRectifycomplit/:id', checkToken, getRectifycomplt)
@@ -12,4 +13,25 @@ router.get('/getAssignEmps/:id', checkToken, getAssignEmps)
 router.get('/getlocationbsedAsset/:id', checkToken, getlocationbsedAsset)
 router.post("/AssetMappComplaint", checkToken, AssetMappComplaint);
 router.get('/AssetDetailsGet/:id', checkToken, AssetDetailsGet)
+
+router.patch("/updateHoldProgress", checkToken, updateHoldProgress);
+
+router.post("/getEmplHoldList", checkToken, getEmplHoldList);
+router.post("/getEmplRectfiedList", checkToken, getEmplRectfiedList);
+router.post("/getEmplVerifiedList", checkToken, getEmplVerifiedList);
+
+router.post("/getUserEndRectfiedList", checkToken, getUserEndRectfiedList);
+router.post("/getUserEndVerifiedList", checkToken, getUserEndVerifiedList);
+
+router.post("/getDepartmentPendingList", checkToken, getDepartmentPendingList);
+router.post("/getDepartmentRectfiedList", checkToken, getDepartmentRectfiedList);
+router.post("/getDepartmentVerifiedList", checkToken, getDepartmentVerifiedList);
+
+router.get('/getAuthorization/:id', checkToken, getAuthorization)
+
+
+
+
+
+
 module.exports = router;

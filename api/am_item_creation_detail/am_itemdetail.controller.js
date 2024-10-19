@@ -13,7 +13,7 @@ const { checkDetailInsertOrNot, GRNDetailsInsert, GRNDetailsUpdate, BillDetailsI
     GetAmcCmcMasterById, GetSupplierSelect, GetBillBySupplNDate, SupplierAdding, GetAMCBySupplNDate,
     GetCMCBySupplNDate, LeaseMasterInsert, LeaseMasterview, GetLeaseBySupplNDate,
     leaseMasterUpdate, AMLeaseDetailsUpdate, spareContamination, spareService, DeviceRackUpdateAsset,
-    DeviceRackUpdateSpare
+    DeviceRackUpdateSpare, AssetService
 
 } = require('../am_item_creation_detail/am_itemdetail.service')
 module.exports = {
@@ -224,6 +224,10 @@ module.exports = {
 
     CustodianDetailsInsert: (req, res) => {
         const body = req.body;
+
+        console.log("body", body);
+
+
         CustodianDetailsInsert(body, (err, result) => {
             if (err) {
                 return res.status(200).json({
@@ -1343,5 +1347,29 @@ module.exports = {
             })
         });
     },
+
+    AssetService: (req, res) => {
+        const body = req.body;
+        AssetService(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Asset Transfered to service List"
+            })
+        })
+    },
+
+
 
 }

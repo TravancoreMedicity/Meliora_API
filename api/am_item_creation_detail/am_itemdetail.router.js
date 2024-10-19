@@ -14,7 +14,7 @@ const { checkDetailInsertOrNot, GRNDetailsInsert, GRNDetailsUpdate, BillDetailsI
     BillMasterview, BillMasterUpdate, BillMasterviewSelect, GetBillMasterById,
     GetAmcCmcMasterById, GetSupplierSelect, GetBillBySupplNDate, SupplierAdding, GetAMCBySupplNDate,
     GetCMCBySupplNDate, LeaseMasterInsert, LeaseMasterview, leaseMasterUpdate, GetLeaseBySupplNDate,
-    AMLeaseDetailsUpdate, spareContamination, spareService
+    AMLeaseDetailsUpdate, spareContamination, spareService, AssetService
 } = require('../am_item_creation_detail/am_itemdetail.controller');
 
 router.get("/checkDetailInsertOrNot/:id", checkToken, checkDetailInsertOrNot)
@@ -94,6 +94,8 @@ router.patch('/AMLeaseDetailsUpdate', checkToken, AMLeaseDetailsUpdate)
 router.patch('/spareContamination', checkToken, spareContamination)
 router.patch('/spareService', checkToken, spareService)
 
+
+router.patch('/AssetService', checkToken, AssetService)
 
 
 module.exports = router

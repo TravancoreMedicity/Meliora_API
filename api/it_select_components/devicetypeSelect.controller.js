@@ -1,4 +1,6 @@
-const { getDeviceType, getDeviceTypePassword, getPasswordCredential, getSimType, getBillType, getBillCategory, getSupplierList } = require('../it_select_components/devicetypeSelect.service')
+const { getDeviceType, getDeviceTypePassword, getPasswordCredential, getSimType, getBillType, getBillCategory, getSupplierList,
+    getSupplierData
+} = require('../it_select_components/devicetypeSelect.service')
 module.exports = {
 
     getDeviceType: (req, res) => {
@@ -141,6 +143,30 @@ module.exports = {
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    getSupplierData: (req, res) => {
+        const id = req.params.id
+        getSupplierData(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
                     success: 2,
                     message: err
                 });

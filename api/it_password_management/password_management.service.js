@@ -16,7 +16,9 @@ module.exports = {
             co_deptsec_mast.sec_name,
             am_item_map_slno,
              item_asset_no,
-            item_asset_no_only
+            item_asset_no_only,
+            item_custodian_dept,
+            item_custodian_dept_sec
             from am_asset_item_map_master
             left join co_deptsec_mast on co_deptsec_mast.sec_id =am_asset_item_map_master.item_deptsec_slno
             left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno

@@ -1,6 +1,6 @@
 
 const { WifiInsert, WifiUpdate, wifiViewById, checkCodeNdGet, updateQrCode,
-    getfreeCodes, getAllowttedWiFi
+    getfreeCodes, getAllowttedWiFi, getCreatedDate, deleteQrCode, getExpiredWiFiDetails
 } = require('../it_wifi_management/wifi.services')
 module.exports = {
     WifiInsert: (req, res) => {
@@ -15,7 +15,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: " inserted successfully"
+                message: "Details Updated"
             })
         })
     },
@@ -157,5 +157,94 @@ module.exports = {
                 data: results
             });
         });
-    }
+    },
+
+    getCreatedDate: (req, res) => {
+        const id = req.params.id;
+        getCreatedDate(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+    },
+
+    deleteQrCode: (req, res) => {
+        const body = req.body;
+        deleteQrCode(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+
+            if (results) {
+                const updateData = {
+                    patient: 0,
+                    bystander: 0,
+                    extra: 0,
+                    in_patient_no: body.it_wifi_ipno
+                }
+                WifiUpdate(updateData, (err, results) => {
+                    if (err) {
+                        logger.logwindow(err)
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Data Updated!"
+                    });
+                })
+            }
+
+        });
+    },
+
+    getExpiredWiFiDetails: (req, res) => {
+        const id = req.params.id;
+        getExpiredWiFiDetails(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+    },
 }

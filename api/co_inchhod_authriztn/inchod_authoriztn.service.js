@@ -91,13 +91,15 @@ module.exports = {
 
     getDeptSeconId: (id, callBack) => {
         pool.query(
-            `SELECT dept_section,
-            AD.sec_name as auth_deptsec
-                        FROM co_authorization
-                        left join co_employee_master on co_employee_master.em_id=co_authorization.emp_id
-            left join co_deptsec_mast AD on AD.sec_id=co_authorization.dept_section
-                   where auth_status=1 and emp_id=?
-                   group by dept_section`,
+            `SELECT
+                   dept_section,AD.sec_name as auth_deptsec
+             FROM
+                   co_authorization
+                left join co_employee_master on co_employee_master.em_id=co_authorization.emp_id
+                left join co_deptsec_mast AD on AD.sec_id=co_authorization.dept_section
+            WHERE
+                 auth_status=1 and emp_id=?
+                GROUP BY dept_section`,
             [
                 id
             ],
@@ -112,13 +114,15 @@ module.exports = {
     },
     getDeptSeconIncharge: (id, callBack) => {
         pool.query(
-            `SELECT dept_section,
-            AD.sec_name as auth_deptsec
-                        FROM co_authorization
-                        left join co_employee_master on co_employee_master.em_id=co_authorization.emp_id
-            left join co_deptsec_mast AD on AD.sec_id=co_authorization.dept_section
-                   where auth_status=1 and emp_id=? and auth_post=1
-                   group by dept_section`,
+            `SELECT
+                   dept_section,AD.sec_name as auth_deptsec
+             FROM
+                  co_authorization
+              left join co_employee_master on co_employee_master.em_id=co_authorization.emp_id
+              left join co_deptsec_mast AD on AD.sec_id=co_authorization.dept_section
+            where
+                  auth_status=1 and emp_id=? and auth_post=1
+            group by dept_section`,
             [
                 id
             ],
@@ -134,13 +138,15 @@ module.exports = {
 
     getDeptSeconHod: (id, callBack) => {
         pool.query(
-            `SELECT dept_section,
-            AD.sec_name as auth_deptsec
-                        FROM co_authorization
-                        left join co_employee_master on co_employee_master.em_id=co_authorization.emp_id
-            left join co_deptsec_mast AD on AD.sec_id=co_authorization.dept_section
-                   where auth_status=1 and emp_id=? and auth_post=2
-                   group by dept_section`,
+            `SELECT
+                   dept_section,AD.sec_name as auth_deptsec
+             FROM
+                  co_authorization
+               left join co_employee_master on co_employee_master.em_id=co_authorization.emp_id
+               left join co_deptsec_mast AD on AD.sec_id=co_authorization.dept_section
+            where
+                   auth_status=1 and emp_id=? and auth_post=2
+            group by dept_section`,
             [
                 id
             ],

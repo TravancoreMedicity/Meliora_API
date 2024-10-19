@@ -2,22 +2,19 @@ const { pool } = require('../../config/database')
 module.exports = {
     getPurchaseAckPending: (callBack) => {
         pool.query(
-            `
-            select crm_request_master.req_slno,crm_request_master.actual_requirement,
-              crm_request_master.needed,
-              R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,
-               crf_close,crf_close_remark,crf_closed_one,close_date,C.em_name as closed_user,
-               crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
-               crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
-               rm_ndrf,category,image_status,emergency_flag,emer_slno,crm_request_master.create_date,
-               total_approx_cost,user_deptsec,req_status,                           
-               ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date,
-                ED.em_name as  ed_user,ed_user as edid,md_user as mdid,
-               md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,
-               MD.em_name as md_user,
-                ed_image,md_image, co_department_mast.dept_name
-            from crm_request_approval        
-                                
+            `SELECT
+                   crm_request_master.req_slno,crm_request_master.actual_requirement,crm_request_master.needed,
+                   R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,
+                   crf_close,crf_close_remark,crf_closed_one,close_date,C.em_name as closed_user,
+                   crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
+                   crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
+                   rm_ndrf,category,image_status,emergency_flag,emer_slno,crm_request_master.create_date,
+                   total_approx_cost,user_deptsec,req_status,ed_approve_req, ed_approve, ed_approve_remarks,
+                   ed_detial_analysis, ed_approve_date,ED.em_name as  ed_user,ed_user as edid,md_user as mdid,
+                   md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,
+                   MD.em_name as md_user,ed_image,md_image, co_department_mast.dept_name
+            FROM
+                   crm_request_approval
                 left join crm_request_master on crm_request_master.req_slno=crm_request_approval.req_slno
                 left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
                 left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
@@ -27,8 +24,9 @@ module.exports = {
                 left join co_employee_master C on C.em_id=crm_request_approval.crf_close_user           
                 left join co_employee_master ED on ED.em_id=crm_request_approval.ed_user
                 left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
-            where ed_approve=1 and md_approve=1 and user_acknldge is null and
-            crm_request_approval.req_slno not in (select req_slno from crm_purchase_mast )
+            WHERE
+                  ed_approve=1 and md_approve=1 and user_acknldge is null and
+                  crm_request_approval.req_slno not in (select req_slno from crm_purchase_mast )
             ORDER BY crm_request_master.req_slno DESC`,
             [],
             (error, results, feilds) => {
@@ -80,7 +78,8 @@ module.exports = {
                         left join co_employee_master QF on QF.em_id=crm_purchase_mast.quatation_fixing_user
 
 
-                          where md_approve=1 and ed_approve=1 and po_to_supplier=0 and user_acknldge is null ORDER BY crm_request_master.req_slno DESC`,
+                          where md_approve=1 and ed_approve=1 and po_to_supplier=0 and user_acknldge is null
+                           ORDER BY crm_request_master.req_slno DESC`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -192,42 +191,41 @@ module.exports = {
         );
     },
 
-
-    InsertinglePO: (data, callBack) => {
-        pool.query(
-            `INSERT INTO crm_purchase_po_details (
-                req_slno,
-                po_number,
-                po_date,
-                po_status,
-                supply_store,
-                expected_delivery,
-                create_user            
-                            )
-            VALUES (?,?,?,?,?,?,?)`,
-            [
-                data.req_slno,
-                data.po_number,
-                data.po_date,
-                data.po_status,
-                data.supply_store,
-                data.expected_delivery,
-                data.create_user
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        )
-    },
+    // InsertinglePO: (data, callBack) => {
+    //     pool.query(
+    //         `INSERT INTO crm_purchase_po_details (
+    //             req_slno,
+    //             po_number,
+    //             po_date,
+    //             po_status,
+    //             supply_store,
+    //             expected_delivery,
+    //             create_user            
+    //                         )
+    //         VALUES (?,?,?,?,?,?,?)`,
+    //         [
+    //             data.req_slno,
+    //             data.po_number,
+    //             data.po_date,
+    //             data.po_status,
+    //             data.supply_store,
+    //             data.expected_delivery,
+    //             data.create_user
+    //         ],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callBack(error);
+    //             }
+    //             return callBack(null, results);
+    //         }
+    //     )
+    // },
     InsertMultiplePO: (data, callback) => {
         pool.query(
             `INSERT INTO crm_purchase_po_details (
-                req_slno,  po_number,po_date,po_status,supply_store, expected_delivery, create_user,
-                supplier_name, po_delivery, po_amount,po_to_supplier,approval_level,po_type,po_expiry)
-               values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+                req_slno,  po_number,po_date,po_status,supply_store, expected_delivery, create_user, supplier_code,
+                supplier_name, po_delivery, po_amount,po_to_supplier,approval_level,po_type,po_expiry,sub_store_slno)
+               values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.req_slno,
                 data.po_number,
@@ -236,13 +234,15 @@ module.exports = {
                 data.supply_store,
                 data.expected_delivery,
                 data.create_user,
+                data.supplier_code,
                 data.supplier_name,
                 data.po_delivery,
                 data.po_amount,
                 data.po_to_supplier,
                 data.approval_level,
                 data.po_type,
-                data.po_expiry
+                data.po_expiry,
+                data.sub_store_slno
             ],
             (error, results, fields) => {
 
@@ -256,13 +256,13 @@ module.exports = {
 
     getPOList: (id, callBack) => {
         pool.query(
-            ` SELECT
-                    po_detail_slno, req_slno, po_number,po_date,expected_delivery,supply_store,sub_store_name,
-                    main_store_slno, main_store, store_code,store_recieve,store_recieve_fully,supplier_name,
-                    po_delivery, po_amount,po_to_supplier,approval_level
+            `   SELECT
+                    po_detail_slno, req_slno, po_number,po_date,expected_delivery,supply_store,
+                    S.main_store_slno, S.main_store,store_recieve,store_recieve_fully,supplier_name,
+                    po_delivery, po_amount,po_to_supplier,approval_level,sub_store_slno,S.sub_store_name
               FROM
                     crm_purchase_po_details
-              LEFT JOIN  crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store
+              LEFT JOIN  crm_store_master S ON S.crm_store_master_slno=crm_purchase_po_details.sub_store_slno
               WHERE
                     req_slno=? and po_status=1 and po_to_supplier=0`,
             [
@@ -294,12 +294,14 @@ module.exports = {
 
     PoComplete: (data, callback) => {
         pool.query(
-            `UPDATE crm_purchase_mast 
-            SET         
-            po_complete = ?,
-            po_complete_user = ?,
-            po_complete_date = ?                
-            WHERE crm_purchase_slno =?`,
+            `UPDATE
+                   crm_purchase_mast
+             SET         
+                   po_complete = ?,
+                   po_complete_user = ?,
+                   po_complete_date = ?                
+             WHERE
+                   crm_purchase_slno =?`,
             [
                 data.po_complete,
                 data.po_complete_user,
@@ -321,14 +323,15 @@ module.exports = {
                     crm_purchase_po_details
                SET         
                    po_to_supplier = 1,
+                   po_to_supplier_date=?,
                    edit_user = ?
              WHERE
                  req_slno = ? and po_number=?`,
             [
+                data.po_to_supplier_date,
                 data.edit_user,
                 data.req_slno,
                 data.po_number
-
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -338,43 +341,15 @@ module.exports = {
             }
         );
     },
-    getAllApprovedForStore: (callBack) => {
+
+    getSubstores: (id, callBack) => {
         pool.query(
-            `select crm_request_master.req_slno,crm_request_master.actual_requirement,
-            crm_request_master.needed,
-            R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,
-            crf_close,crf_close_remark,crf_closed_one,close_date,C.em_name as closed_user,
-            crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
-                        crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
-                        rm_ndrf,category,image_status,emergency_flag,emer_slno,crm_request_master.create_date,
-                        total_approx_cost,user_deptsec,req_status,                           
-                ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date, ED.em_name as  ed_user,
-                       md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,MD.em_name as md_user,
-                       crm_purchase_slno,ack_status,ack_remarks,PA.em_name as purchase_ackuser,
-                       crm_purchase_mast.create_date as ack_date,quatation_calling_status,quatation_calling_date,
-                       QC.em_name as quatation_user,quatation_negotiation,quatation_negotiation_date,
-                       QN.em_name as quatation_neguser,quatation_fixing,quatation_fixing_date,
-                       QF.em_name as quatation_fixuser,po_prepartion,po_complete,po_approva_level_one,
-                       po_approva_level_two,po_to_supplier,store_receive,SA.em_name as storeack_user,
-                       store_receive_date
-                         from crm_request_master
-                         left join crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
-                         left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
-                          left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
-                        left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
-                          left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
-                          left join co_employee_master CR on CR.em_id=crm_request_master.create_user           
-                          left join co_employee_master C on C.em_id=crm_request_approval.crf_close_user           
-                          left join co_employee_master ED on ED.em_id=crm_request_approval.ed_user
-                          left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
-                          left join co_employee_master PA on PA.em_id=crm_purchase_mast.create_user
-                          left join co_employee_master QC on QC.em_id=crm_purchase_mast.quatation_calling_user
-                        left join co_employee_master QN on QN.em_id=crm_purchase_mast.quatation_negotiation_user
-                        left join co_employee_master QF on QF.em_id=crm_purchase_mast.quatation_fixing_user
-                        left join co_employee_master SA on SA.em_id=crm_purchase_mast.store_receive_user
-                          where crm_purchase_mast.po_to_supplier=1 and store_receive is null
-                          and user_acknldge is null  ORDER BY crm_request_master.req_slno DESC`,
-            [],
+            `select
+                   crm_store_master_slno,sub_store_name,store_code
+             from
+                  crm_store_master
+             where main_store_slno=?`,
+            [id],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -384,129 +359,166 @@ module.exports = {
         )
     },
 
-    storedataUpdate: (data, callback) => {
-        pool.query(
-            `UPDATE crm_purchase_mast 
-            SET         
-            store_receive = ?,
-            store_receive_user = ?,
-            store_receive_date = ?                
-            WHERE crm_purchase_slno =?`,
-            [
-                data.store_receive,
-                data.store_receive_user,
-                data.store_receive_date,
-                data.crm_purchase_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
 
-    getSubstores: (callBack) => {
-        pool.query(
-            `select crm_store_master_slno,sub_store_name
-            from crm_store_master 
-            `,
-            [],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        )
-    },
-    getMainStore: (id, callBack) => {
-        pool.query(
-            `  select main_store,crs_store_code
-            from crm_store_master 
-                        where crm_store_master_slno=? `,
-            [
-                id
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
+    // getAllApprovedForStore: (callBack) => {
+    //     pool.query(
+    //         `select crm_request_master.req_slno,crm_request_master.actual_requirement,
+    //         crm_request_master.needed,
+    //         R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,
+    //         crf_close,crf_close_remark,crf_closed_one,close_date,C.em_name as closed_user,
+    //         crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
+    //                     crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
+    //                     rm_ndrf,category,image_status,emergency_flag,emer_slno,crm_request_master.create_date,
+    //                     total_approx_cost,user_deptsec,req_status,                           
+    //             ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date, ED.em_name as  ed_user,
+    //                    md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,MD.em_name as md_user,
+    //                    crm_purchase_slno,ack_status,ack_remarks,PA.em_name as purchase_ackuser,
+    //                    crm_purchase_mast.create_date as ack_date,quatation_calling_status,quatation_calling_date,
+    //                    QC.em_name as quatation_user,quatation_negotiation,quatation_negotiation_date,
+    //                    QN.em_name as quatation_neguser,quatation_fixing,quatation_fixing_date,
+    //                    QF.em_name as quatation_fixuser,po_prepartion,po_complete,po_approva_level_one,
+    //                    po_approva_level_two,po_to_supplier,store_receive,SA.em_name as storeack_user,
+    //                    store_receive_date
+    //                      from crm_request_master
+    //                      left join crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
+    //                      left join crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
+    //                       left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
+    //                     left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
+    //                       left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
+    //                       left join co_employee_master CR on CR.em_id=crm_request_master.create_user           
+    //                       left join co_employee_master C on C.em_id=crm_request_approval.crf_close_user           
+    //                       left join co_employee_master ED on ED.em_id=crm_request_approval.ed_user
+    //                       left join co_employee_master MD on MD.em_id=crm_request_approval.md_user
+    //                       left join co_employee_master PA on PA.em_id=crm_purchase_mast.create_user
+    //                       left join co_employee_master QC on QC.em_id=crm_purchase_mast.quatation_calling_user
+    //                     left join co_employee_master QN on QN.em_id=crm_purchase_mast.quatation_negotiation_user
+    //                     left join co_employee_master QF on QF.em_id=crm_purchase_mast.quatation_fixing_user
+    //                     left join co_employee_master SA on SA.em_id=crm_purchase_mast.store_receive_user
+    //                       where crm_purchase_mast.po_to_supplier=1 and store_receive is null
+    //                       and user_acknldge is null  ORDER BY crm_request_master.req_slno DESC`,
+    //         [],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callBack(error);
+    //             }
+    //             return callBack(null, results);
+    //         }
+    //     )
+    // },
 
-    storeReciverdataUpdate: (data, callback) => {
-        pool.query(
-            `UPDATE crm_purchase_po_details 
-            SET         
-            store_recieve = 1,
-            store_receive_user = ?,
-            store_receive_date = ?                
-            WHERE po_detail_slno =?`,
-            [
-                data.store_receive_user,
-                data.store_receive_date,
-                data.po_detail_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
+    // storedataUpdate: (data, callback) => {
+    //     pool.query(
+    //         `UPDATE crm_purchase_mast 
+    //         SET         
+    //         store_receive = ?,
+    //         store_receive_user = ?,
+    //         store_receive_date = ?                
+    //         WHERE crm_purchase_slno =?`,
+    //         [
+    //             data.store_receive,
+    //             data.store_receive_user,
+    //             data.store_receive_date,
+    //             data.crm_purchase_slno
+    //         ],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callback(error);
+    //             }
+    //             return callback(null, results);
+    //         }
+    //     );
+    // },
 
-    getPOListSubStorewise: (id, callBack) => {
-        pool.query(
-            `select po_detail_slno,crm_request_master.req_slno, po_number,po_date,expected_delivery,
-            supply_store,sub_store_name, main_store_slno, main_store,store_code,store_recieve,
-            store_recieve_fully,
-            R.sec_name as req_deptsec,U.sec_name as user_deptsection,
-            sub_store_recieve,actual_requirement,
-            needed,expected_date,crm_request_master.create_date as req_date
-          from crm_purchase_po_details
-                    left join crm_store_master on crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store
-          left join crm_request_master on crm_request_master.req_slno=crm_purchase_po_details.req_slno
-          left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
-          left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
-                        where supply_store=? and  store_recieve=1`,
-            [
-                id
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
 
-    SubstoreReciverdataUpdate: (data, callback) => {
-        pool.query(
-            `UPDATE crm_purchase_po_details 
-            SET         
-            sub_store_recieve = 1,
-            sub_store_recieve_user = ?,
-            sub_store_date = ?                
-            WHERE po_detail_slno =?`,
-            [
-                data.sub_store_recieve_user,
-                data.sub_store_date,
-                data.po_detail_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
+    // getMainStore: (id, callBack) => {
+    //     pool.query(
+    //         `select
+    //                 main_store,crs_store_code
+    //          from
+    //                crm_store_master
+    //          where
+    //               crm_store_master_slno=? `,
+    //         [
+    //             id
+    //         ],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callBack(error);
+    //             }
+    //             return callBack(null, results);
+    //         }
+    //     );
+    // },
+
+    // storeReciverdataUpdate: (data, callback) => {
+    //     pool.query(
+    //         `UPDATE crm_purchase_po_details 
+    //         SET         
+    //         store_recieve = 1,
+    //         store_receive_user = ?,
+    //         store_receive_date = ?                
+    //         WHERE po_detail_slno =?`,
+    //         [
+    //             data.store_receive_user,
+    //             data.store_receive_date,
+    //             data.po_detail_slno
+    //         ],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callback(error);
+    //             }
+    //             return callback(null, results);
+    //         }
+    //     );
+    // },
+
+    // getPOListSubStorewise: (id, callBack) => {
+    //     pool.query(
+    //         `select po_detail_slno,crm_request_master.req_slno, po_number,po_date,expected_delivery,
+    //         supply_store,sub_store_name, main_store_slno, main_store,store_code,store_recieve,
+    //         store_recieve_fully,
+    //         R.sec_name as req_deptsec,U.sec_name as user_deptsection,
+    //         sub_store_recieve,actual_requirement,
+    //         needed,expected_date,crm_request_master.create_date as req_date
+    //       from crm_purchase_po_details
+    //                 left join crm_store_master on crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store
+    //       left join crm_request_master on crm_request_master.req_slno=crm_purchase_po_details.req_slno
+    //       left join co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
+    //       left join co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec
+    //                     where supply_store=? and  store_recieve=1`,
+    //         [
+    //             id
+    //         ],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callBack(error);
+    //             }
+    //             return callBack(null, results);
+    //         }
+    //     );
+    // },
+
+    // SubstoreReciverdataUpdate: (data, callback) => {
+    //     pool.query(
+    //         `UPDATE crm_purchase_po_details 
+    //         SET         
+    //         sub_store_recieve = 1,
+    //         sub_store_recieve_user = ?,
+    //         sub_store_date = ?                
+    //         WHERE po_detail_slno =?`,
+    //         [
+    //             data.sub_store_recieve_user,
+    //             data.sub_store_date,
+    //             data.po_detail_slno
+    //         ],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callback(error);
+    //             }
+    //             return callback(null, results);
+    //         }
+    //     );
+    // },
 
     PurchsDataCollectionPending: (callBack) => {
         pool.query(
@@ -571,6 +583,8 @@ module.exports = {
                    main_store_slno,crs_store_code,main_store
              from 
                   crm_store_master
+             where
+                   main_store_slno is not null
              group by crs_store_code`,
             [],
             (error, results, feilds) => {
@@ -581,33 +595,38 @@ module.exports = {
             }
         )
     },
-    // CheckPOExist: (data, callBack) => {
-    //     pool.query(
-    //         `SELECT 
-    //                 po_detail_slno
-    //          FROM
-    //                crm_purchase_po_details
-    //          WHERE
-    //                 po_number=? and supply_store=?`,
-    //         [
-    //             data.po_number,
-    //             data.supply_store
-    //         ],
-    //         (err, results, fields) => {
-    //             if (err) {
-    //                 return callBack(err)
-    //             }
-    //             return callBack(null, results)
-    //         }
-    //     )
-    // },
+    CheckPOExist: (data, callBack) => {
+        pool.query(
+            ` SELECT 
+                    crm_purchase_po_details.po_detail_slno, req_slno, po_number, po_date, po_status, supply_store,
+                    expected_delivery,supplier_name, po_delivery, po_amount,sub_store_name, po_to_supplier,
+                    approval_level, po_type, po_expiry,po_itm_slno,item_code, item_name, item_qty,
+                    item_rate,item_mrp, tax, tax_amount,net_amount,crm_purchase_po_details.create_date
+             FROM
+                    crm_purchase_po_details
+             LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno 
+             LEFT JOIN crm_purchase_item_details ON crm_purchase_item_details.po_detail_slno=crm_purchase_po_details.po_detail_slno      
+             WHERE
+                    po_number=? and supply_store=?`,
+            [
+                data.po_number,
+                data.supply_store
+            ],
+            (err, results, fields) => {
+                if (err) {
+                    return callBack(err)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
 
     InsertPOItems: (data, callback) => {
         pool.query(
             `INSERT INTO
                   crm_purchase_item_details
                 (
-                  po_detail_slno,item_code,item_name,item_qty,item_rate,item_mrp,tax,tax_amount,create_user,net_amount
+                  po_detail_slno,item_code,item_name,item_qty,item_rate,item_mrp,tax,tax_amount,create_user,net_amount,grn_qnty
                 )
             VALUES ?`,
             [
@@ -623,7 +642,7 @@ module.exports = {
         );
     },
 
-    getOPItemDetails: (id, callBack) => {
+    getPOItemDetails: (id, callBack) => {
         pool.query(
             ` SELECT
                    po_itm_slno, po_detail_slno, item_code, item_name, item_qty, item_rate,
@@ -647,9 +666,11 @@ module.exports = {
     getPendingPo: (callBack) => {
         pool.query(
             ` SELECT  
-                    crm_purchase_po_details.po_number,crm_store_master.crs_store_code from crm_purchase_po_details
+                    crm_purchase_po_details.po_number,crs_store_code
+              FROM
+                    crm_purchase_po_details
                 LEFT JOIN crm_purchase_mast ON crm_purchase_mast.req_slno=crm_purchase_po_details.req_slno
-                LEFT JOIN  crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store  
+                LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno  
              WHERE 
                  crm_purchase_mast.po_complete=1 and crm_purchase_po_details.po_to_supplier=0`,
             [],
@@ -664,17 +685,21 @@ module.exports = {
 
     getPendingPOItemDetails: (callBack) => {
         pool.query(
-            ` SELECT 
+            `SELECT 
                    crm_purchase_po_details.po_detail_slno, crm_purchase_po_details.req_slno, po_number,po_date, supply_store,
-                   expected_delivery,main_store,supplier_name,po_delivery, po_amount, approval_level, po_type, po_expiry,
-                   item_code, item_name, item_qty, item_rate, item_mrp, tax, tax_amount, net_amount
+                   expected_delivery,main_store, sub_store_name,sub_store_slno,supplier_name,po_delivery, po_amount,
+                   approval_level, po_type,po_expiry,item_code,item_name,item_qty,item_rate,item_mrp,tax,tax_amount,net_amount
               FROM 
                    crm_purchase_po_details
-              LEFT JOIN  crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store   
+              LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno 
               LEFT JOIN crm_purchase_item_details ON crm_purchase_item_details.po_detail_slno=crm_purchase_po_details.po_detail_slno
               LEFT JOIN crm_purchase_mast On crm_purchase_mast.req_slno=crm_purchase_po_details.req_slno
+              LEFT JOIN crm_request_master ON crm_request_master.req_slno=crm_purchase_po_details.req_slno
               WHERE  
-                   crm_purchase_po_details.po_to_supplier=0 AND crm_purchase_mast.po_complete=1`,
+                   crm_purchase_po_details.po_to_supplier=0 AND crm_purchase_mast.po_complete=1
+                   AND crm_request_master.user_acknldge is null 
+              GROUP BY crm_purchase_po_details.po_detail_slno,crm_purchase_item_details.po_itm_slno
+			  ORDER BY crm_purchase_po_details.req_slno`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -701,7 +726,6 @@ module.exports = {
                         val.expected_delivery,
                         val.po_number,
                         val.supply_store
-
                     ],
                     (error, results, fields) => {
                         if (error) {
@@ -710,35 +734,32 @@ module.exports = {
                         return resolve(results)
                     }
                 )
-
-
             })
         })
         )
     },
 
-
-    getPODetailsForStore: (id, callBack) => {
-        pool.query(
-            ` SELECT
-                    po_detail_slno, req_slno, po_number,po_date,expected_delivery,supply_store,sub_store_name,
-                    main_store_slno, main_store, store_code,store_recieve,store_recieve_fully,supplier_name,
-                    po_delivery, po_amount,po_to_supplier,approval_level
-              FROM
-                    crm_purchase_po_details
-              LEFT JOIN  crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store
-              WHERE
-                    req_slno=? and po_status=1 and po_to_supplier=1`,
-            [
-                id
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
+    // getPODetailsForStore: (id, callBack) => {
+    //     pool.query(
+    //         ` SELECT
+    //                 po_detail_slno, req_slno, po_number,po_date,expected_delivery,supply_store,sub_store_name,
+    //                 main_store_slno, main_store, store_code,store_recieve,store_recieve_fully,supplier_name,
+    //                 po_delivery, po_amount,po_to_supplier,approval_level
+    //           FROM
+    //                 crm_purchase_po_details
+    //           LEFT JOIN  crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.supply_store
+    //           WHERE
+    //                 req_slno=? and po_status=1 and po_to_supplier=1`,
+    //         [
+    //             id
+    //         ],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callBack(error);
+    //             }
+    //             return callBack(null, results);
+    //         }
+    //     );
+    // },
 
 }

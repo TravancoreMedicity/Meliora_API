@@ -206,6 +206,7 @@ const SpareCondemService = require('./api/am_spare_condemnation/am_spare_condemn
 const opAseessment = require('./api/qi_initial_assessment_details/assessment.router')
 const feedbackdata = require('./api/feedback_module/feedback.router')
 const qideptAccess = require('./api/qi_dept_access_mast/dept_access_router')
+const crfDeliveryMarking = require('./api/crm_delivery_marking/delivery_marking_router')
 
 
 app.use(express.json({ limit: '50mb' }));
@@ -380,6 +381,7 @@ app.use('/api/SpareCondemService', SpareCondemService)
 app.use('/api/InitialAsessment', opAseessment)
 app.use('/api/feedback', feedbackdata)
 app.use('/api/qideptAccess', qideptAccess)
+app.use('/api/deliveryMarking', crfDeliveryMarking)
 
 
 server.listen(process.env.APP_PORT, () =>

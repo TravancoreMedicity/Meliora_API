@@ -1,6 +1,7 @@
 const { requestRegistInsert, requestRegistInsertDetl, requestApprovalInsert, InHodExist, getAllReqBasedDept,
-    getDetailItemList, deleteItemListByReqno, EditItemListByReqno, UpdateReqMaster, getApprovListOthers,
-    getAllListDashboard, getAllReqBasedDeptreq
+    getDetailItemList, EditItemListByReqno, UpdateReqMaster, getApprovListOthers, getpoApproovalDetails,
+    getAllListDashboard, getAllReqBasedDeptreq, deleteItemDetails, getCRFPurchaseDashboard, getDeliveryMarkingDetails,
+    getAllPoDetails, getAllItemDetails, getStoreAckDetails, getUserAckDetails, getCompletedCRF
 } = require('../crm_newrequest_registration/newRequestRegister.service');
 const { validateCRMRequestRegister } = require('../../validation/validation_schema');
 const logger = require('../../logger/logger');
@@ -148,55 +149,7 @@ module.exports = {
         });
     },
 
-    deleteItemListByReqno: (req, res) => {
-        const body = req.body;
 
-        deleteItemListByReqno(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (!results) {
-                logger.infologwindow("Record Not Found")
-                return res.status(200).json({
-                    success: 2,
-                    message: "Record Not Found"
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "Item Removed successfully"
-            });
-        });
-    },
-
-    EditItemListByReqno: (req, res) => {
-        const body = req.body;
-
-        EditItemListByReqno(body, (err, results) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (!results) {
-                logger.infologwindow("Record Not Found")
-                return res.status(200).json({
-                    success: 2,
-                    message: "Record Not Found"
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "Data Edited successfully"
-            });
-        });
-    },
 
     UpdateReqMaster: (req, res) => {
         const body = req.body;
@@ -255,13 +208,13 @@ module.exports = {
         getAllListDashboard((err, results) => {
             if (err) {
                 return res.status(200).json({
-                    success: 2,
+                    success: 0,
                     message: err
                 });
             }
             if (!results) {
                 return res.status(200).json({
-                    success: 0,
+                    success: 2,
                     message: "No results found"
                 });
             }
@@ -296,5 +249,212 @@ module.exports = {
         });
     },
 
+    deleteItemDetails: (req, res) => {
+        const body = req.body;
+        deleteItemDetails(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Deleted"
+            });
+        });
+    },
+
+    EditItemListByReqno: async (req, res) => {
+        const body = req.body;
+        EditItemListByReqno(body).then(results => {
+            return res.status(200).json({
+                success: 1,
+                message: "Updated"
+            });
+        }).catch(err => {
+            return res.status(200).json({
+                success: 0,
+                message: "Error Occured"
+            });
+        })
+    },
+
+    getCRFPurchaseDashboard: (req, res) => {
+        getCRFPurchaseDashboard((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No results found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    getpoApproovalDetails: (req, res) => {
+        getpoApproovalDetails((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No results found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    getDeliveryMarkingDetails: (req, res) => {
+        const body = req.body;
+        getDeliveryMarkingDetails(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            })
+        })
+    },
+    getAllPoDetails: (req, res) => {
+        const id = req.params.id
+        getAllPoDetails(id, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    getAllItemDetails: (req, res) => {
+        const body = req.body;
+        getAllItemDetails(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            })
+        })
+    },
+
+    getStoreAckDetails: (req, res) => {
+        const body = req.body;
+        getStoreAckDetails(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            })
+        })
+    },
+    getUserAckDetails: (req, res) => {
+        const body = req.body;
+        getUserAckDetails(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            })
+        })
+    },
+    getCompletedCRF: (req, res) => {
+        const body = req.body;
+        getCompletedCRF(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            })
+        })
+    },
 }
 

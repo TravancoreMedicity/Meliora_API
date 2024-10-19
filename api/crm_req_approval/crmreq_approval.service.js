@@ -4,15 +4,18 @@ module.exports = {
 
     getItemListApproval: (id, callBack) => {
         pool.query(
-            `  select req_detl_slno, req_slno, item_slno, item_desc, item_brand, item_unit,
-             item_qnty, item_specification, item_unit_price, aprox_cost, item_status,
-              approve_item_desc, approve_item_brand, approve_item_unit, item_qnty_approved,
-               approve_item_unit_price, approve_aprox_cost, item_status_approved, approve_item_status,
-               approve_item_delete_who, approve_item_delete_user, old_item_slno,
-                old_item_slno,item_unit,am_uom.uom_name,approve_item_specification
-                        from crm_request_mast_detail
-                         left join am_uom on am_uom.uom_slno=crm_request_mast_detail.item_unit
-                        where req_slno=? and approve_item_status=1`,
+            ` SELECT
+                    req_detl_slno, req_slno, item_slno, item_desc, item_brand, item_unit,item_qnty, item_specification,
+                    item_unit_price, aprox_cost, item_status,approve_item_desc, approve_item_brand, approve_item_unit,
+                    item_qnty_approved,approve_item_unit_price, approve_aprox_cost, item_status_approved, approve_item_status,
+                    approve_item_delete_who, approve_item_delete_user, old_item_slno,old_item_slno,item_unit,
+                    I.uom_name as uom_name,IA.uom_name as apprv_uom ,approve_item_specification,item_add_higher
+             FROM
+                 crm_request_mast_detail
+                LEFT JOIN am_uom I ON I.uom_slno=crm_request_mast_detail.item_unit
+                LEFT JOIN am_uom IA ON IA.uom_slno=crm_request_mast_detail.approve_item_unit
+            WHERE
+                 req_slno=? and approve_item_status=1`,
             [
                 id
             ],
@@ -730,9 +733,10 @@ module.exports = {
                 item_status_approved,
                 approve_item_status,
                 item_add_higher,
-                create_user
+                create_user,
+                approve_aprox_cost
                )
-                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.req_slno,
                 data.item_slno,
@@ -753,7 +757,8 @@ module.exports = {
                 data.item_status_approved,
                 data.approve_item_status,
                 data.item_add_higher,
-                data.create_user
+                data.create_user,
+                data.approve_aprox_cost
             ],
             (error, results, fields) => {
 
@@ -767,12 +772,15 @@ module.exports = {
 
     updateUserAck: (data, callback) => {
         pool.query(
-            `UPDATE crm_request_master 
-                SET user_acknldge = ? ,
-                user_acknldge_remarks=?,
-                user_ack_user=?,
-                user_ack_date =?
-                WHERE req_slno =?`,
+            `UPDATE
+                   crm_request_master
+             SET
+                  user_acknldge = ? ,
+                  user_acknldge_remarks=?,
+                  user_ack_user=?,
+                  user_ack_date =?
+             WHERE
+                   req_slno =?`,
             [
                 data.user_acknldge,
                 data.user_acknldge_remarks,
@@ -780,6 +788,26 @@ module.exports = {
                 data.user_ack_date,
                 data.req_slno
 
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateUserReply: (id, callback) => {
+        pool.query(
+            `UPDATE
+                   crm_req_item_collect_details
+             SET         
+                  received_status=1            
+             WHERE
+                   req_slno = ?`,
+            [
+                id
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -868,4 +896,25 @@ module.exports = {
             }
         );
     },
+
+    getStoreReceiveStatus: (id, callBack) => {
+        pool.query(
+            `SELECT
+                   store_receive
+             FROM
+                   crm_purchase_mast
+             WHERE
+                   req_slno=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
 }

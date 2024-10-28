@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { WifiInsert, WifiUpdate, wifiViewById, checkCodeNdGet, updateQrCode, getAllowttedWiFi, getCreatedDate,
-    deleteQrCode, getExpiredWiFiDetails
+    deleteQrCode, getExpiredWiFiDetails, getQrCodeLink
 } = require('../it_wifi_management/wifi.controller');
 
 
@@ -16,5 +16,7 @@ router.get('/getAllowttedWiFi', checkToken, getAllowttedWiFi)
 router.get('/getDate/:id', checkToken, getCreatedDate)
 router.patch('/delete', checkToken, deleteQrCode)
 router.get('/expiredData/:id', checkToken, getExpiredWiFiDetails)
+
+router.get('/getqrLink', checkToken, getQrCodeLink)
 
 module.exports = router

@@ -158,11 +158,30 @@ module.exports = {
 
     ReqComCategorty: (data, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno,compalint_date,cm_location,complaint_desc,
-            cm_complaint_type.complaint_type_name,cm_priority_desc,em_name as createuser,
+            // `select cm_complaint_mast.complaint_slno,compalint_date,cm_location,complaint_desc,
+            // cm_complaint_type.complaint_type_name,cm_priority_desc,em_name as createuser,
+            // assigned_date,co_deptsec_mast.sec_name as location,cm_rectify_time,cm_verfy_time,
+            // cm_rectify_time,cm_verfy_time,
+            // TIMEDIFF(assigned_date, compalint_date) as tat
+            // from cm_complaint_mast
+            // left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
+            // left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
+            // left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
+            // left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+            // left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
+            // where compalint_date between ? and ?  and complaint_typeslno=? group by complaint_slno`,
+            `select 
+			cm_complaint_mast.complaint_slno,
+            compalint_date,
+            cm_location,
+            complaint_desc,
+            cm_complaint_type.complaint_type_name,
+            cm_priority_desc,
+            em_name as createuser,
             assigned_date,co_deptsec_mast.sec_name as location,cm_rectify_time,cm_verfy_time,
-            cm_rectify_time,cm_verfy_time,
-            TIMEDIFF(assigned_date, compalint_date) as tat
+            cm_rectify_time,
+            cm_verfy_time,
+            assigned_date            
             from cm_complaint_mast
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
             left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location

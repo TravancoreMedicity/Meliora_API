@@ -28,7 +28,7 @@ const taskfilestorage = multer.diskStorage({
 
 });
 
-const maxSize = 2 * 1024 * 1024
+const maxSize = 3 * 1024 * 1024
 
 // for  multiple file upload
 const uploadtask = multer({

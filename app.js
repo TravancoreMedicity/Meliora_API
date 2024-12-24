@@ -13,6 +13,10 @@ const fs = require('fs');
 //sockect io configuration
 app.use(cors());
 
+app.use(express.urlencoded({ extended : true }));
+app.use(express.json());
+
+
 const server = http.createServer(app);
 const io = socketUtils.WSIO(server)
 socketUtils.connection(io);

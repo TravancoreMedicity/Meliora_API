@@ -85,7 +85,7 @@ WHERE vehicle_status = 1
     searchVehicle: (data, callBack) => {
         pool.query(
             `
-                select * from mv_vehicle_registration where vehicle_number like ?               
+                select * from mv_vehicle_registration where vehicle_number like ?   AND vehicle_status = 1            
             `,
             [
                 '%' + data.vehicle_number + '%',

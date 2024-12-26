@@ -170,7 +170,6 @@ module.exports = {
             }
             const get_password = body.emp_password.toString();
             const result = compareSync(get_password, results.emp_password);
-            console.log(result,"password");
             if (result) {
                 results.emp_password = undefined;
                 const jsontoken = sign({ result: results }, "@dhj$&$(*)dndkm76$%#jdn(^$6GH%^#73*#*", {

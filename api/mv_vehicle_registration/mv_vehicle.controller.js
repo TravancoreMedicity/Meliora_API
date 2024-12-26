@@ -118,11 +118,7 @@ module.exports = {
     },
     searchVehicle: (req, res) => {
         const data = req.body;
-        console.log(data);
-
         if (data === undefined && data === '' && data === null) {
-            console.log("enterd hi");
-
             return res.status(200).json({
                 message: 'Search Token is empty',
                 success: 2

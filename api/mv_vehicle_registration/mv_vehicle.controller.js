@@ -32,8 +32,7 @@ module.exports = {
                 return new Promise((resolve) => {
                     fs.readdir(folderPath, (err, files) => {
                         if (err) {
-                            console.log(err, "message");
-
+                            // console.log(err, "message");
                             resolve({
                                 ...data,
                                 images: [],
@@ -180,8 +179,6 @@ module.exports = {
     getTodayVehicles: (req, res) => {
         const data = req.body;
         if (data === undefined && data === '' && data === null) {
-            console.log("enterd hi");
-
             return res.status(200).json({
                 message: 'Search Token is empty',
                 success: 2

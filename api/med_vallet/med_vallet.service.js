@@ -515,7 +515,6 @@ ORDER BY
         )
     },
     getTodayAttendaceReport: (data, callBack) => {
-        console.log(data);
         //     SELECT 
         //     em_name,
         //     driver_id ,atendnace_time ,attendnace_status,em_name

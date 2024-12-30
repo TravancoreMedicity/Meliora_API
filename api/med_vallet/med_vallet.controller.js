@@ -469,8 +469,6 @@ module.exports = {
     },
     getTodayAttendaceReport: (req, res) => {
         const data = req.body;
-        console.log(data, "daata");
-
         if (!data || data === null || data === undefined) {
             return res.status(400).json({
                 success: 2,
@@ -498,8 +496,6 @@ module.exports = {
     },
     getAttendaceBetweenDate: (req, res) => {
         const data = req.body;
-        console.log(data, "daata");
-
         if (!data || data === null || data === undefined) {
             return res.status(400).json({
                 success: 2,

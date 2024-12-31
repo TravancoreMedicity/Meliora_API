@@ -24,12 +24,17 @@ const crfRegisterstorage = multer.diskStorage({
         cb(null, filepath);
     },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'crf' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'crf' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
 })
 
 // const em_id_folder = path.join('D:/DocMeliora/Inteliqo/', "PersonalRecords", `${em_id}`, "checklist", `${checklistid}`);
@@ -49,12 +54,17 @@ const crfDataCollectionstorage = multer.diskStorage({
 
         cb(null, filepath);
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'crfDataCollect' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'crfDataCollect' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
 })
 
@@ -74,12 +84,17 @@ const ImageInsertHODstorage = multer.diskStorage({
         cb(null, filepath);
     },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'HodUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'HodUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
 })
 
 const ImageInsertDMSstorage = multer.diskStorage({
@@ -98,12 +113,17 @@ const ImageInsertDMSstorage = multer.diskStorage({
         cb(null, filepath);
     },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'DMSUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'DMSUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
 })
 
 const ImageInsertMSstorage = multer.diskStorage({
@@ -121,12 +141,17 @@ const ImageInsertMSstorage = multer.diskStorage({
 
         cb(null, filepath);
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'MSUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'MSUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
 })
 
@@ -145,12 +170,17 @@ const ImageInsertMOstorage = multer.diskStorage({
 
         cb(null, filepath);
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'MOUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'MOUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
 })
 
@@ -169,12 +199,17 @@ const ImageInsertSMOstorage = multer.diskStorage({
 
         cb(null, filepath);
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'SMOUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'SMOUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
 })
 
@@ -193,12 +228,17 @@ const ImageInsertGMstorage = multer.diskStorage({
 
         cb(null, filepath);
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'GMUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'GMUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
 })
 
@@ -217,12 +257,17 @@ const ImageInsertMDstorage = multer.diskStorage({
 
         cb(null, filepath);
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'MDUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'MDUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
 })
 
@@ -242,12 +287,17 @@ const ImageInsertEDstorage = multer.diskStorage({
         cb(null, filepath);
     },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'EDUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'EDUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
 })
 const maxSize = 25 * 1024 * 1024
 

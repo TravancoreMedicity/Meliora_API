@@ -155,7 +155,7 @@ const wifiManagement = require('./api/it_wifi_management/wifi.router')
 const itemCreationDeptmap = require('./api/am_Item_creation_mast/item_creation_mast.router')
 const CustodianDeptMast = require('./api/am_custodian_department/am_custodian_dept.router')
 const ItemMapDetails = require('./api/am_item_creation_detail/am_itemdetail.router')
-const CrfImageUpload = require('./api/crf_fileupload/crf_fileupload.router')
+// const CrfImageUpload = require('./api/crf_fileupload/crf_fileupload.router')
 const IiImageUpload = require('./api/it_managemnt_file_upload/it_file_upload.router')
 const PasswordManagementMain = require('./api/it_password_management/password_management.router')
 const PasswordCredentialType = require('./api/it_password_credential_type_master/password_credential.router')
@@ -206,6 +206,7 @@ const SpareCondemService = require('./api/am_spare_condemnation/am_spare_condemn
 const opAseessment = require('./api/qi_initial_assessment_details/assessment.router')
 const feedbackdata = require('./api/feedback_module/feedback.router')
 const qideptAccess = require('./api/qi_dept_access_mast/dept_access_router')
+const crfDeliveryMarking = require('./api/crm_delivery_marking/delivery_marking_router')
 
 
 app.use(express.json({ limit: '50mb' }));
@@ -329,7 +330,7 @@ app.use('/api/wifiManagement', wifiManagement)
 app.use('/api/itemCreationDeptmap', itemCreationDeptmap)
 app.use('/api/CustodianDeptMast', CustodianDeptMast)
 app.use('/api/ItemMapDetails', ItemMapDetails)
-app.use('/api/CrfImageUpload', CrfImageUpload)
+// app.use('/api/CrfImageUpload', CrfImageUpload)
 app.use('/api/ItImageUpload', IiImageUpload)
 app.use('/api/PasswordManagementMain', PasswordManagementMain)
 app.use('/api/PasswordCredentialType', PasswordCredentialType)
@@ -380,6 +381,7 @@ app.use('/api/SpareCondemService', SpareCondemService)
 app.use('/api/InitialAsessment', opAseessment)
 app.use('/api/feedback', feedbackdata)
 app.use('/api/qideptAccess', qideptAccess)
+app.use('/api/deliveryMarking', crfDeliveryMarking)
 
 
 server.listen(process.env.APP_PORT, () =>

@@ -77,7 +77,7 @@ module.exports = {
     checkCodeNdGet: (data, callback) => {
         pool.query(
             `SELECT
-                   code
+                   code,username
              FROM
                    it_wifi_qr_code_link                               
             WHERE 
@@ -205,4 +205,21 @@ module.exports = {
             }
         );
     },
+
+    getQrCodeLink: (callBack) => {
+        pool.query(
+            `SELECT
+                   qr_code_link
+             FROM
+                   it_wifi_common_settings`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+
 }

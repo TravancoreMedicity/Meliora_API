@@ -1,5 +1,5 @@
 
-const { WifiInsert, WifiUpdate, wifiViewById, checkCodeNdGet, updateQrCode,
+const { WifiInsert, WifiUpdate, wifiViewById, checkCodeNdGet, updateQrCode, getQrCodeLink,
     getfreeCodes, getAllowttedWiFi, getCreatedDate, deleteQrCode, getExpiredWiFiDetails
 } = require('../it_wifi_management/wifi.services')
 module.exports = {
@@ -89,7 +89,6 @@ module.exports = {
 
     updateQrCode: (req, res) => {
         const body = req.body;
-
         getfreeCodes((err, results) => {
             if (err) {
                 // logger.logwindow(err)
@@ -244,6 +243,27 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 data: results
+            });
+        })
+    },
+
+    getQrCodeLink: (req, res) => {
+        getQrCodeLink((err, result) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (result.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: result
             });
         })
     },

@@ -1,4 +1,4 @@
-const { getItemList, getItemsFronList } = require('../am_reports/am_reports.service');
+const { getItemList, getItemsFronList, getAllItemList } = require('../am_reports/am_reports.service');
 const logger = require('../../logger/logger');
 
 
@@ -55,5 +55,31 @@ module.exports = {
             });
         })
     },
+
+    getAllItemList: (req, res) => {
+        getAllItemList((err, results) => {
+            if (err) {
+                logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results.length === 0) {
+                logger.infoLogger("No Records Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
 
 }

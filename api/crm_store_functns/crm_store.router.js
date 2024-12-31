@@ -31,7 +31,7 @@ router.patch("/update", checkToken, updateStoreAcknow);
 router.get("/viewStoreAck/:id", checkToken, getUserAckDetails);
 router.patch("/userReply", checkToken, updateUserReply);
 
-router.get('/getReqItem/:id', checkToken, getReqItemForCRFView);
+router.get('/storeReceivedItem/:id', checkToken, getReqItemForCRFView);
 
 
 

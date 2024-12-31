@@ -226,7 +226,7 @@ module.exports = {
                         store_receive: val.store_recieve === null ? 0 : val.store_recieve,
                         store_receive_user: val.store_recieve === 1 ? val.store_receive_user : null,
                         store_receive_date: val.store_recieve === 1 ? val.store_receive_date : null,
-                        req_slno: val.req_slno
+                        crm_purchase_slno: val.crm_purchase_slno
                     }
                 })
                 UpdatePurchasePoReceive(newArray).then(results => {
@@ -324,7 +324,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Notification Successfully Saved!"
+                message: "User acknowledgment successfully saved"
             })
         })
     },
@@ -350,7 +350,7 @@ module.exports = {
                     }
                     return res.status(200).json({
                         success: 1,
-                        message: "Notification Successfully Saved!"
+                        message: "User acknowledgment successfully saved"
                     })
                 })
             }
@@ -462,7 +462,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Notification Successfully Updated!"
+                message: "User acknowledgment successfully saved"
             });
         });
     },

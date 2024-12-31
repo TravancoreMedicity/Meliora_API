@@ -141,9 +141,6 @@ module.exports = {
         );
     },
     updateDeliveredItemQty: (body) => {
-
-        console.log(body, "itembody");
-
         return Promise.all(body.map((val) => {
             return new Promise((resolve, reject) => {
                 pool.query(
@@ -173,7 +170,6 @@ module.exports = {
         )
     },
     updatePOStatus: (body) => {
-        console.log(body, "pobody");
         return Promise.all(body.map((val) => {
             return new Promise((resolve, reject) => {
                 pool.query(

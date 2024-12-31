@@ -504,6 +504,7 @@ WHERE user_group_id = 2
         pool.query(
             `
                  SELECT 
+                 
             em_name,
             driver_id ,atendnace_time ,attendnace_status,em_name
          FROM 
@@ -511,7 +512,7 @@ WHERE user_group_id = 2
         LEFT JOIN  
              co_employee_master ON mv_attendance_marking_details.driver_id = co_employee_master.em_id
         WHERE 
-          DATE(mv_attendance_marking_details.create_date) = ?
+          DATE(mv_attendance_marking_details.create_date) = ? 
   
             `,
             [

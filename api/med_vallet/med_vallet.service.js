@@ -471,40 +471,17 @@ WHERE user_group_id = 2
         // FROM
         // 	mv_attendance_marking_details
         // LEFT JOIN  co_employee_master ON mv_attendance_marking_details.driver_id = co_employee_master.em_id
+
+   
+
         pool.query(
             `
-SELECT 
-    mad.driver_id,
-    cem.em_name,
-    mad.atendnace_time AS check_in_time,
-    COALESCE(
-        (SELECT MIN(mad2.atendnace_time) 
-         FROM mv_attendance_marking_details mad2 
-         WHERE mad2.driver_id = mad.driver_id 
-           AND mad2.atendnace_time > mad.atendnace_time), 
-        '9999-12-31 23:59:59'  
-    ) AS check_out_time,
-    COUNT(mvr.registration_slno) AS vehicle_count
-FROM
-    mv_attendance_marking_details mad
-LEFT JOIN co_employee_master cem 
-    ON mad.driver_id = cem.em_id
-LEFT JOIN mv_vehicle_registration mvr 
-    ON mad.driver_id = mvr.driver_emid
-    AND mvr.create_date BETWEEN mad.atendnace_time 
-    AND COALESCE(
-        (SELECT MIN(mad2.atendnace_time) 
-         FROM mv_attendance_marking_details mad2 
-         WHERE mad2.driver_id = mad.driver_id 
-           AND mad2.atendnace_time > mad.atendnace_time), 
-        '9999-12-31 23:59:59'
-    )
-WHERE 
-    mad.attendnace_status = 'I'
-GROUP BY 
-    mad.driver_id, cem.em_name, mad.atendnace_time
-ORDER BY 
-    mad.atendnace_time;
+             SELECT 
+        	driver_id ,atendnace_time ,attendnace_status,em_name    
+        FROM
+        	mv_attendance_marking_details
+        LEFT JOIN  co_employee_master ON mv_attendance_marking_details.driver_id = co_employee_master.em_id
+
             `,
             (error, results, feilds) => {
                 if (error) {
@@ -524,40 +501,18 @@ ORDER BY
         //      co_employee_master ON mv_attendance_marking_details.driver_id = co_employee_master.em_id
         // WHERE 
         //   DATE(mv_attendance_marking_details.create_date) = ?
-
         pool.query(
             `
-  SELECT 
-    mad.driver_id,
-    cem.em_name,
-    mad.atendnace_time AS check_in_time,
-    COALESCE(
-        (SELECT MIN(mad2.atendnace_time) 
-         FROM mv_attendance_marking_details mad2 
-         WHERE mad2.driver_id = mad.driver_id AND mad2.atendnace_time > mad.atendnace_time), 
-        '9999-12-31 23:59:59'  
-    ) AS check_out_time,
-    COUNT(mvr.registration_slno) AS vehicle_count
-FROM
-    mv_attendance_marking_details mad
-LEFT JOIN co_employee_master cem 
-    ON mad.driver_id = cem.em_id
-LEFT JOIN mv_vehicle_registration mvr 
-    ON mad.driver_id = mvr.driver_emid
-    AND mvr.create_date BETWEEN mad.atendnace_time 
-    AND COALESCE(
-        (SELECT MIN(mad2.atendnace_time) 
-         FROM mv_attendance_marking_details mad2 
-         WHERE mad2.driver_id = mad.driver_id AND mad2.atendnace_time > mad.atendnace_time), 
-        '9999-12-31 23:59:59'
-    )
-WHERE 
-    mad.attendnace_status = 'I'
-     AND DATE(mad.atendnace_time) = ? 
-GROUP BY 
-    mad.driver_id, cem.em_name, mad.atendnace_time
-ORDER BY 
-    mad.atendnace_time
+                 SELECT 
+            em_name,
+            driver_id ,atendnace_time ,attendnace_status,em_name
+         FROM 
+         mv_attendance_marking_details
+        LEFT JOIN  
+             co_employee_master ON mv_attendance_marking_details.driver_id = co_employee_master.em_id
+        WHERE 
+          DATE(mv_attendance_marking_details.create_date) = ?
+  
             `,
             [
                 data.currentDate
@@ -585,37 +540,17 @@ ORDER BY
 
         pool.query(
             `
-  SELECT 
-    mad.driver_id,
-    cem.em_name,
-    mad.atendnace_time AS check_in_time,
-    COALESCE(
-        (SELECT MIN(mad2.atendnace_time) 
-         FROM mv_attendance_marking_details mad2 
-         WHERE mad2.driver_id = mad.driver_id AND mad2.atendnace_time > mad.atendnace_time), 
-        '9999-12-31 23:59:59'  
-    ) AS check_out_time,
-    COUNT(mvr.registration_slno) AS vehicle_count
-FROM
-    mv_attendance_marking_details mad
-LEFT JOIN co_employee_master cem 
-    ON mad.driver_id = cem.em_id
-LEFT JOIN mv_vehicle_registration mvr 
-    ON mad.driver_id = mvr.driver_emid
-    AND mvr.create_date BETWEEN mad.atendnace_time 
-    AND COALESCE(
-        (SELECT MIN(mad2.atendnace_time) 
-         FROM mv_attendance_marking_details mad2 
-         WHERE mad2.driver_id = mad.driver_id AND mad2.atendnace_time > mad.atendnace_time), 
-        '9999-12-31 23:59:59'
-    )
-WHERE 
-    mad.attendnace_status = 'I'
-     AND DATE(mad.atendnace_time) BETWEEN ? AND ?
-GROUP BY 
-    mad.driver_id, cem.em_name, mad.atendnace_time
-ORDER BY 
-    mad.atendnace_time
+
+             SELECT 
+                ROW_NUMBER() OVER () as slno,
+            em_name,
+           driver_id ,atendnace_time ,attendnace_status,em_name
+        FROM
+            mv_attendance_marking_details
+        LEFT JOIN  
+            co_employee_master ON mv_attendance_marking_details.driver_id = co_employee_master.em_id
+        WHERE
+        DATE(mv_attendance_marking_details.atendnace_time) BETWEEN ? AND ?
 `,
             [
                 data.startDate,
@@ -639,39 +574,19 @@ ORDER BY
         // LEFT JOIN  
         //     co_employee_master ON mv_attendance_marking_details.driver_id = co_employee_master.em_id
         // WHERE driver_id = ?
+
         pool.query(
             `
-    SELECT 
-    mad.driver_id,
-    cem.em_name,
-    mad.atendnace_time AS check_in_time,
-    COALESCE(
-        (SELECT MIN(mad2.atendnace_time) 
-         FROM mv_attendance_marking_details mad2 
-         WHERE mad2.driver_id = mad.driver_id AND mad2.atendnace_time > mad.atendnace_time), 
-        '9999-12-31 23:59:59'  
-    ) AS check_out_time,
-    COUNT(mvr.registration_slno) AS vehicle_count
-FROM
-    mv_attendance_marking_details mad
-LEFT JOIN co_employee_master cem 
-    ON mad.driver_id = cem.em_id
-LEFT JOIN mv_vehicle_registration mvr 
-    ON mad.driver_id = mvr.driver_emid
-    AND mvr.create_date BETWEEN mad.atendnace_time 
-    AND COALESCE(
-        (SELECT MIN(mad2.atendnace_time) 
-         FROM mv_attendance_marking_details mad2 
-         WHERE mad2.driver_id = mad.driver_id AND mad2.atendnace_time > mad.atendnace_time), 
-        '9999-12-31 23:59:59'
-    )
-WHERE 
-    mad.attendnace_status = 'I' AND
-    mad.driver_id = ?
-GROUP BY 
-    mad.driver_id, cem.em_name, mad.atendnace_time
-ORDER BY 
-    mad.atendnace_time
+    
+                     SELECT 
+                ROW_NUMBER() OVER () as slno,
+            em_name,
+           driver_id ,atendnace_time ,attendnace_status,em_name
+        FROM
+            mv_attendance_marking_details
+        LEFT JOIN  
+            co_employee_master ON mv_attendance_marking_details.driver_id = co_employee_master.em_id
+        WHERE driver_id = ?
 `,
             [
                 data.driver_id

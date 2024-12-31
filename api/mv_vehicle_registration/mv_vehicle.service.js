@@ -26,7 +26,7 @@ module.exports = {
             `
            SELECT 
             ROW_NUMBER() OVER () as slno,
-	 co_employee_master.em_name,registration_slno,file_path,vallet_type, mv_vehicle_registration.zone_slno, owner_name, mobile_number, vehicle_number, token_number, driver_emid, payment_type, upi_payment_transactionid, payment_attach_status,mv_vehicle_registration.create_date, zone_name
+	 co_employee_master.em_name,registration_slno,file_path,vallet_type, mv_vehicle_registration.zone_slno, owner_name, mobile_number, vehicle_number, token_number,slot_number, driver_emid, payment_type, upi_payment_transactionid, payment_attach_status,mv_vehicle_registration.create_date, zone_name
 FROM
 	mv_vehicle_registration
 LEFT JOIN mv_zone_master ON mv_vehicle_registration.zone_slno = mv_zone_master.zone_slno 
@@ -38,6 +38,25 @@ WHERE vehicle_status = 1
                     return callBack(error);
                 }
                 return callBack(null, results)
+            }
+        )
+    },
+    checkTokenexist: (data, callBack) => {
+        pool.query(
+            `
+            SELECT vehicle_number,create_date
+FROM  meliora.mv_vehicle_registration 
+WHERE token_number = ?
+AND DATE(create_date) = CURDATE()
+            `,
+            [
+                data.token_number,
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
             }
         )
     },
@@ -53,13 +72,14 @@ WHERE vehicle_status = 1
                 mobile_number,
                 vehicle_number,
                 token_number,
+                slot_number,
                 driver_emid,
                 payment_type,
                 file_path,
                 upi_payment_transactionid,
                 create_user
             )
-            VALUES(?,?,?,?,?,?,?,?,?,?,?)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?)
             `,
             [
                 data.vallet_type,
@@ -68,6 +88,7 @@ WHERE vehicle_status = 1
                 data.mobile_number,
                 data.vehicle_number,
                 data.token_number,
+                data.slot_number,
                 data.driver_emid,
                 data.payment_type,
                 data.filePath,

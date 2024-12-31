@@ -1,6 +1,16 @@
 const multer = require('multer');
 const logger = require('../../logger/logger');
-const { vehicleImageUpload, getallvehicledetail, createPractiseRegistration, searchVehicle, getTodayVehicles, getvehicleBetweenData, updatevehicleDetail,getAllVehicleReport} = require("./mv_vehicle.service");
+const {
+    vehicleImageUpload,
+    getallvehicledetail,
+    createPractiseRegistration,
+    searchVehicle,
+    getTodayVehicles,
+    getvehicleBetweenData,
+    updatevehicleDetail,
+    getAllVehicleReport,
+    checkTokenexist
+} = require("./mv_vehicle.service");
 const path = require("path");
 const fs = require("fs");
 const { upload } = require('./uploadFiles');
@@ -82,37 +92,51 @@ module.exports = {
 
             if (!objdata || objdata === null || objdata === undefined || !req.filePath) {
                 console.error("Upload Erroror:", err);
-                return res.status(400).json({ success: 0, message: "Error in inseting data" });
+                return res.status(200).json({ success: 0, message: "Error in inseting data" });
             }
-
-            createPractiseRegistration(objdata, (err, result) => {
+            checkTokenexist(objdata, (err, results) => { 
                 if (err) {
-                    return res.status(500).json({ success: 0, message: err });
+                    return res.status(200).json({ success: 0, message: err });
                 }
-                let data = {
-                    registration_slno: result.insertId
-                }
-                if (isPayFileExist && data) {
-                    vehicleImageUpload(data, (err, result) => {
-                        if (err) {
-                            logger.logwindow(err)
-                            return res.status(200).json({
-                                success: 2,
-                                message: err
-                            });
-                        }
-                        return res.status(200).json({
-                            success: 1,
-                            message: "File Upload succssfully Successfully!",
-                        })
-                    })
-                } else {
+                if (results.length > 0) {
                     return res.status(200).json({
-                        success: 1,
-                        message: "Inserted Successfully"
+                        success: 3,
+                        message: "Token Exist Select Another"
                     })
                 }
-            });
+
+                if (results.length === 0) {
+                    createPractiseRegistration(objdata, (err, result) => {
+                        if (err) {
+                            return res.status(200).json({ success: 0, message: err });
+                        }
+                        let data = {
+                            registration_slno: result.insertId
+                        }
+                        if (isPayFileExist && data) {
+                            vehicleImageUpload(data, (err, result) => {
+                                if (err) {
+                                    logger.logwindow(err)
+                                    return res.status(200).json({
+                                        success: 2,
+                                        message: err
+                                    });
+                                }
+                                return res.status(200).json({
+                                    success: 1,
+                                    message: "File Upload succssfully Successfully!",
+                                })
+                            })
+                        } else {
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Inserted Successfully"
+                            })
+                        }
+                    });
+                }
+            })
+
         });
     },
     searchVehicle: (req, res) => {

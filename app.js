@@ -13,6 +13,10 @@ const fs = require('fs');
 //sockect io configuration
 app.use(cors());
 
+app.use(express.urlencoded({ extended : true }));
+app.use(express.json());
+
+
 const server = http.createServer(app);
 const io = socketUtils.WSIO(server)
 socketUtils.connection(io);
@@ -206,6 +210,9 @@ const SpareCondemService = require('./api/am_spare_condemnation/am_spare_condemn
 const opAseessment = require('./api/qi_initial_assessment_details/assessment.router')
 const feedbackdata = require('./api/feedback_module/feedback.router')
 const qideptAccess = require('./api/qi_dept_access_mast/dept_access_router')
+const med_vallet_master = require('./api/med_vallet/med_vallet.router')
+const mv_vehicle_registration = require('./api/mv_vehicle_registration/mv_vehicle.router');
+const { validateTokenFrontend } = require("./authentication/ValidationCheck");
 
 
 app.use(express.json({ limit: '50mb' }));
@@ -380,7 +387,18 @@ app.use('/api/SpareCondemService', SpareCondemService)
 app.use('/api/InitialAsessment', opAseessment)
 app.use('/api/feedback', feedbackdata)
 app.use('/api/qideptAccess', qideptAccess)
+app.use('/api/medvallet', med_vallet_master)
+app.use('/api/medvehilces',mv_vehicle_registration)
 
+app.get('/api/validateToken',validateTokenFrontend)
+
+/*
+
+app.use('/api/validatetoken',validateToken)
+app
+
+
+*/
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

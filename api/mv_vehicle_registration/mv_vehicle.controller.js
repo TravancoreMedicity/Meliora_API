@@ -42,7 +42,6 @@ module.exports = {
                 return new Promise((resolve) => {
                     fs.readdir(folderPath, (err, files) => {
                         if (err) {
-                            // console.log(err, "message");
                             resolve({
                                 ...data,
                                 images: [],
@@ -85,13 +84,13 @@ module.exports = {
             }
             const isPayFileExist = req.isPaymentFile;
             if (err) {
-                console.error("Upload Error:", err);
+                // console.error("Upload Error:", err);
                 return res.status(400).json({ success: 0, message: err });
             }
 
 
             if (!objdata || objdata === null || objdata === undefined || !req.filePath) {
-                console.error("Upload Erroror:", err);
+                // console.error("Upload Erroror:", err);
                 return res.status(200).json({ success: 0, message: "Error in inseting data" });
             }
             checkTokenexist(objdata, (err, results) => { 
@@ -167,8 +166,6 @@ module.exports = {
                 return new Promise((resolve) => {
                     fs.readdir(folderPath, (err, files) => {
                         if (err) {
-                            console.log(err, "message");
-
                             resolve({
                                 ...data,
                                 images: [],
@@ -277,7 +274,7 @@ module.exports = {
     UploadImageSeparate: (req, res) => {
         upload(req, res, (err) => {
             if (err) {
-                console.error("Upload Error:", err);
+                // console.error("Upload Error:", err);
                 return res.status(400).json({ success: 0, message: err });
             }
             return res.status(200).json({

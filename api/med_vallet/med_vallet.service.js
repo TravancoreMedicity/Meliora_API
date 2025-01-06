@@ -370,7 +370,7 @@ LEFT JOIN 	mv_user_master ON 	mv_employee_user_rights	.user_group_id = mv_user_m
 LEFT JOIN  co_department_mast ON mv_employee_user_rights.dept_id = co_department_mast.dept_id
 LEFT JOIN  co_deptsec_mast ON mv_employee_user_rights.sect_id = co_deptsec_mast.sec_id
 LEFT JOIN  co_employee_master ON mv_employee_user_rights.emp_id = co_employee_master.em_id
-WHERE user_group_id = 2
+WHERE user_group_id = 2 AND status = 1
             `,
             (error, results, feilds) => {
                 if (error) {
@@ -383,7 +383,7 @@ WHERE user_group_id = 2
     FindUserExists: (data, callBack) => {
         pool.query(
             `
-        SELECT slno FROM mv_driver_attendnace_marking WHERE emp_id  = ? AND attendance_day = ?
+        SELECT slno FROM mv_driver_attendnace_marking WHERE emp_id  = ? AND attendance_day = ? 
         `,
             [data.empid, data.currentDate],
             (error, results, feilds) => {

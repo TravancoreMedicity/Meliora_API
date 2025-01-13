@@ -19,7 +19,6 @@ const { upload } = require('./uploadFiles');
 
 module.exports = {
 
-
     getallvehicledetail: (req, res) => {
         getallvehicledetail((err, results) => {
             if (err) {
@@ -45,13 +44,16 @@ module.exports = {
                             resolve({
                                 ...data,
                                 images: [],
+                                vedio: [],
                                 error: err.message
                             });
                         } else {
                             const vehicleImages = files.filter(file => file.startsWith('vehicle_'));
+                            const vedioFiles = files.filter(file => file.startsWith('vedio_'));
                             resolve({
                                 ...data,
-                                images: vehicleImages || []
+                                images: vehicleImages || [],
+                                vedio:vedioFiles || []
                             });
                         }
                     });
@@ -84,13 +86,11 @@ module.exports = {
             }
             const isPayFileExist = req.isPaymentFile;
             if (err) {
-                // console.error("Upload Error:", err);
                 return res.status(400).json({ success: 0, message: err });
             }
 
 
             if (!objdata || objdata === null || objdata === undefined || !req.filePath) {
-                // console.error("Upload Erroror:", err);
                 return res.status(200).json({ success: 0, message: "Error in inseting data" });
             }
             checkTokenexist(objdata, (err, results) => { 
@@ -168,14 +168,17 @@ module.exports = {
                         if (err) {
                             resolve({
                                 ...data,
+                                vedio: [],
                                 images: [],
                                 error: err.message
                             });
                         } else {
                             const vehicleImages = files.filter(file => file.startsWith('vehicle_'));
+                            const vedioFiles = files.filter(file => file.startsWith('vedio_'));
                             resolve({
                                 ...data,
-                                images: vehicleImages || []
+                                images: vehicleImages || [],
+                                vedio:vedioFiles || []
                             });
                         }
                     });
@@ -274,12 +277,11 @@ module.exports = {
     UploadImageSeparate: (req, res) => {
         upload(req, res, (err) => {
             if (err) {
-                // console.error("Upload Error:", err);
-                return res.status(400).json({ success: 0, message: err });
+                return res.status(200).json({ success: 2, message: err });
             }
             return res.status(200).json({
                 success: 1,
-                message: "File Upload succssfully Successfully!",
+                message: "File Upload succssfully !",
             })
         })
 

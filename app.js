@@ -17,6 +17,8 @@ app.use(express.urlencoded({ extended : true }));
 app.use(express.json());
 
 
+
+
 const server = http.createServer(app);
 const io = socketUtils.WSIO(server)
 socketUtils.connection(io);
@@ -25,6 +27,8 @@ const socketIOMiddlewre = (req, res, next) => {
     req.io = io;
     next();
 }
+
+
 
 
 // ----- logger display For Info ----
@@ -228,8 +232,13 @@ app.use((req, res, next) => {
         res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
         return res.status(200).json({});
     }
+
     next();
 });
+
+
+
+  
 
 // Outside Route Config
 app.use("/api/user", userRouter);
@@ -397,8 +406,8 @@ app.get('/api/validateToken',validateTokenFrontend)
 app.use('/api/validatetoken',validateToken)
 app
 
-
 */
+
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

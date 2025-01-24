@@ -175,7 +175,8 @@ module.exports = {
                 const jsontoken = sign({ result: results }, "@dhj$&$(*)dndkm76$%#jdn(^$6GH%^#73*#*", {
                     expiresIn: "10h"
                 });
-
+              
+                
                 return res.json({
                     success: 1,
                     message: "login successfully",
@@ -192,7 +193,6 @@ module.exports = {
                     logintime: results.login,
                     supervisor: results.supervisor,
                     logOutTime: format(addHours(new Date(results.login), logout_time), 'yyyy-MM-dd HH:mm:ss')
-
                 });
             } else {
                 return res.json({

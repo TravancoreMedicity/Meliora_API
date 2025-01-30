@@ -1,8 +1,8 @@
 const router = require('express').Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { insertDeliveryMarking, InsertDeliveredPO, checkPOExist, getItemDetails, InsertCheckedItems,
-    updateDeliveredItemQty, updatePOStatus, getSupplier, getAllDeliveredDetails, getAllPoDetails,
-    getPendingPoSup } = require('./delivery_marking.controller')
+    updateDeliveredItemQty, updatePOStatus, getSupplier, getAllDeliveredDetails, viewItemChecking,
+    getPendingPoSup, getSupplierDetailsForItemChecking } = require('./delivery_marking.controller')
 
 router.post("/delMarkInsert", checkToken, insertDeliveryMarking);
 router.post("/insertPo", checkToken, InsertDeliveredPO);
@@ -13,8 +13,9 @@ router.post('/updateqty', checkToken, updateDeliveredItemQty);
 router.post('/updatePoStatus', checkToken, updatePOStatus);
 router.post('/insertCheckItems', checkToken, InsertCheckedItems);
 router.get("/supplier", checkToken, getSupplier);
-// router.post("/viewAll", checkToken, getAllDeliveredDetails);
-router.get("/getpo/:id", checkToken, getAllPoDetails);
+router.post("/viewDelv", checkToken, getAllDeliveredDetails);
+router.get("/viewSupplier", checkToken, getSupplierDetailsForItemChecking);
+router.post("/itemCheck", checkToken, viewItemChecking);
 router.get("/pendingPo/:id", checkToken, getPendingPoSup);
 
 

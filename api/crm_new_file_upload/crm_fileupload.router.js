@@ -4,7 +4,7 @@ const { crfRegistration, crfRegimageGet, crfDataCollection, getDataCollectionIma
     ImageInsertHOD, ImageInsertDMS, ImageInsertMS, ImageInsertMO, ImageInsertSMO,
     ImageInsertGM, ImageInsertMD, ImageInsertED, crfHodImageGet, crfDMSImageGet,
     crfMSImageGet, crfMOImageGet, crfSMOImageGet, crfGMImageGet, crfMDImageGet,
-    crfEDImageGet
+    crfEDImageGet, ImageInsertManaging, crfManageImageGet, ImageInsertMDKmch, crfKMCHMDImageGet
 } = require('../crm_new_file_upload/crm_fileupload.controller')
 
 router.post("/InsertRegisterImage", checkToken, crfRegistration)
@@ -20,6 +20,9 @@ router.post("/crf/ImageInsertSMO", checkToken, ImageInsertSMO)
 router.post("/crf/ImageInsertGM", checkToken, ImageInsertGM)
 router.post("/crf/ImageInsertMD", checkToken, ImageInsertMD)
 router.post("/crf/ImageInsertED", checkToken, ImageInsertED)
+// kmch
+router.post("/crf/ImageInsertMDKmch", checkToken, ImageInsertMDKmch)
+router.post("/crf/ImageInsertManage", checkToken, ImageInsertManaging)
 
 router.get("/crfHodImageGet/:id", checkToken, crfHodImageGet)
 router.get("/crfDMSImageGet/:id", checkToken, crfDMSImageGet)
@@ -29,6 +32,8 @@ router.get("/crfSMOImageGet/:id", checkToken, crfSMOImageGet)
 router.get("/crfGMImageGet/:id", checkToken, crfGMImageGet)
 router.get("/crfMDImageGet/:id", checkToken, crfMDImageGet)
 router.get("/crfEDImageGet/:id", checkToken, crfEDImageGet)
-
+// kmc
+router.get("/crfManageImageGet/:id", checkToken, crfManageImageGet)
+router.get("/crfKmchMdImageGet/:id", checkToken, crfKMCHMDImageGet)
 
 module.exports = router;

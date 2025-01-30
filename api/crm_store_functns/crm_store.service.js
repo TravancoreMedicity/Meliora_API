@@ -9,12 +9,13 @@ module.exports = {
                   received_qnty,crm_purchase_po_details.crm_purchase_slno,crm_store_grn_details.grn_no
             FROM 
 		          crm_purchase_po_details
+               LEFT JOIN crm_request_master ON crm_request_master.req_slno=crm_purchase_po_details.req_slno
                LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno 
                LEFT JOIN crm_purchase_item_details ON crm_purchase_item_details.po_detail_slno=crm_purchase_po_details.po_detail_slno
                LEFT JOIN crm_purchase_mast ON crm_purchase_mast.crm_purchase_slno=crm_purchase_po_details.crm_purchase_slno
                LEFT JOIN crm_store_grn_details ON ( crm_store_grn_details.po_number=crm_purchase_po_details.po_number and crm_store_grn_details.store_code=crm_store_master.crs_store_code)
             WHERE
-		          crm_purchase_po_details.po_to_supplier=1
+		          crm_purchase_po_details.po_to_supplier = 1 AND user_acknldge is null AND po_status = 1
                   AND (crm_purchase_po_details.store_recieve = 0 OR crm_purchase_po_details.store_recieve IS NULL)
 				  GROUP BY crm_purchase_po_details.po_detail_slno,crm_purchase_item_details.po_itm_slno
 				  ORDER BY crm_purchase_po_details.req_slno DESC`,
@@ -28,7 +29,7 @@ module.exports = {
         )
     },
 
-    getCrsReceiceAllList: (callBack) => {
+    getCrsReceiveAllList: (callBack) => {
         pool.query(
             `SELECT
                    crm_purchase_po_details.po_detail_slno,crm_purchase_po_details.req_slno,crm_purchase_po_details.po_number,
@@ -38,12 +39,14 @@ module.exports = {
                    crm_purchase_mast.store_receive as fully_receive
 			 FROM 
                    crm_purchase_po_details
+                LEFT JOIN crm_request_master ON crm_request_master.req_slno=crm_purchase_po_details.req_slno
 		        LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno 
                 LEFT JOIN crm_purchase_item_details ON crm_purchase_item_details.po_detail_slno=crm_purchase_po_details.po_detail_slno
                 LEFT JOIN crm_purchase_mast ON crm_purchase_mast.crm_purchase_slno=crm_purchase_po_details.crm_purchase_slno
                 LEFT JOIN crm_store_grn_details ON ( crm_store_grn_details.po_number=crm_purchase_po_details.po_number and crm_store_grn_details.store_code=crm_store_master.crs_store_code)
              WHERE
 				   crm_purchase_po_details.po_to_supplier=1 AND crm_purchase_po_details.store_recieve = 1
+                   AND user_acknldge is null AND po_status=1
              GROUP BY crm_purchase_po_details.po_detail_slno,crm_purchase_item_details.po_itm_slno
              ORDER BY crm_purchase_po_details.req_slno DESC`,
             [],
@@ -64,12 +67,13 @@ module.exports = {
                   crm_purchase_po_details.crm_purchase_slno,crm_store_grn_details.grn_no
 			 FROM 
                   crm_purchase_po_details
+                LEFT JOIN crm_request_master ON crm_request_master.req_slno=crm_purchase_po_details.req_slno
 		        LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno 
                 LEFT JOIN crm_purchase_item_details ON crm_purchase_item_details.po_detail_slno=crm_purchase_po_details.po_detail_slno
                 LEFT JOIN crm_purchase_mast ON crm_purchase_mast.crm_purchase_slno=crm_purchase_po_details.crm_purchase_slno
                 LEFT JOIN crm_store_grn_details ON ( crm_store_grn_details.po_number=crm_purchase_po_details.po_number and crm_store_grn_details.store_code=crm_store_master.crs_store_code)
              WHERE
-				  crm_purchase_po_details.po_to_supplier=1
+				  crm_purchase_po_details.po_to_supplier=1 AND user_acknldge is null AND po_status=1
                  AND (crm_purchase_po_details.store_recieve = 0 OR crm_purchase_po_details.store_recieve IS NULL)
                  AND supplier_name like ?
                  AND crm_purchase_po_details.req_slno like ?
@@ -99,12 +103,13 @@ module.exports = {
                     crm_purchase_mast.store_receive as fully_receive
 			 FROM 
                   crm_purchase_po_details
+                LEFT JOIN crm_request_master ON crm_request_master.req_slno=crm_purchase_po_details.req_slno
 		        LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno 
                 LEFT JOIN crm_purchase_item_details ON crm_purchase_item_details.po_detail_slno=crm_purchase_po_details.po_detail_slno
                 LEFT JOIN crm_purchase_mast ON crm_purchase_mast.crm_purchase_slno=crm_purchase_po_details.crm_purchase_slno
                 LEFT JOIN crm_store_grn_details ON ( crm_store_grn_details.po_number=crm_purchase_po_details.po_number and crm_store_grn_details.store_code=crm_store_master.crs_store_code)
              WHERE
-             	  crm_purchase_po_details.po_to_supplier=1
+             	  crm_purchase_po_details.po_to_supplier=1 AND user_acknldge is null AND po_status=1
                   AND crm_purchase_po_details.store_recieve = 1
                   AND supplier_name like ?
                   AND crm_purchase_po_details.req_slno like ?
@@ -134,7 +139,7 @@ module.exports = {
               LEFT JOIN  crm_purchase_item_details ON crm_purchase_item_details.po_detail_slno=crm_purchase_po_details.po_detail_slno 
               LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno  
              WHERE 
-                    crm_purchase_po_details.po_to_supplier=1
+                    crm_purchase_po_details.po_to_supplier=1 AND po_status=1
                     AND (crm_purchase_po_details.store_recieve = 0 OR crm_purchase_po_details.store_recieve IS NULL)`,
             [],
             (err, results, fields) => {
@@ -249,7 +254,7 @@ module.exports = {
                     crm_purchase_item_details
               LEFT JOIN crm_purchase_po_details ON crm_purchase_po_details.po_detail_slno=crm_purchase_item_details.po_detail_slno
               WHERE
-                    crm_purchase_item_details.po_detail_slno in (?)`,
+                    crm_purchase_item_details.po_detail_slno in (?) AND po_status=1`,
             [poSlno],
             (error, results, feilds) => {
                 if (error) {
@@ -346,10 +351,11 @@ module.exports = {
                     R.sec_name as req_deptsec,U.sec_name as user_deptsection,crm_request_master.location,
                     crm_purchase_po_details.po_number,crm_purchase_po_details.po_date,supply_store,
                     CS.crs_store_code,CS.main_store,CS.sub_store_name,sub_store_slno,crm_store_grn_details.grn_no,
-                    supplier_name,po_delivery,expected_delivery
+                    supplier_name,po_delivery,expected_delivery,crm_purchase_po_details.crm_purchase_slno
               FROM
 	                crm_purchase_po_details
                  LEFT JOIN crm_request_master ON crm_request_master.req_slno=crm_purchase_po_details.req_slno
+                 LEFT JOIN crm_purchase_mast ON crm_purchase_mast.crm_purchase_slno=crm_purchase_po_details.crm_purchase_slno
 	             LEFT JOIN co_employee_master CR on CR.em_id=crm_request_master.create_user
                  LEFT JOIN co_deptsec_mast R ON R.sec_id=crm_request_master.request_deptsec_slno
                  LEFT JOIN co_deptsec_mast U ON U.sec_id=crm_request_master.user_deptsec
@@ -357,7 +363,7 @@ module.exports = {
                  LEFT JOIN crm_store_grn_details ON (crm_store_grn_details.po_number=crm_purchase_po_details.po_number and
                     crm_store_grn_details.store_code=CS.crs_store_code)
               WHERE
-                     crm_purchase_po_details.po_to_supplier=1
+                     crm_purchase_po_details.po_to_supplier=1 AND po_status=1
                      AND (crm_purchase_po_details.store_recieve = 0 OR crm_purchase_po_details.store_recieve =1)
 		             AND crm_request_master.user_acknldge is null 
               ORDER BY
@@ -433,7 +439,7 @@ module.exports = {
              SET         
                     sub_store_recieve=1         
              WHERE
-                   po_detail_slno in (?)`,
+                   po_detail_slno in (?) AND po_status=1`,
             [
                 data.po_detail_slno
             ],
@@ -566,14 +572,14 @@ module.exports = {
     getReqItemForCRFView: (id, callBack) => {
         pool.query(
             `SELECT
-                    crm_purchase_po_details.req_slno,po_itm_slno, crm_purchase_item_details.po_detail_slno, item_code,
-                    item_name, item_qty,item_receive_status,grn_qnty,received_qnty
+                    crm_purchase_po_details.req_slno,po_itm_slno, crm_purchase_item_details.po_detail_slno,
+                    item_code,item_name, item_qty,item_receive_status,grn_qnty,received_qnty,user_received_status,store_recieve
              FROM
                     crm_purchase_item_details
                  LEFT JOIN crm_purchase_po_details ON crm_purchase_po_details.po_detail_slno=crm_purchase_item_details.po_detail_slno
                  LEFT JOIN crm_request_master ON crm_request_master.req_slno=crm_purchase_po_details.req_slno
              WHERE  
-                   crm_request_master.req_slno=?`,
+                   crm_request_master.req_slno=? AND po_status=1`,
             [
                 id
             ],

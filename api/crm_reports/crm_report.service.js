@@ -55,31 +55,29 @@ module.exports = {
             }
         );
     },
-    getdataUserAcknldged: (data, callBack) => {
-        pool.query(
-            `select ROW_NUMBER() over (order by req_slno) as slno,req_slno, co_department_mast.dept_name,
-            RDS.sec_name,  actual_requirement,
-            needed, category, location, date(expected_date) as expected_date, emergency_flag, emer_slno,
-            crm_emergencytype_mast.emer_type_name, emergeny_remarks, total_approx_cost,
-            UDS.sec_name as user_deptsec,  req_status, image_status, RU.em_name as req_user,
-            crm_request_master.create_date as req_date,  user_acknldge, user_acknldge_remarks,
-            user_ack_user, user_ack_date ,  AU.em_name as ack_user         
-              
-            from crm_request_master 
-            left join co_deptsec_mast RDS on RDS.sec_id=crm_request_master.request_deptsec_slno
-            left join co_department_mast on co_department_mast.dept_id=RDS.dept_id
-            left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
-            left join co_deptsec_mast UDS on RDS.sec_id=crm_request_master.user_deptsec
-            left join co_employee_master RU on RU.em_id=crm_request_master.create_user
-             left join co_employee_master AU on AU.em_id=crm_request_master.user_ack_user
-            where date(crm_request_master.create_date) between ? and ?
-            and user_acknldge=1
-               group by req_slno
-             `,
 
+    getdataUserAcknldged: (data, callBack) => {
+        pool.query(` 
+            SELECT 
+                   select ROW_NUMBER() over (order by req_slno) as slno,crm_request_master.req_slno,req_date,
+                   actual_requirement,needed,location,expected_date,emergency_flag,crm_emergencytype_mast.emer_type_name,
+                   emergeny_remarks, TD.dept_name,R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as req_user,
+                   user_acknldge, user_acknldge_remarks,user_ack_user, user_ack_date,ackUser.em_name as acknowUser,category,
+                   GROUP_CONCAT(DISTINCT am_item_type.item_type_name SEPARATOR ', ') AS category_name
+            FROM 
+                   crm_request_master
+   	            LEFT JOIN crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
+                LEFT JOIN co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
+	            LEFT JOIN co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec                 
+                LEFT JOIN co_employee_master CR on CR.em_id=crm_request_master.create_user
+                LEFT JOIN co_employee_master ackUser on ackUser.em_id=crm_request_master.user_ack_user
+                LEFT JOIN co_department_mast TD on TD.dept_id=R.dept_id
+                LEFT JOIN am_item_type ON JSON_CONTAINS(crm_request_master.category, CAST(am_item_type.item_type_slno AS JSON), '$') 
+            WHERE req_date  between ? and ? and user_acknldge=1
+            GROUP BY crm_request_master.req_slno`,
             [
-                data.start_date,
-                data.end_date
+                data.startDate,
+                data.endDate
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -89,6 +87,41 @@ module.exports = {
             }
         )
     },
+
+
+
+    // getdataUserAcknldged: (data, callBack) => {
+    //     pool.query(
+    //         `select ROW_NUMBER() over (order by req_slno) as slno,req_slno, co_department_mast.dept_name,
+    //         RDS.sec_name,  actual_requirement,
+    //         needed, category, location, date(expected_date) as expected_date, emergency_flag, emer_slno,
+    //         crm_emergencytype_mast.emer_type_name, emergeny_remarks, total_approx_cost,
+    //         UDS.sec_name as user_deptsec,  req_status, image_status, RU.em_name as req_user,
+    //         crm_request_master.create_date as req_date,  user_acknldge, user_acknldge_remarks,
+    //         user_ack_user, user_ack_date ,  AU.em_name as ack_user         
+
+    //         from crm_request_master 
+    //         left join co_deptsec_mast RDS on RDS.sec_id=crm_request_master.request_deptsec_slno
+    //         left join co_department_mast on co_department_mast.dept_id=RDS.dept_id
+    //         left join crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
+    //         left join co_deptsec_mast UDS on RDS.sec_id=crm_request_master.user_deptsec
+    //         left join co_employee_master RU on RU.em_id=crm_request_master.create_user
+    //          left join co_employee_master AU on AU.em_id=crm_request_master.user_ack_user
+    //         where date(crm_request_master.create_date) between ? and ?
+    //         and user_acknldge=1 group by req_slno`,
+
+    //         [
+    //             data.start_date,
+    //             data.end_date
+    //         ],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callBack(error);
+    //             }
+    //             return callBack(null, results);
+    //         }
+    //     )
+    // },
 
     getdataUserNotAcknldged: (data, callBack) => {
         pool.query(
@@ -168,7 +201,7 @@ module.exports = {
             po_approva_level_two, po_to_supplier, store_receive, store_receive_user, store_receive_date,
             create_user, edit_user, create_date, edit_date, sub_store_recieve
  
-             FROM meliora.crm_purchase_mast
+             FROM crm_purchase_mast
  
              where date(crm_purchase_mast.create_date) between ? and ?
                  group by req_slno
@@ -195,7 +228,7 @@ module.exports = {
             po_prepartion, po_complete, PC.em_name as po_completeuser, po_complete_date, po_approva_level_one, po_approva_level_two, 
             po_to_supplier, store_receive, store_receive_user, store_receive_date, sub_store_recieve
  
-                FROM meliora.crm_purchase_mast
+                FROM crm_purchase_mast
  
             left join co_employee_master AC on AC.em_id=crm_purchase_mast.create_user
              left join co_employee_master QC on QC.em_id=crm_purchase_mast.quatation_calling_user
@@ -220,7 +253,7 @@ module.exports = {
             `SELECT po_log_slno, po_slno, receive_date,CR.em_name as crs_receive_user, partialy, fully, 
             substore_receive, SR.em_name as sotre_receive_user, substore_receive_date
 
-            FROM meliora.crm_po_log_detail 
+            FROM crm_po_log_detail 
             left join co_employee_master CR on CR.em_id=crm_po_log_detail.receive_user
             left join co_employee_master SR on SR.em_id=crm_po_log_detail.substore_receive_user
             where po_slno=?`,

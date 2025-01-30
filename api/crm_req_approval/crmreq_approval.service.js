@@ -5,7 +5,8 @@ module.exports = {
             `SELECT
                    req_detl_slno, req_slno, item_slno, approve_item_desc, approve_item_brand, approve_item_unit,
                    item_qnty_approved,approve_item_unit_price, approve_aprox_cost, item_status_approved, approve_item_status,
-                   I.uom_name as apprv_uom,approve_item_specification,hold_remarks,reject_remarks,po_item_status
+                   I.uom_name as apprv_uom,approve_item_specification,hold_remarks,reject_remarks,po_item_status,
+                   internal_remarks
              FROM
                   crm_request_mast_detail
                 LEFT JOIN am_uom I ON I.uom_slno=crm_request_mast_detail.approve_item_unit
@@ -92,39 +93,62 @@ module.exports = {
         );
     },
 
-
-    // checkItemExist: (data, callBack) => {
-    //     pool.query(
-    //         `SELECT
-    //                item_apprv_slno
-    //          FROM
-    //               crm_reqitems_approval_details    
-    //           WHERE
-    //                 req_slno=? and req_detl_slno=?`,
-    //         [
-    //             data.req_slno,
-    //             data.req_detl_slno
-    //         ],
-    //         (error, results, feilds) => {
-    //             if (error) {
-    //                 return callBack(error);
-    //             }
-    //             return callBack(null, results);
-    //         }
-    //     );
-    // },
-
+    updateReqMstInternally: (data, callback) => {
+        pool.query(
+            `UPDATE
+                   crm_request_master
+             SET
+                   req_status = 'I',reject_status = 0,onhold_status = 0,internally_arranged_status=1
+             WHERE
+                   req_slno =?`,
+            [
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    updateAllItemStatusForInternallArran: (body) => {
+        return Promise.all(body.map((val) => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    `UPDATE
+                           crm_request_mast_detail
+                     SET
+                           item_status_approved = 4 
+                     WHERE
+                           req_detl_slno = ? and req_slno = ?`,
+                    [
+                        val.req_detl_slno,
+                        val.req_slno
+                    ],
+                    (error, results, fields) => {
+                        if (error) {
+                            return reject(error)
+                        }
+                        return resolve(results)
+                    }
+                )
+            })
+        })
+        )
+    },
     updateReqMstHold: (data, callback) => {
         pool.query(
             `UPDATE
                    crm_request_master
              SET
-                   req_status = 'P',reject_status = ?,onhold_status = ?
+                   req_status = 'P',reject_status = ?,onhold_status = ?,internally_arranged_status=?
              WHERE
                    req_slno =?`,
             [
                 data.reject_status,
                 data.onhold_status,
+                data.internally_arranged_status,
                 data.req_slno
             ],
             (error, results, feilds) => {
@@ -141,12 +165,13 @@ module.exports = {
             `UPDATE
                    crm_request_master
              SET
-                   req_status = 'A',reject_status = ?,onhold_status = ?
+                   req_status = 'A',reject_status = ?,onhold_status = ?,internally_arranged_status=?
              WHERE
                    req_slno =?`,
             [
                 data.reject_status,
                 data.onhold_status,
+                data.internally_arranged_status,
                 data.req_slno
             ],
             (error, results, feilds) => {
@@ -454,18 +479,51 @@ module.exports = {
         )
     },
 
+    updateApprovedManageItemStatus: (body) => {
+        return Promise.all(body.map((val) => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    `UPDATE
+                           crm_reqitems_approval_details
+                     SET
+                           item_manage_approve = ? ,
+                           item_manage_remarks = ?  ,
+                           item_manage_apprv_date = ?,
+                           item_manage_user = ?
+                     WHERE
+                           req_detl_slno = ? and req_slno = ?`,
+                    [
+                        val.itemStatus,
+                        val.remarks,
+                        val.statusDate,
+                        val.user,
+                        val.req_detl_slno,
+                        val.req_slno
+                    ],
+                    (error, results, fields) => {
+                        if (error) {
+                            return reject(error)
+                        }
+                        return resolve(results)
+                    }
+                )
+            })
+        })
+        )
+    },
 
     updateReqMstReject: (data, callback) => {
         pool.query(
             `UPDATE
                    crm_request_master
              SET
-                   req_status = 'R',reject_status = ?,onhold_status = ?
+                   req_status = 'R',reject_status = ?,onhold_status = ?,internally_arranged_status=?
              WHERE
                    req_slno =?`,
             [
                 data.reject_status,
                 data.onhold_status,
+                data.internally_arranged_status,
                 data.req_slno
             ],
             (error, results, feilds) => {
@@ -642,15 +700,17 @@ module.exports = {
 
     updateHODApproval: (data, callback) => {
         pool.query(
-            `UPDATE crm_request_approval 
+            `UPDATE
+                   crm_request_approval
             SET
-            incharge_approve=1,
-            hod_approve = ?,
-            hod_remarks = ?,
-            hod_detial_analysis=?,
-            hod_approve_date = ?,
-            hod_user=?
-            WHERE req_slno =?`,
+                  incharge_approve=1,
+                  hod_approve = ?,
+                  hod_remarks = ?,
+                  hod_detial_analysis=?,
+                  hod_approve_date = ?,
+                  hod_user=?
+            WHERE
+                  req_slno =?`,
             [
                 data.hod_approve,
                 data.hod_remarks,
@@ -671,13 +731,16 @@ module.exports = {
 
     updateDMSApproval: (data, callback) => {
         pool.query(
-            `UPDATE crm_request_approval 
-            SET dms_approve = ?,
-            dms_remarks = ?,
-            dms_detail_analysis=?,
-            dms_approve_date = ?,
-            dms_user=?
-            WHERE req_slno =?`,
+            `UPDATE
+                   crm_request_approval
+            SET
+                   dms_approve = ?,
+                   dms_remarks = ?,
+                   dms_detail_analysis=?,
+                   dms_approve_date = ?,
+                   dms_user=?
+            WHERE
+                   req_slno =?`,
             [
                 data.dms_approve,
                 data.dms_remarks,
@@ -697,13 +760,16 @@ module.exports = {
 
     updateMSApproval: (data, callback) => {
         pool.query(
-            `UPDATE crm_request_approval 
-            SET ms_approve = ?,
-            ms_approve_remark = ?,
-            ms_detail_analysis=?,
-            ms_approve_date = ?,
-            ms_approve_user=?
-            WHERE req_slno =?`,
+            `UPDATE
+                    crm_request_approval
+            SET
+                   ms_approve = ?,
+                   ms_approve_remark = ?,
+                   ms_detail_analysis=?,
+                   ms_approve_date = ?,
+                   ms_approve_user=?
+            WHERE
+                  req_slno =?`,
             [
                 data.ms_approve,
                 data.ms_approve_remark,
@@ -723,13 +789,16 @@ module.exports = {
 
     updateMOApproval: (data, callback) => {
         pool.query(
-            `UPDATE crm_request_approval 
-            SET manag_operation_approv = ?,
-            manag_operation_remarks = ?,
-            om_detial_analysis=?,
-            om_approv_date = ?,
-            manag_operation_user=?
-            WHERE req_slno =?`,
+            `UPDATE
+                    crm_request_approval
+            SET
+                   manag_operation_approv = ?,
+                   manag_operation_remarks = ?,
+                   om_detial_analysis=?,
+                   om_approv_date = ?,
+                   manag_operation_user=?
+            WHERE
+                   req_slno =?`,
             [
                 data.manag_operation_approv,
                 data.manag_operation_remarks,
@@ -749,13 +818,16 @@ module.exports = {
 
     updateSMOApproval: (data, callback) => {
         pool.query(
-            `UPDATE crm_request_approval 
-            SET senior_manage_approv = ?,
-            senior_manage_remarks = ?,
-            smo_detial_analysis=?,
-            som_aprrov_date = ?,
-            senior_manage_user=?
-            WHERE req_slno =?`,
+            `UPDATE
+                  crm_request_approval
+            SET
+                  senior_manage_approv = ?,
+                  senior_manage_remarks = ?,
+                  smo_detial_analysis=?,
+                  som_aprrov_date = ?,
+                  senior_manage_user=?
+            WHERE
+                  req_slno =?`,
             [
                 data.senior_manage_approv,
                 data.senior_manage_remarks,
@@ -775,13 +847,16 @@ module.exports = {
 
     updateGMApproval: (data, callback) => {
         pool.query(
-            `UPDATE crm_request_approval 
-            SET gm_approve = ?,
-            gm_approve_remarks = ?,
-            gm_detial_analysis=?,
-            gm_approv_date = ?,
-            gm_user=?
-            WHERE req_slno =?`,
+            `UPDATE
+                   crm_request_approval
+             SET
+                  gm_approve = ?,
+                  gm_approve_remarks = ?,
+                  gm_detial_analysis=?,
+                  gm_approv_date = ?,
+                  gm_user=?
+            WHERE
+                  req_slno =?`,
             [
                 data.gm_approve,
                 data.gm_approve_remarks,
@@ -801,16 +876,19 @@ module.exports = {
 
     updateMDApproval: (data, callback) => {
         pool.query(
-            `UPDATE crm_request_approval 
-            SET md_approve = ?,
-            md_approve_remarks = ?,
-            md_detial_analysis=?,
-            md_approve_date = ?,
-            md_user=?
-            WHERE req_slno =?`,
+            `UPDATE
+                   crm_request_approval
+            SET
+                  md_approve_remarks = ?,
+                  md_approve = ?,
+                  md_detial_analysis=?,
+                  md_approve_date = ?,
+                  md_user=?
+            WHERE
+                  req_slno =?`,
             [
-                data.md_approve,
                 data.md_approve_remarks,
+                data.md_approve,
                 data.md_detial_analysis,
                 data.md_approve_date,
                 data.md_user,
@@ -827,13 +905,16 @@ module.exports = {
 
     updateEDApproval: (data, callback) => {
         pool.query(
-            `UPDATE crm_request_approval 
-            SET ed_approve = ?,
-            ed_approve_remarks = ?,
-            ed_detial_analysis=?,
-            ed_approve_date = ?,
-            ed_user=?
-            WHERE req_slno =?`,
+            `UPDATE
+                  crm_request_approval
+              SET
+                  ed_approve = ?,
+                  ed_approve_remarks = ?,
+                  ed_detial_analysis=?,
+                  ed_approve_date = ?,
+                  ed_user=?
+            WHERE
+                  req_slno =?`,
             [
                 data.ed_approve,
                 data.ed_approve_remarks,
@@ -851,6 +932,34 @@ module.exports = {
         );
     },
 
+    updateManagingApproval: (data, callback) => {
+        pool.query(
+            `UPDATE
+                   crm_request_approval
+             SET
+                  managing_director_approve = ?,
+                  managing_director_remarks = ?,
+                  managing_director_analysis=?,
+                  managing_director_approve_date = ?,
+                  managing_director_user=?
+             WHERE
+                req_slno =?`,
+            [
+                data.managing_director_approve,
+                data.managing_director_remarks,
+                data.managing_director_analysis,
+                data.managing_director_approve_date,
+                data.managing_director_user,
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
     CheckCRfExist: (id, callBack) => {
         pool.query(
             `SELECT
@@ -962,12 +1071,14 @@ module.exports = {
 
     CrfDataCollactnSave: (data, callback) => {
         pool.query(
-            `UPDATE crm_data_collection 
-            SET         
-            crf_dept_remarks = ?,
-            crf_dept_status = 1,
-            save_user=?         
-            WHERE crf_data_collect_slno =?`,
+            `UPDATE
+                   crm_data_collection
+             SET         
+                   crf_dept_remarks = ?,
+                   crf_dept_status = 1,
+                   save_user=?         
+            WHERE
+                  crf_data_collect_slno =?`,
             [
                 data.crf_dept_remarks,
                 data.save_user,
@@ -1005,6 +1116,8 @@ module.exports = {
                        gm_approve_req, gm_approve, gm_approve_remarks, gm_detial_analysis, gm_approv_date, GM.em_name as  gm_user,
                        ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date, ED.em_name as  ed_user,
                        md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,MD.em_name as md_user,
+                     managing_director_req, managing_director_approve, managing_director_remarks, managing_director_analysis,
+                    managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
                        crf_close,crf_close_remark,crf_close_user,crf_closed_one,close_date,
                        ndrf_cao_approve,ndrf_cao_approve_remarks,ndrf_ed_approve,ndrf_ed_approve_remarks,
                        ndrf_md_approve,ndrf_md_approve_remarks,
@@ -1030,6 +1143,7 @@ module.exports = {
             LEFT JOIN co_employee_master GM on GM.em_id=crm_request_approval.gm_user
             LEFT JOIN co_employee_master ED on ED.em_id=crm_request_approval.ed_user
             LEFT JOIN co_employee_master MD on MD.em_id=crm_request_approval.md_user
+             LEFT JOIN co_employee_master MAD on MAD.em_id=crm_request_approval.managing_director_user
             where md_approve=1 and ed_approve=1 ORDER BY crm_request_master.req_slno DESC `,
             [],
             (error, results, feilds) => {
@@ -1188,6 +1302,31 @@ module.exports = {
                 return callback(null, results);
             }
         );
+    },
+
+    UpdateItemReceiveStatus: (body) => {
+        return Promise.all(body.map((val) => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    `UPDATE
+                         crm_purchase_item_details
+                     SET
+                          user_received_status=1
+                     WHERE
+                          po_itm_slno in(?) `,
+                    [
+                        val.po_itm_slno,
+                    ],
+                    (error, results, fields) => {
+                        if (error) {
+                            return reject(error)
+                        }
+                        return resolve(results)
+                    }
+                )
+            })
+        })
+        )
     },
 
     DetailItemReject: (data, callback) => {
@@ -1525,14 +1664,86 @@ module.exports = {
         );
     },
 
+    manageItemOnholdRejectUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE
+                  crm_reqitems_approval_details
+             SET
+                  item_manage_approve = ? ,
+                  item_manage_remarks = ?  ,
+                  item_manage_apprv_date = ?,
+                  item_manage_user = ?
+             WHERE
+                 req_detl_slno = ? and req_slno = ?`,
+            [
+                data.itemStatus,
+                data.remarks,
+                data.statusDate,
+                data.user,
+                data.req_detl_slno,
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateInternallyArranged: (data, callback) => {
+        pool.query(
+            `UPDATE
+                  crm_request_mast_detail
+             SET
+                 approve_item_desc = ? ,
+                 approve_item_brand=?  ,
+                 approve_item_unit=?,
+                 item_qnty_approved=?  ,
+                 approve_item_specification=?,
+                 approve_item_unit_price=?  ,
+                 approve_aprox_cost=?,
+                 approve_item_status=?,
+                 item_status_approved=?,
+                 internal_remarks=?,
+                 internal_user=?,
+                 internal_date=?,
+                 po_item_status=0
+            WHERE
+                req_detl_slno =?`,
+            [
+                data.approve_item_desc,
+                data.approve_item_brand,
+                data.approve_item_unit,
+                data.item_qnty_approved,
+                data.approve_item_specification,
+                data.approve_item_unit_price,
+                data.approve_aprox_cost,
+                data.approve_item_status,
+                data.item_status_approved,
+                data.internal_remarks,
+                data.internal_user,
+                data.internal_date,
+                data.req_detl_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
     getStoreReceiveStatus: (id, callBack) => {
         pool.query(
             `SELECT
-                   store_receive
+                    store_receive,sub_store_recieve
              FROM
-                   crm_purchase_mast
+                    crm_purchase_mast
+                LEFT JOIN crm_request_master ON crm_request_master.req_slno=crm_purchase_mast.req_slno     
              WHERE
-                   req_slno=? and po_complete=1`,
+                   crm_purchase_mast.req_slno=?`,
             [
                 id
             ],
@@ -1544,27 +1755,4 @@ module.exports = {
             }
         );
     },
-
-    // getAllApprovedItemList: (id, callBack) => {
-    //     pool.query(
-    //         `SELECT
-    //                req_detl_slno, req_slno, item_slno, approve_item_desc, approve_item_brand, approve_item_unit,
-    //                item_qnty_approved,approve_item_unit_price, approve_aprox_cost, item_status_approved, approve_item_status,
-    //                I.uom_name as apprv_uom,approve_item_specification,hold_remarks,reject_remarks
-    //          FROM
-    //               crm_request_mast_detail
-    //             LEFT JOIN am_uom I ON I.uom_slno=crm_request_mast_detail.approve_item_unit
-    //          WHERE
-    //              req_slno=? and approve_item_status=1`,
-    //         [
-    //             id
-    //         ],
-    //         (error, results, feilds) => {
-    //             if (error) {
-    //                 return callBack(error);
-    //             }
-    //             return callBack(null, results);
-    //         }
-    //     );
-    // },
 }

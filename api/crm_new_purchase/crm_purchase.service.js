@@ -1,33 +1,86 @@
 const { pool } = require('../../config/database')
 module.exports = {
+    // getPurchaseAckPending: (callBack) => {
+    //     pool.query(
+    //         ` SELECT
+    //                 crm_request_master.req_slno,crm_request_master.actual_requirement,crm_request_master.needed,
+    //                 R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,
+    //                 crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
+    //                 crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
+    //                 rm_ndrf,GROUP_CONCAT(item_type_name) as category,image_status,emergency_flag,emer_slno,crm_request_master.create_date,
+    //                 total_approx_cost,user_deptsec,req_status,req_approv_slno,TD.dept_id, TD.dept_name,TD.dept_type,
+    //                 ed_approve_req, ed_approve,ed_approve_remarks, ed_detial_analysis, ed_approve_date,ED.em_name as ed_user,
+    //                 md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,MD.em_name as md_user,
+    //                 ed_image,md_image,ack_status, ack_remarks
+    //             FROM
+    //                 crm_request_master
+    //                 LEFT JOIN crm_request_approval ON crm_request_approval.req_slno=crm_request_master.req_slno
+    //                 LEFT JOIN am_item_type ON JSON_CONTAINS(crm_request_master.category, cast(am_item_type.item_type_slno as json), '$')
+    //                 LEFT JOIN crm_emergencytype_mast ON crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
+    //                 LEFT JOIN co_deptsec_mast R ON R.sec_id=crm_request_master.request_deptsec_slno
+    //                 LEFT JOIN co_deptsec_mast U ON U.sec_id=crm_request_master.user_deptsec                 
+    //                 LEFT JOIN co_employee_master CR ON CR.em_id=crm_request_master.create_user
+    //                 LEFT JOIN co_employee_master ED ON ED.em_id=crm_request_approval.ed_user
+    //                 LEFT JOIN co_employee_master MD On MD.em_id=crm_request_approval.md_user
+    //                 LEFT JOIN co_department_mast TD ON TD.dept_id=R.dept_id
+    //                 LEFT JOIN crm_purchase_mast ON crm_purchase_mast.req_slno=crm_request_master.req_slno
+    //           WHERE
+    //                 ed_approve=1 AND md_approve=1 AND user_acknldge is null AND( ack_status is NULL || ack_status=0 )                   
+    //           GROUP BY crm_request_master.req_slno,crm_purchase_mast.crm_purchase_slno   
+    //           ORDER BY crm_request_master.req_slno DESC`,
+    //         [],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callBack(error);
+    //             }
+    //             return callBack(null, results);
+    //         }
+    //     )
+    // },
+
     getPurchaseAckPending: (callBack) => {
         pool.query(
-            ` SELECT
-                    crm_request_master.req_slno,crm_request_master.actual_requirement,crm_request_master.needed,
-                    R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,
-                    crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
-                    crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
-                    rm_ndrf,GROUP_CONCAT(item_type_name) as category,image_status,emergency_flag,emer_slno,crm_request_master.create_date,
-                    total_approx_cost,user_deptsec,req_status,req_approv_slno,TD.dept_id, TD.dept_name,TD.dept_type,
-                    ed_approve_req, ed_approve,ed_approve_remarks, ed_detial_analysis, ed_approve_date,ED.em_name as ed_user,
-                    md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,MD.em_name as md_user,
-                    ed_image,md_image,ack_status, ack_remarks
-                FROM
-                    crm_request_master
-                    LEFT JOIN crm_request_approval ON crm_request_approval.req_slno=crm_request_master.req_slno
-                    LEFT JOIN am_item_type ON JSON_CONTAINS(crm_request_master.category, cast(am_item_type.item_type_slno as json), '$')
-                    LEFT JOIN crm_emergencytype_mast ON crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
-                    LEFT JOIN co_deptsec_mast R ON R.sec_id=crm_request_master.request_deptsec_slno
-                    LEFT JOIN co_deptsec_mast U ON U.sec_id=crm_request_master.user_deptsec                 
-                    LEFT JOIN co_employee_master CR ON CR.em_id=crm_request_master.create_user
-                    LEFT JOIN co_employee_master ED ON ED.em_id=crm_request_approval.ed_user
-                    LEFT JOIN co_employee_master MD On MD.em_id=crm_request_approval.md_user
-                    LEFT JOIN co_department_mast TD ON TD.dept_id=R.dept_id
-                    LEFT JOIN crm_purchase_mast ON crm_purchase_mast.req_slno=crm_request_master.req_slno
-              WHERE
-                    ed_approve=1 AND md_approve=1 AND user_acknldge is null AND( ack_status is NULL || ack_status=0 )                   
-              GROUP BY crm_request_master.req_slno,crm_purchase_mast.crm_purchase_slno   
-              ORDER BY crm_request_master.req_slno DESC`,
+            `SELECT
+                   crm_request_master.req_slno, crm_request_master.actual_requirement, crm_request_master.needed,
+                   R.sec_name AS req_deptsec, U.sec_name AS user_deptsection, CR.em_name AS create_user,
+                   crm_emergencytype_mast.emer_type_name, crm_emergencytype_mast.emer_type_escalation,
+                   crm_request_master.request_deptsec_slno, crm_request_master.location, emergeny_remarks, expected_date,
+                   rm_ndrf, GROUP_CONCAT(item_type_name) AS category, image_status, emergency_flag, emer_slno, crm_request_master.create_date,
+                   total_approx_cost, user_deptsec, req_status, req_approv_slno, TD.dept_id, TD.dept_name, TD.dept_type,
+                   ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date, ED.em_name AS ed_user,
+                   md_approve_req, md_approve, md_approve_remarks, md_detial_analysis, md_approve_date, MD.em_name AS md_user,
+                   managing_director_req, managing_director_approve, managing_director_remarks, managing_director_analysis,
+                    managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
+                   ed_image, md_image, ack_status, ack_remarks
+            FROM
+                   crm_request_master
+                 LEFT JOIN crm_request_approval ON crm_request_approval.req_slno = crm_request_master.req_slno
+                 LEFT JOIN am_item_type ON JSON_CONTAINS(crm_request_master.category, CAST(am_item_type.item_type_slno AS JSON), '$')
+                 LEFT JOIN crm_emergencytype_mast ON crm_emergencytype_mast.emergency_slno = crm_request_master.emer_slno
+                 LEFT JOIN co_deptsec_mast R ON R.sec_id = crm_request_master.request_deptsec_slno
+                 LEFT JOIN co_deptsec_mast U ON U.sec_id = crm_request_master.user_deptsec                 
+                 LEFT JOIN co_employee_master CR ON CR.em_id = crm_request_master.create_user
+                 LEFT JOIN co_employee_master ED ON ED.em_id = crm_request_approval.ed_user
+                 LEFT JOIN co_employee_master MD ON MD.em_id = crm_request_approval.md_user
+                 LEFT JOIN co_employee_master MAD on MAD.em_id=crm_request_approval.managing_director_user
+                 LEFT JOIN co_department_mast TD ON TD.dept_id = R.dept_id
+                 LEFT JOIN crm_purchase_mast ON crm_purchase_mast.req_slno = crm_request_master.req_slno
+                 LEFT JOIN serial_nos ON serial_nos.serial_slno = 6  
+                 LEFT JOIN crm_approval_mapping_master ON crm_approval_mapping_master.company_slno = serial_nos.serial_current  
+            WHERE
+                 serial_nos.serial_current IS NOT NULL 
+                 AND ((crm_approval_mapping_master.medical_director_approve = 1 
+                 AND crm_approval_mapping_master.executive_director_approve = 1 
+                 AND ed_approve = 1 
+                 AND md_approve = 1)
+                OR (crm_approval_mapping_master.medical_director_approve = 1 
+                 AND crm_approval_mapping_master.managing_director_approve = 1 
+                 AND md_approve = 1 
+                 AND crm_request_approval.managing_director_approve = 1))
+                 AND user_acknldge IS NULL 
+                 AND (ack_status IS NULL OR ack_status = 0)                   
+            GROUP BY crm_request_master.req_slno, crm_purchase_mast.crm_purchase_slno   
+            ORDER BY crm_request_master.req_slno DESC `,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -36,7 +89,6 @@ module.exports = {
                 return callBack(null, results);
             }
         )
-        // crm_request_approval.req_slno NOT IN (SELECT req_slno FROM crm_purchase_mast )
     },
 
     getAllApprovedForPurchase: (callBack) => {
@@ -51,6 +103,8 @@ module.exports = {
                     ed_approve_req, ed_approve,ed_approve_remarks, ed_detial_analysis, ed_approve_date,ED.em_name as ed_user,
                     md_approve_req,md_approve,md_approve_remarks,md_detial_analysis,md_approve_date,MD.em_name as md_user,
                     ed_image,md_image,
+                      managing_director_req, managing_director_approve, managing_director_remarks, managing_director_analysis,
+                    managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
                     crm_purchase_mast.crm_purchase_slno,ack_status,ack_remarks,PA.em_name as purchase_ackuser,
                     crm_purchase_mast.create_date as ack_date,
                     quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
@@ -67,6 +121,7 @@ module.exports = {
                    LEFT JOIN co_employee_master CR ON CR.em_id=crm_request_master.create_user
                    LEFT JOIN co_employee_master ED ON ED.em_id=crm_request_approval.ed_user
                    LEFT JOIN co_employee_master MD ON MD.em_id=crm_request_approval.md_user
+                   LEFT JOIN co_employee_master MAD on MAD.em_id=crm_request_approval.managing_director_user
                    LEFT JOIN co_department_mast TD ON TD.dept_id=R.dept_id
                    LEFT JOIN crm_purchase_mast ON crm_purchase_mast.req_slno=crm_request_master.req_slno
                    LEFT JOIN co_employee_master PA ON PA.em_id=crm_purchase_mast.create_user
@@ -75,8 +130,8 @@ module.exports = {
                    LEFT JOIN co_employee_master QF ON QF.em_id=crm_purchase_mast.quatation_fixing_user
                    LEFT JOIN crm_purchase_po_details on crm_purchase_po_details.crm_purchase_slno=crm_purchase_mast.crm_purchase_slno
 			WHERE
-                   ack_status=1 AND user_acknldge is null AND crm_purchase_po_details.po_to_supplier is null
-                   OR crm_purchase_po_details.po_to_supplier=0
+                   ack_status=1 AND user_acknldge is null  AND ( crm_purchase_po_details.po_to_supplier is null
+                   OR crm_purchase_po_details.po_to_supplier=0)  AND crf_close IS NULL
                GROUP BY crm_request_master.req_slno ,crm_purchase_mast.crm_purchase_slno                 
                ORDER BY crm_request_master.req_slno DESC`,
             [],
@@ -475,7 +530,7 @@ module.exports = {
              LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno 
              LEFT JOIN crm_purchase_item_details ON crm_purchase_item_details.po_detail_slno=crm_purchase_po_details.po_detail_slno      
              WHERE
-                    po_number=? and supply_store=?`,
+                    po_number=? and supply_store=? AND po_status=1`,
             [
                 data.po_number,
                 data.supply_store
@@ -541,7 +596,7 @@ module.exports = {
                 LEFT JOIN crm_purchase_mast ON crm_purchase_mast.crm_purchase_slno=crm_purchase_po_details.crm_purchase_slno
                 LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno  
              WHERE 
-                 crm_purchase_mast.po_complete=1 and crm_purchase_po_details.po_to_supplier=0`,
+                 crm_purchase_mast.po_complete=1 and crm_purchase_po_details.po_to_supplier=0 AND po_status=1`,
             [],
             (err, results, fields) => {
                 if (err) {
@@ -565,7 +620,7 @@ module.exports = {
                 LEFT JOIN crm_purchase_mast On crm_purchase_mast.crm_purchase_slno=crm_purchase_po_details.crm_purchase_slno
                 LEFT JOIN crm_request_master ON crm_request_master.req_slno=crm_purchase_po_details.req_slno
             WHERE  
-                   crm_purchase_po_details.po_to_supplier=0 AND crm_purchase_mast.po_complete=1 AND
+                   po_status=1 AND crm_purchase_po_details.po_to_supplier=0 AND crm_purchase_mast.po_complete=1 AND
                    crm_purchase_po_details.crf_po_complete_status=1 AND crm_request_master.user_acknldge is null 
             GROUP BY crm_purchase_po_details.po_detail_slno,crm_purchase_item_details.po_itm_slno
 			ORDER BY crm_purchase_po_details.req_slno`,
@@ -588,7 +643,7 @@ module.exports = {
                      SET
                          approval_level = ?, po_expiry = ?,expected_delivery = ?
                     where
-                         po_number = ? and supply_store = ?`,
+                         po_number = ? and supply_store = ? AND po_status=1`,
                     [
                         val.approval_level,
                         val.po_expiry,
@@ -612,8 +667,8 @@ module.exports = {
             ` SELECT
                     crm_purchase_po_details.po_detail_slno, req_slno, po_number, po_date,expected_delivery, supply_store,
                     main_store,main_store_slno,sub_store_name,store_code,store_recieve,supplier_name,po_type, po_delivery,
-                    po_amount, po_to_supplier,approval_level,po_expiry,crf_po_complete_status,
-                    po_itm_slno,item_code, item_name, item_qty,item_rate,item_mrp, tax, tax_amount,net_amount
+                    po_amount, po_to_supplier,approval_level,po_expiry,crf_po_complete_status,po_itm_slno,item_code, item_name,
+                     item_qty,item_rate,item_mrp, tax, tax_amount,net_amount,crm_purchase_po_details.crm_purchase_slno
               FROM
                     crm_purchase_po_details
                 LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno 
@@ -632,29 +687,11 @@ module.exports = {
         );
     },
 
-    // getPONumbers: (data, callBack) => {
-    //     pool.query(
-    //         `SELECT
-    //                 po_detail_slno, req_slno, po_number,approval_level
-    //           FROM
-    //                 crm_purchase_po_details
-    //          WHERE
-    //                 req_slno in(?) `,
-    //         [],
-    //         (error, results, feilds) => {
-    //             if (error) {
-    //                 return callBack(error);
-    //             }
-    //             return callBack(null, results);
-    //         }
-    //     );
-    // },
-
     getPOList: (id, callBack) => {
         pool.query(
             `SELECT
                     po_detail_slno, req_slno, po_number,po_date,expected_delivery,supply_store,
-                    S.main_store_slno, S.main_store,store_recieve,store_recieve_fully,supplier_name,
+                    S.main_store_slno, S.main_store,store_recieve,supplier_name,
                     po_delivery, po_amount,po_to_supplier,approval_level,sub_store_slno,S.sub_store_name
               FROM
                     crm_purchase_po_details

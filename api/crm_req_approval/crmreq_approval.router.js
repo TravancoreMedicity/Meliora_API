@@ -4,14 +4,14 @@ const { updateInchargeApproval, InactiveItemDetail, getItemListApproval, Incharg
     updateCrfClose, updateHODApproval, updateDMSApproval, updateMSApproval, updateMOApproval, updateSMOApproval,
     updateGMApproval, updateMDApproval, updateEDApproval, CrfDeptDataCollectInsert, DataCollectComplete, getDataCollectList,
     CrfDataCollactnSave, getAllForPdfView, getFinalItemListApproval, getMaxItemSlno, AddMoreItemsDetails, updateUserAck,
-    DetailItemReject, DetailItemOnHold, getStoreReceiveStatus, getItemStatus
+    DetailItemReject, DetailItemOnHold, getStoreReceiveStatus, getItemStatus, updateInternallyArranged, updateManagingApproval,
 } = require('../crm_req_approval/crmreq_approval.controller');
 
 router.get("/getItemListApproval/:id", checkToken, getItemListApproval);
 router.get("/getItemStatus/:id", checkToken, getItemStatus);
 router.patch("/InactiveItemDetail", checkToken, InactiveItemDetail);
 // apprvl
-router.patch("/inchargeApproval/details", checkToken, InchargeApproveDetail);
+router.patch("/itemsApproval", checkToken, InchargeApproveDetail);
 router.post("/DetailApprvInsert", checkToken, DetailApprvInsert);
 router.patch("/crfClose", checkToken, updateCrfClose);
 
@@ -24,6 +24,7 @@ router.patch("/Smo", checkToken, updateSMOApproval);
 router.patch("/Gm", checkToken, updateGMApproval);
 router.patch("/Md", checkToken, updateMDApproval);
 router.patch("/Ed", checkToken, updateEDApproval);
+router.patch("/Manag", checkToken, updateManagingApproval);
 
 router.post("/dataCollect/Insert", checkToken, CrfDeptDataCollectInsert);
 router.get("/DataCollectComplete/:id", checkToken, DataCollectComplete);
@@ -40,9 +41,8 @@ router.patch("/userAck", checkToken, updateUserAck);
 
 router.patch("/DetailItemReject", checkToken, DetailItemReject);
 router.patch("/DetailItemOnHold", checkToken, DetailItemOnHold);
+router.patch("/internallyArranged", checkToken, updateInternallyArranged);
 
 router.get("/receiveStatus/:id", checkToken, getStoreReceiveStatus);
-// router.get("/allItems/:id", checkToken, getAllApprovedItemList);
-
 
 module.exports = router;

@@ -29,26 +29,4 @@ router.get("/getPoDetails/:id", checkToken, getPoDetails);
 router.get("/getPOList/:id", checkToken, getPOList);
 
 
-// router.post("/getCrfPurchase", checkToken, getPurchaseDeptCRfDetails);
-
-
-
-
-
-// router.get("/potoStore/:id", checkToken, getPODetailsForStore);
-// router.post("/InsertinglePO", checkToken, InsertinglePO)
-// router.patch("/postart", checkToken, updatePOAdd);
-// router.post("/InsertPOItems", checkToken, InsertPOItems);
-// router.get("/getAllApprovedForStore", checkToken, getAllApprovedForStore);
-// router.patch("/storedataUpdate", checkToken, storedataUpdate);
-// router.get("/getSubstores", checkToken, getSubstores);
-// router.get("/getMainStore/:id", checkToken, getMainStore);
-
-
-// substore
-// router.patch("/storeReciverdataUpdate", checkToken, storeReciverdataUpdate);
-// router.get("/getPOListSubStorewise/:id", checkToken, getPOListSubStorewise);
-// router.patch("/SubstoreReciverdataUpdate", checkToken, SubstoreReciverdataUpdate);
-
-
 module.exports = router;

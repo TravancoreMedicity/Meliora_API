@@ -61,7 +61,7 @@ module.exports = {
             `INSERT INTO
                   crm_delivered_item_details
                 (
-                  marking_po_slno, item_code, item_name, item_qty, item_rate, item_mrp,received_qty, create_user
+                  marking_po_slno, item_code, item_name, item_qty, item_rate, item_mrp,received_qty,item_status,create_user
                 )
             VALUES ?`,
             [
@@ -116,12 +116,13 @@ module.exports = {
             }
         );
     },
-
+    // item_slno, crm_delivered_item_details.marking_po_slno, item_code, item_name,
+    // sum(item_qty) as item_qty, sum(received_qty) as received_qty , item_status,po_number
     getItemDetails: (id, callBack) => {
         pool.query(
             `SELECT
                   item_slno, crm_delivered_item_details.marking_po_slno, item_code, item_name,
-                   sum(item_qty) as item_qty, sum(received_qty) as received_qty , item_status,po_number
+                  sum(item_qty) as item_qty, sum(received_qty) as received_qty ,item_status,po_number
              FROM
                   crm_delivered_item_details
                  LEFT JOIN crm_delivery_marking_po_details ON crm_delivery_marking_po_details.marking_po_slno = crm_delivered_item_details.marking_po_slno       
@@ -200,11 +201,11 @@ module.exports = {
     getSupplier: (callBack) => {
         pool.query(
             `SELECT
-                  supplier_code,supplier_name
-             FROM
-                  crm_delivery_marking       
-             GROUP BY supplier_code
-             ORDER BY supplier_name`,
+                   crm_delivery_marking.supplier_code,supplier_name
+            FROM
+                   crm_delivery_marking    
+         GROUP BY crm_delivery_marking.supplier_code
+            ORDER BY supplier_name`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -217,18 +218,17 @@ module.exports = {
 
     getAllDeliveredDetails: (data, callBack) => {
         pool.query(
-            `SELECT 
-                   dc_mark_date,dc_receive_date,crm_delivery_marking.delivery_mark_slno,mt_direct,mt_courier,
-                   package_count,delivery_bill_details,remarks,E.em_name as received_user,PO.marking_po_slno
-             FROM 
+            `SELECT
+                    delivery_mark_slno, supplier_code, supplier_name, dc_mark_date, dc_receive_date, mt_direct,
+                    mt_courier, package_count,delivery_bill_details, remarks,E.em_name as received_user
+	         FROM 
                    crm_delivery_marking
                 LEFT JOIN co_employee_master E ON E.em_id=crm_delivery_marking.received_user     
-                LEFT JOIN crm_delivery_marking_po_details PO ON PO.delivery_mark_slno=crm_delivery_marking.delivery_mark_slno
-			WHERE 
-                   po_status=0 AND crm_delivery_marking.supplier_code=? AND dc_receive_date between ? AND ?
-             GROUP BY PO.marking_po_slno `,
+      	     WHERE 
+                   crm_delivery_marking.supplier_code like ?
+                   AND (dc_receive_date between ? AND ?) `,
             [
-                data.supCode,
+                '%' + data.supCode + '%',
                 data.from,
                 data.to
             ],
@@ -241,21 +241,18 @@ module.exports = {
         );
     },
 
-    getAllPoDetails: (id, callBack) => {
+    getSupplierDetailsForItemChecking: (callBack) => {
         pool.query(
             `SELECT
-                    delivery_mark_slno,crm_delivery_marking_po_details.marking_po_slno,po_number,po_date,crs_store,S.main_store,expected_delivery,
-                    item_slno,item_code,item_name,item_qty,item_rate,item_mrp,received_qty
-             FROM
-                   crm_delivery_marking_po_details
-                LEFT JOIN crm_store_master S ON S.main_store_slno=crm_delivery_marking_po_details.crs_store
-                LEFT JOIN crm_delivered_item_details I ON I.marking_po_slno=crm_delivery_marking_po_details.marking_po_slno
-             WHERE
-                   delivery_mark_slno=? AND po_status=0
-             GROUP BY  item_slno`,
-            [
-                id
-            ],
+                   crm_delivery_marking.supplier_code,supplier_name,po_status
+            FROM
+                   crm_delivery_marking    
+                LEFT JOIN crm_delivery_marking_po_details ON crm_delivery_marking_po_details.delivery_mark_slno=crm_delivery_marking.delivery_mark_slno
+            WHERE 
+                  po_status=1
+            GROUP BY crm_delivery_marking.supplier_code
+            ORDER BY supplier_name`,
+            [],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -264,13 +261,126 @@ module.exports = {
             }
         );
     },
+
+    //     SELECT
+    //     checking_item_slno, checking_slno, supplier_code, item_code, item_name, pending_qty, create_date,
+    //     SUM(delivered_qty) AS delivered_qty, SUM(excess_qty) AS excess_qty,pending_status,
+    //     sum(damage_qty) AS damage_qty,remarks,balance_qty,checking_user,sum(crm_checking_item_details.requested_qty) as requested_qty
+    // FROM
+    //      crm_checking_item_details
+    //    LEFT JOIN crm_delivered_item_details ON crm_delivered_item_details.item_slno=crm_checking_item_details.item_slno 
+    // WHERE 
+    //      supplier_code like ?
+    //      AND (create_date between ? AND ?)
+    // GROUP BY item_code    
+
+    // viewItemChecking: (data, callBack) => {
+    //     pool.query(
+    //         `WITH RankedData AS (
+    //         SELECT
+    //               checking_item_slno,checking_slno,supplier_code,item_code,item_name, pending_qty,create_date,
+    //               delivered_qty,excess_qty,damage_qty,remarks,balance_qty,checking_user,requested_qty,
+    //               ROW_NUMBER() OVER (PARTITION BY item_code ORDER BY create_date DESC) AS RowRank
+    //          FROM
+    //               crm_checking_item_details
+    //          WHERE
+    //               supplier_code like ?
+    //               AND (create_date between ? AND ?)
+    //               )
+    //             SELECT
+    //                 item_code,
+    //                 item_name,
+    //                 SUM(delivered_qty) AS delivered_qty,
+    //                 SUM(excess_qty) AS excess_qty,
+    //                 SUM(damage_qty) AS damage_qty,
+    //                 MAX(pending_qty) AS pending_qty,
+    //                 MAX(balance_qty) AS balance_qty,
+    //                 MAX(remarks) AS remarks,
+    //                 MAX(checking_user) AS checking_user,
+    //                 MAX(pending_status) AS pending_status,
+    //                 (SELECT requested_qty FROM RankedData WHERE RowRank = 1 AND RankedData.item_code = Main.item_code) AS last_requested_qty
+    //             FROM
+    //                 crm_checking_item_details Main
+    //             GROUP BY
+    //                 item_code, item_name `,
+    //         [
+    //             '%' + data.supCode + '%',
+    //             data.from,
+    //             data.to
+    //         ],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callBack(error);
+    //             }
+    //             return callBack(null, results);
+    //         }
+    //     );
+    // },
+
+    viewItemChecking: (data, callBack) => {
+        pool.query(
+            `SELECT
+                    Main.checking_item_slno,
+                    Main.checking_slno,
+                    Main.item_code,
+                    Main.item_name,
+                    Main.create_date,
+                    Main.supplier_code,
+                    SUM(Main.delivered_qty) AS delivered_qty,
+                    SUM(Main.excess_qty) AS excess_qty,
+                    SUM(Main.damage_qty) AS damage_qty,
+                    MAX(Main.pending_qty) AS pending_qty,
+                    MAX(Main.remarks) AS remarks,
+                    MAX(Main.checking_user) AS checking_user,
+                    MAX(Main.pending_status) AS pending_status,
+                     (
+                        SELECT
+                              balance_qty
+                        FROM
+                              crm_checking_item_details AS Sub
+                        WHERE
+                              Sub.item_code = Main.item_code
+                        ORDER BY Sub.create_date DESC
+                        LIMIT 1
+                    ) AS last_balance_qty,
+                    (
+                        SELECT
+                              requested_qty
+                        FROM
+                              crm_checking_item_details AS Sub
+                        WHERE
+                              Sub.item_code = Main.item_code
+                        ORDER BY Sub.create_date DESC
+                        LIMIT 1
+                    ) AS last_requested_qty
+                FROM
+                    crm_checking_item_details Main
+                WHERE
+                    Main.supplier_code = ? AND
+                    Main.create_date BETWEEN ? AND ?
+                GROUP BY
+                    Main.item_code`,
+            [
+                data.supCode,
+                data.from,
+                data.to
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
     InsertCheckedItems: (data, callback) => {
         pool.query(
             `INSERT INTO
                   crm_checking_item_details
                 (
                 checking_slno,supplier_code,item_code,item_name,pending_qty,create_user,delivered_qty,
-                excess_qty,pending_status,damage_qty,remarks,balance_qty
+                excess_qty,pending_status,damage_qty,remarks,balance_qty,checking_user,requested_qty,item_slno
                 )
             VALUES ?`,
             [

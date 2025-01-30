@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require("fs")
 const { CrfImageStatusUpdate, CrfDataColectionImageStatusUpdate, ImageInsertHODStatusUpdate,
     ImageInsertDMSStatusUpdate, ImageInsertMSStatusUpdate, ImageInsertMOStatusUpdate, ImageInsertSMOStatusUpdate,
-    ImageInsertGMStatusUpdate, ImageInsertMDStatusUpdate, ImageInsertEDStatusUpdate
+    ImageInsertGMStatusUpdate, ImageInsertMDStatusUpdate, ImageInsertEDStatusUpdate, ImageInsertMAangeStatusUpdate
 }
     = require('../crm_new_file_upload/crm_fileupload.service');
 const logger = require('../../logger/logger');
@@ -299,6 +299,55 @@ const ImageInsertEDstorage = multer.diskStorage({
     //     cb(null, filename);
     // },
 })
+
+// kmch
+const ImageInsertMDstorageKMCH = multer.diskStorage({
+    destination: (req, file, cb) => {
+
+        const reqslno = req.body.reqslno;
+
+        const id = req.body.id;
+
+        // File or directtory check 
+        const filepath = path.join('D:/DocMeliora/KMCMeliora/CRF/crf_registration/', `${reqslno}`, "MDUpload")
+        if (!fs.existsSync(filepath)) {
+            fs.mkdirSync(filepath, { recursive: true });
+        }
+
+        cb(null, filepath);
+    },
+
+    filename: function (req, file, cb) {
+        cb(null, file.originalname
+
+        )
+    },
+})
+const ImageInsertManagestorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+
+        const reqslno = req.body.reqslno;
+        console.log(reqslno, "reqslno");
+
+        const id = req.body.id;
+
+        // File or directtory check 
+        const filepath = path.join('D:/DocMeliora/KMCMeliora/CRF/crf_registration/', `${reqslno}`, "ManageUpload")
+        if (!fs.existsSync(filepath)) {
+            fs.mkdirSync(filepath, { recursive: true });
+        }
+
+        cb(null, filepath);
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname
+
+        )
+    },
+})
+
+
+
 const maxSize = 25 * 1024 * 1024
 
 
@@ -485,6 +534,45 @@ const ImageInsertMD = multer({
 
 const ImageInsertED = multer({
     storage: ImageInsertEDstorage,
+    fileFilter: (req, file, cb) => {
+        if (
+            file.mimetype == "image/png" ||
+            file.mimetype == "image/jpg" ||
+            file.mimetype == "image/jpeg" ||
+            file.mimetype == "application/pdf"
+        ) {
+            cb(null, true);
+        } else {
+            cb(null, false);
+
+            return cb(new Error('Only .png, .jpeg, and .pdf format allowed!'));
+        }
+    },
+    limits: { fileSize: maxSize }
+}).array('files', 10);
+
+
+const ImageInsertMDKmch = multer({
+    storage: ImageInsertMDstorageKMCH,
+    fileFilter: (req, file, cb) => {
+        if (
+            file.mimetype == "image/png" ||
+            file.mimetype == "image/jpg" ||
+            file.mimetype == "image/jpeg" ||
+            file.mimetype == "application/pdf"
+        ) {
+            cb(null, true);
+        } else {
+            cb(null, false);
+
+            return cb(new Error('Only .png, .jpeg, and .pdf format allowed!'));
+        }
+    },
+    limits: { fileSize: maxSize }
+}).array('files', 10);
+
+const ImageInsertManaging = multer({
+    storage: ImageInsertManagestorage,
     fileFilter: (req, file, cb) => {
         if (
             file.mimetype == "image/png" ||
@@ -1053,6 +1141,105 @@ module.exports = {
 
     },
 
+    ImageInsertMDKmch: (req, res) => {
+
+        ImageInsertMDKmch(req, res, async (err) => {
+            const body = req.body;
+
+            if (err instanceof multer.MulterError) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Max file size 2MB allowed!",
+                });
+            } else if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    status: 0,
+                    message: err.message,
+                });
+            } else if (!req.files || req.files.length === 0) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Files are required!",
+                });
+            } else {
+                const data = {
+                    req_slno: body.reqslno
+                }
+
+                ImageInsertMDStatusUpdate(data, (err, results) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        })
+                    }
+                    if (results === 0) {
+                        return res.status(200).json({
+                            success: 2,
+                            message: "No record found"
+
+                        })
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "File Also Updated"
+                    })
+                })
+            }
+        });
+
+    },
+
+    ImageInsertManaging: (req, res) => {
+
+        ImageInsertManaging(req, res, async (err) => {
+            const body = req.body;
+
+            if (err instanceof multer.MulterError) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Max file size 2MB allowed!",
+                });
+            } else if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    status: 0,
+                    message: err.message,
+                });
+            } else if (!req.files || req.files.length === 0) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Files are required!",
+                });
+            } else {
+                const data = {
+                    req_slno: body.reqslno
+                }
+
+                ImageInsertMAangeStatusUpdate(data, (err, results) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        })
+                    }
+                    if (results === 0) {
+                        return res.status(200).json({
+                            success: 2,
+                            message: "No record found"
+
+                        })
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "File Also Updated"
+                    })
+                })
+            }
+        });
+
+    },
     // for getting HOD Upload file the file
     crfHodImageGet: (req, res) => {
         const id = req.params.id
@@ -1205,5 +1392,43 @@ module.exports = {
         });
 
     },
+
+    crfManageImageGet: (req, res) => {
+        const id = req.params.id
+        const folderPath = `D:/DocMeliora/KMCMeliora/CRF/crf_registration/${id}/ManageUpload`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: files
+            });
+        });
+
+    },
+    crfKMCHMDImageGet: (req, res) => {
+        const id = req.params.id
+        const folderPath = `D:/DocMeliora/KMCMeliora/CRF/crf_registration/${id}/MDUpload`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: files
+            });
+        });
+
+    },
+
 
 }

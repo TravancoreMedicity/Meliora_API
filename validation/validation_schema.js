@@ -1317,7 +1317,11 @@ const validateQiEquipment = Joi.object({
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
 });
-
+const validateCompanyName = Joi.object({
+    company_name: Joi.string().trim().uppercase().required(),
+    comp_status: Joi.number().required(),
+    company_slno: Joi.number().optional()
+});
 module.exports = {
     validateFloors,
     validateRoomCategory,
@@ -1397,5 +1401,6 @@ module.exports = {
     validateQiDepartment,
     validateQiTypeList,
     validateQiEquipment,
+    validateCompanyName,
 
 }

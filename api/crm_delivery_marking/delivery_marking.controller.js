@@ -1,6 +1,6 @@
 const { insertDeliveryMarking, InsertDeliveredPO, InsertDeliveredItems, getItemDetails, checkPOExist, getMaxCheckNo,
-    updateDeliveredItemQty, updatePOStatus, getSupplier, getAllDeliveredDetails, getAllPoDetails, InsertCheckedItems,
-    getPendingPoSup
+    updateDeliveredItemQty, updatePOStatus, getSupplier, getAllDeliveredDetails, InsertCheckedItems,
+    getPendingPoSup, viewItemChecking, getSupplierDetailsForItemChecking
 } = require('./delivery_marking.service');
 
 const logger = require('../../logger/logger');
@@ -88,7 +88,7 @@ module.exports = {
                 const items = val.items;
                 const itemData = items.map((value) => [
                     insert_id, value.item_code, value.item_name, value.item_qty,
-                    value.item_rate, value.item_mrp, value.received_qty, create_user
+                    value.item_rate, value.item_mrp, value.received_qty, value.item_status, create_user
                 ]);
                 await new Promise((resolve, reject) => {
                     InsertDeliveredItems(itemData, (err) => {
@@ -254,9 +254,30 @@ module.exports = {
         })
     },
 
-    getAllPoDetails: (req, res) => {
-        const id = req.params.id
-        getAllPoDetails(id, (err, results) => {
+
+    getSupplierDetailsForItemChecking: (req, res) => {
+        getSupplierDetailsForItemChecking((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    viewItemChecking: (req, res) => {
+        const body = req.body;
+        viewItemChecking(body, (err, results) => {
             if (err) {
                 return res.status(400).json({
                     success: 0,
@@ -293,9 +314,6 @@ module.exports = {
                 const checkno = JSON.parse(JSON.stringify(results[0]));
                 no = checkno.checking_slno === undefined ? 1 : checkno.checking_slno + 1;
             }
-
-            // checking_slno,supplier_code,item_code,item_name,pending_qty,create_user,delivered_qty,
-            // excess_qty,pending_status,damage_qty,remarks
             const itemData = body?.map((value) => [
                 no,
                 value.supplier_code,
@@ -308,7 +326,10 @@ module.exports = {
                 value.pending_status,
                 value.damage_qty,
                 value.remarks,
-                value.balance_qty
+                value.balance_qty,
+                value.checking_user,
+                value.requested_qty,
+                value.item_slno
             ]);
 
             InsertCheckedItems(itemData, (err, result) => {
@@ -318,10 +339,82 @@ module.exports = {
                         message: err
                     });
                 }
-                return res.status(200).json({
-                    success: 1,
-                    message: "Item Details Checked"
-                });
+                if (result) {
+                    const updateQty = body?.map((val) => {
+                        const received = val.excess_qty === 0 ? (val.requested_qty - val.balance_qty) : (val.requested_qty + val.excess_qty)
+                        let item_status;
+                        if (received === 0) {
+                            // supplied qty 0
+                            item_status = null;
+                        } else if (received < val.requested_qty) {
+                            // partially supplied
+                            item_status = 0;
+                        } else if (received >= val.requested_qty) {
+                            // fully supplied
+                            item_status = 1;
+                        }
+                        return {
+                            received_qty: received,
+                            item_status: item_status,
+                            edit_user: val.create_user,
+                            item_slno: val.item_slno,
+                            marking_po_slno: val.marking_po_slno
+                        }
+                    })
+
+                    const poStatusArray = updateQty.reduce((acc, curr) => {
+                        if (!acc[curr.marking_po_slno]) {
+                            acc[curr.marking_po_slno] = { marking_po_slno: curr.marking_po_slno, item_statuses: [] };
+                        }
+                        acc[curr.marking_po_slno].item_statuses.push(curr.item_status);
+                        return acc;
+                    }, {});
+                    const poStatusResult = Object.values(poStatusArray).map(val => {
+                        const allNull = val.item_statuses.every(status => status === null);
+                        const allOne = val.item_statuses.every(status => status === 1);
+                        let po_status;
+                        // () po_status = 1; means not received or partilly received)
+                        if (allNull) {
+                            po_status = 1;
+                        } else if (allOne) {
+                            //   po_status = 0  means all items received
+                            po_status = 0;
+                        } else {
+                            po_status = 1;
+                        }
+                        return {
+                            po_status: po_status,
+                            edit_user: val.edit_user,
+                            marking_po_slno: val.marking_po_slno,
+                        };
+                    });
+                    updateDeliveredItemQty(updateQty).then(resultItems => {
+                        if (resultItems) {
+                            updatePOStatus(poStatusResult).then(results => {
+                                return res.status(200).json({
+                                    success: 1,
+                                    message: "Item Details Checked"
+                                });
+                            }).catch(err => {
+                                return res.status(200).json({
+                                    success: 0,
+                                    message: "Error Occured"
+                                });
+                            })
+                        }
+                    }).catch(err => {
+                        return res.status(200).json({
+                            success: 0,
+                            message: "Error Occured"
+                        });
+                    })
+                }
+                else {
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Item Details Checked"
+                    });
+                }
             });
         });
     },

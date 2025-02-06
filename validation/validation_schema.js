@@ -588,7 +588,8 @@ const validateComplaintRegist = Joi.object({
     priority: Joi.string().optional(),
     priority_reason: Joi.optional(),
     priority_check: Joi.number().optional(),
-    rm_room_slno: Joi.optional()
+    rm_room_slno: Joi.optional(),
+    cm_asset_status: Joi.optional()
 
 })
 
@@ -921,6 +922,7 @@ const validateCategoryCreate = Joi.object({
         }),
     category_slno: Joi.number().optional(),
     category_status: Joi.number().min(0).max(1).required(),
+    am_category_pm_days: Joi.string().optional(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
 });

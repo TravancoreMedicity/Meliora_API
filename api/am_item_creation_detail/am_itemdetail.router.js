@@ -1,20 +1,14 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
-const { checkDetailInsertOrNot, GRNDetailsInsert, GRNDetailsUpdate, BillDetailsInsert,
-    BillDetailsUpdate, CustodianDetailsInsert, CustodianDetailsUpdate, DeviceDetailsInsert,
-    DeviceDetailsUpdate, LeaseDetailsInsert, LeaseDetailsUpdate, WarentGarantInsertOrNot, WarentGraruntyInsert, WarentGraruntyUpdate,
-    AmcPmInsertOrNot, AmcPmInsert, AmcPmUpdate, checkDetailInsertOrNotSpare, WarentGarantInsertOrNotSpare,
-    GRNDetailsInsertSpare, GRNDetailsUpdateSpare, BillDetailsInsertSpare,
-    BillDetailsUpdateSpare, DeviceDetailsInsertSpare, DeviceDetailsUpdateSpare,
-    LeaseDetailsInsertSpare, LeaseDetailsUpdateSpare, WarentGraruntyInsertSpare,
-    WarentGraruntyUpdateSpare, getdeptsecBsedonCustdept,
-    getdeptsecBsedonCustdeptSpare, SpecificationInsertOrNot, SpecificationInsert, SepcifiDelete,
-    GetFreespareList, SpareDetailsInsert, SpareDetailsInsertOrNot,
-    AmcCMCInsert, AmcCmcview, AmcCmcUpdate, AmcCmcviewSelect, BillMasterInsert,
-    BillMasterview, BillMasterUpdate, BillMasterviewSelect, GetBillMasterById,
-    GetAmcCmcMasterById, GetSupplierSelect, GetBillBySupplNDate, SupplierAdding, GetAMCBySupplNDate,
-    GetCMCBySupplNDate, LeaseMasterInsert, LeaseMasterview, leaseMasterUpdate, GetLeaseBySupplNDate,
-    AMLeaseDetailsUpdate, spareContamination, spareService, AssetService
+const { checkDetailInsertOrNot, GRNDetailsInsert, GRNDetailsUpdate, BillDetailsInsert, BillDetailsUpdate, CustodianDetailsInsert, CustodianDetailsUpdate,
+    DeviceDetailsInsert, DeviceDetailsUpdate, LeaseDetailsInsert, LeaseDetailsUpdate, WarentGarantInsertOrNot, WarentGraruntyInsert, WarentGraruntyUpdate,
+    AmcPmInsertOrNot, AmcPmInsert, AmcPmUpdate, checkDetailInsertOrNotSpare, WarentGarantInsertOrNotSpare, GRNDetailsInsertSpare, GRNDetailsUpdateSpare,
+    BillDetailsInsertSpare, BillDetailsUpdateSpare, DeviceDetailsInsertSpare, DeviceDetailsUpdateSpare, LeaseDetailsInsertSpare, LeaseDetailsUpdateSpare,
+    WarentGraruntyInsertSpare, WarentGraruntyUpdateSpare, getdeptsecBsedonCustdept, getdeptsecBsedonCustdeptSpare, SpecificationInsertOrNot, SpecificationInsert,
+    SepcUpdate, GetFreespareList, SpareDetailsInsert, SpareDetailsInsertOrNot, AmcCMCInsert, AmcCmcview, AmcCmcUpdate, AmcCmcviewSelect, BillMasterInsert, BillMasterview,
+    BillMasterUpdate, BillMasterviewSelect, GetBillMasterById, GetAmcCmcMasterById, GetSupplierSelect, GetBillBySupplNDate, SupplierAdding, GetAMCBySupplNDate,
+    GetCMCBySupplNDate, LeaseMasterInsert, LeaseMasterview, leaseMasterUpdate, GetLeaseBySupplNDate, AMLeaseDetailsUpdate, spareContamination, spareService, AssetService,
+    AmcCmcDetailList, amcCmcLogUpdate, PmInsert, PmUpdate, PmDetailsList, UpdatePmLog, LeaseDetailsList, UpdateLeaseLog, spareRemoveFromAsset
 } = require('../am_item_creation_detail/am_itemdetail.controller');
 
 router.get("/checkDetailInsertOrNot/:id", checkToken, checkDetailInsertOrNot)
@@ -59,12 +53,11 @@ router.get("/getdeptsecBsedonCustdept/:id", checkToken, getdeptsecBsedonCustdept
 router.get("/getdeptsecBsedonCustdeptSpare/:id", checkToken, getdeptsecBsedonCustdeptSpare)
 router.get("/SpecificationInsertOrNot/:id", checkToken, SpecificationInsertOrNot)
 router.post("/SpecificationInsert", checkToken, SpecificationInsert);
-router.patch("/SepcifiDelete", checkToken, SepcifiDelete);
+router.patch("/SepcUpdate", checkToken, SepcUpdate);
 
 router.post("/GetFreespareList", checkToken, GetFreespareList);
 router.post("/SpareDetailsInsert", checkToken, SpareDetailsInsert);
 router.get("/SpareDetailsInsertOrNot/:id", checkToken, SpareDetailsInsertOrNot)
-
 
 router.post('/AmcCMCInsert', checkToken, AmcCMCInsert)
 router.get('/AmcCmcview', checkToken, AmcCmcview)
@@ -93,9 +86,19 @@ router.patch('/AMLeaseDetailsUpdate', checkToken, AMLeaseDetailsUpdate)
 
 router.patch('/spareContamination', checkToken, spareContamination)
 router.patch('/spareService', checkToken, spareService)
-
-
 router.patch('/AssetService', checkToken, AssetService)
 
+router.patch('/spareRemoveFromAsset', checkToken, spareRemoveFromAsset)
+
+router.get("/AmcCmcDetailList/:id", checkToken, AmcCmcDetailList)
+router.patch('/amcCmcLogUpdate', checkToken, amcCmcLogUpdate)
+
+router.post('/PmInsert', checkToken, PmInsert)
+router.patch('/PmUpdate', checkToken, PmUpdate)
+router.get("/PmDetailsList/:id", checkToken, PmDetailsList)
+router.patch('/UpdatePmLog', checkToken, UpdatePmLog)
+
+router.get("/LeaseDetailsList/:id", checkToken, LeaseDetailsList)
+router.patch('/UpdateLeaseLog', checkToken, UpdateLeaseLog)
 
 module.exports = router

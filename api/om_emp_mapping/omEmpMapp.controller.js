@@ -57,8 +57,6 @@ module.exports = {
             const value = JSON.parse(JSON.stringify(results))
             if (Object.keys(value).length === 0) {
                 omEmpUpdate(body, (err, results) => {
-                    console.log("controller");
-                    console.log(body);
                     if (err) {
                         return res.status(400).json({
                             success: 0,

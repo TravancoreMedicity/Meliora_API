@@ -18,14 +18,15 @@ const complaintfilestorage = multer.diskStorage({
         cb(null, filepath);
     },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'task' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+        )
     },
 
 });
+
+
+
+
 
 const maxSize = 3 * 1024 * 1024
 
@@ -60,7 +61,6 @@ module.exports = {
                     message: "Max file size 2MB allowed!",
                 });
             } else if (err) {
-                logger.errorLogger(err);
                 return res.status(200).json({
                     status: 0,
                     message: err.message,
@@ -75,23 +75,16 @@ module.exports = {
                     const files = req.files;
                     const id = body.id;
                     const complaint_id_folder = path.join('D:/DocMeliora/Meliora/ComplaintManagement', `${id}`);
-
                     if (!fs.existsSync(complaint_id_folder)) {
                         fs.mkdirSync(complaint_id_folder, { recursive: true });
                     }
-
                     for (const file of files) {
-                        // Process each file individually
-                        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-                        const extension = path.extname(file.originalname);
-                        const filename = 'complaint' + uniqueSuffix + extension;
-                        // Move the file to the destination folder
+                        const filename = file.filename;
                         const destinationPath = path.join(complaint_id_folder, filename);
                         fs.renameSync(file.path, destinationPath);
                     }
                     const data = {
                         complaint_slno: body.id
-
                     }
 
                     ComplaintFileUpload(data, (err, results) => {

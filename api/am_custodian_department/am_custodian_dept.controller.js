@@ -1,5 +1,5 @@
 const { validateAssetType } = require('../../validation/validation_schema');
-const { CustodianDeptInsert, CustodianDepView, CustodianDepUpdate, CustodianDepSelect,
+const { CustodianDeptInsert, CustodianDepView, CustodianDepUpdate, CustodianDepSelect, getDeptSecAsset,
     selectById
 } = require('../am_custodian_department/am_custodian_dept.services')
 module.exports = {
@@ -124,5 +124,35 @@ module.exports = {
             });
         });
     },
+
+
+    // getDeptSecAsset: (req, res) => {
+    //     const body = req.body
+
+    //     getDeptSecAsset(body, (err, results) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+
+    //         if (results.length == 0) {
+    //             logger.infologwindow("No Results Found")
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: "No Record Found"
+    //             });
+    //         }
+
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: results
+
+    //         });
+    //     })
+    // },
+
 
 }

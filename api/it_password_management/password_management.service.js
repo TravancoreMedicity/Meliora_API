@@ -17,6 +17,7 @@ module.exports = {
             am_item_map_slno,
              item_asset_no,
             item_asset_no_only,
+            am_custodian_dept_slno,
             item_custodian_dept,
             item_custodian_dept_sec
             from am_asset_item_map_master
@@ -24,6 +25,7 @@ module.exports = {
             left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
             left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno
             left join am_group on am_group.group_slno=am_item_name_creation.item_group_slno
+            left join am_custodian_department on am_custodian_department.am_custodian_slno=am_asset_item_map_master.item_custodian_dept
             where am_asset_item_map_master.item_asset_no=? and am_asset_item_map_master.item_asset_no_only=?`,
             [
                 data.item_asset_no,
@@ -135,7 +137,7 @@ module.exports = {
             // pswd_mast_description,         
             // am_item_name_creation.item_name,
             // pswd_mast_asset_no
-            // FROM meliora.it_pswd_master
+            // FROM it_pswd_master
             // left join am_item_name_creation on am_item_name_creation.item_creation_slno=it_pswd_master.pswd_mast_item_no
             // left join am_category on am_category.category_slno=it_pswd_master.pswd_mast_categry_no
             // left join am_group on am_group.group_slno=it_pswd_master.pswd_mast_group_no
@@ -158,7 +160,7 @@ module.exports = {
             psw_detail_port,
             psw_detail_remarks,
             credential_name
-            FROM meliora.it_pswd_master
+            FROM it_pswd_master
             left join am_item_name_creation on am_item_name_creation.item_creation_slno=it_pswd_master.pswd_mast_item_no
             left join am_category on am_category.category_slno=it_pswd_master.pswd_mast_categry_no
             left join am_group on am_group.group_slno=it_pswd_master.pswd_mast_group_no

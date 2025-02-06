@@ -2,7 +2,7 @@ const { pool } = require('../../config/database')
 module.exports = {
     ItemcreationdeptInsert: (data, callback) => {
         pool.query(
-            `INSERT INTO meliora.am_asset_item_map_master
+            `INSERT INTO am_asset_item_map_master
           ( 
             item_creation_slno,
             item_dept_slno,
@@ -33,7 +33,7 @@ module.exports = {
     insertItemAdditional: (data, callback) => {
 
         pool.query(
-            `INSERT INTO meliora.am_asset_item_map_master
+            `INSERT INTO am_asset_item_map_master
           ( 
             item_creation_slno,
             item_dept_slno,
@@ -75,27 +75,37 @@ module.exports = {
         );
     },
     getInsertData: (data, callBack) => {
+
+
+
         pool.query(
             `SELECT 
             am_item_map_slno,  am_asset_item_map_master.item_creation_slno,item_dept_slno,item_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,
             am_item_name_creation.item_name,rm_newroom_creation.rm_room_name,
             IFNULL(rm_subroom_master.subroom_name,"Not Subroom" ) subroom_name,
-            item_asset_no,item_asset_no_only
-          FROM
-          am_asset_item_map_master
-         left join co_department_mast on co_department_mast.dept_id=am_asset_item_map_master.item_dept_slno
-          left join co_deptsec_mast on co_deptsec_mast.sec_id=am_asset_item_map_master.item_deptsec_slno
-           left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
-           left join rm_newroom_creation on rm_newroom_creation.rm_room_slno=am_asset_item_map_master.item_room_slno
-           left join rm_subroom_master on rm_subroom_master.subroom_slno=am_asset_item_map_master.item_subroom_slno
-          WHERE
-          am_asset_item_map_master.item_creation_slno=? and  item_dept_slno = ?
-           and item_deptsec_slno=?  and item_create_status=1 ORDER BY am_item_map_slno DESC`,
+            item_asset_no,item_asset_no_only,
+            item_custodian_dept
+            FROM
+            am_asset_item_map_master
+            left join co_department_mast on co_department_mast.dept_id=am_asset_item_map_master.item_dept_slno
+            left join co_deptsec_mast on co_deptsec_mast.sec_id=am_asset_item_map_master.item_deptsec_slno
+            left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
+            left join rm_newroom_creation on rm_newroom_creation.rm_room_slno=am_asset_item_map_master.item_room_slno
+            left join rm_subroom_master on rm_subroom_master.subroom_slno=am_asset_item_map_master.item_subroom_slno
+            left join am_custodian_department on am_custodian_department.am_custodian_slno = am_asset_item_map_master.item_custodian_dept
+            WHERE
+            am_asset_item_map_master.item_creation_slno=?
+            and
+            item_custodian_dept=?
+            and item_create_status=1            
+            ORDER BY am_item_map_slno DESC
+            LIMIT ?
+            `,
             [
                 data.item_creation_slno,
-                data.item_dept_slno,
-                data.item_deptsec_slno
+                data.item_custodian_dept,
+                data.itemCount,
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -127,7 +137,8 @@ module.exports = {
 
     getItemsFronList: (data, callBack) => {
         pool.query(
-            `SELECT 
+            `SELECT
+            am_category_pm_days,
             am_asset_item_map_master.am_item_map_slno,  am_asset_item_map_master.item_creation_slno,item_dept_slno,item_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,item_custodian_dept,
             am_custodian_name,am_manufacture_no,am_category.category_name,
@@ -268,21 +279,27 @@ module.exports = {
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,
             am_item_name_creation.item_name,rm_newroom_creation.rm_room_name,
             IFNULL(rm_subroom_master.subroom_name,"Not Subroom" ) subroom_name,
-            spare_asset_no,spare_asset_no_only
-          FROM
-          am_spare_item_map_master
-         left join co_department_mast on co_department_mast.dept_id=am_spare_item_map_master.spare_dept_slno
-          left join co_deptsec_mast on co_deptsec_mast.sec_id=am_spare_item_map_master.spare_deptsec_slno
-           left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_spare_item_map_master.spare_creation_slno
-           left join rm_newroom_creation on rm_newroom_creation.rm_room_slno=am_spare_item_map_master.spare_room_slno
-           left join rm_subroom_master on rm_subroom_master.subroom_slno=am_spare_item_map_master.spare_subroom_slno
-           WHERE
-          am_spare_item_map_master.spare_creation_slno=? and  spare_dept_slno = ?
-           and spare_deptsec_slno=? and spare_create_status=1 ORDER BY am_spare_item_map_slno DESC`,
+            spare_asset_no,spare_asset_no_only,
+            spare_custodian_dept
+            FROM
+            am_spare_item_map_master
+            left join co_department_mast on co_department_mast.dept_id=am_spare_item_map_master.spare_dept_slno
+            left join co_deptsec_mast on co_deptsec_mast.sec_id=am_spare_item_map_master.spare_deptsec_slno
+            left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_spare_item_map_master.spare_creation_slno
+            left join rm_newroom_creation on rm_newroom_creation.rm_room_slno=am_spare_item_map_master.spare_room_slno
+            left join rm_subroom_master on rm_subroom_master.subroom_slno=am_spare_item_map_master.spare_subroom_slno
+            left join am_custodian_department on am_custodian_department.am_custodian_slno = am_spare_item_map_master.spare_custodian_dept
+            WHERE
+            am_spare_item_map_master.spare_creation_slno=?
+            and spare_custodian_dept=?
+            and spare_create_status=1
+            ORDER BY am_spare_item_map_slno DESC
+            LIMIT ?
+            `,
             [
                 data.spare_creation_slno,
-                data.spare_dept_slno,
-                data.spare_deptsec_slno
+                data.item_custodian_dept,
+                data.itemCount,
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -314,7 +331,8 @@ module.exports = {
 
     getSpareItemsFronListonlydept: (data, callBack) => {
         pool.query(
-            `SELECT 
+            `SELECT
+            am_category_pm_days,
             am_spare_item_map_master.am_spare_item_map_slno,  am_spare_item_map_master.spare_creation_slno,spare_dept_slno,spare_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,spare_custodian_dept,
             am_custodian_name,am_category.category_name,am_manufacture_no,
@@ -344,7 +362,8 @@ module.exports = {
     },
     getSpareItemsFronListdeptandsec: (data, callBack) => {
         pool.query(
-            `SELECT 
+            `SELECT
+            am_category_pm_days,
             am_spare_item_map_master.am_spare_item_map_slno,  am_spare_item_map_master.spare_creation_slno,spare_dept_slno,spare_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,spare_custodian_dept,
             am_custodian_name,am_category.category_name,am_manufacture_no,
@@ -376,7 +395,8 @@ module.exports = {
     },
     getSpareItemsFronList: (data, callBack) => {
         pool.query(
-            `SELECT 
+            `SELECT
+            am_category_pm_days,
             am_spare_item_map_master.am_spare_item_map_slno,  am_spare_item_map_master.spare_creation_slno,spare_dept_slno,spare_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,spare_custodian_dept,
             am_custodian_name,am_category.category_name,am_manufacture_no,
@@ -411,7 +431,8 @@ module.exports = {
 
     getItemsFronListonlydept: (data, callBack) => {
         pool.query(
-            `SELECT 
+            `SELECT
+            am_category_pm_days,
             am_asset_item_map_master.am_item_map_slno,  am_asset_item_map_master.item_creation_slno,item_dept_slno,item_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,item_custodian_dept,
             am_custodian_name,am_manufacture_no,am_category.category_name,
@@ -442,7 +463,8 @@ module.exports = {
     },
     getItemsFronListdeptandsec: (data, callBack) => {
         pool.query(
-            `SELECT 
+            `SELECT
+            am_category_pm_days,
             am_asset_item_map_master.am_item_map_slno,  am_asset_item_map_master.item_creation_slno,item_dept_slno,item_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,item_custodian_dept,
             am_custodian_name,am_manufacture_no,am_category.category_name,
@@ -474,7 +496,8 @@ module.exports = {
     },
     getDataBySerialNoAsset: (data, callBack) => {
         pool.query(
-            `SELECT 
+            `SELECT
+            am_category_pm_days,
             am_asset_item_map_master.am_item_map_slno,  am_asset_item_map_master.item_creation_slno,item_dept_slno,item_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,item_custodian_dept,
             am_custodian_name,am_manufacture_no,am_category.category_name,
@@ -505,7 +528,9 @@ module.exports = {
     },
     getdataBySerailNoSpare: (data, callBack) => {
         pool.query(
-            `SELECT am_spare_item_map_master.am_spare_item_map_slno, am_spare_item_map_master.spare_creation_slno,spare_dept_slno,spare_deptsec_slno,
+            `SELECT
+            am_category_pm_days,
+             am_spare_item_map_master.am_spare_item_map_slno, am_spare_item_map_master.spare_creation_slno,spare_dept_slno,spare_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,spare_custodian_dept,
             am_custodian_name,am_manufacture_no,am_category.category_name,
             am_item_name_creation.item_name,spare_asset_no,spare_asset_no_only

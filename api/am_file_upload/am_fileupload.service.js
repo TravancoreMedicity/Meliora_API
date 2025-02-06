@@ -35,6 +35,23 @@ module.exports = {
             }
         )
     },
+    GaurenteeWarrentefileUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE am_item_map_wargrarnt_detail SET 
+            file_upload_status=1
+            WHERE 
+            am_item_wargar_slno=?`,
+            [
+                data.am_item_wargar_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
     LeaseMstImageUpdate: (data, callback) => {
         pool.query(
             `UPDATE am_lease_detail_mast SET 

@@ -2,7 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require("fs")
 
-const { ItemMastUpdate } = require('../fileupload/fileupload.services')
+const { ItemMastUpdate, InsertFileDetails } = require('../fileupload/fileupload.services')
 
 const itemDetailStorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -26,7 +26,6 @@ const itemDetailStorage = multer.diskStorage({
 })
 
 
-
 const itemStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         const id = req.body.id;
@@ -47,6 +46,8 @@ const itemStorage = multer.diskStorage({
         cb(null, 'profilePic' + path.extname(file.originalname))
     },
 })
+
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const id = req.body.id;
@@ -67,6 +68,7 @@ const storage = multer.diskStorage({
         cb(null, 'profilePic' + path.extname(file.originalname))
     },
 })
+
 
 const storageSubModel = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -89,15 +91,16 @@ const storageSubModel = multer.diskStorage({
     },
 })
 
+
 const storageCategory = multer.diskStorage({
     destination: (req, file, cb) => {
         const id = req.body.id;
         // File or directtory check 
-        const filepath = path.join('D:/MelioraDoc/Category', `${id}`)
+        const filepath = path.join('D:/DocMeliora/Meliora/AssetName/Category', `${id}`)
         if (fs.existsSync(filepath)) {
             cb(null, `${filepath}`);
         } else {
-            fs.mkdir(path.join('D:/MelioraDoc/Category', `${id}`), {}, (err) => {
+            fs.mkdir(path.join('D:/DocMeliora/Meliora/AssetName/Category', `${id}`), {}, (err) => {
                 if (err) {
                     return cb(new Error('Error Occured while Mkdir'));
                 }
@@ -106,9 +109,11 @@ const storageCategory = multer.diskStorage({
         }
     },
     filename: function (req, file, cb) {
-        cb(null, 'profilePic' + path.extname(file.originalname))
+        cb(null, file.originalname
+        )
     },
 })
+
 
 const storageSubcategory = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -131,6 +136,7 @@ const storageSubcategory = multer.diskStorage({
     },
 })
 
+
 const storageGroup = multer.diskStorage({
     destination: (req, file, cb) => {
         const id = req.body.id;
@@ -151,6 +157,7 @@ const storageGroup = multer.diskStorage({
         cb(null, 'profilePic' + path.extname(file.originalname))
     },
 })
+
 
 const storageSubGroup = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -174,7 +181,6 @@ const storageSubGroup = multer.diskStorage({
 })
 
 
-
 const maxSize = 2 * 1024 * 1024
 
 const uploadItemDetail = multer({
@@ -194,11 +200,6 @@ const uploadItemDetail = multer({
     },
     limits: { fileSize: maxSize }
 }).single('file');
-
-
-
-
-
 
 //Model Files
 const uploadItem = multer({
@@ -256,6 +257,7 @@ const uploadSubModel = multer({
     limits: { fileSize: maxSize }
 }).single('file');
 
+
 //category Files
 const uploadCategory = multer({
     storage: storageCategory,
@@ -274,6 +276,7 @@ const uploadCategory = multer({
     },
     limits: { fileSize: maxSize }
 }).single('file');
+
 
 //subcategory Files
 const uploadSubCategory = multer({
@@ -331,8 +334,6 @@ const uploadSubGroup = multer({
     },
     limits: { fileSize: maxSize }
 }).single('file');
-
-
 
 
 module.exports = {
@@ -492,11 +493,12 @@ module.exports = {
             }
         })
     },
-    //category
+
+
     uploadFileCategory: (req, res) => {
         uploadCategory(req, res, (err) => {
             const body = req.body;
-            // FILE SIZE ERROR
+
             if (err instanceof multer.MulterError) {
                 // return res.end("Max file size 2MB allowed!");
                 return res.status(200).json({
@@ -517,16 +519,33 @@ module.exports = {
                     status: 0,
                     message: "File is required!",
                 })
-            }
-            // SUCCESS
-            else {
-                return res.status(200).json({
-                    success: 1,
-                    message: "File Uploaded SuccessFully"
-                });
+            } else {
+                const patchdata = {
+                    mime_type: req.file.mimetype,
+                    file_name: req.file.filename,
+                    category_slno: body.id
+
+                }
+                InsertFileDetails(patchdata, (err, results) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+
+                    return res.status(200).json({
+                        success: 1,
+                        message: "File Uploaded SuccessFully"
+                    })
+
+                })
             }
         })
     },
+
+
+
     //subcategory
     uploadFileSubCategory: (req, res) => {
         uploadSubCategory(req, res, (err) => {
@@ -635,4 +654,32 @@ module.exports = {
 
 
 
+    getCategoryFile: (req, res) => {
+        const id = req.params.id;
+        const folderPath = path.join('D:/DocMeliora/Meliora/AssetName/Category', id);
+        // Check if the folder exists before reading
+        fs.access(folderPath, fs.constants.F_OK, (err) => {
+            if (err) {
+                // If the folder does not exist, return an empty array as a dummy response          
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // Return an empty array if the folder doesn't exist
+                });
+            }
+
+            // If the folder exists, read its contents
+            fs.readdir(folderPath, (err, files) => {
+                if (err) {
+                    return res.status(500).json({
+                        success: 0,
+                        message: `Error reading the directory: ${err.message}`
+                    });
+                }
+                return res.status(200).json({
+                    success: 1,
+                    data: files // Send the list of files
+                });
+            });
+        });
+    }
 }

@@ -4,7 +4,8 @@ const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign, getcomplai
     AssistantRecieved, checkInsertVal, TransferDept, assignedListNotRectifiedOnly, rectifiedListForVErify,
     AssistMultiple, getALLAssignedComList, EmployeeInactive, beforAssignHold, empTransInactive,
     sendMeassageUser, ReadMeassageUser, AssistReqListAll, getAssistRequestEmps, assistTransInactive, AssistReqEmployee,
-    AssisttransferInsert, SupervsrVerifyPending, SupervsrVerify, ReopenComplaintInsert, AskQuery, changeQueryStatus, getQuery, replyQuery, AssistanceReject
+    AssisttransferInsert, SupervsrVerifyPending, SupervsrVerify, ReopenComplaintInsert, AskQuery, changeQueryStatus, getQuery, replyQuery, AssistanceReject,
+    getAssistRequestDetails
 } = require('../complaint_assign/complaintAssign.service');
 const logger = require('../../logger/logger');
 const { default: Expo } = require('expo-server-sdk');
@@ -847,5 +848,28 @@ module.exports = {
                 data: results
             })
         })
+    },
+    getAssistRequestDetails: (req, res) => {
+        const id = req.params.id
+        getAssistRequestDetails(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Complaints"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
     },
 }

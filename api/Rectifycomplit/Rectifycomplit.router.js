@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { getRectifycomplt, Updatecomplit, UpdateVerify, getAssignEmps,
     getlocationbsedAsset, AssetMappComplaint, AssetDetailsGet, updateHoldProgress, getEmplHoldList, getEmplRectfiedList, getEmplVerifiedList, getUserEndRectfiedList,
-    getUserEndVerifiedList, getDepartmentPendingList, getDepartmentRectfiedList, getDepartmentVerifiedList, getAuthorization
+    getUserEndVerifiedList, getDepartmentPendingList, getDepartmentRectfiedList, getDepartmentVerifiedList, getAuthorization, getAssetUnderSelectedCompltDept
 } = require('../Rectifycomplit/Rectifycomplit.controller')
 
 router.get('/getRectifycomplit/:id', checkToken, getRectifycomplt)
@@ -29,7 +29,7 @@ router.post("/getDepartmentVerifiedList", checkToken, getDepartmentVerifiedList)
 
 router.get('/getAuthorization/:id', checkToken, getAuthorization)
 
-
+router.post("/getAssetUnderSelectedCompltDept", checkToken, getAssetUnderSelectedCompltDept);
 
 
 

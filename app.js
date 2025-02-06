@@ -210,6 +210,8 @@ const complaintFileUpload = require('./api/cm_file_upload/cm_file_upload.router'
 const complaintHoldReason = require('./api/cm_complaint_hold_reason_mast/hold_reason.router')
 const assetSpareDetails = require('./api/am_spare_service_details/spare_service_details.router')
 const AmServiceFileUpload = require('./api/am_asset_serviced_file_upload/service_file_upload.router')
+const Amdashboard = require('./api/am_dashboard/am_dashboard.router')
+const Ticketdashboard = require('./api/cm_dashboard/cm_dashboard.router')
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
@@ -387,6 +389,8 @@ app.use('/api/complaintFileUpload', complaintFileUpload)
 app.use('/api/complaintHoldReason', complaintHoldReason)
 app.use('/api/assetSpareDetails', assetSpareDetails)
 app.use('/api/AmServiceFileUpload', AmServiceFileUpload)
+app.use('/api/Amdashboard', Amdashboard)
+app.use('/api/Ticketdashboard', Ticketdashboard)
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

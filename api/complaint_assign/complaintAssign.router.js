@@ -7,7 +7,7 @@ const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign,
     getALLAssignedComList, transferInsert, EmployeeInactive,
     beforAssignHold, empTransInactive, sendMeassageUser, ReadMeassageUser, AssistReqListAll,
     getAssistRequestEmps, assistTransInactive, AssisttransferInsert, SupervsrVerifyPending, getQuery,
-    SupervsrVerify, AskQuery, replyQuery, AssistanceReject, AssistReqEmployee
+    SupervsrVerify, AskQuery, replyQuery, AssistanceReject, AssistReqEmployee, getAssistRequestDetails
 } = require('../complaint_assign/complaintAssign.controller');
 
 router.get("/:id", checkToken, getcomplaintAssign);
@@ -49,5 +49,7 @@ router.post('/getQuery', checkToken, getQuery)
 router.post('/replyQuery', checkToken, replyQuery)
 
 router.post('/AssistReqEmployee', checkToken, AssistReqEmployee)
+
+router.get("/getAssistRequestDetails/:id", checkToken, getAssistRequestDetails)
 
 module.exports = router;

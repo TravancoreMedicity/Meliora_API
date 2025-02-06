@@ -1,7 +1,8 @@
 
 const { getRectifycomplt, Updatecomplit, UpdateVerify, getAssignEmps, updateassignDetail,
     ReopenComplaintInsert, getlocationbsedAsset, AssetMappComplaint, AssetDetailsGet, updateHoldProgress, getEmplHoldList, getEmplRectfiedList, getEmplVerifiedList,
-    getUserEndRectfiedList, getUserEndVerifiedList, getDepartmentPendingList, getDepartmentRectfiedList, getDepartmentVerifiedList, getAuthorization
+    getUserEndRectfiedList, getUserEndVerifiedList, getDepartmentPendingList, getDepartmentRectfiedList, getDepartmentVerifiedList, getAuthorization,
+    getAssetUnderSelectedCompltDept
 } = require('../Rectifycomplit/Rectifycomplit.service')
 const logger = require('../../logger/logger');
 module.exports = {
@@ -281,8 +282,6 @@ module.exports = {
     getUserEndRectfiedList: (req, res) => {
         const body = req.body;
         getUserEndRectfiedList(body, (err, results) => {
-            console.log("results", results);
-
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -351,8 +350,6 @@ module.exports = {
     getDepartmentRectfiedList: (req, res) => {
         const body = req.body;
         getDepartmentRectfiedList(body, (err, results) => {
-            console.log("results", results);
-
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -418,6 +415,29 @@ module.exports = {
                 data: results
             });
         });
+    },
+    getAssetUnderSelectedCompltDept: (req, res) => {
+        const body = req.body;
+        getAssetUnderSelectedCompltDept(body, (err, results) => {
+
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No record found"
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
     },
 
 }

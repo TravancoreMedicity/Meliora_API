@@ -2,7 +2,8 @@ const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { getAssetDetails, getcomplaintDetails, getAssetcomplaintDetails, serviceDetailsInsert, getserviceDetails, serviceDetailsUpdate,
     getAllserviceDetails, AssetDetailsUpdate, SpareDetailsUpdate, spareServiceUpdate, servicedEmpDetailsInsert, getDeptServiceDetailsData, servicedEmpDetailsUpdate,
-    AssetServiceHoldUpdate, SpareServiceHoldUpdate, getAssetListUnderCustodian, getAssetAlllDetails
+    AssetServiceHoldUpdate, SpareServiceHoldUpdate, getAssetListUnderCustodian, getAssetAlllDetails, getAssetUnderSelectdDeptAndSec, getPendingAsset, getPendingSpare,
+    CmSpareComplaintService
 } = require('./spare_service_details.controller');
 
 router.post("/getAssetDetails", checkToken, getAssetDetails);
@@ -29,7 +30,13 @@ router.patch('/AssetServiceHoldUpdate', checkToken, AssetServiceHoldUpdate)
 router.patch('/SpareServiceHoldUpdate', checkToken, SpareServiceHoldUpdate)
 
 router.post("/getAssetListUnderCustodianDetails", checkToken, getAssetListUnderCustodian);
-
 router.post("/getAssetAlllDetails", checkToken, getAssetAlllDetails);
+
+router.post("/getAssetUnderSelectdDeptAndSec", checkToken, getAssetUnderSelectdDeptAndSec);
+
+router.post("/getPendingAsset", checkToken, getPendingAsset);
+router.post("/getPendingSpare", checkToken, getPendingSpare);
+
+router.post('/CmSpareComplaintService', checkToken, CmSpareComplaintService)
 
 module.exports = router

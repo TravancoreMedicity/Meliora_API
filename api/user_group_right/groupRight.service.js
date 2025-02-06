@@ -197,7 +197,7 @@ module.exports = {
                 user_group_rights.menu_edit
             FROM user_group_rights
             RIGHT JOIN menu_master ON menu_master.menu_slno = user_group_rights.menu_slno 
-            WHERE menu_master.menu_module_slno = ? AND user_group_slno = ? and user_group_rights.sub_module_slno=?`,
+            WHERE menu_master.menu_module_slno = ? AND user_group_slno = ? and user_group_rights.sub_module_slno=? and menu_status=1`,
             [
                 data.module_slno,
                 data.user_group_slno,

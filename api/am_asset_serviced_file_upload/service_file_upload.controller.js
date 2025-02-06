@@ -111,7 +111,7 @@ module.exports = {
                         }
                         return res.status(200).json({
                             success: 1,
-                            message: "File Also Updated"
+                            message: "File Updated"
                         })
                     })
                 } catch (error) {

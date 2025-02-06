@@ -115,7 +115,6 @@ module.exports = {
             [id],
 
             (error, results, feilds) => {
-                console.log(results);
                 if (error) {
                     return callBack(error);
                 }

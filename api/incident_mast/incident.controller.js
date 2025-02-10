@@ -43,8 +43,8 @@ module.exports = {
                             }
 
                             return res.status(200).json({
-                                success: 0,
-                                message: errr
+                                success: 1,
+                                message: 'Deleted'
                             });
                         });
                     } else {
@@ -83,8 +83,8 @@ module.exports = {
                             }
 
                             return res.status(200).json({
-                                success: 0,
-                                message: errr
+                                success: 1,
+                                message: 'Deleted'
                             });
                         });
                     } else {
@@ -123,8 +123,8 @@ module.exports = {
                             }
 
                             return res.status(200).json({
-                                success: 0,
-                                message: errr
+                                success: 1,
+                                message: 'Deleted'
                             });
                         });
                     } else {
@@ -163,8 +163,8 @@ module.exports = {
                             }
 
                             return res.status(200).json({
-                                success: 0,
-                                message: errr
+                                success: 1,
+                                message: 'Deleted'
                             });
                         });
                     } else {
@@ -203,8 +203,8 @@ module.exports = {
                             }
 
                             return res.status(200).json({
-                                success: 0,
-                                message: errr
+                                success: 1,
+                                message: 'Deleted'
                             });
                         });
                     } else {
@@ -243,8 +243,8 @@ module.exports = {
                             }
 
                             return res.status(200).json({
-                                success: 0,
-                                message: errr
+                                success: 1,
+                                message: 'Deleted'
                             });
                         });
                     } else {

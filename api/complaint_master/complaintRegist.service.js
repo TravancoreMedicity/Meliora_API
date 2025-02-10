@@ -1,6 +1,10 @@
 const { pool } = require('../../config/database')
 module.exports = {
     complaintRegistInsert: (data, callback) => {
+
+
+
+
         pool.query(
             `INSERT INTO cm_complaint_mast (
                 complaint_slno,
@@ -14,9 +18,10 @@ module.exports = {
                 complaint_dept_secslno,
                 cm_location,
                 create_user,
-                priority_reason
+                priority_reason,
+                rm_room_slno
                )
-                VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.complaint_slno,
                 data.complaint_desc,
@@ -29,7 +34,8 @@ module.exports = {
                 data.complaint_dept_secslno,
                 data.cm_location,
                 data.create_user,
-                data.priority_reason
+                data.priority_reason,
+                data.rm_room_slno
             ],
             (error, results, fields) => {
 
@@ -51,8 +57,9 @@ module.exports = {
                 priority_check = ?,
                 complaint_hicslno = ?, 
                 cm_location=?,
-                edit_user=?,    
-                priority_reason=?     
+                edit_user=?,
+                rm_room_slno=?,    
+                priority_reason=? 
                 WHERE complaint_slno = ?`,
             [
                 data.complaint_desc,
@@ -64,6 +71,7 @@ module.exports = {
                 data.complaint_hicslno,
                 data.cm_location,
                 data.edit_user,
+                data.rm_room_slno,
                 data.priority_reason,
                 data.complaint_slno
             ],
@@ -103,6 +111,44 @@ module.exports = {
 
     getcomplaintListbylogin: (id, callBack) => {
         pool.query(
+            // `select complaint_slno,
+            // S.sec_name as sec_name, 
+            //   IFNULL( L.sec_name,"Nil" ) location,
+            //             complaint_desc,
+            //             req_type_name,
+            //             complaint_dept_secslno,
+            //             complaint_request_slno,
+            //             complaint_hicslno,
+            //             compalint_priority,
+            //             complaint_dept_name,
+            //             complaint_deptslno,
+            //             complaint_typeslno,
+            //             complaint_type_name,
+            //             cm_complaint_mast.create_user,
+            //             cm_location,priority_check,
+            //             compalint_status,priority_reason,
+            //             hic_policy_status,
+            //             cm_rectify_status,compdept_message,compdept_message_flag,
+            //             rectify_pending_hold_remarks,message_reply_emp,
+            //             (case when rectify_pending_hold_remarks is null then "not updated" else rectify_pending_hold_remarks end ) as rectify_pending_hold_remarks1,
+            //             (case when priority_check='1' then "Yes"  else "No" end ) as priority ,
+            //             (case when hic_policy_name is not null then hic_policy_name else 'Not Suggested' end )as hic_policy_name,
+            //             (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"  when compalint_status = '3' then "Verified"  else "Not" end ) as compalint_status1,
+            //                          (case when cm_rectify_status = 'R' then "Rectified" when cm_rectify_status = 'P' then "Pending" when cm_rectify_status = 'O' then "On Hold" else "Not" end ) as cm_rectify_status1,
+            //                          verify_spervsr,compalint_date,compalint_status,cm_rectify_status,
+            //             M.em_name as send_user,R.em_name as read_user
+            //             from 
+            //             cm_complaint_mast
+            //             left join co_employee_master C on cm_complaint_mast.create_user = C.em_id
+            //             left join co_employee_master M on cm_complaint_mast.message_send_emp = M.em_id
+            //             left join co_employee_master R on cm_complaint_mast.message_read_emp = R.em_id
+            //             left join co_request_type on cm_complaint_mast.complaint_request_slno = co_request_type.req_type_slno
+            //             left join cm_complaint_dept on cm_complaint_mast.complaint_deptslno = cm_complaint_dept.complaint_dept_slno
+            //             left join cm_complaint_type on cm_complaint_mast.complaint_typeslno = cm_complaint_type.complaint_type_slno
+            //             left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
+            //             left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
+            //             left join cm_hic_policy on cm_complaint_mast.complaint_hicslno = cm_hic_policy.hic_policy_slno
+            //             where complaint_dept_secslno =?  ORDER BY compalint_date DESC `,
             `select complaint_slno,
             S.sec_name as sec_name, 
               IFNULL( L.sec_name,"Nil" ) location,
@@ -116,6 +162,14 @@ module.exports = {
                         complaint_deptslno,
                         complaint_typeslno,
                         complaint_type_name,
+                        cm_complaint_mast.rm_room_slno,
+                        rm_room_name,
+                        rm_newroom_creation.rm_roomtype_slno,
+                        rm_room_floor_slno,
+                        rm_insidebuilldblock_slno,
+                        rm_insidebuildblock_name,
+                        rm_floor_name,
+                        rm_roomtype_name,
                         cm_complaint_mast.create_user,
                         cm_location,priority_check,
                         compalint_status,priority_reason,
@@ -140,7 +194,11 @@ module.exports = {
                         left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
                         left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
                         left join cm_hic_policy on cm_complaint_mast.complaint_hicslno = cm_hic_policy.hic_policy_slno
-                        where complaint_dept_secslno =?  ORDER BY compalint_date DESC `,
+                        left join rm_newroom_creation on rm_newroom_creation.rm_room_slno = cm_complaint_mast.rm_room_slno
+                        LEFT JOIN rm_room_type_master ON rm_room_type_master.rm_roomtype_slno =rm_newroom_creation.rm_roomtype_slno
+						LEFT JOIN rm_floor_creation ON rm_floor_creation.rm_floor_slno =rm_newroom_creation.rm_room_floor_slno
+						LEFT JOIN rm_insidebuildblock_mast ON rm_insidebuildblock_mast.rm_insidebuildblock_slno =rm_newroom_creation.rm_insidebuilldblock_slno
+                        where complaint_dept_secslno =?  ORDER BY compalint_date DESC`,
             [
                 id
             ],
@@ -194,6 +252,33 @@ module.exports = {
 
     getcomplaintAll: (callBack) => {
         pool.query(
+            // `SELECT cm_complaint_mast.complaint_slno,complaint_desc,DATE_FORMAT(compalint_date,'%d-%m-%Y ')compalint_date1,
+            // compalint_date, 
+            // IFNULL(assigned_date,"Not Assign") as assigned_date,
+            // IFNULL(cm_rectify_time,"Not Updated") as cm_rectify_time,
+            //    IFNULL(cm_verfy_time,"Not updated") as cm_verfy_time,   
+            //   IFNULL(em_name,"Not assigned" ) em_name,
+            //            S.sec_name as sec_name, 
+            //   IFNULL( L.sec_name,"Nil" ) location,
+            //     complaint_dept_secslno,
+            //     complaint_request_slno,
+            //     compalint_priority,complaint_hicslno,
+            //     req_type_name,
+            //     complaint_dept_name,
+            //     complaint_type_name,compalint_status,
+            //     (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High" else "Medium" end ) as priority,
+            //     (case when hic_policy_name is not null then hic_policy_name else 'Not Suggested' end )as hic_policy_name,
+            //     (case when compalint_status = '0' then "not assigned" when compalint_status = '1' then "assigned" when compalint_status = '2' then "Rectified"  when compalint_status = '3' then "Verified"  else "Not" end ) as compalint_status1
+            //     FROM cm_complaint_mast
+            //     LEFT JOIN co_request_type ON co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
+            //     LEFT JOIN cm_complaint_dept ON cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
+            //     LEFT JOIN cm_hic_policy ON cm_hic_policy.hic_policy_slno=cm_complaint_mast.complaint_hicslno 
+            //    left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
+            //             left join co_deptsec_mast L on L.sec_id=cm_complaint_mast.cm_location
+            //     LEFT JOIN cm_complaint_type ON cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
+            //     LEFT JOIN cm_complaint_detail ON cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
+            //     LEFT JOIN co_employee_master ON co_employee_master.em_id=cm_complaint_detail.assigned_emp
+            //    group by cm_complaint_mast.complaint_slno ORDER BY compalint_date DESC `,
             `SELECT cm_complaint_mast.complaint_slno,complaint_desc,DATE_FORMAT(compalint_date,'%d-%m-%Y ')compalint_date1,
             compalint_date, 
             IFNULL(assigned_date,"Not Assign") as assigned_date,
@@ -206,7 +291,15 @@ module.exports = {
                 complaint_request_slno,
                 compalint_priority,complaint_hicslno,
                 req_type_name,
-                complaint_dept_name,
+                complaint_dept_name,           
+                cm_complaint_mast.rm_room_slno,
+				rm_room_name,
+				rm_newroom_creation.rm_roomtype_slno,
+				rm_room_floor_slno,
+				rm_insidebuilldblock_slno,
+				rm_insidebuildblock_name,
+				rm_floor_name,
+				rm_roomtype_name,
                 complaint_type_name,compalint_status,
                 (case when compalint_priority='1' then "Critical" when compalint_priority='2' then "High" else "Medium" end ) as priority,
                 (case when hic_policy_name is not null then hic_policy_name else 'Not Suggested' end )as hic_policy_name,
@@ -220,7 +313,11 @@ module.exports = {
                 LEFT JOIN cm_complaint_type ON cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
                 LEFT JOIN cm_complaint_detail ON cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
                 LEFT JOIN co_employee_master ON co_employee_master.em_id=cm_complaint_detail.assigned_emp
-               group by cm_complaint_mast.complaint_slno ORDER BY compalint_date DESC `,
+                 left join rm_newroom_creation on rm_newroom_creation.rm_room_slno = cm_complaint_mast.rm_room_slno
+				LEFT JOIN rm_room_type_master ON rm_room_type_master.rm_roomtype_slno =rm_newroom_creation.rm_roomtype_slno
+				LEFT JOIN rm_floor_creation ON rm_floor_creation.rm_floor_slno =rm_newroom_creation.rm_room_floor_slno
+				LEFT JOIN rm_insidebuildblock_mast ON rm_insidebuildblock_mast.rm_insidebuildblock_slno =rm_newroom_creation.rm_insidebuilldblock_slno
+               group by cm_complaint_mast.complaint_slno ORDER BY compalint_date DESC`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -260,5 +357,94 @@ module.exports = {
                 return callBack(null, results);
             }
         )
+    },
+    getAssetinComplaint: (id, callback) => {
+        pool.query(
+            `select 
+            cm_am_assetmap_slno
+            from
+            cm_comasset_mapping
+            where
+            cm_complait_slno=?`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+
+    UpdateAssetinComplaint: (data, callback) => {
+        pool.query(
+            `UPDATE
+            cm_comasset_mapping
+             SET
+                cm_am_assetmap_slno=?,          
+                edit_user=? 
+                 WHERE 
+                 cm_complait_slno=?`,
+            [
+                data.cm_am_assetmap_slno,
+                data.edit_user,
+                data.cm_complait_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
+    getRoomsNameNdTypeList: (id, callback) => {
+        pool.query(
+            `select
+                rm_room_slno,
+                rm_room_name,
+                rm_newroom_creation.rm_roomtype_slno,
+                rm_room_floor_slno,
+                rm_insidebuilldblock_slno,
+                rm_insidebuildblock_name,
+                rm_floor_name,
+                rm_roomtype_name
+                from
+                rm_newroom_creation
+                LEFT JOIN rm_room_type_master ON rm_room_type_master.rm_roomtype_slno =rm_newroom_creation.rm_roomtype_slno
+                LEFT JOIN rm_floor_creation ON rm_floor_creation.rm_floor_slno =rm_newroom_creation.rm_room_floor_slno
+                LEFT JOIN rm_insidebuildblock_mast ON rm_insidebuildblock_mast.rm_insidebuildblock_slno =rm_newroom_creation.rm_insidebuilldblock_slno
+                where
+                rm_outlet_slno=?`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+
+    getAssetsInRoom: (id, callBack) => {
+        pool.query(
+            `select am_asset_item_map_master.am_item_map_slno,item_name,am_asset_no
+            from am_asset_item_map_master
+            left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
+            left join am_item_map_details on am_item_map_details.am_item_map_slno=am_asset_item_map_master.am_item_map_slno
+            where item_room_slno=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
     },
 }

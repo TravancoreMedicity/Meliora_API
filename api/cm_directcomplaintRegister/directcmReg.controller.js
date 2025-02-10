@@ -128,6 +128,7 @@ module.exports = {
 
                             return res.status(200).json({
                                 success: 1,
+                                insertId: slno,
                                 message: "Complaint Registered Successfully"
                             });
                         });
@@ -235,6 +236,7 @@ module.exports = {
 
                             return res.status(200).json({
                                 success: 1,
+                                insertId: body.complaint_slno,
                                 message: "Complaint Registered Successfully"
                             });
                         });
@@ -299,6 +301,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
+                Complt_id: body.complaint_slno,
                 message: "Complaint Updated Successfully"
             });
         });

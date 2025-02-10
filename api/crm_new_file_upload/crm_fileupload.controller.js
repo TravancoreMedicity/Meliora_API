@@ -713,14 +713,30 @@ module.exports = {
         });
 
     },
+    crfManageImageGet: (req, res) => {
+        const id = req.params.id
+        const folderPath = `D:/DocMeliora/KMCMeliora/CRF/crf_registration/${id}/ManageUpload`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: files
+            });
+        });
 
+    },
     getDataCollectionImage: (req, res) => {
-
         const reqslno = req.body.req_slno
         const datacollslno = req.body.crf_data_collect_slno
-
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${reqslno}/datacollection/${datacollslno}`;
         fs.readdir(folderPath, (err, files) => {
+
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({

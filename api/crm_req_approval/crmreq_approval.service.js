@@ -1055,7 +1055,7 @@ module.exports = {
                 LEFT JOIN co_deptsec_mast RE ON RE.sec_id=crm_data_collection.crf_req_collect_dept
             WHERE
                     crf_req_collect_dept=?
-              GROUP BY crm_request_master.req_slno
+              GROUP BY crm_request_master.req_slno, crf_data_collect_slno
               ORDER BY crm_request_master.req_slno DESC`,
             [
                 id

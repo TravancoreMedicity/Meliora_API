@@ -25,51 +25,6 @@ module.exports = {
         })
     },
 
-    // InsertDeliveredPO: (req, res) => {
-    //     const body = req.body;
-    //     try {
-    //         const promises = body.map((val) => {
-    //             return new Promise((resolve, reject) => {
-    //                 InsertDeliveredPO(val, async (err, results) => {
-    //                     if (err) {
-    //                         reject(err);
-    //                     } else {
-    //                         const insert_id = results.insertId;
-    //                         const create_user = val.create_user;
-    //                         const items = val.items;
-    //                         const itemData = items.map((value) => [
-    //                             insert_id, value.item_code, value.item_name, value.item_qty,
-    //                             value.item_rate, value.item_mrp, value.tax, value.tax_amount,
-    //                             create_user, value.net_amount, value.grn_qnty
-    //                         ]);
-
-    //                         InsertPOItems(itemData, (err, result) => {
-    //                             if (err) {
-    //                                 reject(err);
-    //                             } else {
-    //                                 resolve();
-    //                             }
-    //                         });
-    //                     }
-    //                 });
-    //             });
-    //         });
-    //         await Promise.all(promises);
-    //         return res.status(200).json({
-    //             success: 1,
-    //             message: "PO inserted successfully"
-    //         });
-
-    //     } catch (err) {
-    //         return res.status(200).json({
-    //             success: 0,
-    //             message: err
-    //         });
-    //     }
-
-
-    // },
-
     InsertDeliveredPO: async (req, res) => {
         const body = req.body;
         try {
@@ -113,28 +68,6 @@ module.exports = {
             });
         }
     },
-
-    // checkDeliveryExist: (req, res) => {
-    //     const id = req.params.id
-    //     checkDeliveryExist(id, (err, results) => {
-    //         if (err) {
-    //             return res.status(400).json({
-    //                 success: 0,
-    //                 message: err
-    //             });
-    //         }
-    //         if (results.length === 0) {
-    //             return res.status(200).json({
-    //                 success: 2,
-    //                 message: "No Results Found"
-    //             });
-    //         }
-    //         return res.status(200).json({
-    //             success: 1,
-    //             data: results
-    //         });
-    //     });
-    // },
 
     checkPOExist: (req, res) => {
         const id = req.params.id

@@ -45,11 +45,11 @@ module.exports = {
                    R.sec_name AS req_deptsec, U.sec_name AS user_deptsection, CR.em_name AS create_user,
                    crm_emergencytype_mast.emer_type_name, crm_emergencytype_mast.emer_type_escalation,
                    crm_request_master.request_deptsec_slno, crm_request_master.location, emergeny_remarks, expected_date,
-                   rm_ndrf, GROUP_CONCAT(item_type_name) AS category, image_status, emergency_flag, emer_slno, crm_request_master.create_date,
+                   GROUP_CONCAT(item_type_name) AS category, image_status, emergency_flag, emer_slno, crm_request_master.create_date,
                    total_approx_cost, user_deptsec, req_status, req_approv_slno, TD.dept_id, TD.dept_name, TD.dept_type,
                    ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date, ED.em_name AS ed_user,
                    md_approve_req, md_approve, md_approve_remarks, md_detial_analysis, md_approve_date, MD.em_name AS md_user,
-                   managing_director_req, managing_director_approve, managing_director_remarks, managing_director_analysis,
+                   managing_director_req, crm_request_approval.managing_director_approve, managing_director_remarks, managing_director_analysis,
                     managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
                    ed_image, md_image, ack_status, ack_remarks
             FROM
@@ -77,8 +77,8 @@ module.exports = {
                  AND crm_approval_mapping_master.managing_director_approve = 1 
                  AND md_approve = 1 
                  AND crm_request_approval.managing_director_approve = 1))
-                 AND user_acknldge IS NULL 
-                 AND (ack_status IS NULL OR ack_status = 0)                   
+                 AND (ack_status IS NULL OR ack_status = 0)
+                 AND internally_arranged_status=0 AND user_acknldge is null            
             GROUP BY crm_request_master.req_slno, crm_purchase_mast.crm_purchase_slno   
             ORDER BY crm_request_master.req_slno DESC `,
             [],

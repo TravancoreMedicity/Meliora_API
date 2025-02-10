@@ -572,12 +572,14 @@ module.exports = {
     getReqItemForCRFView: (id, callBack) => {
         pool.query(
             `SELECT
-                    crm_purchase_po_details.req_slno,po_itm_slno, crm_purchase_item_details.po_detail_slno,
-                    item_code,item_name, item_qty,item_receive_status,grn_qnty,received_qnty,user_received_status,store_recieve
+                    crm_purchase_po_details.req_slno,crm_purchase_item_details.po_itm_slno,
+                    crm_purchase_item_details.po_detail_slno,item_code,item_name, item_qty,
+                    item_receive_status,grn_qnty,received_qnty,user_received_status,store_recieve,return_status
              FROM
                     crm_purchase_item_details
                  LEFT JOIN crm_purchase_po_details ON crm_purchase_po_details.po_detail_slno=crm_purchase_item_details.po_detail_slno
                  LEFT JOIN crm_request_master ON crm_request_master.req_slno=crm_purchase_po_details.req_slno
+                 LEFT JOIN crm_item_return_to_store_details ON crm_item_return_to_store_details.po_itm_slno=crm_purchase_item_details.po_itm_slno
              WHERE  
                    crm_request_master.req_slno=? AND po_status=1`,
             [

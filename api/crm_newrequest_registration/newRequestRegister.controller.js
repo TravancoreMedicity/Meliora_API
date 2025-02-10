@@ -632,6 +632,14 @@ module.exports = {
                 val: 22, name: 'medicalpending', sql: `AND managing_director_approve is null AND crf_close is null AND user_acknldge is null
                   AND req_status!='P' AND req_status!='R'`
             },
+            {
+                val: 23, name: 'tmchData', sql: `AND (ed_approve is null OR md_approve is null ) AND crf_close is null AND user_acknldge is null
+                  AND req_status!='P' AND req_status!='R'`
+            },
+            {
+                val: 24, name: 'kmchData', sql: `AND (managing_director_approve is null OR md_approve is null ) AND crf_close is null AND user_acknldge is null
+                  AND req_status!='P' AND req_status!='R'`
+            },
         ]
         const filterSql = sqlArray.find(e => e.val === level)?.sql || '';
         const sql = `

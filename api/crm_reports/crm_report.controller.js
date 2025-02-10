@@ -1,5 +1,5 @@
-const { getCRFNoBased, getdataUserAcknldged, getdataUserNotAcknldged, getdataAllCRF,
-    getPurchaseCRFData, getPurchaseDetails, getPOdetailStores, getdataAllCRFWithPO
+const { getCRFNoBased, getdataUserAcknldged, getdataUserNotAcknldged, getdataAllCRF, getPurchaseCRFData,
+    getPurchaseDetails, getPOdetailStores, getdataAllCRFWithPO, getCRFPurchaseAckPending
 } = require('../crm_reports/crm_report.service');
 const logger = require('../../logger/logger');
 
@@ -12,14 +12,14 @@ module.exports = {
             if (err) {
                 logger.logwindow(err)
                 return res.status(400).json({
-                    success: 2,
+                    success: 0,
                     message: err
                 });
             }
             if (results.length === 0) {
                 logger.infologwindow("No Results Found")
                 return res.status(200).json({
-                    success: 0,
+                    success: 2,
                     message: "No Results Found"
                 });
             }
@@ -84,6 +84,28 @@ module.exports = {
                     message: err
                 });
             }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    getPurchaseCRFData: (req, res) => {
+        const body = req.body
+        getPurchaseCRFData(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
 
             if (results.length === 0) {
                 return res.status(200).json({
@@ -98,9 +120,9 @@ module.exports = {
             });
         });
     },
-    getPurchaseCRFData: (req, res) => {
-        const body = req.body
-        getPurchaseCRFData(body, (err, results) => {
+
+    getCRFPurchaseAckPending: (req, res) => {
+        getCRFPurchaseAckPending((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,

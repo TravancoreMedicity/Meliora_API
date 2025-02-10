@@ -423,7 +423,7 @@ module.exports = {
                     managing_director_req, managing_director_approve, managing_director_remarks, managing_director_analysis,
                     managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
                    hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
-                   TD.dept_name,TD.dept_type,TD.dept_id,
+                   TD.dept_name,TD.dept_type,TD.dept_id,internally_arranged_status,
 
                    ack_status, ack_remarks,PA.em_name as purchase_ackuser,crm_purchase_mast.create_date as ack_date,
                    quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
@@ -491,7 +491,7 @@ module.exports = {
                    crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
                    category,GROUP_CONCAT(item_type_name) as category_name,internally_arranged_status,
                    image_status,emergency_flag,emer_slno,crm_request_master.create_date,
-                   total_approx_cost,user_deptsec,req_status,req_approv_slno,           
+                   total_approx_cost,user_deptsec,req_status,req_approv_slno,internally_arranged_status,           
                    incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date,
                    I.em_name as incharge_user,
                    hod_req, hod_approve, hod_remarks, hod_detial_analysis, hod_approve_date, H.em_name as hod_user,

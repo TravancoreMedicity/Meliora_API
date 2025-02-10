@@ -220,16 +220,40 @@ module.exports = {
     UpdateStoreReceive: async (req, res) => {
         const body = req.body;
         UpdateStoreReceive(body).then(results => {
+            const { store_receive_user, store_receive_date } = body[0]
             if (results) {
-                const newArray = body?.map((val) => {
-                    return {
-                        store_receive: val.store_recieve === null ? 0 : val.store_recieve === 0 ? 0 : val.store_recieve,
-                        store_receive_user: val.store_recieve === 1 ? val.store_receive_user : null,
-                        store_receive_date: val.store_recieve === 1 ? val.store_receive_date : null,
-                        crm_purchase_slno: val.crm_purchase_slno
+                // const newArray = body?.map((val) => {
+                //     return {
+                //         store_receive: val.store_recieve === null ? 0 : val.store_recieve === 0 ? 0 : val.store_recieve,
+                //         store_receive_user: val.store_recieve === 1 ? val.store_receive_user : null,
+                //         store_receive_date: val.store_recieve === 1 ? val.store_receive_date : null,
+                //         crm_purchase_slno: val.crm_purchase_slno
+                //     }
+                // })
+                // console.log(newArray, "newArray");
+                const groupedData = {};
+
+                body.forEach(item => {
+                    if (!groupedData[item.crm_purchase_slno]) {
+                        groupedData[item.crm_purchase_slno] = [];
                     }
-                })
-                UpdatePurchasePoReceive(newArray).then(results => {
+                    groupedData[item.crm_purchase_slno].push(item.store_recieve);
+                });
+
+
+                const updateStatus = Object.entries(groupedData).map(([crm_purchase_slno, storeRecieveValues]) => {
+                    const allReceived = storeRecieveValues.every(status => status === 1);
+                    const store_status = allReceived ? 1 : 0;
+
+                    return {
+                        crm_purchase_slno: Number(crm_purchase_slno),
+                        store_receive: store_status,
+                        store_receive_user: store_status === 1 ? store_receive_user : null,
+                        store_receive_date: store_status === 1 ? store_receive_date : null
+                    };
+                });
+
+                UpdatePurchasePoReceive(updateStatus).then(results => {
                     return res.status(200).json({
                         success: 1,
                         message: "Updated"

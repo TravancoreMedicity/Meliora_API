@@ -19,7 +19,7 @@ const { checkDetailInsertOrNot, GRNDetailsInsert, GRNDetailsUpdate, BillDetailsI
     InsertLeaseLog, LeaseDetailsList, UpdateLeaseLog, updateTransLog, spareRemoveFromAsset,
     InsertTransferMaster,
     InsertTransferDetails,
-    UpdateAssetService,
+    UpdateAssetService, SpareCondm
 
 
 
@@ -1533,7 +1533,7 @@ module.exports = {
 
     spareContamination: (req, res) => {
         const body = req.body;
-        SpareDelete(body, (err, results) => {
+        SpareCondm(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({

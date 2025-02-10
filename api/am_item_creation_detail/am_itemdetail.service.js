@@ -1180,86 +1180,6 @@ module.exports = {
 
     AmcCmcDetailList: (id, callBack) => {
         pool.query(
-            // ` SELECT
-            //     am_item_map_amcpm_detail.am_item_amcpm_slno,
-            //     it_bill_supplier_details_mast.it_supplier_name,
-            //     am_amc_cmc_master.amccmc_slno,
-            //     am_item_map_amcpm_detail.am_item_map_slno,
-            //     am_item_map_amcpm_detail.am_spare_item_map_slno,
-            //     am_item_map_amcpm_detail.amc_status AS item_amc_status,
-            //     am_item_map_amcpm_detail.cmc_status AS item_cmc_status,
-            //     am_amc_cmc_master.amc_status AS master_amc_status,
-            //     am_amc_cmc_master.cmc_status AS master_cmc_status,
-            //     am_amc_cmc_master.suplier_slno,
-            //     am_amc_cmc_master.from_date,
-            //     am_amc_cmc_master.to_date,
-            //     am_amc_cmc_master.amccmc_status,
-            //     am_amc_cmc_master.image_upload,
-            //     am_amc_cmc_log.am_amc_cmc_log_slno,
-            //     am_amc_cmc_log.am_item_amc_cmc_slno,
-            //     am_amc_cmc_log.am_amc_cmc_log_status
-            // FROM
-            //     am_item_map_amcpm_detail
-            // LEFT JOIN am_amc_cmc_log
-            //     ON am_amc_cmc_log.am_item_amc_cmc_slno = am_item_map_amcpm_detail.am_item_amcpm_slno
-            // LEFT JOIN am_amc_cmc_master
-            //     ON am_amc_cmc_master.amccmc_slno = am_amc_cmc_log.am_cmc_slno
-            // LEFT JOIN it_bill_supplier_details_mast
-            //     ON it_bill_supplier_details_mast.it_supplier_slno = am_amc_cmc_master.suplier_slno
-            // WHERE
-            //     am_item_map_amcpm_detail.am_item_map_slno = ?
-            //     and
-            //     am_amc_cmc_log_status=1
-            //     and
-            //     amccmc_status=1
-            // ORDER BY
-            //     am_item_map_amcpm_detail.am_item_amcpm_slno,
-            //     am_amc_cmc_log.am_amc_cmc_log_slno;
-            //               `,
-
-
-
-
-
-
-            //             `SELECT
-            //     am_item_map_amcpm_detail.am_item_amcpm_slno,
-            //     it_bill_supplier_details_mast.it_supplier_name,
-            //     am_amc_cmc_master.amccmc_slno,
-            //     am_item_map_amcpm_detail.am_item_map_slno,
-            //     am_item_map_amcpm_detail.am_spare_item_map_slno,
-            //     am_item_map_amcpm_detail.amc_status AS item_amc_status,
-            //     am_item_map_amcpm_detail.cmc_status AS item_cmc_status,
-            //     am_amc_cmc_master.amc_status AS master_amc_status,
-            //     am_amc_cmc_master.cmc_status AS master_cmc_status,  
-            //     am_amc_cmc_master.suplier_slno,
-            //     am_amc_cmc_master.from_date,
-            //     am_amc_cmc_master.to_date,
-            //     am_amc_cmc_master.amccmc_status,
-            //     am_amc_cmc_master.image_upload,
-            //     am_amc_cmc_log.am_amc_cmc_log_slno,
-            //     am_amc_cmc_log.am_item_amc_cmc_slno,
-            //     am_amc_cmc_log.am_amc_cmc_log_status,
-            //     CASE 
-            //         WHEN am_amc_cmc_master.to_date < CURDATE() THEN 0
-            //         ELSE 1
-            //     END AS status
-            // FROM
-            //     am_item_map_amcpm_detail
-            // LEFT JOIN am_amc_cmc_log
-            //     ON am_amc_cmc_log.am_item_amc_cmc_slno = am_item_map_amcpm_detail.am_item_amcpm_slno
-            // LEFT JOIN am_amc_cmc_master
-            //     ON am_amc_cmc_master.amccmc_slno = am_amc_cmc_log.am_cmc_slno
-            // LEFT JOIN it_bill_supplier_details_mast
-            //     ON it_bill_supplier_details_mast.it_supplier_slno = am_amc_cmc_master.suplier_slno
-            // WHERE
-            //     am_item_map_amcpm_detail.am_item_map_slno = ?
-            //     AND am_amc_cmc_log_status = 1
-            //     AND amccmc_status = 1
-            // ORDER BY
-            //     am_item_map_amcpm_detail.am_item_amcpm_slno,
-            //     am_amc_cmc_log.am_amc_cmc_log_slno`,
-
 
             `WITH RankedAMCLogs AS (
             SELECT
@@ -1347,11 +1267,12 @@ module.exports = {
 
     SpareDetailsInsertOrNot: (id, callBack) => {
         pool.query(
-            `SELECT asset_spare_slno,am_item_map_slno,am_asset_spare_details.am_spare_item_map_slno,am_item_name_creation.item_name,
+            `SELECT            
+            asset_spare_slno,am_item_map_slno,am_asset_spare_details.am_spare_item_map_slno,am_item_name_creation.item_name,
             spare_asset_no,spare_asset_no_only
-                        FROM am_asset_spare_details
-                        left join am_spare_item_map_master on am_spare_item_map_master.am_spare_item_map_slno=am_asset_spare_details.am_spare_item_map_slno
-                        left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_spare_item_map_master.spare_creation_slno
+            FROM am_asset_spare_details
+            left join am_spare_item_map_master on am_spare_item_map_master.am_spare_item_map_slno=am_asset_spare_details.am_spare_item_map_slno
+            left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_spare_item_map_master.spare_creation_slno
             WHERE am_item_map_slno=? and spare_status=1`,
             [id],
             (error, results, fields) => {
@@ -1382,7 +1303,28 @@ module.exports = {
             }
         );
     },
-
+    SpareCondm: (data, callback) => {
+        pool.query(
+            `UPDATE am_asset_spare_details
+            SET 
+            spare_status = 0,
+            delete_user = ?,  
+            deleted_date = NOW()  
+            WHERE 
+            asset_spare_slno = ?            
+`,
+            [
+                data.delete_user,
+                data.asset_spare_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 
     spareRemoveFromAsset: (data, callback) => {
         pool.query(
@@ -1916,31 +1858,7 @@ module.exports = {
             }
         )
     },
-    // UpdateAssetService: (data, callback) => {
 
-    //     pool.query(
-    //         `UPDATE am_asset_item_map_master SET
-    //         asset_item_service=1,
-    //         asset_item_service_user=?,
-    //         item_dept_slno=?,
-    //         item_deptsec_slno=?
-    //         WHERE 
-    //         am_item_map_slno=?`,
-    //         [
-    //             data.asset_item_service_user,
-    //             data.item_dept_slno,
-    //             data.item_deptsec_slno,
-    //             data.am_item_map_slno,
-
-    //         ],
-    //         (error, results, feilds) => {
-    //             if (error) {
-    //                 return callback(error);
-    //             }
-    //             return callback(null, results);
-    //         }
-    //     )
-    // },
     UpdateAssetService: (data) => {
         return new Promise((resolve, reject) => {
             const query = `
@@ -1998,27 +1916,7 @@ module.exports = {
     },
     PmDetailsList: (id, callBack) => {
         pool.query(
-            // `SELECT 
-            //     am_pm_log_slno, 
-            //     item_asset_no,
-            //     item_asset_no_only,
-            //     am_pm_log_table.am_item_map_slno, 
-            //     am_pm_fromdate,
-            //     am_pm_dutedate,
-            //     am_pm_log_status, 
-            //     am_pm_log_table.create_user,
-            //     am_pm_log_table.create_date,
-            //     CASE 
-            //     WHEN am_pm_dutedate < CURRENT_DATE THEN 0
-            //      ELSE 1
-            //     END AS status
-            //     FROM 
-            //     am_pm_log_table
-            //     left join  am_asset_item_map_master on am_asset_item_map_master.am_item_map_slno=am_pm_log_table.am_item_map_slno
-            //     WHERE 
-            //     am_pm_log_table.am_item_map_slno = ?
-            //     AND am_pm_log_status = 1
-            //     `,
+
             `WITH RankedLogs AS (            
             SELECT
             am_pm_log_slno, 
@@ -2077,38 +1975,12 @@ module.exports = {
     LeaseDetailsList: (id, callBack) => {
         pool.query(
 
-            // `select 
-            // am_lease_log.am_lease_slno,
-            // am_item_map_slno,
-            // am_lease_mast_slno,
-            // am_lease_log_status, 
-            // lease_suppler_slno,
-            // lease_fromdate,
-            // lease_todate, 
-            // lease_amount,
-            // lease_status,
-            // lease_image,
-            // it_supplier_name,
-            // CASE 
-            // WHEN am_lease_detail_mast.lease_todate < CURRENT_DATE THEN 0
-            // ELSE 1
-            // END AS status
-            // from
-            // am_lease_log
-            // left join am_lease_detail_mast on am_lease_detail_mast.am_lease_mastslno =am_lease_log.am_lease_mast_slno
-            // left join it_bill_supplier_details_mast on it_bill_supplier_details_mast.it_supplier_slno =am_lease_detail_mast.lease_suppler_slno
-            // where
-            // am_lease_log_status=1
-            // and
-            // am_lease_log.am_item_map_slno=?
-            //     `,
-            `
-WITH RankedLogs AS (    
-select 
+            `WITH RankedLogs AS (            
+            select 
             am_lease_log.am_lease_slno,
             am_item_map_slno,
             am_lease_mast_slno,
-            am_lease_log_status, 
+            am_lease_log_status,             
             lease_suppler_slno,
             lease_fromdate,
             lease_todate, 

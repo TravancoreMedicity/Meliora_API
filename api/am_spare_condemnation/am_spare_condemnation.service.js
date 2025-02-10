@@ -3,18 +3,23 @@ module.exports = {
     CondemnationList: (id, callBack) => {
         pool.query(
             `           
-                    select
-                    ROW_NUMBER() over (order by am_spare_item_map_slno) as slno,am_spare_item_map_slno,
+                     select
+                    ROW_NUMBER() over (order by am_spare_item_map_slno) as slno,am_spare_item_map_master.am_spare_item_map_slno,
                     spare_creation_slno, am_item_name_creation.item_name,
                     category_name,spare_dept_slno, spare_deptsec_slno,
                     spare_room_slno, spare_subroom_slno, spare_rack_slno, spare_custodian_dept, 
                     spare_custodian_dept_sec, spare_asset_no, spare_create_status, spare_asset_no_only, 
-                    spare_condamtn, spare_service
+                    spare_condamtn, spare_service,
+                    co_employee_master.em_name as sparecondm_emp,
+                    deleted_date
                     from am_spare_item_map_master
                     left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_spare_item_map_master.spare_creation_slno
                     left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno
                     left join am_custodian_department on am_custodian_department.am_custodian_slno=am_spare_item_map_master.spare_custodian_dept
-                    where am_custodian_dept_slno=? and spare_condamtn=1`,
+                    left join am_asset_spare_details on am_asset_spare_details.am_spare_item_map_slno=am_spare_item_map_master.am_spare_item_map_slno
+                    left join co_employee_master on co_employee_master.em_id=am_asset_spare_details.delete_user
+                    where am_custodian_dept_slno=? and spare_condamtn=1
+                    order by deleted_date desc`,
 
             [id],
             (error, results, fields) => {
@@ -30,17 +35,20 @@ module.exports = {
         pool.query(
             `       select
                     category_name,
+                    ROW_NUMBER() over (order by am_item_map_slno) as slno,
                     em_name as condm_trans_user,
                     am_item_map_slno, am_asset_item_map_master.item_creation_slno, item_dept_slno, item_deptsec_slno, item_room_slno, item_subroom_slno, item_rack_slno, 
                     item_custodian_dept, item_custodian_dept_sec, item_asset_no, item_asset_no_only, item_create_status,am_item_name_creation.item_name,
 					asset_item_condmnation,
+                    item_condm_date,
                     asset_item_condm_user
                     from am_asset_item_map_master
                     left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
                     left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno                    
                     left join am_custodian_department on am_custodian_department.am_custodian_slno=am_asset_item_map_master.item_custodian_dept
                     left join co_employee_master on co_employee_master.em_id=am_asset_item_map_master.asset_item_condm_user
-                    where am_custodian_dept_slno=? and asset_item_condmnation=1`,
+                    where am_custodian_dept_slno=? and asset_item_condmnation=1
+                    order by item_condm_date desc`,
 
             [id],
             (error, results, fields) => {
@@ -53,17 +61,7 @@ module.exports = {
     },
     ServiceList: (id, callBack) => {
         pool.query(
-            // `
-            //     select ROW_NUMBER() over (order by am_spare_item_map_slno) as slno,am_spare_item_map_slno,
-            //      spare_creation_slno, am_item_name_creation.item_name,
-            //     category_name,spare_dept_slno, spare_deptsec_slno,
-            //     spare_room_slno, spare_subroom_slno, spare_rack_slno, spare_custodian_dept, 
-            //     spare_custodian_dept_sec, spare_asset_no, spare_create_status, spare_asset_no_only, 
-            //     spare_condamtn, spare_service
-            //     from am_spare_item_map_master
-            //     left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_spare_item_map_master.spare_creation_slno
-            //     left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno
-            //      where spare_custodian_dept_sec=? and spare_service=1 `,
+
             `SELECT 
             am_spare_item_map_master.am_spare_item_map_slno,                
             hold_color,      
@@ -150,40 +148,7 @@ module.exports = {
                 AND spare_status=2
                 group by am_spare_item_map_master.am_spare_item_map_slno
                 ORDER BY am_spare_item_map_master.am_spare_item_map_slno`,
-            // `  SELECT 
-            //     am_spare_item_map_master.am_spare_item_map_slno,
-            //     spare_creation_slno,
-            //     spare_service_hold,
-            //     cm_hold_reason,
-            //     spare_status,
-            //     am_item_name_creation.item_name,
-            //     category_name,
-            //     spare_dept_slno,
-            //     spare_deptsec_slno,
-            //     spare_room_slno,
-            //     spare_subroom_slno,
-            //      spare_rack_slno,
-            //     spare_custodian_dept,
-            //     spare_custodian_dept_sec,
-            //     spare_asset_no,
-            //     spare_create_status,
-            //     spare_asset_no_only,
-            //     spare_condamtn,
-            //     spare_service,
-            //     asset_spare_slno
-            //     FROM am_spare_item_map_master
-            //     LEFT JOIN am_item_name_creation 
-            //     ON am_item_name_creation.item_creation_slno = am_spare_item_map_master.spare_creation_slno
-            //     LEFT JOIN am_category 
-            //     ON am_category.category_slno = am_item_name_creation.item_category_slno
-            //     LEFT JOIN am_asset_spare_details 
-            //     ON am_asset_spare_details.am_spare_item_map_slno = am_spare_item_map_master.am_spare_item_map_slno
-            //     LEFT JOIN cm_hold_reason_mast 
-            //     ON cm_hold_reason_mast.cm_hold_id = am_spare_item_map_master.spare_service_hold
-            //     WHERE spare_custodian_dept_sec = ?
-            //     AND spare_service = 1 
-            //     AND spare_status=2
-            //     ORDER BY am_spare_item_map_master.am_spare_item_map_slno`,
+
             [id],
             (error, results, fields) => {
                 if (error) {

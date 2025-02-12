@@ -301,7 +301,8 @@ module.exports = {
             where  tm_new_task_mast.tm_task_status=1
             AND tm_new_task_mast_detl.tm_assigne_emp=?
             AND (tm_detail_status=1)
-            group by tm_new_task_mast.tm_task_slno`,
+            group by tm_new_task_mast.tm_task_slno
+            order by tm_complete_date desc`,
             [id],
             (error, results, fields) => {
                 if (error) {

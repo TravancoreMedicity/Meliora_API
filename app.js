@@ -13,7 +13,7 @@ const fs = require('fs');
 //sockect io configuration
 app.use(cors());
 
-app.use(express.urlencoded({ extended : true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 
@@ -163,7 +163,7 @@ const wifiManagement = require('./api/it_wifi_management/wifi.router')
 const itemCreationDeptmap = require('./api/am_Item_creation_mast/item_creation_mast.router')
 const CustodianDeptMast = require('./api/am_custodian_department/am_custodian_dept.router')
 const ItemMapDetails = require('./api/am_item_creation_detail/am_itemdetail.router')
-const CrfImageUpload = require('./api/crf_fileupload/crf_fileupload.router')
+// const CrfImageUpload = require('./api/crf_fileupload/crf_fileupload.router')
 const IiImageUpload = require('./api/it_managemnt_file_upload/it_file_upload.router')
 const PasswordManagementMain = require('./api/it_password_management/password_management.router')
 const PasswordCredentialType = require('./api/it_password_credential_type_master/password_credential.router')
@@ -217,6 +217,11 @@ const qideptAccess = require('./api/qi_dept_access_mast/dept_access_router')
 const med_vallet_master = require('./api/med_vallet/med_vallet.router')
 const mv_vehicle_registration = require('./api/mv_vehicle_registration/mv_vehicle.router');
 const { validateTokenFrontend } = require("./authentication/ValidationCheck");
+const crfDeliveryMarking = require('./api/crm_delivery_marking/delivery_marking_router')
+const companyMast = require('./api/crm_company_mast/company.router')
+const crmDashboard = require('./api/crm_dashboard/crmDasboard.router')
+const approvalMapping = require('./api/crm_approval_mapping/approval.router')
+
 
 
 app.use(express.json({ limit: '50mb' }));
@@ -238,7 +243,7 @@ app.use((req, res, next) => {
 
 
 
-  
+
 
 // Outside Route Config
 app.use("/api/user", userRouter);
@@ -345,7 +350,7 @@ app.use('/api/wifiManagement', wifiManagement)
 app.use('/api/itemCreationDeptmap', itemCreationDeptmap)
 app.use('/api/CustodianDeptMast', CustodianDeptMast)
 app.use('/api/ItemMapDetails', ItemMapDetails)
-app.use('/api/CrfImageUpload', CrfImageUpload)
+// app.use('/api/CrfImageUpload', CrfImageUpload)
 app.use('/api/ItImageUpload', IiImageUpload)
 app.use('/api/PasswordManagementMain', PasswordManagementMain)
 app.use('/api/PasswordCredentialType', PasswordCredentialType)
@@ -396,10 +401,11 @@ app.use('/api/SpareCondemService', SpareCondemService)
 app.use('/api/InitialAsessment', opAseessment)
 app.use('/api/feedback', feedbackdata)
 app.use('/api/qideptAccess', qideptAccess)
+<<<<<<< HEAD
 app.use('/api/medvallet', med_vallet_master)
-app.use('/api/medvehilces',mv_vehicle_registration)
+app.use('/api/medvehilces', mv_vehicle_registration)
 
-app.get('/api/validateToken',validateTokenFrontend)
+app.get('/api/validateToken', validateTokenFrontend)
 
 /*
 
@@ -407,6 +413,14 @@ app.use('/api/validatetoken',validateToken)
 app
 
 */
+=======
+app.use('/api/deliveryMarking', crfDeliveryMarking)
+app.use('/api/companyMast', companyMast)
+app.use('/api/CRFDashboard', crmDashboard)
+app.use('/api/approvalMapping', approvalMapping)
+
+
+>>>>>>> origin/Meliora_api_shibina
 
 
 server.listen(process.env.APP_PORT, () =>

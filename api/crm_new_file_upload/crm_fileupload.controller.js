@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require("fs")
 const { CrfImageStatusUpdate, CrfDataColectionImageStatusUpdate, ImageInsertHODStatusUpdate,
     ImageInsertDMSStatusUpdate, ImageInsertMSStatusUpdate, ImageInsertMOStatusUpdate, ImageInsertSMOStatusUpdate,
-    ImageInsertGMStatusUpdate, ImageInsertMDStatusUpdate, ImageInsertEDStatusUpdate
+    ImageInsertGMStatusUpdate, ImageInsertMDStatusUpdate, ImageInsertEDStatusUpdate, ImageInsertMAangeStatusUpdate
 }
     = require('../crm_new_file_upload/crm_fileupload.service');
 const logger = require('../../logger/logger');
@@ -24,12 +24,17 @@ const crfRegisterstorage = multer.diskStorage({
         cb(null, filepath);
     },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'crf' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'crf' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
 })
 
 // const em_id_folder = path.join('D:/DocMeliora/Inteliqo/', "PersonalRecords", `${em_id}`, "checklist", `${checklistid}`);
@@ -49,12 +54,17 @@ const crfDataCollectionstorage = multer.diskStorage({
 
         cb(null, filepath);
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'crfDataCollect' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'crfDataCollect' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
 })
 
@@ -74,12 +84,17 @@ const ImageInsertHODstorage = multer.diskStorage({
         cb(null, filepath);
     },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'HodUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'HodUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
 })
 
 const ImageInsertDMSstorage = multer.diskStorage({
@@ -98,12 +113,17 @@ const ImageInsertDMSstorage = multer.diskStorage({
         cb(null, filepath);
     },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'DMSUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'DMSUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
 })
 
 const ImageInsertMSstorage = multer.diskStorage({
@@ -121,12 +141,17 @@ const ImageInsertMSstorage = multer.diskStorage({
 
         cb(null, filepath);
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'MSUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'MSUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
 })
 
@@ -145,12 +170,17 @@ const ImageInsertMOstorage = multer.diskStorage({
 
         cb(null, filepath);
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'MOUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'MOUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
 })
 
@@ -169,12 +199,17 @@ const ImageInsertSMOstorage = multer.diskStorage({
 
         cb(null, filepath);
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'SMOUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'SMOUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
 })
 
@@ -193,12 +228,17 @@ const ImageInsertGMstorage = multer.diskStorage({
 
         cb(null, filepath);
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'GMUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'GMUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
 })
 
@@ -217,12 +257,17 @@ const ImageInsertMDstorage = multer.diskStorage({
 
         cb(null, filepath);
     },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'MDUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'MDUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
     },
 })
 
@@ -242,13 +287,67 @@ const ImageInsertEDstorage = multer.diskStorage({
         cb(null, filepath);
     },
     filename: function (req, file, cb) {
-        // Generate a unique filename using a timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const extension = path.extname(file.originalname);
-        const filename = 'EDUpload' + uniqueSuffix + extension;
-        cb(null, filename);
+        cb(null, file.originalname
+
+        )
+    },
+    // filename: function (req, file, cb) {
+    //     // Generate a unique filename using a timestamp
+    //     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    //     const extension = path.extname(file.originalname);
+    //     const filename = 'EDUpload' + uniqueSuffix + extension;
+    //     cb(null, filename);
+    // },
+})
+
+// kmch
+const ImageInsertMDstorageKMCH = multer.diskStorage({
+    destination: (req, file, cb) => {
+
+        const reqslno = req.body.reqslno;
+
+        const id = req.body.id;
+
+        // File or directtory check 
+        const filepath = path.join('D:/DocMeliora/KMCMeliora/CRF/crf_registration/', `${reqslno}`, "MDUpload")
+        if (!fs.existsSync(filepath)) {
+            fs.mkdirSync(filepath, { recursive: true });
+        }
+
+        cb(null, filepath);
+    },
+
+    filename: function (req, file, cb) {
+        cb(null, file.originalname
+
+        )
     },
 })
+const ImageInsertManagestorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+
+        const reqslno = req.body.reqslno;
+        console.log(reqslno, "reqslno");
+
+        const id = req.body.id;
+
+        // File or directtory check 
+        const filepath = path.join('D:/DocMeliora/KMCMeliora/CRF/crf_registration/', `${reqslno}`, "ManageUpload")
+        if (!fs.existsSync(filepath)) {
+            fs.mkdirSync(filepath, { recursive: true });
+        }
+
+        cb(null, filepath);
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname
+
+        )
+    },
+})
+
+
+
 const maxSize = 25 * 1024 * 1024
 
 
@@ -452,6 +551,45 @@ const ImageInsertED = multer({
     limits: { fileSize: maxSize }
 }).array('files', 10);
 
+
+const ImageInsertMDKmch = multer({
+    storage: ImageInsertMDstorageKMCH,
+    fileFilter: (req, file, cb) => {
+        if (
+            file.mimetype == "image/png" ||
+            file.mimetype == "image/jpg" ||
+            file.mimetype == "image/jpeg" ||
+            file.mimetype == "application/pdf"
+        ) {
+            cb(null, true);
+        } else {
+            cb(null, false);
+
+            return cb(new Error('Only .png, .jpeg, and .pdf format allowed!'));
+        }
+    },
+    limits: { fileSize: maxSize }
+}).array('files', 10);
+
+const ImageInsertManaging = multer({
+    storage: ImageInsertManagestorage,
+    fileFilter: (req, file, cb) => {
+        if (
+            file.mimetype == "image/png" ||
+            file.mimetype == "image/jpg" ||
+            file.mimetype == "image/jpeg" ||
+            file.mimetype == "application/pdf"
+        ) {
+            cb(null, true);
+        } else {
+            cb(null, false);
+
+            return cb(new Error('Only .png, .jpeg, and .pdf format allowed!'));
+        }
+    },
+    limits: { fileSize: maxSize }
+}).array('files', 10);
+
 module.exports = {
 
     crfRegistration: (req, res) => {
@@ -575,14 +713,30 @@ module.exports = {
         });
 
     },
+    crfManageImageGet: (req, res) => {
+        const id = req.params.id
+        const folderPath = `D:/DocMeliora/KMCMeliora/CRF/crf_registration/${id}/ManageUpload`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: files
+            });
+        });
 
+    },
     getDataCollectionImage: (req, res) => {
-
         const reqslno = req.body.req_slno
         const datacollslno = req.body.crf_data_collect_slno
-
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${reqslno}/datacollection/${datacollslno}`;
         fs.readdir(folderPath, (err, files) => {
+
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({
@@ -1003,6 +1157,105 @@ module.exports = {
 
     },
 
+    ImageInsertMDKmch: (req, res) => {
+
+        ImageInsertMDKmch(req, res, async (err) => {
+            const body = req.body;
+
+            if (err instanceof multer.MulterError) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Max file size 2MB allowed!",
+                });
+            } else if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    status: 0,
+                    message: err.message,
+                });
+            } else if (!req.files || req.files.length === 0) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Files are required!",
+                });
+            } else {
+                const data = {
+                    req_slno: body.reqslno
+                }
+
+                ImageInsertMDStatusUpdate(data, (err, results) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        })
+                    }
+                    if (results === 0) {
+                        return res.status(200).json({
+                            success: 2,
+                            message: "No record found"
+
+                        })
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "File Also Updated"
+                    })
+                })
+            }
+        });
+
+    },
+
+    ImageInsertManaging: (req, res) => {
+
+        ImageInsertManaging(req, res, async (err) => {
+            const body = req.body;
+
+            if (err instanceof multer.MulterError) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Max file size 2MB allowed!",
+                });
+            } else if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    status: 0,
+                    message: err.message,
+                });
+            } else if (!req.files || req.files.length === 0) {
+                return res.status(200).json({
+                    status: 0,
+                    message: "Files are required!",
+                });
+            } else {
+                const data = {
+                    req_slno: body.reqslno
+                }
+
+                ImageInsertMAangeStatusUpdate(data, (err, results) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        })
+                    }
+                    if (results === 0) {
+                        return res.status(200).json({
+                            success: 2,
+                            message: "No record found"
+
+                        })
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "File Also Updated"
+                    })
+                })
+            }
+        });
+
+    },
     // for getting HOD Upload file the file
     crfHodImageGet: (req, res) => {
         const id = req.params.id
@@ -1155,5 +1408,43 @@ module.exports = {
         });
 
     },
+
+    crfManageImageGet: (req, res) => {
+        const id = req.params.id
+        const folderPath = `D:/DocMeliora/KMCMeliora/CRF/crf_registration/${id}/ManageUpload`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: files
+            });
+        });
+
+    },
+    crfKMCHMDImageGet: (req, res) => {
+        const id = req.params.id
+        const folderPath = `D:/DocMeliora/KMCMeliora/CRF/crf_registration/${id}/MDUpload`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: files
+            });
+        });
+
+    },
+
 
 }

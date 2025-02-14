@@ -48,10 +48,10 @@ module.exports = {
 
     getBackupDetails: (callBack) => {
         pool.query(
-            ` 
-      SELECT 
+            `       SELECT 
             it_backup_details_mast.backup_slno, 
-            backup_type, 
+            backup_type,
+            backup_type_name, 
             backup_name, 
             backup_location, 
             backup_device_ip, 
@@ -71,6 +71,7 @@ module.exports = {
          LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_details_mast.backup_schedule_type
          LEFT JOIN it_backup_schedule_time ON JSON_CONTAINS(it_backup_details_mast.backup_schedule_time,cast(it_backup_schedule_time.schedule_time_id as json),'$') 
          LEFT JOIN it_backup_selecteddays_details ON it_backup_selecteddays_details.backup_slno=it_backup_details_mast.backup_slno
+          LEFT JOIN it_backup_type_mast ON it_backup_type_mast.backup_type_id=it_backup_details_mast.backup_type
       GROUP BY backup_slno
             `, [],
             (error, results, feilds) => {

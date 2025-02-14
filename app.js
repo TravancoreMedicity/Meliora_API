@@ -401,7 +401,6 @@ app.use('/api/SpareCondemService', SpareCondemService)
 app.use('/api/InitialAsessment', opAseessment)
 app.use('/api/feedback', feedbackdata)
 app.use('/api/qideptAccess', qideptAccess)
-<<<<<<< HEAD
 app.use('/api/medvallet', med_vallet_master)
 app.use('/api/medvehilces', mv_vehicle_registration)
 
@@ -413,14 +412,12 @@ app.use('/api/validatetoken',validateToken)
 app
 
 */
-=======
 app.use('/api/deliveryMarking', crfDeliveryMarking)
 app.use('/api/companyMast', companyMast)
 app.use('/api/CRFDashboard', crmDashboard)
 app.use('/api/approvalMapping', approvalMapping)
 
 
->>>>>>> origin/Meliora_api_shibina
 
 
 server.listen(process.env.APP_PORT, () =>

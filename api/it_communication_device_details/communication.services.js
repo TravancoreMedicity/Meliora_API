@@ -182,8 +182,34 @@ module.exports = {
 
     SimMastView: (callback) => {
         pool.query(
-            `SELECT
+            // SELECT
+            // it_sim_slno,
+            // it_sim_serial_no,
+            // it_sim_imei_no,
+            // it_sim_mobile_no,
+            // it_sim_operator, 
+            // it_sim_tariff, 
+            // it_sim_tariff_amount,
+            // it_sim_status,
+            // it_sim_type,
+            // it_sim_type_name,
+            // it_sim_dept,
+            // it_sim_deptsec,
+            // it_sim_recie_empid,
+            // it_sim_recie_name,
+            // it_sim_recei_contact,
+            // it_sim_issue_date,
+            //  dept_name,
+            //  sec_name                  
+            // FROM
+            // it_sim_detail_mast
+            // left join co_department_mast on co_department_mast.dept_id=it_sim_detail_mast.it_sim_dept
+            // left join co_deptsec_mast on co_deptsec_mast.sec_id=it_sim_detail_mast.it_sim_deptsec
+            // left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_sim_detail_mast.it_sim_type
+            `        
+           SELECT
             it_sim_slno,
+            sim_operator_name,
             it_sim_serial_no,
             it_sim_imei_no,
             it_sim_mobile_no,
@@ -205,7 +231,9 @@ module.exports = {
             it_sim_detail_mast
             left join co_department_mast on co_department_mast.dept_id=it_sim_detail_mast.it_sim_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=it_sim_detail_mast.it_sim_deptsec
-            left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_sim_detail_mast.it_sim_type`, [],
+            left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_sim_detail_mast.it_sim_type
+            left join it_sim_operators on it_sim_operators.sim_operator_id=it_sim_detail_mast.it_sim_operator
+            `, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);

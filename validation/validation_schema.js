@@ -1147,6 +1147,7 @@ const validateBackupDetails = Joi.object({
     selected_days: Joi.optional(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
+    backup_active_status: Joi.optional()
 });
 
 // Backup Verification

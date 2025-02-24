@@ -18,9 +18,10 @@ module.exports = {
                 backup_schedule_type, 
                 backup_schedule_time,
                 selected_days,
-                create_user
+                create_user,
+                backup_active_status
                )
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.backup_type,
                 data.backup_name,
@@ -34,7 +35,8 @@ module.exports = {
                 data.backup_schedule_type,
                 JSON.stringify(data.backup_schedule_time),
                 data.selected_days,
-                data.create_user
+                data.create_user,
+                data.backup_active_status
             ],
 
             (error, results, fields) => {
@@ -48,8 +50,10 @@ module.exports = {
 
     getBackupDetails: (callBack) => {
         pool.query(
-            `       SELECT 
-            it_backup_details_mast.backup_slno, 
+            `SELECT 
+            it_backup_details_mast.backup_slno,
+            backup_active_status,
+            co_department_mast.dept_name as backup_dept,
             backup_type,
             backup_type_name, 
             backup_name, 
@@ -66,13 +70,14 @@ module.exports = {
             GROUP_CONCAT(schedule_time_name) as timedata,
             it_backup_details_mast.selected_days,
             it_backup_selecteddays_details.backup_selected_date
-      FROM
+        FROM
             it_backup_details_mast
-         LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_details_mast.backup_schedule_type
-         LEFT JOIN it_backup_schedule_time ON JSON_CONTAINS(it_backup_details_mast.backup_schedule_time,cast(it_backup_schedule_time.schedule_time_id as json),'$') 
-         LEFT JOIN it_backup_selecteddays_details ON it_backup_selecteddays_details.backup_slno=it_backup_details_mast.backup_slno
-          LEFT JOIN it_backup_type_mast ON it_backup_type_mast.backup_type_id=it_backup_details_mast.backup_type
-      GROUP BY backup_slno
+            LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_details_mast.backup_schedule_type
+            LEFT JOIN it_backup_schedule_time ON JSON_CONTAINS(it_backup_details_mast.backup_schedule_time,cast(it_backup_schedule_time.schedule_time_id as json),'$') 
+            LEFT JOIN it_backup_selecteddays_details ON it_backup_selecteddays_details.backup_slno=it_backup_details_mast.backup_slno
+            LEFT JOIN it_backup_type_mast ON it_backup_type_mast.backup_type_id=it_backup_details_mast.backup_type
+            left join co_department_mast on co_department_mast.dept_id=it_backup_details_mast.backup_location
+        GROUP BY backup_slno            
             `, [],
             (error, results, feilds) => {
                 if (error) {
@@ -100,7 +105,8 @@ module.exports = {
                 backup_schedule_type=?, 
                 backup_schedule_time=?,
                 selected_days=?,
-                edit_user=?
+                edit_user=?,
+                backup_active_status=?
             WHERE 
                backup_slno=?`,
             [
@@ -117,6 +123,7 @@ module.exports = {
                 JSON.stringify(data.backup_schedule_time),
                 data.selected_days,
                 data.edit_user,
+                data.backup_active_status,
                 data.backup_slno
             ],
             (error, results, feilds) => {
@@ -332,6 +339,53 @@ module.exports = {
                 return callBack(null, results);
             }
         )
+    },
+
+    getDeptwiseBackup: (id, callback) => {
+        pool.query(
+            `SELECT 
+            it_backup_details_mast.backup_slno,            
+            backup_active_status,
+            dept1.dept_name as backup_dept,
+            backup_type,
+            backup_type_name, 
+            backup_name, 
+            backup_location, 
+            backup_device_ip, 
+            backup_device_name, 
+            backup_device_location, 
+            transferred_device_ip, 
+            transferred_device_name, 
+            transferred_device_location,
+            backup_schedule_type,
+            it_backup_schedule_type.schedule_type_name,
+            backup_schedule_time,
+            GROUP_CONCAT(schedule_time_name) as timedata,
+            it_backup_details_mast.selected_days,
+            it_backup_selecteddays_details.backup_selected_date
+        FROM
+            it_backup_details_mast
+            LEFT JOIN it_backup_schedule_type ON it_backup_schedule_type.schedule_type_id=it_backup_details_mast.backup_schedule_type
+            LEFT JOIN it_backup_schedule_time ON JSON_CONTAINS(it_backup_details_mast.backup_schedule_time,cast(it_backup_schedule_time.schedule_time_id as json),'$') 
+            LEFT JOIN it_backup_selecteddays_details ON it_backup_selecteddays_details.backup_slno=it_backup_details_mast.backup_slno
+            LEFT JOIN it_backup_type_mast ON it_backup_type_mast.backup_type_id=it_backup_details_mast.backup_type
+            left join co_department_mast dept1 on dept1.dept_id=it_backup_details_mast.backup_location
+            LEFT JOIN co_employee_master emp2 ON emp2.em_id = it_backup_details_mast.create_user
+            left join co_department_mast dept2 on dept2.dept_id=emp2.em_department
+            where  dept2.dept_id=?
+            GROUP BY backup_slno
+            order by backup_active_status desc
+            `,
+
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
     },
 
 }

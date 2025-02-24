@@ -28,46 +28,88 @@ const { getDailyBackup,
 
 } = require('./backupdash.service')
 module.exports = {
+    // getSelectedDaysBackup: (req, res) => {
+    //     getSelectedDaysBackup((err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (Object.keys(results).length === 0) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 // message: "No Data Found",
+    //                 data: []
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 2,
+    //             data: results
+    //         })
+    //     })
+    // },
+
     getSelectedDaysBackup: (req, res) => {
-        getSelectedDaysBackup((err, results) => {
+        const id = req.params.id;
+        getSelectedDaysBackup(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
-                })
+                });
             }
-            if (Object.keys(results).length === 0) {
+            if (!results) {
                 return res.status(200).json({
                     success: 1,
-                    // message: "No Data Found",
-                    data: []
-                })
+                    message: "No Data"
+                });
             }
             return res.status(200).json({
                 success: 2,
                 data: results
-            })
+            });
         })
     },
-
+    // getSelectedDays: (req, res) => {
+    //     getSelectedDays((err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (Object.keys(results).length === 0) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 data: []
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 2,
+    //             data: results
+    //         })
+    //     })
+    // },
     getSelectedDays: (req, res) => {
-        getSelectedDays((err, results) => {
+        const id = req.params.id;
+        getSelectedDays(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
-                })
+                });
             }
-            if (Object.keys(results).length === 0) {
+            if (!results) {
                 return res.status(200).json({
                     success: 1,
-                    data: []
-                })
+                    message: "No Data"
+                });
             }
             return res.status(200).json({
                 success: 2,
                 data: results
-            })
+            });
         })
     },
 
@@ -136,25 +178,46 @@ module.exports = {
         })
     },
 
+    // getDailyBackup: (req, res) => {
+    //     getDailyBackup((err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (Object.keys(results).length === 0) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 // message: "No Data Found",
+    //                 data: []
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 2,
+    //             data: results
+    //         })
+    //     })
+    // },
     getDailyBackup: (req, res) => {
-        getDailyBackup((err, results) => {
+        const id = req.params.id;
+        getDailyBackup(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
-                })
+                });
             }
-            if (Object.keys(results).length === 0) {
+            if (!results) {
                 return res.status(200).json({
                     success: 1,
-                    // message: "No Data Found",
-                    data: []
-                })
+                    message: "No Data"
+                });
             }
             return res.status(200).json({
                 success: 2,
                 data: results
-            })
+            });
         })
     },
 
@@ -211,25 +274,46 @@ module.exports = {
         })
     },
 
+    // getDailyDetailsForVerification: (req, res) => {
+    //     getDailyDetailsForVerification((err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (Object.keys(results).length === 0) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 // message: "No Data Found",
+    //                 data: []
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 2,
+    //             data: results
+    //         })
+    //     })
+    // },
     getDailyDetailsForVerification: (req, res) => {
-        getDailyDetailsForVerification((err, results) => {
+        const id = req.params.id;
+        getDailyDetailsForVerification(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
-                })
+                });
             }
-            if (Object.keys(results).length === 0) {
+            if (!results) {
                 return res.status(200).json({
                     success: 1,
-                    // message: "No Data Found",
-                    data: []
-                })
+                    message: "No Data"
+                });
             }
             return res.status(200).json({
                 success: 2,
                 data: results
-            })
+            });
         })
     },
 
@@ -256,28 +340,48 @@ module.exports = {
         })
     },
 
+    // getMonthlyBackup: (req, res) => {
+    //     getMonthlyBackup((err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (Object.keys(results).length === 0) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 // message: "No Data Found",
+    //                 data: []
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 2,
+    //             data: results
+    //         })
+    //     })
+    // },
     getMonthlyBackup: (req, res) => {
-        getMonthlyBackup((err, results) => {
+        const id = req.params.id;
+        getMonthlyBackup(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
-                })
+                });
             }
-            if (Object.keys(results).length === 0) {
+            if (!results) {
                 return res.status(200).json({
                     success: 1,
-                    // message: "No Data Found",
-                    data: []
-                })
+                    message: "No Data"
+                });
             }
             return res.status(200).json({
                 success: 2,
                 data: results
-            })
+            });
         })
     },
-
     backupMonthlyInsert: (req, res) => {
         const body = req.body;
         const data = body?.map((val) => {
@@ -310,25 +414,47 @@ module.exports = {
         })
     },
 
+    // getMonthlyDetailsForVerification: (req, res) => {
+    //     getMonthlyDetailsForVerification((err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (Object.keys(results).length === 0) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 // message: "No Data Found",
+    //                 data: []
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 2,
+    //             data: results
+    //         })
+    //     })
+    // },
+
     getMonthlyDetailsForVerification: (req, res) => {
-        getMonthlyDetailsForVerification((err, results) => {
+        const id = req.params.id;
+        getMonthlyDetailsForVerification(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
-                })
+                });
             }
-            if (Object.keys(results).length === 0) {
+            if (!results) {
                 return res.status(200).json({
                     success: 1,
-                    // message: "No Data Found",
-                    data: []
-                })
+                    message: "No Data"
+                });
             }
             return res.status(200).json({
                 success: 2,
                 data: results
-            })
+            });
         })
     },
 
@@ -355,26 +481,48 @@ module.exports = {
         })
     },
 
+    // getYearlyBackup: (req, res) => {
+    //     getYearlyBackup((err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (Object.keys(results).length === 0) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 // message: "No Data Found",
+    //                 data: []
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 2,
+    //             data: results
+    //         })
+
+    //     })
+    // },
+
     getYearlyBackup: (req, res) => {
-        getYearlyBackup((err, results) => {
+        const id = req.params.id;
+        getYearlyBackup(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
-                })
+                });
             }
-            if (Object.keys(results).length === 0) {
+            if (!results) {
                 return res.status(200).json({
                     success: 1,
-                    // message: "No Data Found",
-                    data: []
-                })
+                    message: "No Data"
+                });
             }
             return res.status(200).json({
                 success: 2,
                 data: results
-            })
-
+            });
         })
     },
 
@@ -409,25 +557,46 @@ module.exports = {
         })
     },
 
+    // getYearlyDetailsForVerification: (req, res) => {
+    //     getYearlyDetailsForVerification((err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (Object.keys(results).length === 0) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 // message: "No Data Found",
+    //                 data: []
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 2,
+    //             data: results
+    //         })
+    //     })
+    // },
     getYearlyDetailsForVerification: (req, res) => {
-        getYearlyDetailsForVerification((err, results) => {
+        const id = req.params.id;
+        getYearlyDetailsForVerification(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
-                })
+                });
             }
-            if (Object.keys(results).length === 0) {
+            if (!results) {
                 return res.status(200).json({
                     success: 1,
-                    // message: "No Data Found",
-                    data: []
-                })
+                    message: "No Data"
+                });
             }
             return res.status(200).json({
                 success: 2,
                 data: results
-            })
+            });
         })
     },
 
@@ -454,26 +623,47 @@ module.exports = {
         })
     },
 
+    // getWeeklyBackup: (req, res) => {
+    //     getWeeklyBackup((err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (Object.keys(results).length === 0) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 // message: "No Data Found",
+    //                 data: []
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 2,
+    //             data: results
+    //         })
+
+    //     })
+    // },
     getWeeklyBackup: (req, res) => {
-        getWeeklyBackup((err, results) => {
+        const id = req.params.id;
+        getWeeklyBackup(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
-                })
+                });
             }
-            if (Object.keys(results).length === 0) {
+            if (!results) {
                 return res.status(200).json({
                     success: 1,
-                    // message: "No Data Found",
-                    data: []
-                })
+                    message: "No Data"
+                });
             }
             return res.status(200).json({
                 success: 2,
                 data: results
-            })
-
+            });
         })
     },
 
@@ -508,28 +698,48 @@ module.exports = {
         })
     },
 
+    // getWeeklyDetails: (req, res) => {
+    //     getWeeklyDetails((err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (Object.keys(results).length === 0) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 // message: "No Data Found",
+    //                 data: []
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 2,
+    //             data: results
+    //         })
+    //     })
+    // },
     getWeeklyDetails: (req, res) => {
-        getWeeklyDetails((err, results) => {
+        const id = req.params.id;
+        getWeeklyDetails(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
-                })
+                });
             }
-            if (Object.keys(results).length === 0) {
+            if (!results) {
                 return res.status(200).json({
                     success: 1,
-                    // message: "No Data Found",
-                    data: []
-                })
+                    message: "No Data"
+                });
             }
             return res.status(200).json({
                 success: 2,
                 data: results
-            })
+            });
         })
     },
-
     getWeeklyVerifiedDetails: (req, res) => {
         const body = req.body;
         getWeeklyVerifiedDetails(body, (err, results) => {

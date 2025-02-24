@@ -480,7 +480,7 @@ module.exports = {
             FROM meliora.it_other_bills
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_other_bills.bill_category
             left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
-            where (payed_status is null || payed_status=0)and (it_bill_type_mast.it_bill_type_slno=2)`
+            where (payed_status is null || payed_status=0)and (it_bill_type_mast.it_bill_type_slno=2) `
             , [],
             (error, results, feilds) => {
                 if (error) {
@@ -576,7 +576,7 @@ module.exports = {
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category
             left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
             left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype
-            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=1)`, [],
+            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=1) and bill_stat=1`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -608,7 +608,7 @@ module.exports = {
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category
             left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
             left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype
-            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=1)`, [],
+            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=1) and bill_stat=1`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -640,7 +640,7 @@ module.exports = {
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno = it_bill_add.bill_category
             left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno = it_bill_category_mast.it_bill_type_slno
             left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype
-            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=1)`, [],
+            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=1) and bill_stat=1`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -699,7 +699,7 @@ module.exports = {
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category
             left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
             left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype
-            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=2)`, [],
+            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=2) and bill_stat=1`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -731,7 +731,7 @@ module.exports = {
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category
             left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
             left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype
-            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=2)`, [],
+            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=2) and bill_stat=1`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -763,7 +763,7 @@ module.exports = {
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno = it_bill_add.bill_category
             left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno = it_bill_category_mast.it_bill_type_slno
             left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype
-            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=2)`, [],
+            where (payed_status is null || payed_status=0) and (it_bill_type_mast.it_bill_type_slno=2) and bill_stat=1`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);

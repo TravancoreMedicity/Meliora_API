@@ -44,15 +44,29 @@ module.exports = {
         );
     },
 
-    getBackupEmployee: (callBack) => {
+    // getBackupEmployee: (callBack) => {
+    //     pool.query(
+    //         ` SELECT em_id,em_name FROM co_employee_master WHERE em_department=1 and em_status=1`, [],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callBack(error);
+    //             }
+    //             return callBack(null, results);
+    //         }
+    //     );
+    // },
+
+    getBackupEmployee: (id, callback) => {
         pool.query(
-            ` SELECT em_id,em_name FROM co_employee_master WHERE em_department=1 and em_status=1`, [],
-            (error, results, feilds) => {
+            ` SELECT em_id,em_name FROM co_employee_master WHERE em_department=? and em_status=1`,
+            [id],
+            (error, results, fields) => {
                 if (error) {
-                    return callBack(error);
+                    return callback(error);
                 }
-                return callBack(null, results);
+                return callback(null, results);
             }
+
         );
     },
 

@@ -243,37 +243,68 @@ module.exports = {
         })
     },
 
+    // backupDailyInsert: (req, res) => {
+    //     const body = req.body;
+    //     const data = body?.map((val) => {
+    //         return [val.time_slno, val.backup_slno, val.backup_daily_date,
+    //         val.backup_schedule_time, val.verify_status, val.create_user]
+    //     })
+    //     DailyAlreadyExist(data, (err, results) => {
+    //         const value = JSON.parse(JSON.stringify(results))
+    //         if (Object.keys(value).length === 0) {
+    //             backupDailyInsert(data, (err, results) => {
+    //                 if (err) {
+    //                     return res.status(200).json({
+    //                         success: 0,
+    //                         message: err.message
+    //                     });
+    //                 }
+    //                 return res.status(200).json({
+    //                     success: 1,
+    //                     message: "Inserted"
+    //                 })
+    //             })
+    //         }
+    //         else {
+    //             return res.status(200).json({
+    //                 success: 7,
+    //                 message: "Already Exist"
+    //             })
+    //         }
+    //     })
+    // },
+
     backupDailyInsert: (req, res) => {
         const body = req.body;
-        const data = body?.map((val) => {
-            return [val.time_slno, val.backup_slno, val.backup_daily_date,
-            val.backup_schedule_time, val.verify_status, val.create_user]
-        })
-        DailyAlreadyExist(data, (err, results) => {
-            const value = JSON.parse(JSON.stringify(results))
-            if (Object.keys(value).length === 0) {
-                backupDailyInsert(data, (err, results) => {
-                    if (err) {
-                        return res.status(200).json({
-                            success: 0,
-                            message: err.message
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Inserted"
-                    })
-                })
+        const data = body?.map((val) => [
+            val.time_slno,
+            val.backup_slno,
+            val.backup_daily_date,
+            val.backup_schedule_time,
+            val.verify_status,
+            val.create_user
+        ]);
+        DailyAlreadyExist(data, (err, existingRecords) => {
+            if (err) {
+                return res.status(500).json({ success: 0, message: err.message });
             }
-            else {
+            const existingSet = new Set(existingRecords.map(row => `${row.time_slno},${row.backup_slno}`));
+            const newRecords = data.filter(([time_slno, backup_slno]) =>
+                !existingSet.has(`${time_slno},${backup_slno}`)
+            );
+            if (newRecords.length === 0) {
+                return res.status(200).json({ success: 7, message: "Already Exist" });
+            }
+            backupDailyInsert(newRecords, (err, results) => {
+                if (err) {
+                    return res.status(500).json({ success: 0, message: err.message });
+                }
                 return res.status(200).json({
-                    success: 7,
-                    message: "Already Exist"
-                })
-            }
-        })
+                    success: 1,
+                });
+            });
+        });
     },
-
     // getDailyDetailsForVerification: (req, res) => {
     //     getDailyDetailsForVerification((err, results) => {
     //         if (err) {
@@ -382,36 +413,68 @@ module.exports = {
             });
         })
     },
+    // backupMonthlyInsert: (req, res) => {
+    //     const body = req.body;
+    //     const data = body?.map((val) => {
+    //         return [val.time_slno, val.backup_slno, val.backup_monthly_date,
+    //         val.backup_schedule_time, val.verify_status, val.create_user]
+    //     })  
+
+    //     MonthlyAlreadyExist(data, (err, results) => {
+    //         const value = JSON.parse(JSON.stringify(results))
+
+    //         if (Object.keys(value).length === 0) {
+    //             backupMonthlyInsert(data, (err, results) => {
+    //                 if (err) {
+    //                     return res.status(200).json({
+    //                         success: 0,
+    //                         message: err.message
+    //                     });
+    //                 }
+    //                 return res.status(200).json({
+    //                     success: 1,
+    //                     message: "Inserted"
+    //                 })
+    //             })
+    //         }
+    //         else {
+    //             return res.status(200).json({
+    //                 success: 7,
+    //                 message: "Already Exist"
+    //             })
+    //         }
+    //     })
+    // },
     backupMonthlyInsert: (req, res) => {
         const body = req.body;
-        const data = body?.map((val) => {
-            return [val.time_slno, val.backup_slno, val.backup_monthly_date,
-            val.backup_schedule_time, val.verify_status, val.create_user]
-        })
-        MonthlyAlreadyExist(data, (err, results) => {
-            const value = JSON.parse(JSON.stringify(results))
-
-            if (Object.keys(value).length === 0) {
-                backupMonthlyInsert(data, (err, results) => {
-                    if (err) {
-                        return res.status(200).json({
-                            success: 0,
-                            message: err.message
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Inserted"
-                    })
-                })
+        const data = body?.map((val) => [
+            val.time_slno,
+            val.backup_slno,
+            val.backup_monthly_date,
+            val.backup_schedule_time,
+            val.verify_status,
+            val.create_user
+        ]);
+        MonthlyAlreadyExist(data, (err, existingRecords) => {
+            if (err) {
+                return res.status(500).json({ success: 0, message: err.message });
             }
-            else {
+            const existingSet = new Set(existingRecords.map(row => `${row.time_slno},${row.backup_slno}`));
+            const newRecords = data.filter(([time_slno, backup_slno]) =>
+                !existingSet.has(`${time_slno},${backup_slno}`)
+            );
+            if (newRecords.length === 0) {
+                return res.status(200).json({ success: 7, message: "Already Exist" });
+            }
+            backupMonthlyInsert(newRecords, (err, results) => {
+                if (err) {
+                    return res.status(500).json({ success: 0, message: err.message });
+                }
                 return res.status(200).json({
-                    success: 7,
-                    message: "Already Exist"
-                })
-            }
-        })
+                    success: 1,
+                });
+            });
+        });
     },
 
     // getMonthlyDetailsForVerification: (req, res) => {
@@ -435,7 +498,6 @@ module.exports = {
     //         })
     //     })
     // },
-
     getMonthlyDetailsForVerification: (req, res) => {
         const id = req.params.id;
         getMonthlyDetailsForVerification(id, (err, results) => {
@@ -503,7 +565,6 @@ module.exports = {
 
     //     })
     // },
-
     getYearlyBackup: (req, res) => {
         const id = req.params.id;
         getYearlyBackup(id, (err, results) => {
@@ -526,35 +587,66 @@ module.exports = {
         })
     },
 
+    // backupYearlyInsert: (req, res) => {
+    //     const body = req.body;
+    //     const data = body?.map((val) => {
+    //         return [val.time_slno, val.backup_slno, val.backup_yearly_date,
+    //         val.backup_schedule_time, val.verify_status, val.create_user]
+    //     })
+    //     YearAlreadyExist(data, (err, results) => {
+    //         const value = JSON.parse(JSON.stringify(results))
+    //         if (Object.keys(value).length === 0) {
+    //             backupYearlyInsert(data, (err, results) => {
+    //                 if (err) {
+    //                     return res.status(200).json({
+    //                         success: 0,
+    //                         message: err.message
+    //                     });
+    //                 }
+    //                 return res.status(200).json({
+    //                     success: 1,
+    //                     message: "Inserted"
+    //                 })
+    //             })
+    //         }
+    //         else {
+    //             return res.status(200).json({
+    //                 success: 7,
+    //                 message: "Already Exist"
+    //             })
+    //         }
+    //     })
+    // },
     backupYearlyInsert: (req, res) => {
         const body = req.body;
-        const data = body?.map((val) => {
-            return [val.time_slno, val.backup_slno, val.backup_yearly_date,
-            val.backup_schedule_time, val.verify_status, val.create_user]
-        })
-        YearAlreadyExist(data, (err, results) => {
-            const value = JSON.parse(JSON.stringify(results))
-            if (Object.keys(value).length === 0) {
-                backupYearlyInsert(data, (err, results) => {
-                    if (err) {
-                        return res.status(200).json({
-                            success: 0,
-                            message: err.message
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Inserted"
-                    })
-                })
+        const data = body?.map((val) => [
+            val.time_slno,
+            val.backup_slno,
+            val.backup_yearly_date,
+            val.backup_schedule_time,
+            val.verify_status,
+            val.create_user
+        ]);
+        YearAlreadyExist(data, (err, existingRecords) => {
+            if (err) {
+                return res.status(500).json({ success: 0, message: err.message });
             }
-            else {
+            const existingSet = new Set(existingRecords.map(row => `${row.time_slno},${row.backup_slno}`));
+            const newRecords = data.filter(([time_slno, backup_slno]) =>
+                !existingSet.has(`${time_slno},${backup_slno}`)
+            );
+            if (newRecords.length === 0) {
+                return res.status(200).json({ success: 7, message: "Already Exist" });
+            }
+            backupYearlyInsert(newRecords, (err, results) => {
+                if (err) {
+                    return res.status(500).json({ success: 0, message: err.message });
+                }
                 return res.status(200).json({
-                    success: 7,
-                    message: "Already Exist"
-                })
-            }
-        })
+                    success: 1,
+                });
+            });
+        });
     },
 
     // getYearlyDetailsForVerification: (req, res) => {
@@ -667,37 +759,67 @@ module.exports = {
         })
     },
 
+    // backupWeeklyInsert: (req, res) => {
+    //     const body = req.body;
+    //     const data = body?.map((val) => {
+    //         return [val.time_slno, val.backup_slno, val.backup_weekly_date,
+    //         val.backup_schedule_time, val.verify_status, val.create_user]
+    //     })
+    //     WeekAlreadyExist(data, (err, results) => {
+    //         const value = JSON.parse(JSON.stringify(results))
+    //         if (Object.keys(value).length === 0) {
+    //             backupWeeklyInsert(data, (err, results) => {
+    //                 if (err) {
+    //                     return res.status(200).json({
+    //                         success: 0,
+    //                         message: err.message
+    //                     });
+    //                 }
+    //                 return res.status(200).json({
+    //                     success: 1,
+    //                     message: "Inserted"
+    //                 })
+    //             })
+    //         }
+    //         else {
+    //             return res.status(200).json({
+    //                 success: 7,
+    //                 message: "Already Exist"
+    //             })
+    //         }
+    //     })
+    // },
     backupWeeklyInsert: (req, res) => {
         const body = req.body;
-        const data = body?.map((val) => {
-            return [val.time_slno, val.backup_slno, val.backup_weekly_date,
-            val.backup_schedule_time, val.verify_status, val.create_user]
-        })
-        WeekAlreadyExist(data, (err, results) => {
-            const value = JSON.parse(JSON.stringify(results))
-            if (Object.keys(value).length === 0) {
-                backupWeeklyInsert(data, (err, results) => {
-                    if (err) {
-                        return res.status(200).json({
-                            success: 0,
-                            message: err.message
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "Inserted"
-                    })
-                })
+        const data = body?.map((val) => [
+            val.time_slno,
+            val.backup_slno,
+            val.backup_weekly_date,
+            val.backup_schedule_time,
+            val.verify_status,
+            val.create_user
+        ]);
+        WeekAlreadyExist(data, (err, existingRecords) => {
+            if (err) {
+                return res.status(500).json({ success: 0, message: err.message });
             }
-            else {
+            const existingSet = new Set(existingRecords.map(row => `${row.time_slno},${row.backup_slno}`));
+            const newRecords = data.filter(([time_slno, backup_slno]) =>
+                !existingSet.has(`${time_slno},${backup_slno}`)
+            );
+            if (newRecords.length === 0) {
+                return res.status(200).json({ success: 7, message: "Already Exist" });
+            }
+            backupWeeklyInsert(newRecords, (err, results) => {
+                if (err) {
+                    return res.status(500).json({ success: 0, message: err.message });
+                }
                 return res.status(200).json({
-                    success: 7,
-                    message: "Already Exist"
-                })
-            }
-        })
+                    success: 1,
+                });
+            });
+        });
     },
-
     // getWeeklyDetails: (req, res) => {
     //     getWeeklyDetails((err, results) => {
     //         if (err) {

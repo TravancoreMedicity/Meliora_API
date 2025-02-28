@@ -1161,6 +1161,7 @@ const validateBackupVerification = Joi.object({
     verify_status: Joi.number().optional(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
+    backup_path: Joi.optional(),
 });
 
 const validateMonthBackupVerification = Joi.object({
@@ -1173,6 +1174,7 @@ const validateMonthBackupVerification = Joi.object({
     verify_status: Joi.number().optional(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
+    backup_path: Joi.optional(),
 });
 
 const validateWeekBackupVerification = Joi.object({
@@ -1185,6 +1187,7 @@ const validateWeekBackupVerification = Joi.object({
     verify_status: Joi.number().optional(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
+    backup_path: Joi.optional(),
 });
 
 const validateYearBackupVerification = Joi.object({
@@ -1197,6 +1200,7 @@ const validateYearBackupVerification = Joi.object({
     verify_status: Joi.number().optional(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
+    backup_path: Joi.optional(),
 });
 
 const validateSelectedDaysBackupVerification = Joi.object({
@@ -1209,10 +1213,10 @@ const validateSelectedDaysBackupVerification = Joi.object({
     verify_status: Joi.number().optional(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
+    backup_path: Joi.optional(),
 });
 
 const validateAssetRackMaster = Joi.object({
-
     am_rack_name: Joi.string().trim().uppercase().required(),
     am_rack_status: Joi.number().optional(),
     am_rack_deptsec: Joi.number().optional(),

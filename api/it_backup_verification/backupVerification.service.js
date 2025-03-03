@@ -44,19 +44,35 @@ module.exports = {
         );
     },
 
-    getBackupEmployee: (callBack) => {
+    // getBackupEmployee: (callBack) => {
+    //     pool.query(
+    //         ` SELECT em_id,em_name FROM co_employee_master WHERE em_department=1 and em_status=1`, [],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callBack(error);
+    //             }
+    //             return callBack(null, results);
+    //         }
+    //     );
+    // },
+
+    getBackupEmployee: (id, callback) => {
         pool.query(
-            ` SELECT em_id,em_name FROM co_employee_master WHERE em_department=1 and em_status=1`, [],
-            (error, results, feilds) => {
+            ` SELECT em_id,em_name FROM co_employee_master WHERE em_department=? and em_status=1`,
+            [id],
+            (error, results, fields) => {
                 if (error) {
-                    return callBack(error);
+                    return callback(error);
                 }
-                return callBack(null, results);
+                return callback(null, results);
             }
+
         );
     },
 
     verificationUpdate: (data, callback) => {
+
+
         pool.query(
             `UPDATE 
                  it_backup_daily_details
@@ -67,7 +83,8 @@ module.exports = {
                   em_id=?,
                   verify_status=?, 
                   remarks=?, 
-                  edit_user=?                
+                  edit_user=? ,
+                  backup_path=?               
             WHERE 
                  daily_slno=?`,
             [
@@ -78,6 +95,7 @@ module.exports = {
                 data.verify_status,
                 data.remarks,
                 data.edit_user,
+                data.backup_path,
                 data.daily_slno
             ],
             (error, results, feilds) => {
@@ -90,6 +108,7 @@ module.exports = {
     },
 
     monthlyVerificationUpdate: (data, callback) => {
+
         pool.query(
             `UPDATE 
                  it_backup_monthly_details
@@ -100,7 +119,8 @@ module.exports = {
                   em_id=?,
                   verify_status=?, 
                   remarks=?, 
-                  edit_user=?                
+                  edit_user=?,
+                  backup_path=?                
             WHERE 
                   monthly_slno=?`,
             [
@@ -111,6 +131,7 @@ module.exports = {
                 data.verify_status,
                 data.remarks,
                 data.edit_user,
+                data.backup_path,
                 data.monthly_slno
             ],
             (error, results, feilds) => {
@@ -132,7 +153,8 @@ module.exports = {
                   em_id=?,
                   verify_status=?, 
                   remarks=?, 
-                  edit_user=?                
+                  edit_user=?,
+                   backup_path=?                  
             WHERE 
                   yearly_slno=?`,
             [
@@ -143,6 +165,7 @@ module.exports = {
                 data.verify_status,
                 data.remarks,
                 data.edit_user,
+                data.backup_path,
                 data.yearly_slno
             ],
             (error, results, feilds) => {
@@ -165,7 +188,8 @@ module.exports = {
                   em_id=?,
                   verify_status=?, 
                   remarks=?, 
-                  edit_user=?                
+                  edit_user=?,
+                   backup_path=?            
             WHERE 
                 weekly_slno=?`,
             [
@@ -176,6 +200,7 @@ module.exports = {
                 data.verify_status,
                 data.remarks,
                 data.edit_user,
+                data.backup_path,
                 data.weekly_slno
             ],
             (error, results, feilds) => {
@@ -197,7 +222,8 @@ module.exports = {
                   em_id=?,
                   remarks=?, 
                   verify_status=?, 
-                  edit_user=?                
+                  edit_user=?,
+                   backup_path=?                  
             WHERE 
                 days_slno=?`,
             [
@@ -208,6 +234,7 @@ module.exports = {
                 data.remarks,
                 data.verify_status,
                 data.edit_user,
+                data.backup_path,
                 data.days_slno
             ],
             (error, results, feilds) => {

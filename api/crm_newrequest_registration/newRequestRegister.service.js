@@ -714,7 +714,7 @@ module.exports = {
                    crm_request_master.sub_store_recieve,approval_level,crm_purchase_po_details.store_recieve,
                    user_acknldge,user_acknldge_remarks,ackUser.em_name as acknowUser,user_ack_date,sub_store_name,
                    sub_store_slno, store_receive_date,CRS.em_name as crs_user,STR.em_name as store_user,substore_ack_date,
-                   po_number
+                   po_number,user_acknldge,internally_arranged_status
              FROM
                   crm_request_master
                 LEFT JOIN crm_request_mast_detail on crm_request_mast_detail.req_slno=crm_request_master.req_slno
@@ -783,6 +783,10 @@ module.exports = {
         if (data.needed) {
             query += " AND needed like ?";
             params.push('%' + data.needed + '%');
+        }
+        if (data.category) {
+            query += "   AND JSON_CONTAINS(CAST(category AS JSON), CAST(? AS JSON), '$')";
+            params.push(JSON.stringify([data.category]));  // Wrap the value in an array and stringify it
         }
 
         query += `
@@ -1001,15 +1005,34 @@ module.exports = {
                    LEFT JOIN co_department_mast TD ON TD.dept_id = R.dept_id
                WHERE
                    (incharge_approve = 1 OR hod_approve = 1) 
-                   AND JSON_CONTAINS(category, '7', '$') AND req_status='A' AND user_acknldge is null
-                   AND req_date BETWEEN ? AND ?
+                   AND JSON_CONTAINS(category, '?', '$')
+                   
                GROUP BY
                    crm_request_master.req_slno  
                ORDER BY
                    crm_request_master.req_slno DESC`,
             [
-                data.from,
-                data.to
+                data.category,
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    getCommonMaster: (data, callback) => {
+
+        pool.query(
+            `INSERT INTO crm_common_master (
+                category
+                           
+               )
+                VALUES(?)`,
+            [
+                JSON.stringify(data.category)
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -1021,8 +1044,53 @@ module.exports = {
     },
 
 
+    getCommonMasterGet: (data, callback) => {
 
+        pool.query(
+            `Select category,common_master_slno From crm_common_master`,
+            [
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 
+    getCommonMasterUpdate: (data, callback) => {
 
+        pool.query(
+            `UPDATE crm_common_master 
+            SET category = ?
+            WHERE common_master_slno = ?`,
+            [
+                JSON.stringify(data.category),
+                data.id
+            ],
+            (error, results, feilds) => {
 
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getCommonMasterGetCat: (data, callback) => {
+        pool.query(
+            `SELECT * FROM am_item_type WHERE item_type_slno IN  (?)`,
+            [
+                data.editRowData
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 }

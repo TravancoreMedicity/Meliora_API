@@ -4,7 +4,7 @@ const { updateInchargeApproval, InactiveItemDetail, getItemListApproval, Incharg
     updateCrfClose, updateHODApproval, updateDMSApproval, updateMSApproval, updateMOApproval, updateSMOApproval,
     updateGMApproval, updateMDApproval, updateEDApproval, CrfDeptDataCollectInsert, DataCollectComplete, getDataCollectList,
     CrfDataCollactnSave, getAllForPdfView, getFinalItemListApproval, getMaxItemSlno, AddMoreItemsDetails, updateUserAck,
-    DetailItemReject, DetailItemOnHold, getStoreReceiveStatus, getItemStatus, updateInternallyArranged, updateManagingApproval,
+    DetailItemReject, DetailItemOnHold, getStoreReceiveStatus, getItemStatus, updateInternallyArranged, updateManagingApproval, updateuserAckInternally
 } = require('../crm_req_approval/crmreq_approval.controller');
 
 router.get("/getItemListApproval/:id", checkToken, getItemListApproval);
@@ -44,5 +44,7 @@ router.patch("/DetailItemOnHold", checkToken, DetailItemOnHold);
 router.patch("/internallyArranged", checkToken, updateInternallyArranged);
 
 router.get("/receiveStatus/:id", checkToken, getStoreReceiveStatus);
+router.patch("/userAckInternally", checkToken, updateuserAckInternally);
+
 
 module.exports = router;

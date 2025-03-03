@@ -94,6 +94,7 @@ module.exports = {
     },
 
     updateReqMstInternally: (data, callback) => {
+
         pool.query(
             `UPDATE
                    crm_request_master
@@ -161,6 +162,7 @@ module.exports = {
     },
 
     updateReqMstApproved: (data, callback) => {
+
         pool.query(
             `UPDATE
                    crm_request_master
@@ -788,6 +790,7 @@ module.exports = {
     },
 
     updateMOApproval: (data, callback) => {
+
         pool.query(
             `UPDATE
                     crm_request_approval
@@ -1257,6 +1260,7 @@ module.exports = {
     },
 
     updateUserAck: (data, callback) => {
+
         pool.query(
             `UPDATE
                    crm_request_master
@@ -1528,6 +1532,7 @@ module.exports = {
     },
 
     moItemOnholdRejectUpdate: (data, callback) => {
+
         pool.query(
             `UPDATE
                   crm_reqitems_approval_details
@@ -1693,6 +1698,7 @@ module.exports = {
     },
 
     updateInternallyArranged: (data, callback) => {
+
         pool.query(
             `UPDATE
                   crm_request_mast_detail
@@ -1736,6 +1742,7 @@ module.exports = {
         );
     },
     getStoreReceiveStatus: (id, callBack) => {
+
         pool.query(
             `SELECT
                     store_receive,sub_store_recieve

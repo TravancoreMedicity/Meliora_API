@@ -327,7 +327,6 @@ const ImageInsertManagestorage = multer.diskStorage({
     destination: (req, file, cb) => {
 
         const reqslno = req.body.reqslno;
-        console.log(reqslno, "reqslno");
 
         const id = req.body.id;
 
@@ -658,6 +657,7 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 data: files
+
             });
         });
 

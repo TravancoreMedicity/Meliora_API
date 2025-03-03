@@ -11,7 +11,7 @@ const { getItemListApproval, InactiveItemDetail, updateInchargeApproval, updateR
     updateApprovedSMOItemStatus, updateApprovedGMItemStatus, updateApprovedEDItemStatus,
     updateApprovedInchargeItemStatus, UpdateItemReceiveStatus, updateInternallyArranged, updateReqMstInternally,
     updateAllItemStatusForInternallArran, updateApprovedMDItemStatus, updateManagingApproval,
-    updateApprovedManageItemStatus, manageItemOnholdRejectUpdate
+    updateApprovedManageItemStatus, manageItemOnholdRejectUpdate, updateuserAckInternally
 } = require('../crm_req_approval/crmreq_approval.service');
 const { InsertPurchaseAck } = require('../crm_new_purchase/crm_purchase.service')
 const { updateApproveStatus, insertApprvitemsStatus } = require('../crm_newrequest_registration/newRequestRegister.service')
@@ -582,7 +582,7 @@ module.exports = {
                 const hasApproved = items?.filter((item) => item.item_status_approved === 1);
                 const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
                 const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
-                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 1 : 0;
+                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 0 : 0;
                 const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
                 const handleResponse = (message, success = 1) => {
@@ -696,7 +696,7 @@ module.exports = {
                 const hasApproved = items?.filter((item) => item.item_status_approved === 1);
                 const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
                 const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
-                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 1 : 0;
+                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 0 : 0;
                 const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
                 const handleResponse = (message, success = 1) => {
@@ -792,6 +792,7 @@ module.exports = {
     updateMOApproval: (req, res) => {
         const body = req.body;
         const { manag_operation_user, om_approv_date, req_slno, items } = body
+
         updateMOApproval(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
@@ -812,7 +813,7 @@ module.exports = {
                 const hasApproved = items?.filter((item) => item.item_status_approved === 1);
                 const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
                 const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
-                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 1 : 0;
+                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 0 : 0;
                 const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
                 const handleResponse = (message, success = 1) => {
@@ -927,7 +928,7 @@ module.exports = {
                 const hasApproved = items?.filter((item) => item.item_status_approved === 1);
                 const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
                 const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
-                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 1 : 0;
+                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 0 : 0;
                 const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
                 const handleResponse = (message, success = 1) => {
@@ -1043,7 +1044,7 @@ module.exports = {
                 const hasApproved = items?.filter((item) => item.item_status_approved === 1);
                 const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
                 const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
-                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 1 : 0;
+                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 0 : 0;
                 const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
                 const handleResponse = (message, success = 1) => {
@@ -1158,7 +1159,7 @@ module.exports = {
             const hasApproved = items?.filter((item) => item.item_status_approved === 1);
             const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
             const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
-            const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 1 : 0;
+            const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 0 : 0;
             const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
             const handleResponse = (message, success = 1) => {
@@ -1289,7 +1290,7 @@ module.exports = {
             const hasApproved = items?.filter((item) => item.item_status_approved === 1);
             const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
             const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
-            const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 1 : 0;
+            const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 0 : 0;
             const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
             const handleResponse = (message, success = 1) => {
@@ -1421,7 +1422,7 @@ module.exports = {
             const hasApproved = items?.filter((item) => item.item_status_approved === 1);
             const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
             const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
-            const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 1 : 0;
+            const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 0 : 0;
             const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
             const handleResponse = (message, success = 1) => {
@@ -2367,6 +2368,49 @@ module.exports = {
             });
         });
     },
+    updateuserAckInternally: (req, res) => {
+        const body = req.body;
+        updateUserAck(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+            if (results) {
+                updateUserReply(body.req_slno, (err, replyResult) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    if (!replyResult) {
+                        // You could also handle "reply not found" case here if needed
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Reply Record Not Found"
+                        });
+                    }
 
+                    // If everything goes well, return success
+                    return res.status(200).json({
+                        success: 1,
+                        message: "User Acknowledged successfully"
+                    });
+
+                })
+            }
+
+        });
+    },
 }
 

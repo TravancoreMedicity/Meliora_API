@@ -2,8 +2,8 @@ const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { requestRegistInsert, InHodExist, getAllReqBasedDept, getDetailItemList, UpdateReqMaster, getApprovListOthers,
     getAllReqBasedDeptreq, deleteItemDetails, getAllPendingApprovalsAboveHOD, getPoList, searchCrfDetails,
-    getAllHoldAndRejectItems, getackPending, UpdateItemReceiveStatus, checkStoreReturnItem, insertReturnItemDetails,
-    itemReturnDetailsForViewStore, returnReplyDetails, viewItemReturnDetails, getCrfDetailsForBiomedical
+    getAllHoldAndRejectItems, getackPending, UpdateItemReceiveStatus, checkStoreReturnItem, insertReturnItemDetails, getCommonMasterUpdate,
+    itemReturnDetailsForViewStore, returnReplyDetails, viewItemReturnDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet, getCommonMasterGetCat
 } = require('./newRequestRegister.controller');
 
 router.post("/InsertRegMast", checkToken, requestRegistInsert);
@@ -37,6 +37,10 @@ router.post('/returnReply', checkToken, returnReplyDetails);
 router.get("/returnView/:id", checkToken, viewItemReturnDetails);
 
 router.post("/biomedicalView", checkToken, getCrfDetailsForBiomedical);
+router.post("/CommonMaster", checkToken, getCommonMaster);
+router.post("/CommonMasterGet", checkToken, getCommonMasterGet);
+router.post("/CommonMasterUpdate/update", checkToken, getCommonMasterUpdate);
+router.post("/CommonMasterGetCat", checkToken, getCommonMasterGetCat);
 
 
 module.exports = router;

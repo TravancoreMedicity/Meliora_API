@@ -2,8 +2,8 @@ const { requestRegistInsert, deleteCrfReq, requestRegistInsertDetl, requestAppro
     getDetailItemList, EditItemListByReqno, UpdateReqMaster, getApprovListOthers, getAllReqBasedDeptreq,
     deleteItemDetails, getAllPendingApprovalsAboveHOD, getPoList, searchCrfDetails, getAllHoldAndRejectItems,
     insertApprvitemsStatus, deleteCrfReqApproval, deleteCrfRegItemDetl, updateApproveStatus, getackPending,
-    UpdateItemReceiveStatus, checkStoreReturnItem, insertReturnItemDetails, itemReturnDetailsForViewStore,
-    viewItemReturnDetails, returnReplyDetails, getCrfDetailsForBiomedical } = require('./newRequestRegister.service');
+    UpdateItemReceiveStatus, checkStoreReturnItem, insertReturnItemDetails, itemReturnDetailsForViewStore, getCommonMasterUpdate, getCommonMasterGetCat,
+    viewItemReturnDetails, returnReplyDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet } = require('./newRequestRegister.service');
 const logger = require('../../logger/logger');
 module.exports = {
 
@@ -613,24 +613,24 @@ module.exports = {
             {
                 val: 18, name: 'smopending', sql: `AND senior_manage_approv is null AND gm_approve is null AND
                  ed_approve is null AND md_approve is null AND crf_close is null AND user_acknldge is null
-                  AND req_status!='P' AND req_status!='R'`
+                  AND req_status!='P' AND req_status!='R' AND internally_arranged_status =0 `
             },
             {
                 val: 19, name: 'gmpending', sql: `AND gm_approve is null AND
                  ed_approve is null AND md_approve is null AND crf_close is null AND user_acknldge is null
-                  AND req_status!='P' AND req_status!='R'`
+                  AND req_status!='P' AND req_status!='R'AND internally_arranged_status =0`
             },
             {
                 val: 20, name: 'mdpending', sql: `AND md_approve is null AND crf_close is null AND user_acknldge is null
-                  AND req_status!='P' AND req_status!='R'`
+                  AND req_status!='P' AND req_status!='R' AND internally_arranged_status =0`
             },
             {
                 val: 21, name: 'edpending', sql: `AND ed_approve is null AND crf_close is null AND user_acknldge is null
-                  AND req_status!='P' AND req_status!='R'`
+                  AND req_status!='P' AND req_status!='R' AND internally_arranged_status =0`
             },
             {
                 val: 22, name: 'medicalpending', sql: `AND managing_director_approve is null AND crf_close is null AND user_acknldge is null
-                  AND req_status!='P' AND req_status!='R'`
+                  AND req_status!='P' AND req_status!='R' AND internally_arranged_status =0`
             },
             {
                 val: 23, name: 'tmchData', sql: `AND (ed_approve is null OR md_approve is null ) AND crf_close is null AND user_acknldge is null
@@ -665,7 +665,7 @@ module.exports = {
                     managing_director_req, managing_director_approve, managing_director_remarks, managing_director_analysis,
                     managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
                     hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
-                    TD.dept_id, TD.dept_name,TD.dept_type,
+                    TD.dept_id, TD.dept_name,TD.dept_type,internally_arranged_status,
 
                     ack_status, ack_remarks,PA.em_name as purchase_ackuser,crm_purchase_mast.create_date as ack_date,
                     quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
@@ -1035,6 +1035,101 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 data: results
+            })
+        })
+    },
+    getCommonMaster: (req, res) => {
+        const body = req.body;
+        getCommonMaster(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+
+    getCommonMasterGet: (req, res) => {
+        const body = req.body;
+        getCommonMasterGet(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+
+
+
+
+
+    getCommonMasterUpdate: (req, res) => {
+        const body = req.body;
+        getCommonMasterUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+
+    getCommonMasterGetCat: (req, res) => {
+        const body = req.body;
+        getCommonMasterGetCat(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    dataCat: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                dataCat: results
             })
         })
     },

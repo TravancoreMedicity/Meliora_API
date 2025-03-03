@@ -216,6 +216,7 @@ const feedbackdata = require('./api/feedback_module/feedback.router')
 const qideptAccess = require('./api/qi_dept_access_mast/dept_access_router')
 const med_vallet_master = require('./api/med_vallet/med_vallet.router')
 const mv_vehicle_registration = require('./api/mv_vehicle_registration/mv_vehicle.router');
+
 const backuptypemast = require('./api/it_backup_type_master/backup_type.router')
 const simOperators = require('./api/it_sim_operators/sim_operators.router')
 
@@ -405,11 +406,16 @@ app.use('/api/InitialAsessment', opAseessment)
 app.use('/api/feedback', feedbackdata)
 app.use('/api/qideptAccess', qideptAccess)
 
+
 app.use('/api/medvallet', med_vallet_master)
 app.use('/api/medvehilces', mv_vehicle_registration)
 app.use('/api/backuptypemast', backuptypemast)
 app.use('/api/simOperators', simOperators)
 
+
+
+app.use('/api/medvallet', med_vallet_master)
+app.use('/api/medvehilces', mv_vehicle_registration)
 
 app.get('/api/validateToken', validateTokenFrontend)
 

@@ -52,7 +52,7 @@ const upload = multer({
             file.mimetype === "image/jpg" ||
             file.mimetype === "image/jpeg" ||
             file.mimetype === "video/mp4" ||
-            file.mimetype === "video/quicktime" 
+            file.mimetype === "video/quicktime"
         ) {
             cb(null, true);
         } else {
@@ -60,7 +60,7 @@ const upload = multer({
             cb(new Error('Only .png, .jpg, and .jpeg .MOV are allowed'), false);
         }
     },
-    limits: { fileSize:25 * 1024 * 1024 }
+    limits: { fileSize: 25 * 1024 * 1024 }
 }).array('files', 6);
 
 module.exports = {

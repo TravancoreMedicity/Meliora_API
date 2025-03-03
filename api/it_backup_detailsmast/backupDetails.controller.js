@@ -12,7 +12,8 @@ const { backupDetailsInsert,
     MonthlyDetailsDelete,
     WeekDetailsDelete,
     YearDetailsDelete,
-    SelectedDaysDelete
+    SelectedDaysDelete,
+    getDeptwiseBackup
 } = require('./backupDetails.service')
 module.exports = {
     backupDetailsInsert: (req, res) => {
@@ -300,6 +301,28 @@ module.exports = {
                 success: 2,
                 message: "Deleted successfully"
             })
+        })
+    },
+
+    getDeptwiseBackup: (req, res) => {
+        const id = req.params.id;
+        getDeptwiseBackup(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
         })
     },
 

@@ -681,6 +681,7 @@ module.exports = {
     },
 
     searchCrfDetails: (data, callBack) => {
+
         let query = `
                 SELECT
                    crm_request_master.req_slno,crm_request_master.actual_requirement,crm_request_master.needed,

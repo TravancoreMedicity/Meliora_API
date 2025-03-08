@@ -1624,6 +1624,7 @@ module.exports = {
     },
 
     getAllForPdfView: (req, res) => {
+
         getAllForPdfView((err, results) => {
             if (err) {
                 logger.logwindow(err)

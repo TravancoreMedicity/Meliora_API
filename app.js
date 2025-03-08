@@ -6,16 +6,34 @@ const cors = require('cors')
 const logger = require('./logger/logger');
 const http = require("http");
 const socketUtils = require('./socketio/socketUltil')
+const axios = require("axios");
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const fs = require('fs');
 
 //sockect io configuration
-app.use(cors());
+//app.use(cors());
 
-app.use(express.urlencoded({ extended: true }));
+
+app.use(cookieParser());
+
+app.use(
+    cors({
+        origin: "http://192.168.22.4:3000",
+        credentials: true
+    })
+);
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+
+
+// app.use(cors({
+//     origin: ['http://192.168.22.4:3000', 'http://localhost:3000',],
+//     credentials: true
+// }));
 
 
 
@@ -218,14 +236,16 @@ const med_vallet_master = require('./api/med_vallet/med_vallet.router')
 const mv_vehicle_registration = require('./api/mv_vehicle_registration/mv_vehicle.router');
 const backuptypemast = require('./api/it_backup_type_master/backup_type.router')
 const simOperators = require('./api/it_sim_operators/sim_operators.router')
+const userRegistration = require("./api/usermanagment/user.route");
 
 const { validateTokenFrontend } = require("./authentication/ValidationCheck");
+const { generateOTP } = require("./api/usermanagment/user.controller");
 
 
 app.use(express.json({ limit: '50mb' }));
 app.use((req, res, next) => {
     //     res.header("Access-Control-Allow-Origin", "http://192.168.10.170:8080
-    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Origin", "http://192.168.22.4:3000");
     res.header(
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-Width, Content-Type, Accept, Authorization"
@@ -406,6 +426,8 @@ app.use('/api/simOperators', simOperators)
 
 
 app.get('/api/validateToken', validateTokenFrontend)
+app.get("/api/generateOTP/:id", generateOTP); // generate OTP function
+app.use("/api/user", userRegistration);
 
 /*
 
@@ -419,3 +441,8 @@ server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),
     logger.productionLogger.log('info', `Server Up and Running ${process.env.APP_PORT}`, { meta1: 'meta1' })
 );
+
+
+
+
+

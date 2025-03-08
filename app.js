@@ -409,6 +409,7 @@ app.use('/api/qideptAccess', qideptAccess)
 
 app.use('/api/medvallet', med_vallet_master)
 app.use('/api/medvehilces', mv_vehicle_registration)
+
 app.use('/api/backuptypemast', backuptypemast)
 app.use('/api/simOperators', simOperators)
 

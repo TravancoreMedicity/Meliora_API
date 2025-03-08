@@ -634,7 +634,37 @@ module.exports = {
         );
     },
 
+    // updatePoApprovals: (body) => {
+    //     return Promise.all(body?.map((val) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `UPDATE
+    //                      crm_purchase_po_details
+    //                  SET
+    //                      approval_level = ?, po_expiry = ?,expected_delivery = ?
+    //                 where
+    //                      po_number = ? and supply_store = ? AND po_status=1`,
+    //                 [
+    //                     val.approval_level,
+    //                     val.po_expiry,
+    //                     val.expected_delivery,
+    //                     val.po_number,
+    //                     val.supply_store
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         return reject(error)
+    //                     }
+    //                     return resolve(results)
+    //                 }
+    //             )
+    //         })
+    //     })
+    //     )
+    // },
+
     updatePoApprovals: (body) => {
+
         return Promise.all(body.map((val) => {
             return new Promise((resolve, reject) => {
                 pool.query(

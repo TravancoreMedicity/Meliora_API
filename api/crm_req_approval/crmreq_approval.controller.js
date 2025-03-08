@@ -1532,7 +1532,7 @@ module.exports = {
     },
     CrfDeptDataCollectInsert: (req, res) => {
         const body = req.body;
-        var newList = body.map((val, index) => {
+        var newList = body?.map((val, index) => {
             return [val.crf_requst_slno, val.crf_req_collect_dept, val.crf_req_remark, val.reqest_one, val.req_user]
         })
         CrfDeptDataCollectInsert(newList, (err, results) => {
@@ -1624,6 +1624,7 @@ module.exports = {
     },
 
     getAllForPdfView: (req, res) => {
+
         getAllForPdfView((err, results) => {
             if (err) {
                 logger.logwindow(err)

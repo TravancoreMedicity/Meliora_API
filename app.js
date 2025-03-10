@@ -222,6 +222,9 @@ const Amdashboard = require('./api/am_dashboard/am_dashboard.router')
 const Ticketdashboard = require('./api/cm_dashboard/cm_dashboard.router')
 const med_vallet_master = require('./api/med_vallet/med_vallet.router')
 const mv_vehicle_registration = require('./api/mv_vehicle_registration/mv_vehicle.router');
+const AssetCondemnation = require('./api/am_condem_details/am_condem.router');
+
+
 const { validateTokenFrontend } = require("./authentication/ValidationCheck");
 
 
@@ -410,6 +413,9 @@ app.use('/api/Amdashboard', Amdashboard)
 app.use('/api/Ticketdashboard', Ticketdashboard)
 app.use('/api/medvallet', med_vallet_master)
 app.use('/api/medvehilces', mv_vehicle_registration)
+app.use('/api/AssetCondemnation', AssetCondemnation)
+
+
 
 app.get('/api/validateToken', validateTokenFrontend)
 

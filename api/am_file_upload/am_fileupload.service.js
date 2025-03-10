@@ -69,4 +69,21 @@ module.exports = {
             }
         )
     },
+    CondemImageUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE am_condemnation_details SET 
+            file_status=1
+            WHERE 
+            am_condem_detail_slno=?`,
+            [
+                data.am_condem_detail_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
 }

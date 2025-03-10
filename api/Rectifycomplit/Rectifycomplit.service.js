@@ -955,6 +955,7 @@ module.exports = {
     },
 
     getUserEndRectfiedList: (data, callBack) => {
+
         pool.query(
             // `select 
             // cm_complaint_mast.complaint_slno,

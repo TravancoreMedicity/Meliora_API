@@ -336,9 +336,11 @@ module.exports = {
                 suppl_serviced_date,
                 suppl_serviced_remarks,
                 suppl_concted_emp,
-                create_user
+                create_user,
+                am_asset_item_slno,
+                am_spare_item_slno
             )
-            VALUES (?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)`,
+            VALUES (?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)`,
             [
                 data.service_item_slno || null,
                 data.service_asset_spare || null,
@@ -359,7 +361,9 @@ module.exports = {
                 data.suppl_serviced_date || null,
                 data.suppl_serviced_remarks || null,
                 data.suppl_concted_emp || null,
-                data.create_user || null
+                data.create_user || null,
+                data.am_asset_item_slno || null,
+                data.am_spare_item_slno || null
             ],
             (error, results, fields) => {
                 if (error) {

@@ -611,7 +611,8 @@ module.exports = {
         pool.query(
             `SELECT *           
             FROM am_item_map_wargrarnt_detail
-            WHERE am_item_map_slno=?`,
+            WHERE am_item_map_slno=?
+            and status=1`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -626,7 +627,8 @@ module.exports = {
         pool.query(
             `SELECT *           
             FROM am_item_map_wargrarnt_detail
-            WHERE am_spare_item_map_slno=?`,
+            WHERE am_spare_item_map_slno=?
+            and status=1`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -638,10 +640,9 @@ module.exports = {
     },
 
     WarentGraruntyInsert: (data, callback) => {
-
         pool.query(
             `INSERT INTO am_item_map_wargrarnt_detail
-          ( 
+        ( 
             am_item_map_slno,
             warrenty_status,
             guarenty_status,
@@ -650,10 +651,12 @@ module.exports = {
             troll_free,
             ph_one,
             ph_two,
-            address,            
-            create_user
-          )
-          VALUES(?,?,?,?,?,?,?,?,?,?)`,
+            address,
+            file_upload_status,
+            create_user,
+            remarks
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 data.am_item_map_slno,
                 data.warrenty_status,
@@ -664,7 +667,9 @@ module.exports = {
                 data.ph_one,
                 data.ph_two,
                 data.address,
-                data.create_user
+                data.file_upload_status,
+                data.create_user,
+                data.remarks,
             ],
 
             (error, results, fields) => {
@@ -675,8 +680,47 @@ module.exports = {
             }
         );
     },
-    WarentGraruntyUpdate: (data, callback) => {
 
+    // WarentGraruntyUpdate: (data, callback) => {
+    //     pool.query(
+    //         `UPDATE am_item_map_wargrarnt_detail SET 
+    //         warrenty_status=?,
+    //         guarenty_status=?,
+    //         from_date=?,
+    //         to_date=?,
+    //         troll_free=?,
+    //         ph_one=?,
+    //         ph_two=?,
+    //         address=?,   
+    //         edit_user=?,
+    //         address=?,
+    //         file_upload_status=?,
+    //         edit_user=?,
+    //         remarks=?
+    //         WHERE 
+    //         am_item_wargar_slno=?`,
+    //         [
+    //             data.warrenty_status,
+    //             data.guarenty_status,
+    //             data.from_date,
+    //             data.to_date,
+    //             data.troll_free,
+    //             data.ph_one,
+    //             data.ph_two,
+    //             data.address,
+    //             data.edit_user,
+    //             data.remarks,
+    //             data.am_item_wargar_slno,
+    //         ],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callback(error);
+    //             }
+    //             return callback(null, results);
+    //         }
+    //     )
+    // },
+    WarentGraruntyUpdate: (data, callback) => {
         pool.query(
             `UPDATE am_item_map_wargrarnt_detail SET 
             warrenty_status=?,
@@ -686,10 +730,12 @@ module.exports = {
             troll_free=?,
             ph_one=?,
             ph_two=?,
-            address=?,   
-            edit_user=?
+            address=?,
+            file_upload_status=?,
+            edit_user=?,
+            remarks=?
             WHERE 
-            am_item_map_slno=?`,
+            am_item_wargar_slno=?`,
             [
                 data.warrenty_status,
                 data.guarenty_status,
@@ -699,8 +745,10 @@ module.exports = {
                 data.ph_one,
                 data.ph_two,
                 data.address,
+                data.file_upload_status,
                 data.edit_user,
-                data.am_item_map_slno,
+                data.remarks,
+                data.am_item_wargar_slno,
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -710,7 +758,6 @@ module.exports = {
             }
         )
     },
-
     WarentGraruntyInsertSpare: (data, callback) => {
 
         pool.query(
@@ -727,7 +774,9 @@ module.exports = {
             address,      
             create_user
           )
-          VALUES(?,?,?,?,?,?,?,?,?,?)`,
+
+          VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
+
             [
                 data.am_spare_item_map_slno,
                 data.warrenty_status,
@@ -738,7 +787,9 @@ module.exports = {
                 data.ph_one,
                 data.ph_two,
                 data.address,
-                data.create_user
+                data.file_upload_status,
+                data.create_user,
+                data.remarks
             ],
 
             (error, results, fields) => {
@@ -763,7 +814,7 @@ module.exports = {
             address=?, 
             edit_user=?
             WHERE 
-            am_spare_item_map_slno=?`,
+            am_item_wargar_slno=?`,
             [
                 data.warrenty_status,
                 data.guarenty_status,
@@ -774,7 +825,7 @@ module.exports = {
                 data.ph_two,
                 data.address,
                 data.edit_user,
-                data.am_spare_item_map_slno,
+                data.am_item_wargar_slno,
             ],
             (error, results, feilds) => {
                 if (error) {

@@ -12,7 +12,8 @@ const { backupDetailsInsert,
     MonthlyDetailsDelete,
     WeekDetailsDelete,
     YearDetailsDelete,
-    SelectedDaysDelete
+    SelectedDaysDelete,
+    getDeptwiseBackup
 } = require('./backupDetails.controller');
 router.post('/insertMast', checkToken, backupDetailsInsert);
 router.post('/detailInsert', checkToken, scheduleTimeInsert);
@@ -27,4 +28,8 @@ router.post('/monthdelete', checkToken, MonthlyDetailsDelete);
 router.post('/weekdelete', checkToken, WeekDetailsDelete);
 router.post('/yeardelete', checkToken, YearDetailsDelete);
 router.post('/seldaysdelete', checkToken, SelectedDaysDelete);
+
+router.get('/getDeptwiseBackup/:id', checkToken, getDeptwiseBackup);
+
+
 module.exports = router;

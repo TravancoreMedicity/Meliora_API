@@ -24,30 +24,30 @@ const {
     getWeeklyDetails,
     getWeeklyVerifiedDetails
 } = require('./backupdash.controller');
-router.get('/select', checkToken, getSelectedDaysBackup);
-router.get('/days', checkToken, getSelectedDays);
+router.get('/select/:id', checkToken, getSelectedDaysBackup);
+router.get('/days/:id', checkToken, getSelectedDays);
 router.get('/exist', checkToken, DaysAlreadyExist);
 router.post('/add', checkToken, SelectedDaysInsert);
 router.post('/altdaysverified', checkToken, getSelectedDaysVerified);
 
-router.get('/selectdaily', checkToken, getDailyBackup);
+router.get('/selectdaily/:id', checkToken, getDailyBackup);
 router.get('/lastday', checkToken, getLastDayOfBackup);
 router.post('/insertdaily', checkToken, backupDailyInsert);
-router.get('/daydetails', checkToken, getDailyDetailsForVerification);
+router.get('/daydetails/:id', checkToken, getDailyDetailsForVerification);
 router.post('/dayverified', checkToken, getDailyVerifiedDetails);
 
-router.get('/weekly', checkToken, getWeeklyBackup);
+router.get('/weekly/:id', checkToken, getWeeklyBackup);
 router.post('/insertweek', checkToken, backupWeeklyInsert);
-router.get('/weeklydetails', checkToken, getWeeklyDetails);
+router.get('/weeklydetails/:id', checkToken, getWeeklyDetails);
 router.post('/weekverified', checkToken, getWeeklyVerifiedDetails);
 
-router.get('/monthly', checkToken, getMonthlyBackup);
+router.get('/monthly/:id', checkToken, getMonthlyBackup);
 router.post('/insertmonthly', checkToken, backupMonthlyInsert);
-router.get('/monthdetails', checkToken, getMonthlyDetailsForVerification);
+router.get('/monthdetails/:id', checkToken, getMonthlyDetailsForVerification);
 router.post('/monthverified', checkToken, getMonthVerified);
 
-router.get('/yearly', checkToken, getYearlyBackup);
+router.get('/yearly/:id', checkToken, getYearlyBackup);
 router.post('/insertyearly', checkToken, backupYearlyInsert);
-router.get('/yeardetails', checkToken, getYearlyDetailsForVerification);
+router.get('/yeardetails/:id', checkToken, getYearlyDetailsForVerification);
 router.post('/yearverified', checkToken, getYearVerified);
 module.exports = router;

@@ -32,26 +32,49 @@ module.exports = {
         })
     },
 
+    // getBackupEmployee: (req, res) => {
+    //     getBackupEmployee((err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (Object.keys(results).length === 0) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 data: []
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 2,
+    //             data: results
+    //         })
+    //     })
+    // },
+
     getBackupEmployee: (req, res) => {
-        getBackupEmployee((err, results) => {
+        const id = req.params.id;
+        getBackupEmployee(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
-                })
+                });
             }
-            if (Object.keys(results).length === 0) {
+            if (!results) {
                 return res.status(200).json({
                     success: 1,
-                    data: []
-                })
+                    message: "No Data"
+                });
             }
             return res.status(200).json({
                 success: 2,
                 data: results
-            })
+            });
         })
     },
+
     verificationUpdate: (req, res) => {
         const body = req.body;
         const body_result = validateBackupVerification.validate(body)

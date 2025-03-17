@@ -16,10 +16,24 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
+
 app.use(cors({
     origin: ['http://localhost:3000', 'http://192.168.22.8:3000'],
     credentials: true
 }));
+
+
+
+// const server = http.createServer(app);
+// const io = socketUtils.WSIO(server)
+// socketUtils.connection(io);
+
+// const socketIOMiddlewre = (req, res, next) => {
+//     req.io = io;
+//     next();
+// }
+
+
 
 // ----- logger display For Info ----
 app.get('/info', (req, res) => {
@@ -218,29 +232,41 @@ const med_vallet_master = require('./api/med_vallet/med_vallet.router')
 const mv_vehicle_registration = require('./api/mv_vehicle_registration/mv_vehicle.router');
 const userRegistration = require("./api/usermanagement/user.router");
 const feedbackforms = require('./api/Feedback/Feedback.router')
+const backuptypemast = require('./api/it_backup_type_master/backup_type.router')
+const simOperators = require('./api/it_sim_operators/sim_operators.router')
 const { validateTokenFrontend } = require("./authentication/ValidationCheck");
 const { validateAccessToken } = require("./api/tokenValidation/tokenValidation");
 
 
 app.use(express.json({ limit: '50mb' }));
 
-// app.use((req, res, next) => {
+app.use((req, res, next) => {
 
 
-//     res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-//     res.header('Access-Control-Allow-Credentials', true);
-//     res.header(
-//         "Access-Control-Allow-Headers",
-//         "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-//     );
+    //     res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    //     res.header('Access-Control-Allow-Credentials', true);
+    //     res.header(
+    //         "Access-Control-Allow-Headers",
+    //         "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    //     );
 
-//     if (req.method === "OPTIONS") {
-//         res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
-//         return res.status(200).json({});
-//     }
-//     next();
-// });
+    //     if (req.method === "OPTIONS") {
+    //         res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
+    //         return res.status(200).json({});
+    //     }
+    //     next();
+    // });
 
+
+
+
+    if (req.method === "OPTIONS") {
+        res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
+        return res.status(200).json({});
+    }
+
+    next();
+});
 
 
 
@@ -407,14 +433,17 @@ app.use("/api/user", userRegistration);
 app.use("/api/feedback", feedbackforms);
 app.get('/api/validateToken', validateTokenFrontend)
 app.get('/api/validateAccessToken', validateAccessToken)
+app.use('/api/backuptypemast', backuptypemast)
+app.use('/api/simOperators', simOperators)
+app.get('/api/validateToken', validateTokenFrontend)
 
 /*
 
 app.use('/api/validatetoken',validateToken)
 app
 
-
 */
+
 
 server.listen(process.env.APP_PORT, () =>
     console.log(`Server Up and Running ${process.env.APP_PORT}`),

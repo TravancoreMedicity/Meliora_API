@@ -156,7 +156,7 @@ module.exports = {
     },
     getDeptStatus: (callBack) => {
         pool.query(
-            `SELECT dept_id,
+            `SELECT dept_id,    
              dept_name 
              FROM co_department_mast WHERE dept_status=1 order by dept_name ASC`,
             (error, results, feilds) => {

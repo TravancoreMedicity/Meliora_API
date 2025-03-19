@@ -1,9 +1,10 @@
 const { requestRegistInsert, deleteCrfReq, requestRegistInsertDetl, requestApprovalInsert, InHodExist, getAllReqBasedDept,
     getDetailItemList, EditItemListByReqno, UpdateReqMaster, getApprovListOthers, getAllReqBasedDeptreq,
-    deleteItemDetails, getAllPendingApprovalsAboveHOD, getPoList, searchCrfDetails, getAllHoldAndRejectItems,
-    insertApprvitemsStatus, deleteCrfReqApproval, deleteCrfRegItemDetl, updateApproveStatus, getackPending,
+    deleteItemDetails, getAllPendingApprovalsAboveHOD, getPoList, searchCrfDetails, getAllHoldAndRejectItems, getStoreMasterUpdate,
+    insertApprvitemsStatus, deleteCrfReqApproval, deleteCrfRegItemDetl, updateApproveStatus, getackPending, getGetStoreMasterById,
     UpdateItemReceiveStatus, checkStoreReturnItem, insertReturnItemDetails, itemReturnDetailsForViewStore, getCommonMasterUpdate, getCommonMasterGetCat,
-    viewItemReturnDetails, returnReplyDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet } = require('./newRequestRegister.service');
+    viewItemReturnDetails, returnReplyDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet, getStoreMasterInsert, getGetStoreMaster
+} = require('./newRequestRegister.service');
 const logger = require('../../logger/logger');
 module.exports = {
 
@@ -665,7 +666,8 @@ module.exports = {
                     managing_director_req, managing_director_approve, managing_director_remarks, managing_director_analysis,
                     managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
                     hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
-                    TD.dept_id, TD.dept_name,TD.dept_type,internally_arranged_status,
+                    TD.dept_id, TD.dept_name,TD.dept_type,internally_arranged_status,crf_view_remark,crf_view_status,VD.dept_name as viewDep,
+                   VE.em_name as viewName,
 
                     ack_status, ack_remarks,PA.em_name as purchase_ackuser,crm_purchase_mast.create_date as ack_date,
                     quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
@@ -674,7 +676,7 @@ module.exports = {
                     po_prepartion, po_complete,po_complete_date,PC.em_name as pocomplete_user,crm_purchase_po_details.po_to_supplier,po_to_supplier_date,
                     crm_request_master.sub_store_recieve,approval_level,crm_purchase_po_details.store_recieve,
                     user_acknldge,sub_store_name,sub_store_slno,po_number,
-                    store_receive_date,CRS.em_name as crs_user,STR.em_name as store_user,substore_ack_date       
+                    crm_purchase_mast.store_receive_date,CRS.em_name as crs_user,STR.em_name as store_user,substore_ack_date       
                 FROM
                     crm_request_master
                     LEFT JOIN crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
@@ -705,6 +707,8 @@ module.exports = {
                     LEFT JOIN co_employee_master CRS ON CRS.em_id=crm_purchase_mast.store_receive_user
                     LEFT JOIN co_employee_master STR ON STR.em_id=crm_req_item_collect_details.substore_user
                     LEFT JOIN co_department_mast TD on TD.dept_id=R.dept_id
+                      LEFT JOIN co_department_mast VD ON VD.dept_id = crm_request_approval.crf_view_dep
+                    LEFT JOIN co_employee_master VE ON  VE.em_id = crm_request_approval.crf_view_Emid
                     LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno 
                 WHERE
                     (incharge_approve=1 OR hod_approve=1) ${filterSql}
@@ -1130,6 +1134,95 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 dataCat: results
+            })
+        })
+    },
+
+    getStoreMasterInsert: (req, res) => {
+        const body = req.body;
+        getStoreMasterInsert(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    dataCat: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                dataCat: results
+            })
+        })
+    },
+    getGetStoreMaster: (req, res) => {
+        const body = req.body;
+        getGetStoreMaster(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    dataCat: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+    getGetStoreMasterById: (req, res) => {
+        const body = req.body;
+        getGetStoreMasterById(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    dataCat: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+    getStoreMasterUpdate: (req, res) => {
+        const body = req.body;
+        getStoreMasterUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    dataCat: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
             })
         })
     },

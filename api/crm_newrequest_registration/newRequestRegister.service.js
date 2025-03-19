@@ -423,7 +423,8 @@ module.exports = {
                     managing_director_req, managing_director_approve, managing_director_remarks, managing_director_analysis,
                     managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
                    hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
-                   TD.dept_name,TD.dept_type,TD.dept_id,internally_arranged_status,
+                   TD.dept_name,TD.dept_type,TD.dept_id,internally_arranged_status,crf_view_remark,crf_view_status,VD.dept_name as viewDep,
+                   VE.em_name as viewName,
 
                    ack_status, ack_remarks,PA.em_name as purchase_ackuser,crm_purchase_mast.create_date as ack_date,
                    quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
@@ -432,7 +433,7 @@ module.exports = {
                    po_prepartion, po_complete,po_complete_date,PC.em_name as pocomplete_user,crm_purchase_po_details.po_to_supplier,po_to_supplier_date,
                    crm_request_master.sub_store_recieve,approval_level,crm_purchase_po_details.store_recieve,
                    user_acknldge,sub_store_name,sub_store_slno,store_receive,
-                   store_receive_date,CRS.em_name as crs_user,STR.em_name as store_user,substore_ack_date       
+                   crm_purchase_mast.store_receive_date,CRS.em_name as crs_user,STR.em_name as store_user,substore_ack_date       
            FROM
                   crm_request_master
               LEFT JOIN crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
@@ -463,7 +464,10 @@ module.exports = {
               LEFT JOIN co_employee_master CRS ON CRS.em_id=crm_purchase_mast.store_receive_user
               LEFT JOIN co_employee_master STR ON STR.em_id=crm_req_item_collect_details.substore_user
               LEFT JOIN co_department_mast TD on TD.dept_id=R.dept_id
-              LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno 
+                LEFT JOIN co_department_mast VD ON VD.dept_id = crm_request_approval.crf_view_dep
+              LEFT JOIN co_employee_master VE ON  VE.em_id = crm_request_approval.crf_view_Emid
+              LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno
+            
         WHERE
              user_deptsec IN (?) AND user_acknldge is null
              GROUP BY crm_request_master.req_slno
@@ -472,6 +476,7 @@ module.exports = {
                 data
             ],
             (error, results, feilds) => {
+
                 if (error) {
                     return callBack(error);
                 }
@@ -514,7 +519,7 @@ module.exports = {
                    po_prepartion, po_complete,po_complete_date,PC.em_name as pocomplete_user,crm_purchase_po_details.po_to_supplier,po_to_supplier_date,
                    crm_request_master.sub_store_recieve,approval_level,crm_purchase_po_details.store_recieve,
                    user_acknldge,user_acknldge_remarks,ackUser.em_name as acknowUser,user_ack_date,sub_store_name,store_receive,
-                   sub_store_slno, store_receive_date,CRS.em_name as crs_user,STR.em_name as store_user,substore_ack_date
+                   sub_store_slno, crm_purchase_mast.store_receive_date,CRS.em_name as crs_user,STR.em_name as store_user,substore_ack_date
             FROM
                   crm_request_master
               LEFT JOIN crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
@@ -714,7 +719,7 @@ module.exports = {
                    po_prepartion, po_complete,po_complete_date,PC.em_name as pocomplete_user,crm_purchase_po_details.po_to_supplier,po_to_supplier_date,
                    crm_request_master.sub_store_recieve,approval_level,crm_purchase_po_details.store_recieve,
                    user_acknldge,user_acknldge_remarks,ackUser.em_name as acknowUser,user_ack_date,sub_store_name,
-                   sub_store_slno, store_receive_date,CRS.em_name as crs_user,STR.em_name as store_user,substore_ack_date,
+                   sub_store_slno, crm_purchase_mast.store_receive_date,CRS.em_name as crs_user,STR.em_name as store_user,substore_ack_date,
                    po_number,user_acknldge,internally_arranged_status
              FROM
                   crm_request_master
@@ -811,7 +816,7 @@ module.exports = {
                    crm_purchase_mast
                 LEFT JOIN crm_request_master ON crm_request_master.req_slno=crm_purchase_mast.req_slno     
             WHERE 
-                  user_acknldge IS NULL AND user_deptsec=? AND sub_store_recieve=1
+                  user_acknldge IS NULL AND user_deptsec=? AND crm_request_master.sub_store_recieve=1
 		    GROUP BY crm_purchase_slno`,
             [id],
             (err, results, fields) => {
@@ -1087,6 +1092,126 @@ module.exports = {
                 data.editRowData
             ],
             (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getStoreMasterInsert: (data, callback) => {
+        pool.query(
+            `INSERT INTO crm_store_mapping_master (
+                store,sub_store,department,dp_section,emid
+                           
+               )
+                VALUES(?,?,?,?,?)`,
+            [
+                JSON.stringify(data.crsstore),
+                JSON.stringify(data.subStoreList),
+                data.dept,
+                data.deptsec,
+                data.empId
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getGetStoreMaster: (data, callback) => {
+        pool.query(
+            `SELECT 
+              crm_store_mapping_master.Store_slno, 
+              store,
+              sub_store,
+              department,
+              dp_section,
+              emid,
+              dept_name,
+              sec_name,
+              em_name,
+              GROUP_CONCAT(DISTINCT sub_store_master.sub_store_name ORDER BY sub_store_master.crm_store_master_slno) AS sub_store_names,
+              COALESCE(store_data.store_names, '') AS store_names
+              FROM 
+              crm_store_mapping_master
+              LEFT JOIN co_department_mast ON co_department_mast.dept_id = crm_store_mapping_master.department
+              LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id = crm_store_mapping_master.dp_section       
+              LEFT JOIN co_employee_master OM ON OM.em_id = crm_store_mapping_master.emid
+              LEFT JOIN 
+              crm_store_master AS sub_store_master
+              ON JSON_CONTAINS(crm_store_mapping_master.sub_store, CAST(sub_store_master.crm_store_master_slno AS JSON), '$')
+              LEFT JOIN (
+              SELECT 
+              crm_store_mapping_master.Store_slno, 
+              GROUP_CONCAT(DISTINCT sub_store_master.main_store ORDER BY sub_store_master.main_store_slno) AS store_names
+              FROM 
+              crm_store_mapping_master
+              LEFT JOIN 
+              crm_store_master AS sub_store_master
+              ON JSON_CONTAINS(crm_store_mapping_master.store, CAST(sub_store_master.main_store_slno AS JSON), '$')
+              GROUP BY 
+              crm_store_mapping_master.Store_slno
+              ) AS store_data ON store_data.Store_slno = crm_store_mapping_master.Store_slno
+              GROUP BY 
+              crm_store_mapping_master.Store_slno, 
+              sub_store,
+              store,
+              department,
+              dp_section,
+              emid,
+              dept_name,
+              sec_name,
+              em_name;
+                 `,
+            [
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    getGetStoreMasterById: (data, callback) => {
+        pool.query(
+            `SELECT * FROM crm_store_mapping_master where emid =?`,
+            [
+                data.empsecid
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    getStoreMasterUpdate: (data, callback) => {
+
+        pool.query(
+            `UPDATE crm_store_mapping_master 
+            SET store = ?,
+            sub_store=?,
+            department=?,
+            dp_section=?
+            WHERE emid = ?`,
+            [
+                JSON.stringify(data.crsstore),
+                JSON.stringify(data.subStoreList),
+                data.dept,
+                data.deptsec,
+                data.empId,
+            ],
+            (error, results, feilds) => {
+
                 if (error) {
                     return callback(error);
                 }

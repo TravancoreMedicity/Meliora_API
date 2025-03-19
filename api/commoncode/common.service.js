@@ -31,7 +31,7 @@ module.exports = {
         pool.query(
             `SELECT 
             menu_slno
-            FROM meliora.menu_master `,
+            FROM menu_master `,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -46,7 +46,7 @@ module.exports = {
             `SELECT 
             em_id,
             em_name
-            FROM meliora.co_employee_master `,
+            FROM co_employee_master `,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -61,7 +61,7 @@ module.exports = {
             `SELECT 
             mod_grp_slno,
             mod_grp_name
-            FROM meliora.module_group_mast `,
+            FROM module_group_mast `,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -165,7 +165,7 @@ where module_slno = ?`,
         pool.query(
             `SELECT diet_patient.dietpt_slno,diet_patient.ip_no,diet_patient.pt_no,doc_name,rcc_desc,
             ptc_ptname,bdc_no,diet_patient.bd_code,plan_status,ora_roommaster.rmc_desc,ora_roomtype.rtc_desc,ipd_date
-            FROM meliora.diet_patient
+            FROM diet_patient
               LEFT JOIN ora_doctor on diet_patient.do_code=ora_doctor.do_code
             left join diet_plan on diet_patient.pt_no = diet_plan.pt_no
             left join ora_bed on diet_patient.bd_code =ora_bed.bd_code
@@ -354,7 +354,7 @@ where module_slno = ?`,
     },
     getEmployeedeptSec: (id, callBack) => {
         pool.query(
-            `SELECT em_id,em_no,em_name FROM meliora.co_employee_master where em_dept_section=? 
+            `SELECT em_id,em_no,em_name FROM co_employee_master where em_dept_section=? 
             and em_status=1 and em_no!=1 and em_id!=1606 order by em_name ASC`,
             [
                 id

@@ -3,7 +3,7 @@ const { pool } = require('../../config/database');
 module.exports = {
     kotItemInsert: (data, callBack) => {
         pool.query(
-            `INSERT INTO meliora.kot_item_master 
+            `INSERT INTO kot_item_master 
             (
             item_name,
             grp_slno,
@@ -70,8 +70,8 @@ module.exports = {
             if(kot_item_master.status = 1 ,'Yes','No') kotstatus,
             kot_item_master.status,
             kot_item_master.em_id 
-            from  meliora.kot_item_master
-            left join meliora.item_group on kot_item_master.grp_slno = item_group.grp_slno
+            from  kot_item_master
+            left join item_group on kot_item_master.grp_slno = item_group.grp_slno
             order by item_slno desc`,
             [],
             function (err, results) {
@@ -85,7 +85,7 @@ module.exports = {
     },
     updatekotitem: (data, callBack) => {
         pool.query(
-            `update meliora.kot_item_master
+            `update kot_item_master
             set item_name = ? ,
             grp_slno=?,
             rate=?,

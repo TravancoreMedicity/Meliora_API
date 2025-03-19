@@ -78,7 +78,7 @@ module.exports = {
 
     getComplaintcount: (id, callBack) => {
         pool.query(
-            `call meliora.GET_COMPLAINT_COUNT(?)`,
+            `call GET_COMPLAINT_COUNT(?)`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -103,7 +103,7 @@ module.exports = {
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
         if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
         compalint_status
-         from meliora.cm_complaint_detail
+         from cm_complaint_detail
          left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
          left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
          left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
@@ -142,7 +142,7 @@ module.exports = {
                            when compalint_status = '3' then "Verified" end ) as compalint_status1,
         if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
         compalint_status
-         from meliora.cm_complaint_detail
+         from cm_complaint_detail
          left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
          left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
          left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
@@ -220,7 +220,7 @@ module.exports = {
 
     getAllCompDeptwiseCount: (id, callBack) => {
         pool.query(
-            `call meliora.GET_COMPLAINT_COUNT_ALL_DEPT(?)`,
+            `call GET_COMPLAINT_COUNT_ALL_DEPT(?)`,
             [id],
             (error, results, fields) => {
                 if (error) {

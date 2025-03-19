@@ -1745,7 +1745,7 @@ module.exports = {
 
         pool.query(
             `SELECT
-                    store_receive,sub_store_recieve
+                    store_receive,crm_request_master.sub_store_recieve
              FROM
                     crm_purchase_mast
                 LEFT JOIN crm_request_master ON crm_request_master.req_slno=crm_purchase_mast.req_slno     
@@ -1759,6 +1759,31 @@ module.exports = {
                     return callBack(error);
                 }
                 return callBack(null, results);
+            }
+        );
+    },
+
+    InsertCrfViewInsert: (data, callback) => {
+        pool.query(
+            `UPDATE crm_request_approval 
+            SET crf_view_remark = ?,
+            crf_view_status = ?,
+            crf_view_dep=?,
+            crf_view_Emid=?
+            WHERE req_slno =?`,
+            [
+                data?.ViewCrfRemark,
+                data?.status,
+                data?.empdept,
+                data?.empid,
+                data?.req_slno,
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
             }
         );
     },

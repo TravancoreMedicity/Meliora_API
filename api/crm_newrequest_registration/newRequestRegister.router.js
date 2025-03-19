@@ -1,10 +1,10 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { requestRegistInsert, InHodExist, getAllReqBasedDept, getDetailItemList, UpdateReqMaster, getApprovListOthers,
-    getAllReqBasedDeptreq, deleteItemDetails, getAllPendingApprovalsAboveHOD, getPoList, searchCrfDetails,
+    getAllReqBasedDeptreq, deleteItemDetails, getAllPendingApprovalsAboveHOD, getPoList, searchCrfDetails, getStoreMasterInsert, getGetStoreMaster,
     getAllHoldAndRejectItems, getackPending, UpdateItemReceiveStatus, checkStoreReturnItem, insertReturnItemDetails, getCommonMasterUpdate,
-    itemReturnDetailsForViewStore, returnReplyDetails, viewItemReturnDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet, getCommonMasterGetCat
-} = require('./newRequestRegister.controller');
+    itemReturnDetailsForViewStore, returnReplyDetails, viewItemReturnDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet,
+    getCommonMasterGetCat, getGetStoreMasterById, getStoreMasterUpdate } = require('./newRequestRegister.controller');
 
 router.post("/InsertRegMast", checkToken, requestRegistInsert);
 router.patch("/deleteItemList", checkToken, deleteItemDetails);
@@ -41,6 +41,11 @@ router.post("/CommonMaster", checkToken, getCommonMaster);
 router.post("/CommonMasterGet", checkToken, getCommonMasterGet);
 router.post("/CommonMasterUpdate/update", checkToken, getCommonMasterUpdate);
 router.post("/CommonMasterGetCat", checkToken, getCommonMasterGetCat);
+router.post("/StoreMaster", checkToken, getStoreMasterInsert);
+router.get("/GetStoreMaster", checkToken, getGetStoreMaster);
+router.post("/GetStoreMasterById", checkToken, getGetStoreMasterById);
+router.post("/StoreMaster/update", checkToken, getStoreMasterUpdate);
+
 
 
 module.exports = router;

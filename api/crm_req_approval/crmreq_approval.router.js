@@ -3,7 +3,7 @@ const { checkToken } = require("../../authentication/token_validation");
 const { updateInchargeApproval, InactiveItemDetail, getItemListApproval, InchargeApproveDetail, DetailApprvInsert,
     updateCrfClose, updateHODApproval, updateDMSApproval, updateMSApproval, updateMOApproval, updateSMOApproval,
     updateGMApproval, updateMDApproval, updateEDApproval, CrfDeptDataCollectInsert, DataCollectComplete, getDataCollectList,
-    CrfDataCollactnSave, getAllForPdfView, getFinalItemListApproval, getMaxItemSlno, AddMoreItemsDetails, updateUserAck,
+    CrfDataCollactnSave, getAllForPdfView, getFinalItemListApproval, getMaxItemSlno, AddMoreItemsDetails, updateUserAck, InsertCrfViewInsert,
     DetailItemReject, DetailItemOnHold, getStoreReceiveStatus, getItemStatus, updateInternallyArranged, updateManagingApproval, updateuserAckInternally
 } = require('../crm_req_approval/crmreq_approval.controller');
 
@@ -46,5 +46,6 @@ router.patch("/internallyArranged", checkToken, updateInternallyArranged);
 router.get("/receiveStatus/:id", checkToken, getStoreReceiveStatus);
 router.patch("/userAckInternally", checkToken, updateuserAckInternally);
 
+router.post("/CrfViewInsert", checkToken, InsertCrfViewInsert);
 
 module.exports = router;

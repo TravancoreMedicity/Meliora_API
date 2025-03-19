@@ -150,7 +150,7 @@ module.exports = {
     },
     getEmployee: (id, callBack) => {
         pool.query(
-            ` SELECT em_id, em_name ,em_no FROM meliora.co_employee_master where em_department=?
+            ` SELECT em_id, em_name ,em_no FROM co_employee_master where em_department=?
             and em_status=1 and em_no!=1 and em_id!=1606 order by em_name ASC `,
             [
                 id
@@ -238,7 +238,7 @@ module.exports = {
                  if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
                  compalint_status,cm_verfy_time,cm_not_verify_time,cm_rectify_time,pending_onhold_user,
                  pending_onhold_time,verify_spervsr
-                  from meliora.cm_complaint_detail
+                  from cm_complaint_detail
                   left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
                   left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
                   left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
@@ -289,7 +289,7 @@ module.exports = {
     },
     getassistantEmployee: (data, callBack) => {
         pool.query(
-            ` SELECT em_id, em_name FROM meliora.co_employee_master where em_department=? and em_id !=?
+            ` SELECT em_id, em_name FROM co_employee_master where em_department=? and em_id !=?
             and em_status=1 and em_no!=1 and em_id!=1606`,
             [
                 data.em_department,
@@ -485,7 +485,7 @@ module.exports = {
                     RD.dept_name as empdept,verify_spervsr,
                     compalint_date,
                     compalint_priority
-            from meliora.cm_complaint_detail
+            from cm_complaint_detail
                     left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
                     left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
                     left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
@@ -565,7 +565,7 @@ module.exports = {
                     if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
                     if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
                     compalint_status,verify_spervsr
-                from meliora.cm_complaint_detail
+                from cm_complaint_detail
                     left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
                     left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
                     left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno
@@ -605,7 +605,7 @@ module.exports = {
                     if(complaint_remark is null,"No Remark",complaint_remark) as complaint_remark,
                     if(cm_complaint_mast.complaint_hicslno is null,'Not Suggested',hic_policy_name) as hic_policy_name,
                     compalint_status,verify_spervsr
-                from meliora.cm_complaint_detail
+                from cm_complaint_detail
                     left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
                     left join co_request_type on co_request_type.req_type_slno=cm_complaint_mast.complaint_request_slno
                     left join co_deptsec_mast S on S.sec_id=cm_complaint_mast.complaint_dept_secslno

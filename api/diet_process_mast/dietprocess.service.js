@@ -22,7 +22,7 @@ module.exports = {
     },
     dietProcessinsert: (data, callBack) => {
         pool.query(
-            `insert into meliora.diet_process_mast 
+            `insert into diet_process_mast 
             (
             plan_slno,
             dmenu_slno,
@@ -58,7 +58,7 @@ module.exports = {
     },
     updateDietplan: (data, callBack) => {
         pool.query(
-            `update meliora.diet_plan
+            `update diet_plan
             set 
             process=1
             where plan_slno = ?`,
@@ -86,7 +86,7 @@ module.exports = {
             process_status,
             discharge_status,
             em_id
-             FROM meliora.diet_process_mast;`, [],
+             FROM diet_process_mast;`, [],
             function (err, results) {
 
                 if (err) {
@@ -98,7 +98,7 @@ module.exports = {
     },
     updatedietprocess: (data, callBack) => {
         pool.query(
-            `UPDATE meliora.diet_process_mast 
+            `UPDATE diet_process_mast 
         set 
         plan_slno = ?,
         dmenu_slno=?,
@@ -127,7 +127,7 @@ module.exports = {
             `SELECT diet_rate_list.type_slno , 
             diet_rate_list.hosp_rate,
             diet_rate_list.cant_rate 
-            FROM meliora.diet_plan            
+            FROM diet_plan            
             left join ora_bed on ora_bed.bd_code =diet_plan.bd_code 
             left join ora_roomtype on  ora_roomtype.rt_code=ora_bed.rt_code 
             left join ora_roomcategory on  ora_roomcategory.rc_code=ora_roomtype.rc_code 
@@ -153,7 +153,7 @@ module.exports = {
             cant_rate as rate_cant,
             diet_menu_setting_detl.type_slno,
             diet_process_mast.dmenu_slno
-             FROM  meliora.diet_process_mast
+             FROM  diet_process_mast
              left join diet_master on diet_process_mast.diet_slno = diet_master.diet_slno
              left join diet_menu_setting_detl on diet_process_mast.dmenu_slno = diet_menu_setting_detl.dmenu_slno
              left join diet_rate_list on diet_menu_setting_detl.type_slno = diet_rate_list.type_slno
@@ -198,7 +198,7 @@ module.exports = {
             diet_rate_list.type_slno,
             diet_rate_list.hosp_rate,
             diet_rate_list.cant_rate
-            FROM meliora.diet_menu_setting
+            FROM diet_menu_setting
             left join diet_master on diet_menu_setting.diet_slno = diet_master.diet_slno
             left join diet_menu_setting_detl on diet_menu_setting.dmenu_slno = diet_menu_setting_detl.dmenu_slno
             left join diet_rate_list on diet_master.diet_slno = diet_rate_list.diet_slno

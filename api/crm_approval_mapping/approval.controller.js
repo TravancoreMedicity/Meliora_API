@@ -4,7 +4,6 @@ module.exports = {
         const body = req.body;
         checKCompany(body, (err, checkResult) => {
             const value = JSON.parse(JSON.stringify(checkResult))
-            console.log(value, "exist");
 
             if (Object.keys(value).length === 0) {
                 approvalInsert(body, (err, results) => {

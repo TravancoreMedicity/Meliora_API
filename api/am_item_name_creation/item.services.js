@@ -3,7 +3,7 @@ module.exports = {
     ItemNameInsert: (data, callback) => {
 
         pool.query(
-            `INSERT INTO meliora.am_item_name_creation
+            `INSERT INTO am_item_name_creation
           ( 
             item_asset_type_slno,
             item_type_slno,

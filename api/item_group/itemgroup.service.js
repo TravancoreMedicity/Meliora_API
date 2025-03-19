@@ -3,7 +3,7 @@ const { pool } = require('../../config/database');
 module.exports = {
     itemgroupInsert: (data, callBack) => {
         pool.query(
-            `INSERT into meliora.item_group
+            `INSERT into item_group
             (
           
            group_name,
@@ -49,7 +49,7 @@ module.exports = {
         if(status = 1 ,'Yes','No') as grpstatus,
         status,
         em_id
-        from  meliora.item_group`, [],
+        from  item_group`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);
@@ -63,7 +63,7 @@ module.exports = {
     updateItemgrp: (data, callBack) => {
 
         pool.query(
-            `UPDATE meliora.item_group
+            `UPDATE item_group
             SET  
             group_name =?,
             status=?
@@ -102,7 +102,7 @@ module.exports = {
     },
     getItemgrpname: (callBack) => {
         pool.query(
-            `SELECT grp_slno,group_name  FROM meliora.item_group; `,
+            `SELECT grp_slno,group_name  FROM item_group; `,
             [],
             (error, results, feilds) => {
                 if (error) {

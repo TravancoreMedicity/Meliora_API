@@ -2,7 +2,7 @@ const { pool } = require('../../config/database')
 module.exports = {
     ItemcreationdeptInsert: (data, callback) => {
         pool.query(
-            `INSERT INTO meliora.am_asset_item_map_master
+            `INSERT INTO am_asset_item_map_master
           ( 
             item_creation_slno,
             item_dept_slno,
@@ -33,7 +33,7 @@ module.exports = {
     insertItemAdditional: (data, callback) => {
 
         pool.query(
-            `INSERT INTO meliora.am_asset_item_map_master
+            `INSERT INTO am_asset_item_map_master
           ( 
             item_creation_slno,
             item_dept_slno,

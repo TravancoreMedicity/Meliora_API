@@ -78,7 +78,7 @@ const otherbillstorage = multer.diskStorage({
         cb(null, filename);
     },
 });
-const maxSize = 2 * 1024 * 1024
+const maxSize = 3 * 1024 * 1024
 // for monthly bill multiple file upload
 const uploadmonthly = multer({
     storage: monthlystorage,

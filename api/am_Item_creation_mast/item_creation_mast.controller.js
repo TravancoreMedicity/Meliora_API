@@ -8,14 +8,12 @@ const { ItemcreationdeptInsert, insertItemAdditional, getInsertData, getItemsFro
 module.exports = {
     ItemcreationdeptInsert: (req, res) => {
         const body = req.body;
-
         var custodian = body.map((val) => {
             return val.item_custodian_dept
         })
         var xx = custodian.find((e) => e)
 
         getCustdyBasedLastAssetNo(xx, (err, results) => {
-
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({
@@ -44,9 +42,7 @@ module.exports = {
                 })
             }
             const assetno = JSON.parse(JSON.stringify(results[0]))
-
             let no = assetno.item_asset_no_only
-
             var newList = body.map((val, index) => {
                 return [val.item_creation_slno, val.item_dept_slno, val.item_deptsec_slno,
                 val.item_room_slno, val.item_subroom_slno, val.item_rack_slno, val.item_create_status,

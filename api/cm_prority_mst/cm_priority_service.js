@@ -104,8 +104,12 @@ module.exports = {
     },
     PrioritySelectCmp: (callback) => {
         pool.query(
-            ` SELECT cm_priority_slno, cm_priority_desc                        
-            FROM cm_priority_mast`,
+            ` SELECT cm_priority_slno, cm_priority_desc    ,
+            escalation_min,escalation_max                    
+            FROM cm_priority_mast
+            where
+            cm_priority_status=1
+            `,
             [],
             (error, results, fields) => {
                 if (error) {

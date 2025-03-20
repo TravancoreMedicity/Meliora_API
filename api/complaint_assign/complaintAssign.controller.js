@@ -3,8 +3,9 @@ const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign, getcomplai
     detailedAssigncompstatus, getassistantEmployee, insertAssistemp, getALLcomplaintbyEmployee, getIndividualassitemployee,
     AssistantRecieved, checkInsertVal, TransferDept, assignedListNotRectifiedOnly, rectifiedListForVErify,
     AssistMultiple, getALLAssignedComList, EmployeeInactive, beforAssignHold, empTransInactive,
-    sendMeassageUser, ReadMeassageUser, AssistReqListAll, getAssistRequestEmps, assistTransInactive,
-    AssisttransferInsert, SupervsrVerifyPending, SupervsrVerify, ReopenComplaintInsert
+    sendMeassageUser, ReadMeassageUser, AssistReqListAll, getAssistRequestEmps, assistTransInactive, AssistReqEmployee,
+    AssisttransferInsert, SupervsrVerifyPending, SupervsrVerify, ReopenComplaintInsert, AskQuery, changeQueryStatus, getQuery, replyQuery, AssistanceReject,
+    getAssistRequestDetails
 } = require('../complaint_assign/complaintAssign.service');
 const logger = require('../../logger/logger');
 const { default: Expo } = require('expo-server-sdk');
@@ -282,8 +283,6 @@ module.exports = {
         });
     },
     AssistantRecieved: (req, res) => {
-
-
         const body = req.body
         AssistantRecieved(body, (err, results) => {
             if (err) {
@@ -296,10 +295,31 @@ module.exports = {
             req.io.emit("message", `New Complaint Registed ! Please Check`)
             return res.status(200).json({
                 success: 1,
-                message: "Assisted Successfully"
+                message: "Assist Request Accepted"
             });
         });
     },
+
+    AssistanceReject: (req, res) => {
+        const body = req.body
+        AssistanceReject(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            req.io.emit("message", `New Complaint Registed ! Please Check`)
+            return res.status(200).json({
+                success: 1,
+                message: "Assist Request Rejected"
+            });
+        });
+    },
+
+
+
     TransferDept: (req, res) => {
 
 
@@ -394,7 +414,7 @@ module.exports = {
                 req.io.emit("message", `New Complaint Registed ! Please Check`)
                 return res.status(200).json({
                     success: 1,
-                    message: "Complaint Assist Requested Successfullt"
+                    message: "Assistance Requested"
                 });
             }
 
@@ -653,6 +673,7 @@ module.exports = {
     },
     SupervsrVerifyPending: (req, res) => {
         const id = req.params.id
+
         SupervsrVerifyPending(id, (err, results) => {
             if (err) {
                 logger.logwindow(err)
@@ -674,9 +695,8 @@ module.exports = {
             });
         });
     },
+
     SupervsrVerify: (req, res) => {
-
-
         const body = req.body
         SupervsrVerify(body, (err, results) => {
             if (err) {
@@ -717,6 +737,139 @@ module.exports = {
                 });
 
             }
+        });
+    },
+    AskQuery: (req, res) => {
+        const body = req.body;
+        AskQuery(body, (err, result) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (result) {
+                const patchdata = {
+                    complaint_slno: body.complaint_slno,
+                    cm_query_status: 1,
+                }
+                changeQueryStatus(patchdata, (err, resl) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Raised a Query Successfully",
+
+                    })
+                })
+            }
+        })
+    },
+    getQuery: (req, res) => {
+        const body = req.body;
+        getQuery(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    replyQuery: (req, res) => {
+        const body = req.body;
+        replyQuery(body, (err, result) => {
+
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (result) {
+
+
+                const patchdata = {
+                    complaint_slno: body.complaint_slno,
+                    cm_query_status: 2,
+                }
+                changeQueryStatus(patchdata, (err, resl) => {
+
+
+
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Message added ",
+
+                    })
+                })
+            }
+        })
+    },
+
+    AssistReqEmployee: (req, res) => {
+        const body = req.body;
+        AssistReqEmployee(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getAssistRequestDetails: (req, res) => {
+        const id = req.params.id
+        getAssistRequestDetails(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Complaints"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
         });
     },
 }

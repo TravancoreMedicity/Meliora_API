@@ -16,12 +16,16 @@ module.exports = {
             co_deptsec_mast.sec_name,
             am_item_map_slno,
              item_asset_no,
-            item_asset_no_only
+            item_asset_no_only,
+            am_custodian_dept_slno,
+            item_custodian_dept,
+            item_custodian_dept_sec
             from am_asset_item_map_master
             left join co_deptsec_mast on co_deptsec_mast.sec_id =am_asset_item_map_master.item_deptsec_slno
             left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
             left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno
             left join am_group on am_group.group_slno=am_item_name_creation.item_group_slno
+            left join am_custodian_department on am_custodian_department.am_custodian_slno=am_asset_item_map_master.item_custodian_dept
             where am_asset_item_map_master.item_asset_no=? and am_asset_item_map_master.item_asset_no_only=?`,
             [
                 data.item_asset_no,
@@ -120,8 +124,7 @@ module.exports = {
 
 
     PasswordMasterView: (callback) => {
-        pool.query(
-
+        pool.query(          
             `SELECT 
             pswd_mast_slno,
             am_item_name_creation.item_creation_slno,

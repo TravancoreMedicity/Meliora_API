@@ -79,6 +79,7 @@ module.exports = {
             // left join cm_hic_policy on cm_complaint_mast.complaint_hicslno = cm_hic_policy.hic_policy_slno
             // where cm_complaint_mast.create_user =?  ORDER BY compalint_date DESC `,
             `select complaint_slno,
+            cm_asset_status,
             complaint_desc,
             req_type_name,
             complaint_dept_secslno,

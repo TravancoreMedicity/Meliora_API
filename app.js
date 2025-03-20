@@ -214,6 +214,12 @@ const SpareCondemService = require('./api/am_spare_condemnation/am_spare_condemn
 const opAseessment = require('./api/qi_initial_assessment_details/assessment.router')
 const feedbackdata = require('./api/feedback_module/feedback.router')
 const qideptAccess = require('./api/qi_dept_access_mast/dept_access_router')
+const complaintFileUpload = require('./api/cm_file_upload/cm_file_upload.router')
+const complaintHoldReason = require('./api/cm_complaint_hold_reason_mast/hold_reason.router')
+const assetSpareDetails = require('./api/am_spare_service_details/spare_service_details.router')
+const AmServiceFileUpload = require('./api/am_asset_serviced_file_upload/service_file_upload.router')
+const Amdashboard = require('./api/am_dashboard/am_dashboard.router')
+const Ticketdashboard = require('./api/cm_dashboard/cm_dashboard.router')
 const med_vallet_master = require('./api/med_vallet/med_vallet.router')
 const mv_vehicle_registration = require('./api/mv_vehicle_registration/mv_vehicle.router');
 
@@ -405,16 +411,18 @@ app.use('/api/SpareCondemService', SpareCondemService)
 app.use('/api/InitialAsessment', opAseessment)
 app.use('/api/feedback', feedbackdata)
 app.use('/api/qideptAccess', qideptAccess)
-
-
 app.use('/api/medvallet', med_vallet_master)
 app.use('/api/medvehilces', mv_vehicle_registration)
-
 app.use('/api/backuptypemast', backuptypemast)
 app.use('/api/simOperators', simOperators)
-
-
-
+app.use('/api/medvallet', med_vallet_master)
+app.use('/api/medvehilces', mv_vehicle_registration)
+app.use('/api/complaintFileUpload', complaintFileUpload)
+app.use('/api/complaintHoldReason', complaintHoldReason)
+app.use('/api/assetSpareDetails', assetSpareDetails)
+app.use('/api/AmServiceFileUpload', AmServiceFileUpload)
+app.use('/api/Amdashboard', Amdashboard)
+app.use('/api/Ticketdashboard', Ticketdashboard)
 app.use('/api/medvallet', med_vallet_master)
 app.use('/api/medvehilces', mv_vehicle_registration)
 
@@ -436,7 +444,6 @@ app.use('/api/approvalMapping', approvalMapping)
 
 
 server.listen(process.env.APP_PORT, () =>
-    console.log("xcbvhcvb"),
     
     console.log(`Server Up and Running ${process.env.APP_PORT}`),
     logger.productionLogger.log('info', `Server Up and Running ${process.env.APP_PORT}`, { meta1: 'meta1' })

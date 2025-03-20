@@ -436,6 +436,8 @@ app.use('/api/approvalMapping', approvalMapping)
 
 
 server.listen(process.env.APP_PORT, () =>
+    console.log("xcbvhcvb"),
+    
     console.log(`Server Up and Running ${process.env.APP_PORT}`),
     logger.productionLogger.log('info', `Server Up and Running ${process.env.APP_PORT}`, { meta1: 'meta1' })
 );

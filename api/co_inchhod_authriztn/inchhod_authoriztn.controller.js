@@ -54,6 +54,7 @@ module.exports = {
 
     AuthUpdateData: (req, res) => {
         const body = req.body;
+        
         AuthUpdateData(body, (err, results) => {
             if (err) {
                 return res.status(400).json({
@@ -79,7 +80,7 @@ module.exports = {
         const id = req.params.id;
         getDeptSeconId(id, (err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: err

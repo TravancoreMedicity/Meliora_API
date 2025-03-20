@@ -608,6 +608,7 @@ module.exports = {
     },
 
     WarentGarantInsertOrNot: (id, callBack) => {
+
         pool.query(
             `SELECT *           
             FROM am_item_map_wargrarnt_detail
@@ -651,12 +652,11 @@ module.exports = {
             troll_free,
             ph_one,
             ph_two,
-            address,
-            file_upload_status,
+            address,          
             create_user,
             remarks
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 data.am_item_map_slno,
                 data.warrenty_status,
@@ -667,7 +667,6 @@ module.exports = {
                 data.ph_one,
                 data.ph_two,
                 data.address,
-                data.file_upload_status,
                 data.create_user,
                 data.remarks,
             ],
@@ -730,8 +729,7 @@ module.exports = {
             troll_free=?,
             ph_one=?,
             ph_two=?,
-            address=?,
-            file_upload_status=?,
+            address=?,       
             edit_user=?,
             remarks=?
             WHERE 
@@ -745,7 +743,6 @@ module.exports = {
                 data.ph_one,
                 data.ph_two,
                 data.address,
-                data.file_upload_status,
                 data.edit_user,
                 data.remarks,
                 data.am_item_wargar_slno,
@@ -772,10 +769,11 @@ module.exports = {
             ph_one,
             ph_two,
             address,      
-            create_user
+            create_user,
+            remarks
           )
 
-          VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
 
             [
                 data.am_spare_item_map_slno,
@@ -787,7 +785,6 @@ module.exports = {
                 data.ph_one,
                 data.ph_two,
                 data.address,
-                data.file_upload_status,
                 data.create_user,
                 data.remarks
             ],
@@ -811,7 +808,8 @@ module.exports = {
             troll_free=?,
             ph_one=?,
             ph_two=?,
-            address=?, 
+            address=?,
+            remarks=?,
             edit_user=?
             WHERE 
             am_item_wargar_slno=?`,
@@ -824,6 +822,7 @@ module.exports = {
                 data.ph_one,
                 data.ph_two,
                 data.address,
+                data.remarks,
                 data.edit_user,
                 data.am_item_wargar_slno,
             ],

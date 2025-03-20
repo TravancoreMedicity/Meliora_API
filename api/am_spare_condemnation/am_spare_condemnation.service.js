@@ -4,14 +4,16 @@ module.exports = {
         pool.query(
             `Select
                     am_service_details.condm_transfr_emp,
+                    am_item_map_details.am_manufacture_no,
+                     am_item_map_details.am_asset_old_no,                    
                     am_bill_amount,
-                     am_condem_detail_slno, 
+                    am_condem_detail_slno, 
                     condem_mast_slno,                 
                     am_condem_reason,
                     item_status,
                     keep_inscarp_status,
-                    keep_in_srap_store_reason
-                    , scarp_store_emp,
+                    keep_in_srap_store_reason,
+                    scarp_store_emp,
                     condm_transf_remarks,
                     complaint_slno,
                     ROW_NUMBER() over (order by am_spare_item_map_slno) as slno,am_spare_item_map_master.am_spare_item_map_slno,
@@ -30,8 +32,8 @@ module.exports = {
                     left join am_service_details on am_service_details.am_spare_item_slno=am_spare_item_map_master.am_spare_item_map_slno
                     left join co_employee_master on co_employee_master.em_id=am_service_details.condm_transfr_emp
                     left join am_item_map_details on am_item_map_details.am_spare_item_map_slno =am_spare_item_map_master.am_spare_item_map_slno
-                    left join am_condemnation_details on am_condemnation_details.am_spare_item_slno=am_spare_item_map_master.am_spare_item_map_slno
-                    where am_custodian_dept_slno=? and spare_condamtn=1     
+                    left join am_condemnation_details on am_condemnation_details.am_spare_item_slno=am_spare_item_map_master.am_spare_item_map_slno                  
+                    where am_custodian_dept_slno=? and spare_condamtn=1  and submited_condemnation=0
                     group by am_spare_item_map_slno                
                     order by deleted_date desc`,
             [id],
@@ -49,14 +51,16 @@ module.exports = {
             `select
                     category_name,
                     am_bill_amount,
+                    am_item_map_details.am_manufacture_no,
+                    am_item_map_details.am_asset_old_no, 
                     complaint_slno,
                     am_condem_detail_slno,
-                    condem_mast_slno,                 
+                    condem_mast_slno,                
                     am_condem_reason,
                     item_status,
                     keep_inscarp_status,
-                    keep_in_srap_store_reason
-                    , scarp_store_emp,
+                    keep_in_srap_store_reason,
+                    scarp_store_emp,
                     condm_transf_remarks,
                     ROW_NUMBER() over (order by am_item_map_slno) as slno,
                     em_name as condm_trans_user,
@@ -72,8 +76,8 @@ module.exports = {
                     left join am_service_details on am_service_details.am_asset_item_slno=am_asset_item_map_master.am_item_map_slno
                     left join co_employee_master on co_employee_master.em_id=am_service_details.condm_transfr_emp
                     left join am_item_map_details on am_item_map_details.am_Item_map_slno =am_asset_item_map_master.am_item_map_slno
-                     left join am_condemnation_details on am_condemnation_details.am_asset_item_slno=am_asset_item_map_master.am_item_map_slno
-                    where am_custodian_dept_slno=? and asset_item_condmnation=1
+                    left join am_condemnation_details on am_condemnation_details.am_asset_item_slno=am_asset_item_map_master.am_item_map_slno                    
+                    where am_custodian_dept_slno=? and asset_item_condmnation=1     and submited_condemnation=0           
                     group by am_item_map_slno
                     order by item_condm_date desc`,
 
@@ -217,6 +221,7 @@ module.exports = {
         pool.query(
             `select
             am_category_pm_days,
+            am_item_map_details.am_manufacture_no,
             em_name,
             am_asset_transfer_master.transfrd_employee,
             am_amc_cmc_master.from_date,

@@ -886,8 +886,8 @@ WHERE serial_slno = 3
             })
     },
     insertFeedbackQuestAnswer: (data, callBack) => {
-        const { answer, fb_transact_slno, create_user } = data
-        return Promise.all(answer.map((items) => {
+        const { answer, fb_transact_slno, create_user } = data;
+        return Promise.all(answer?.map((items) => {
             return new Promise((resolve, reject) => {
                 pool.query(
                     `
@@ -901,7 +901,7 @@ WHERE serial_slno = 3
                         fb_suggestion,
                         create_user
                     ) 
-                    VALUES (?, ?, ?, ?, ?,?,?,?)
+                    VALUES (?,?,?,?,?,?,?,?)
                     `,
                     [
                         fb_transact_slno,
@@ -914,6 +914,8 @@ WHERE serial_slno = 3
                         create_user,
                     ],
                     (error, results, fields) => {
+                        // console.log(results, "result");
+
                         if (error) {
                             return callBack(error)
                         }
@@ -2737,20 +2739,40 @@ ORDER BY
             fb_bd_code,
             fb_bdc_no,
             fb_ns_code,
+            fb_overall_condition,
+            fb_overall_remarks,
+            fb_it_status,
+            fb_maintenance_status,
+            fb_biomedical_status,
+            fb_biomedical_emp_assign, 
+            fb_it_emp_assign, 
+            fb_maintenace_emp_assign,
             fb_bed_reason,
-            fb_bed_remarks,
+            fb_it_remark,
+            fb_biomedical_remarks,
+            fb_maintenace_remark,
             fb_bed_status,
             create_user
             ) 
-            VALUES(?,?,?,?,?,?,?,?)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             `,
             [
                 data.fb_bed_slno,
                 data.fb_bd_code,
                 data.fb_bdc_no,
                 data.fb_ns_code,
+                data.fb_overall_condition,
+                data.fb_overall_remarks,
+                data.fb_it_status,
+                data.fb_maintenance_status,
+                data.fb_biomedical_status,
+                data.fb_biomedical_emp_assign,
+                data.fb_it_emp_assign,
+                data.fb_maintenace_emp_assign,
                 data.fb_bed_reason,
-                data.fb_bed_remarks,
+                data.fb_it_remark,
+                data.fb_biomedical_remarks,
+                data.fb_maintenace_remark,
                 data.fb_bed_status,
                 data.create_user
             ],
@@ -2798,7 +2820,272 @@ ORDER BY
                 }
                 return callBack(null, results)
             })
-    }
+    },
+    CheckIfRemarkAlreadyExist: (data, callBack) => {
+        pool.query(
+            `select fb_bed_rmk_slno,fb_bd_code from fb_bed_remarks where fb_bed_slno = ? and fb_bd_code = ?`,
+            [
+                data.fb_bed_slno,
+                data.fb_bd_code
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    FetchInsertIdBedRemark: (data, callBack) => {
+        pool.query(
+            `select fb_bed_rmk_slno,fb_bd_code,fb_bed_slno from fb_bed_remarks where fb_bed_slno = ? and fb_bd_code = ?`,
+            [
+                data.fb_bed_slno,
+                data.fb_bd_code
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    InsertBedRemarkDetail: (data, callBack) => {
+        // Create promises for each item in the data
+        const promises = data?.map((item) => {
+            const { name, values, fb_bed_rmk_slno, create_user } = item;
+            return values?.map((value) => {
+                const fb_dep_name = name;
+                // Use Object.keys() to get the keys (asset names) from the value object
+                return Object.keys(value).map((fb_asset_name) => {
+                    const fb_asset_status = value[fb_asset_name]; // Get the status (1 or 0)
+
+                    const query = `
+                        INSERT INTO fb_bed_remark_detail (
+                            fb_bed_rmk_slno,
+                            fb_dep_name,
+                            fb_asset_name,
+                            fb_asset_status,
+                            create_user
+                        )
+                        VALUES (?, ?, ?, ?, ?)
+                    `;
+                    const valuesToInsert = [
+                        fb_bed_rmk_slno,
+                        fb_dep_name,
+                        fb_asset_name,
+                        fb_asset_status,
+                        create_user
+                    ];
+
+                    // Return the promise for the query execution
+                    return new Promise((resolve, reject) => {
+                        pool.query(query, valuesToInsert, (error, results) => {
+                            if (error) {
+                                reject(error);
+                            } else {
+                                resolve(results);
+                            }
+                        });
+                    });
+                });
+            }).flat();
+        }).flat(); // Flatten the outer array of promises
+
+        // Use Promise.all to wait for all insertions to complete
+        Promise.all(promises)
+            .then((results) => {
+                callBack(null, results);
+            })
+            .catch((error) => {
+                callBack(error);
+            });
+    },
+    getbedremarkDetail: (data, callBack) => {
+        pool.query(
+            `select  fb_bed_slno, 
+                fb_bd_code,
+                fb_bdc_no, 
+                fb_ns_code,
+                fb_bed_status,
+                fb_bed_reason,
+                fb_biomedical_emp_assign,
+                fb_it_emp_assign,
+                fb_maintenace_emp_assign,
+                fb_overall_condition,
+                fb_overall_remarks,
+                fb_it_status,
+                fb_maintenance_status,
+                fb_biomedical_status,
+                fb_it_remark,
+                fb_biomedical_remarks,
+                fb_maintenace_remark,
+                fb_dep_name,
+                fb_asset_name,
+                fb_asset_status
+            from fb_bed_remarks 
+                left join fb_bed_remark_detail on fb_bed_remarks.fb_bed_rmk_slno = fb_bed_remark_detail.fb_bed_rmk_slno
+                where fb_bd_code = ?`,
+            [
+                data
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    updatebedremarks: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE fb_bed_remarks
+            SET
+                fb_bd_code = ?,
+                fb_bdc_no = ?,
+                fb_ns_code = ?,
+                fb_overall_condition = ?,
+                fb_overall_remarks = ?,
+                fb_it_status = ?,
+                fb_maintenance_status = ?,
+                fb_biomedical_status = ?,
+                fb_biomedical_emp_assign = ?, 
+                fb_it_emp_assign = ?, 
+                fb_maintenace_emp_assign = ?,
+                fb_bed_reason = ?,
+                fb_it_remark = ?,
+                fb_biomedical_remarks = ?,
+                fb_maintenace_remark = ?,
+                fb_bed_status = ?,
+                edit_user = ?
+            WHERE fb_bed_rmk_slno = ?`,
+            [
+                data.fb_bd_code,
+                data.fb_bdc_no,
+                data.fb_ns_code,
+                data.fb_overall_condition,
+                data.fb_overall_remarks,
+                data.fb_it_status,
+                data.fb_maintenance_status,
+                data.fb_biomedical_status,
+                data.fb_biomedical_emp_assign,
+                data.fb_it_emp_assign,
+                data.fb_maintenace_emp_assign,
+                data.fb_bed_reason,
+                data.fb_it_remark,
+                data.fb_biomedical_remarks,
+                data.fb_maintenace_remark,
+                data.fb_bed_status,
+                data.edit_user,
+                data.fb_bed_rmk_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    UpdateBedRemarkDetail: (data, callBack) => {
+        // Create promises for each item in the data
+        const promises = data?.map((item) => {
+            const { name, values, fb_bed_rmk_slno, create_user } = item;
+            return values?.map((value) => {
+                const fb_dep_name = name;
+                return Object.keys(value).map((fb_asset_name) => {
+                    const fb_asset_status = value[fb_asset_name];
+                    const query = `
+                        UPDATE fb_bed_remark_detail
+                        SET
+                            fb_dep_name = ?, 
+                            fb_asset_name = ?, 
+                            fb_asset_status = ?, 
+                            edit_user = ?
+                        WHERE fb_bed_rmk_slno = ? AND fb_asset_name = ?
+                    `;
+                    const valuesToUpdate = [
+                        fb_dep_name,
+                        fb_asset_name,
+                        fb_asset_status,
+                        create_user,
+                        fb_bed_rmk_slno,
+                        fb_asset_name
+                    ];
+                    return new Promise((resolve, reject) => {
+                        pool.query(query, valuesToUpdate, (error, results) => {
+                            if (error) {
+                                reject(error);
+                            } else {
+                                resolve(results);
+                            }
+                        });
+                    });
+                });
+            }).flat();
+        }).flat();
+        // Use Promise.all to wait for all updates to complete
+        Promise.all(promises)
+            .then((results) => {
+                callBack(null, results);
+            })
+            .catch((error) => {
+                callBack(error);
+            });
+    },
+    getberremarkstatus: (callBack) => {
+        pool.query(
+            `select  fb_bed_slno, 
+                fb_bd_code,
+                fb_bdc_no, 
+                fb_ns_code,
+                fb_bed_status,
+                fb_bed_reason,
+                fb_overall_condition,
+                fb_it_status,
+                fb_maintenance_status,
+                fb_biomedical_status,
+                fb_it_remark,
+                fb_biomedical_remarks,
+                fb_maintenace_remark
+            from 
+                fb_bed_remarks 
+                `,
+            [
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getallHousekeepingBeds: (callBack) => {
+        pool.query(
+            `select 	
+	            fb_bed_rmk_slno,
+	            fb_bed_slno,
+                fb_bd_code,
+                fb_bdc_no,
+                fb_ns_code,
+                fb_bed_reason,
+                fb_overall_remarks,
+                fb_bed_status,
+                create_date
+            from 
+                fb_bed_remarks
+            where 
+                fb_bed_status = 0
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+
+
 }
 
 

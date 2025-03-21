@@ -94,7 +94,15 @@ const {
     getallblockedbed,
     insertbedremarks,
     getllbedremarks,
-    getempdetail
+    getempdetail,
+    CheckIfRemarkAlreadyExist,
+    FetchInsertIdBedRemark,
+    InsertBedRemarkDetail,
+    getbedremarkDetail,
+    updatebedremarks,
+    UpdateBedRemarkDetail,
+    getberremarkstatus,
+    getallHousekeepingBeds
 } = require("./Feedback.service");
 
 module.exports = {
@@ -1915,20 +1923,146 @@ module.exports = {
         })
     },
     insertbedremarks: (req, res) => {
-        const data = req.body;
-        insertbedremarks(data, (error, results) => {
+        const Body = req.body;
+        const { fb_bed_slno, fb_bd_code, fb_bdc_no, data, fb_overall_condition, fb_bed_reason, create_user, fb_ns_code, fb_bed_status, fb_it_status, fb_maintenance_status, fb_biomedical_status, fb_it_remark, fb_biomedical_remarks, fb_maintenace_remark, fb_biomedical_emp_assign, fb_it_emp_assign, fb_maintenace_emp_assign, fb_overall_remarks } = Body;
+
+        const bioemployee = JSON.stringify(fb_biomedical_emp_assign);
+        const itemployee = JSON.stringify(fb_it_emp_assign);
+        const maintenaceemployee = JSON.stringify(fb_maintenace_emp_assign);
+
+        const insertdata = {
+            fb_bed_slno: fb_bed_slno,
+            fb_bd_code: fb_bd_code,
+            fb_bdc_no: fb_bdc_no,
+            fb_overall_condition: fb_overall_condition,
+            fb_overall_remarks: fb_overall_remarks,
+            fb_ns_code: fb_ns_code,
+            fb_it_status: fb_it_status,
+            fb_maintenance_status: fb_maintenance_status,
+            fb_biomedical_status: fb_biomedical_status,
+            fb_maintenace_emp_assign: maintenaceemployee,
+            fb_it_emp_assign: itemployee,
+            fb_biomedical_emp_assign: bioemployee,
+            fb_bed_reason: fb_bed_reason,
+            fb_it_remark: fb_it_remark,
+            fb_biomedical_remarks: fb_biomedical_remarks,
+            fb_maintenace_remark: fb_maintenace_remark,
+            fb_bed_status: fb_bed_status,
+            create_user: create_user
+        }
+        const searchData = {
+            fb_bed_slno: fb_bed_slno,
+            fb_bd_code: fb_bd_code
+        }
+        CheckIfRemarkAlreadyExist(searchData, (error, results) => {
             if (error) {
                 return res.status(200).json({
                     success: 0,
                     message: error
                 })
             }
+            const searchDetailId = results[0]?.fb_bed_rmk_slno
+            if (results.length === 0 || !results) {
+                insertbedremarks(insertdata, (error, results) => {
+                    if (error) {
+                        console.log(error, "error");
+
+                        return res.status(200).json({
+                            success: 0,
+                            message: error
+                        })
+                    }
+                    FetchInsertIdBedRemark(searchData, (error, results) => {
+                        if (error) {
+                            return res.status(200).json({
+                                success: 0,
+                                message: error
+                            })
+                        }
+                        const DetailId = results[0]?.fb_bed_rmk_slno
+                        const detailData = data.map((item) => {
+                            return {
+                                ...item,
+                                fb_bed_rmk_slno: DetailId,
+                                create_user: create_user
+                            };
+                        });
+                        if (results.length > 0 && DetailId) {
+                            InsertBedRemarkDetail(detailData, (error, results) => {
+                                if (error) {
+                                    return res.status(200).json({
+                                        success: 0,
+                                        message: error
+                                    })
+                                }
+                            })
+                        } else {
+                            return res.status(200).json({
+                                success: 0,
+                                message: 'Error in inserting Bed Detail'
+
+                            });
+                        }
+                    })
+
+                })
+            }
+            const update_data = {
+                fb_bed_slno: fb_bed_slno,
+                fb_bd_code: fb_bd_code,
+                fb_bdc_no: fb_bdc_no,
+                fb_overall_condition: fb_overall_condition,
+                fb_overall_remarks: fb_overall_remarks,
+                fb_ns_code: fb_ns_code,
+                fb_it_status: fb_it_status,
+                fb_maintenance_status: fb_maintenance_status,
+                fb_biomedical_status: fb_biomedical_status,
+                fb_maintenace_emp_assign: maintenaceemployee,
+                fb_it_emp_assign: itemployee,
+                fb_biomedical_emp_assign: bioemployee,
+                fb_bed_reason: fb_bed_reason,
+                fb_it_remark: fb_it_remark,
+                fb_biomedical_remarks: fb_biomedical_remarks,
+                fb_maintenace_remark: fb_maintenace_remark,
+                fb_bed_status: fb_bed_status,
+                create_user: create_user,
+                fb_bed_rmk_slno: searchDetailId
+            }
+            if (results.length > 0) {
+                updatebedremarks(update_data, (error, results) => {
+                    if (error) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: error
+                        })
+                    }
+
+                    const updatedetailData = data.map((item) => {
+                        return {
+                            ...item,
+                            fb_bed_rmk_slno: searchDetailId,
+                            edit_user: create_user
+                        };
+                    });
+
+                    UpdateBedRemarkDetail(updatedetailData, (error, results) => {
+                        if (error) {
+                            return res.status(200).json({
+                                success: 0,
+                                message: error
+                            })
+                        }
+                    })
+                })
+
+            }
             return res.status(200).json({
                 success: 2,
-                message: 'Successfully Inserted Remarks'
+                message: 'Successfully Inseted Data'
 
             });
         })
+
     },
     getllbedremarks: (req, res) => {
         getllbedremarks((error, results) => {
@@ -1974,6 +2108,74 @@ module.exports = {
             });
         });
     },
+    getbedremarkDetail: (req, res) => {
+        const id = req.params.id;
+        getbedremarkDetail(id, (err, results) => {
+            if (err) {
+                console.log(err);
+
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getberremarkstatus: (req, res) => {
+        getberremarkstatus((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getallHousekeepingBeds: (req, res) => {
+        getallHousekeepingBeds((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
+
 
 
 }

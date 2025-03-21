@@ -54,7 +54,10 @@ const {
     getallblockedbed,
     insertbedremarks,
     getllbedremarks,
-    getempdetail
+    getempdetail,
+    getbedremarkDetail,
+    getberremarkstatus,
+    getallHousekeepingBeds
 } = require("./Feedback.controller");
 
 
@@ -134,7 +137,10 @@ router.post('/insertbedremarks', insertbedremarks)
 router.get('/getllbedremarks', getllbedremarks)
 
 
-router.get('/getempdetail/:id',getempdetail)
+router.get('/getempdetail/:id', getempdetail)
+router.get('/getbedremarkDetail/:id', getbedremarkDetail)
+router.get('/getberremarkstatus', getberremarkstatus)
+router.get('/getallhkbeds', getallHousekeepingBeds)
 
 //edlider meliora table
 router.post('/insertbddetail', insertbddetail)

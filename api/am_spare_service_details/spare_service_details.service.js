@@ -152,7 +152,7 @@ module.exports = {
             LEFT JOIN co_employee_master ON co_employee_master.em_id = cm_complaint_detail.assigned_emp
             WHERE cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
             AND assign_status = 1
-            ) AS worked_employees
+            ) AS assigned_employees
             FROM
             am_spare_item_map_master
             LEFT JOIN am_item_name_creation ON am_item_name_creation.item_creation_slno = am_spare_item_map_master.spare_creation_slno
@@ -270,7 +270,7 @@ module.exports = {
                 and assign_status = 1
                 order by cm_complaint_detail.complaint_slno desc
                 limit 1
-                ) as worked_employees
+                ) as assigned_employees
                 from
                 am_asset_item_map_master    
                 left join am_item_name_creation on am_item_name_creation.item_creation_slno = am_asset_item_map_master.item_creation_slno

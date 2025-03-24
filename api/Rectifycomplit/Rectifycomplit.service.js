@@ -1090,7 +1090,7 @@ module.exports = {
             (SELECT GROUP_CONCAT(E.em_name SEPARATOR ', ') 
             FROM cm_complaint_detail D
             LEFT JOIN co_employee_master E ON D.assigned_emp = E.em_id
-            WHERE D.complaint_slno = cm_complaint_mast.complaint_slno AND D.assign_status = 1) AS assinged_employees
+            WHERE D.complaint_slno = cm_complaint_mast.complaint_slno AND D.assign_status = 1) AS assigned_employees
             FROM 
             cm_complaint_mast
             LEFT JOIN cm_complaint_detail ON cm_complaint_mast.complaint_slno = cm_complaint_detail.complaint_slno
@@ -1190,7 +1190,7 @@ module.exports = {
             (SELECT GROUP_CONCAT(E.em_name SEPARATOR ', ') 
             FROM cm_complaint_detail D
             LEFT JOIN co_employee_master E ON D.assigned_emp = E.em_id
-            WHERE D.complaint_slno = cm_complaint_mast.complaint_slno AND D.assign_status = 1) AS assinged_employees,
+            WHERE D.complaint_slno = cm_complaint_mast.complaint_slno AND D.assign_status = 1) AS assigned_employees,
                         U.em_name as verified_user_name
                         from 
                         cm_complaint_mast
@@ -1279,7 +1279,7 @@ module.exports = {
             //             (SELECT GROUP_CONCAT(E.em_name SEPARATOR ', ') 
             //             FROM cm_complaint_detail D
             //             LEFT JOIN co_employee_master E ON D.assigned_emp = E.em_id
-            //             WHERE D.complaint_slno = cm_complaint_mast.complaint_slno AND D.assign_status = 1) AS assinged_employees
+            //             WHERE D.complaint_slno = cm_complaint_mast.complaint_slno AND D.assign_status = 1) AS assigned_employees
             //             FROM 
             //             cm_complaint_mast
             //             LEFT JOIN cm_complaint_detail ON cm_complaint_mast.complaint_slno = cm_complaint_detail.complaint_slno
@@ -1847,7 +1847,7 @@ ORDER BY
     (SELECT GROUP_CONCAT(E.em_name)
      FROM cm_complaint_detail CD
      LEFT JOIN co_employee_master E ON E.em_id = CD.assigned_emp
-     WHERE CD.complaint_slno = cm_complaint_mast.complaint_slno AND CD.assign_status = 1) AS worked_employees
+     WHERE CD.complaint_slno = cm_complaint_mast.complaint_slno AND CD.assign_status = 1) AS assigned_employees
 from 
     cm_complaint_mast
 left join cm_complaint_detail ON cm_complaint_mast.complaint_slno = cm_complaint_detail.complaint_slno

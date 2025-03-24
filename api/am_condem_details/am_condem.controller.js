@@ -310,6 +310,7 @@ module.exports = {
         let sql = `
             SELECT
              am_condemnation_master.condem_mast_slno,
+             dept_name,
             inch_emp.em_name as incharge_employee,
             hod_emp.em_name as hod_employee,
             gm_emp.em_name as gm_opr_employee,
@@ -351,6 +352,7 @@ module.exports = {
             left join co_employee_master ac_emp on ac_emp.em_id=am_condemnation_master.acc_emp
             left join co_employee_master mm_emp on mm_emp.em_id=am_condemnation_master.material_mang_emp
             left join co_employee_master st_emp on st_emp.em_id=am_condemnation_master.store_approve_emp
+            left join co_department_mast  on co_department_mast.dept_id=am_condemnation_master.req_dept
             WHERE `;
 
         const queryParams = [];

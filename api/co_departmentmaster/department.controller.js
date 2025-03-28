@@ -216,7 +216,7 @@ module.exports = {
                 success: 1,
                 data: results
             });
-        });
+        }); 
     },
     getDepartmentId: (req, res) => {
         getDepartmentId((err, results) => {

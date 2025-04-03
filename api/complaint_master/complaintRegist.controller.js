@@ -1,6 +1,8 @@
 const { complaintRegistInsert, complaintRegistUpdate,
-    getcomplaintRegistByID, getcomplaintListbylogin, getcomplaintListbydept,
-    getcomplaintAll, getapptokenbydept, updateserialnum } = require('../complaint_master/complaintRegist.service');
+    getcomplaintRegistByID, getcomplaintListbylogin, getcomplaintListbydept, insertAssetArray, assetinactive,
+    getcomplaintAll, getapptokenbydept, updateserialnum, getAssetinComplaint, UpdateAssetinComplaint, getRoomsNameNdTypeList, getAssetsInRoom, getDeptSecWiseTicket,
+    SpareDetailsUndercomplaint, viewAllPendingTicket, deleteTicket
+} = require('../complaint_master/complaintRegist.service');
 const { validateComplaintRegist } = require('../../validation/validation_schema');
 const logger = require('../../logger/logger');
 const { default: Expo } = require('expo-server-sdk');
@@ -8,10 +10,10 @@ const { getCompSerialno } = require('../commoncode/common.service');
 const expo = new Expo()
 
 module.exports = {
+
+
     complaintRegistInsert: (req, res) => {
-
         // console.log(req.io)
-
         const body = req.body;
         //validate complaintdept Insert function
         const body_result = validateComplaintRegist.validate(body);
@@ -21,9 +23,7 @@ module.exports = {
                 message: body_result.error.details[0].message
             });
         }
-
         const slno = body.complaint_slno
-
         getCompSerialno((err, results) => {
             if (err) {
                 logger.errorLogger(err)
@@ -32,7 +32,6 @@ module.exports = {
                     message: err
                 });
             }
-
             if (!results) {
                 logger.infoLogger("No Records Found")
                 return res.status(200).json({
@@ -41,7 +40,6 @@ module.exports = {
                 });
             }
             if (slno === results[0].serial_current) {
-
                 complaintRegistInsert(body, (err, results) => {
                     if (err) {
                         logger.logwindow(err)
@@ -51,7 +49,6 @@ module.exports = {
                         })
                     }
                     if (results) {
-
                         getapptokenbydept(body.complaint_deptslno, (err, result) => {
                             if (err) {
                                 logger.logwindow(err)
@@ -114,7 +111,6 @@ module.exports = {
                         })
 
                         // let pushTicket = expo.sendPushNotificationsAsync()
-
                         updateserialnum((err, results) => {
                             if (err) {
                                 //logger.errorLogger(err)
@@ -132,6 +128,7 @@ module.exports = {
                             req.io.emit("message", `New Complaint Registed ! Please Check`)
                             return res.status(200).json({
                                 success: 1,
+                                insertId: slno,
                                 message: "Complaint Registered Successfully"
                             });
                         });
@@ -150,7 +147,6 @@ module.exports = {
                         })
                     }
                     if (results) {
-
                         getapptokenbydept(body.complaint_deptslno, (err, result) => {
                             if (err) {
                                 logger.logwindow(err)
@@ -163,11 +159,8 @@ module.exports = {
                             if (data.length > 0) {
 
                                 let emppushTokens = data?.map(val => val.app_token)
-
                                 // let somePushTokens = ['ExponentPushToken[9JbCJvDTrQ1DggVszGG6zk]'];
-
                                 if (Object.keys(emppushTokens).length > 0) {
-
                                     let messages = [];
                                     for (let pushToken of emppushTokens) {
 
@@ -185,9 +178,7 @@ module.exports = {
                                             color: '#d5fc5c'
                                         })
                                     }
-
                                     let chunks = expo.chunkPushNotifications(messages);
-
                                     let tickets = [];
                                     (async () => {
                                         // Send the chunks to the Expo push notification service. There are
@@ -208,12 +199,9 @@ module.exports = {
                                         }
                                     })()
                                 }
-
                             }
                         })
-
                         // let pushTicket = expo.sendPushNotificationsAsync()
-
                         updateserialnum((err, results) => {
                             if (err) {
                                 //logger.errorLogger(err)
@@ -231,17 +219,15 @@ module.exports = {
                             req.io.emit("message", `New Complaint Registed ! Please Check`)
                             return res.status(200).json({
                                 success: 1,
+                                insertId: body.complaint_slno,
                                 message: "Complaint Registered Successfully"
                             });
                         });
                     }
                 });
-
-
             }
         });
     },
-
     complaintRegistUpdate: (req, res) => {
         const body = req.body;
         const body_result = validateComplaintRegist.validate(body);
@@ -269,6 +255,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
+                Complt_id: body.complaint_slno,
                 message: "Complaint Department Updated Successfully"
             });
         });
@@ -390,5 +377,235 @@ module.exports = {
         });
     },
 
+    getAssetinComplaint: (req, res) => {
+        const id = req.params.id;
+        getAssetinComplaint(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+
+    UpdateAssetinComplaint: (req, res) => {
+        const body = req.body;
+        UpdateAssetinComplaint(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+            })
+        })
+    },
+
+
+
+    getRoomsNameNdTypeList: (req, res) => {
+        const id = req.params.id;
+        getRoomsNameNdTypeList(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+
+    getAssetsInRoom: (req, res) => {
+        const id = req.params.id
+        getAssetsInRoom(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    insertAssetArray: (req, res) => {
+        const body = req.body;
+        const data = body && body.map((val) => {
+            return [val.cm_complait_slno,
+            val.am_item_map_slno,
+            val.cm_am_assetmap_slno,
+            val.cm_asset_dept,
+            val.asset_status,
+            val.create_user
+            ]
+        })
+        insertAssetArray(data, (err, result) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                insertId: body.complaint_slno,
+
+            })
+        })
+    },
+
+    assetinactive: (req, res) => {
+        const body = req.body;
+
+        const result = assetinactive(body)
+            .then((r) => {
+                return res.status(200).json({
+                    success: 1,
+                    message: r
+                });
+            }).catch((e) => {
+                return res.status(200).json({
+                    success: 0,
+                    message: e.sqlMessage
+                });
+            })
+    },
+    getDeptSecWiseTicket: (req, res) => {
+        const id = req.params.id;
+        getDeptSecWiseTicket(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Record Found")
+                return res.status(400).json({
+                    success: 0,
+                    message: "No Record Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    SpareDetailsUndercomplaint: (req, res) => {
+        const id = req.params.id;
+        SpareDetailsUndercomplaint(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    viewAllPendingTicket: (req, res) => {
+        viewAllPendingTicket((err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+
+    deleteTicket: (req, res) => {
+        const { id } = req.params;
+        deleteTicket({ id }, (err, results) => {
+            if (err) {
+                logger.logwindow(err);
+                return res.status(400).json({
+                    success: 0,
+                    message: 'An error occurred while deleting the ticket',
+                });
+            }
+            if (!results || results.affectedRows === 0) {
+                logger.infologwindow("Ticket Not Found");
+                return res.status(400).json({
+                    success: 1,
+                    message: "Ticket Not Found",
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Ticket deleted successfully",
+            });
+        });
+    }
+
+
 }
+
+
+
 

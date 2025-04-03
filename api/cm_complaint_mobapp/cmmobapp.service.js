@@ -2,7 +2,9 @@ const { pool } = require('../../config/database')
 module.exports = {
     getTotalNotAssigncomplaints: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
+            `select
+            cm_asset_status,
+            cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno,
             complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
             compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
             rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
@@ -61,7 +63,9 @@ module.exports = {
 
     getAssignListEmp: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,complaint_dept_name,
+            `select
+            cm_asset_status,
+            cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,complaint_dept_name,
             req_type_name,complaint_type_name,
             S.sec_name as sec_name, cm_rectify_time,cm_verfy_time,
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
@@ -106,7 +110,9 @@ module.exports = {
 
     getAssistListEmp: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,complaint_dept_name,
+            `select
+            cm_asset_status,
+            cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,complaint_dept_name,
             req_type_name,complaint_type_name,
             S.sec_name as sec_name, cm_rectify_time,cm_verfy_time,
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
@@ -152,7 +158,9 @@ module.exports = {
     },
     getOnHoldListEmp: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,complaint_dept_name,
+            `select
+            cm_asset_status,
+             cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,complaint_dept_name,
             req_type_name,complaint_type_name,
             S.sec_name as sec_name, cm_rectify_time,cm_verfy_time,
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
@@ -232,7 +240,9 @@ module.exports = {
     },
     getforVerifyListEmp: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,complaint_dept_name,
+            `select
+            cm_asset_status,
+             cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,complaint_dept_name,
             req_type_name,complaint_type_name,
             S.sec_name as sec_name, cm_rectify_time,cm_verfy_time,
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
@@ -272,7 +282,7 @@ module.exports = {
     },
     getforSuperVerifyListEmp: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,complaint_dept_name,
+            `select cm_asset_status, cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,complaint_dept_name,
             req_type_name,complaint_type_name,
             S.sec_name as sec_name, cm_rectify_time,cm_verfy_time,
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
@@ -312,7 +322,7 @@ module.exports = {
     },
     getCompleteListEmp: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,complaint_dept_name,
+            `select cm_asset_status, cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,complaint_dept_name,
             req_type_name,complaint_type_name,
             S.sec_name as sec_name, cm_rectify_time,cm_verfy_time,
             IFNULL( L.sec_name,"Nil" ) location,cm_rectify_status,
@@ -353,7 +363,7 @@ module.exports = {
 
     getAssignListDeptWise: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
+            `select cm_asset_status, cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
             complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
             compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
             rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
@@ -396,7 +406,7 @@ module.exports = {
 
     getAssistListDeptWise: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
+            `select cm_asset_status, cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
             complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
             compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
             rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
@@ -439,7 +449,7 @@ module.exports = {
 
     getOnHoldListDeptWise: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
+            `select cm_asset_status, cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
             complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
             compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
             rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
@@ -482,7 +492,7 @@ module.exports = {
 
     getOnHoldBeforeAssigntDeptWise: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
+            `select cm_asset_status, cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
             complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
             compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
             rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
@@ -526,7 +536,7 @@ module.exports = {
 
     getOnProgressListDeptWise: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
+            `select cm_asset_status, cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
             complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
             compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
             rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
@@ -569,7 +579,7 @@ module.exports = {
 
     getforVerifyListDeptWise: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
+            `select cm_asset_status, cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
             complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
             compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
             rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
@@ -611,7 +621,7 @@ module.exports = {
     },
     getCompleteListDeptWiseToday: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
+            `select cm_asset_status, cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
             complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
             compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
             rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
@@ -655,7 +665,7 @@ module.exports = {
 
     getforSuperVerifyListDeptWise: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
+            `select cm_asset_status, cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
             complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
             compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
             rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,
@@ -698,7 +708,7 @@ module.exports = {
 
     getAssignListAllDetailDeptWise: (id, callBack) => {
         pool.query(
-            `select cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
+            `select cm_asset_status, cm_complaint_mast.complaint_slno, complaint_desc, complaint_request_slno, complaint_deptslno, 
             complaint_typeslno,compalint_priority, complaint_hicslno, complaint_dept_secslno, compalint_status, 
             compalint_date,complaint_remark,cm_rectify_time, cm_verfy_time, cm_rectify_status, 
             rectify_pending_hold_remarks, verify_remarks, cm_not_verify_time, cm_location,compalint_date,

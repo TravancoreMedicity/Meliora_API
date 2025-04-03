@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { checkToken } = require("../../authentication/token_validation");
-const { AmcCmcImage, AmcCmcImageView, BillMasterImage, BillMasterImageView,
-    LeaseMasterImage, LeaseMasterImageView
+const { AmcCmcImage, AmcCmcImageView, BillMasterImage, BillMasterImageView, LeaseMasterImage, LeaseMasterImageView, GaurenteeWarrenteeFile, GaurenteeWarrenteeFileView,
+    uploadCondemFile, getCondemFile
 } = require('../am_file_upload/am_fileupload.controller')
 
 router.post("/asset/AmcCmcImage", checkToken, AmcCmcImage)
@@ -12,6 +12,14 @@ router.get("/BillMasterImageView/:id", checkToken, BillMasterImageView)
 
 router.post("/asset/LeaseMasterImage", checkToken, LeaseMasterImage)
 router.get("/LeaseMasterImageView/:id", checkToken, LeaseMasterImageView)
+
+
+router.post("/asset/GaurenteeWarrentee", checkToken, GaurenteeWarrenteeFile)
+router.get("/GaurenteeWarrenteefileView/:id", checkToken, GaurenteeWarrenteeFileView)
+
+
+router.post("/uploadFile/uploadCondemnation", checkToken, uploadCondemFile)
+router.post("/uploadFile/getCondemnation", checkToken, getCondemFile)
 
 
 module.exports = router;

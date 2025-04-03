@@ -120,4 +120,22 @@ module.exports = {
             }
         );
     },
+    getSupplierData: (id, callBack) => {
+        pool.query(
+            `SELECT 
+            *
+            FROM
+            it_bill_supplier_details_mast
+            Where it_supplier_slno=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 }

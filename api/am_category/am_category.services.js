@@ -7,12 +7,14 @@ module.exports = {
           ( 
             category_name,
             category_status,
+            am_category_pm_days,
             create_user
           )
-          VALUES(?,?,?)`,
+          VALUES(?,?,?,?)`,
             [
                 data.category_name,
                 data.category_status,
+                data.am_category_pm_days,
                 data.create_user
             ],
 
@@ -30,6 +32,9 @@ module.exports = {
             category_slno,
             category_name, 
             category_status,
+            am_category_pm_days,
+            mime_type,
+            file_name,
             if(category_status=1,'Yes','No')status
             FROM
             am_category`, [],
@@ -49,6 +54,7 @@ module.exports = {
             `UPDATE am_category SET 
             category_name=?,
             category_status=?,
+            am_category_pm_days=?,
             edit_user=?
             WHERE 
             category_slno=?`,
@@ -58,6 +64,7 @@ module.exports = {
 
                 data.category_name,
                 data.category_status,
+                data.am_category_pm_days,
                 data.edit_user,
                 data.category_slno,
 

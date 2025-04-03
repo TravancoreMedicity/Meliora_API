@@ -214,61 +214,73 @@ module.exports = {
     getpendingApprovals: (data, callback) => {
         pool.query(
 
+            // `SELECT
+            // am_condemnation_master.condem_mast_slno,
+            // inch_emp.em_name as incharge_employee,
+            // hod_emp.em_name as hod_employee,
+            // gm_emp.em_name as gm_opr_employee,
+            // ac_emp.em_name as accounts_employee,
+            // mm_emp.em_name as material_mangm_employee,
+            // st_emp.em_name as store_approve_employee,   
+            // inch_apprv_reject_date,
+            // hod_apprv_reject_date,
+            // gm_apprv_reject_date,
+            // acc_apprv_reject_date,
+            // material_mange_apprv_reject_date,
+            // condem_form_prefix,
+            // condem_form_no,
+            // am_condem_reason,
+            // reg_date, 
+            // store_approve_status,          
+            // store_approve_remarks,
+            // req_dept, 
+            // condem_status, 
+            // incharge_approve_status, 
+            // incharge_remarks, 
+            // hod_approve_status, 
+            // hod_remarks, 
+            // gm_approve_status, 
+            // gm_approve_remarks, 
+            // acc_approve_status, 
+            // acc_approve_remarks,
+            // store_approve_reject_date,
+            // material_mangmnt_mangr_apprv_status, 
+            // material_mangmnt_mangr_apprv_remark, 
+            // am_condemnation_master.create_user,
+            // COUNT(CASE WHEN am_spare_item_slno IS NOT NULL THEN 1 END) AS count_of_spare,
+            // COUNT(CASE WHEN am_asset_item_slno IS NOT NULL THEN 1 END) AS count_of_asset
+            // FROM am_condemnation_master
+            // LEFT JOIN am_condemnation_details 
+            // ON am_condemnation_details.condem_mast_slno = am_condemnation_master.condem_mast_slno
+            // left join co_employee_master inch_emp on inch_emp.em_id=am_condemnation_master.inch_emp
+            // left join co_employee_master hod_emp on hod_emp.em_id=am_condemnation_master.hod_emp
+            // left join co_employee_master gm_emp on gm_emp.em_id=am_condemnation_master.gm_emp
+            // left join co_employee_master ac_emp on ac_emp.em_id=am_condemnation_master.acc_emp
+            // left join co_employee_master mm_emp on mm_emp.em_id=am_condemnation_master.material_mang_emp
+            // left join co_employee_master st_emp on st_emp.em_id=am_condemnation_master.store_approve_emp
+            // WHERE am_condemnation_master.req_dept = ?
+            // AND condem_status < ?
+            // AND condem_status > ?
+            // GROUP BY 
+            // am_condemnation_master.condem_mast_slno, condem_form_prefix, condem_form_no, 
+            // reg_date, req_dept, condem_status, incharge_approve_status, incharge_remarks, 
+            // hod_approve_status, hod_remarks, gm_approve_status, gm_approve_remarks, 
+            // acc_approve_status, acc_approve_remarks, material_mangmnt_mangr_apprv_status, 
+            // material_mangmnt_mangr_apprv_remark,am_condemnation_master.create_user
+            // order by condem_status desc`,
             `SELECT
-            am_condemnation_master.condem_mast_slno,
-            inch_emp.em_name as incharge_employee,
-            hod_emp.em_name as hod_employee,
-            gm_emp.em_name as gm_opr_employee,
-            ac_emp.em_name as accounts_employee,
-            mm_emp.em_name as material_mangm_employee,
-            st_emp.em_name as store_approve_employee,   
-            inch_apprv_reject_date,
-            hod_apprv_reject_date,
-            gm_apprv_reject_date,
-            acc_apprv_reject_date,
-            material_mange_apprv_reject_date,
-            condem_form_prefix,
-            condem_form_no,
-            am_condem_reason,
-            reg_date, 
-            store_approve_status,          
-            store_approve_remarks,
-            req_dept, 
-            condem_status, 
-            incharge_approve_status, 
-            incharge_remarks, 
-            hod_approve_status, 
-            hod_remarks, 
-            gm_approve_status, 
-            gm_approve_remarks, 
-            acc_approve_status, 
-            acc_approve_remarks,
-            store_approve_reject_date,
-            material_mangmnt_mangr_apprv_status, 
-            material_mangmnt_mangr_apprv_remark, 
-            am_condemnation_master.create_user,
+                *,
             COUNT(CASE WHEN am_spare_item_slno IS NOT NULL THEN 1 END) AS count_of_spare,
             COUNT(CASE WHEN am_asset_item_slno IS NOT NULL THEN 1 END) AS count_of_asset
             FROM am_condemnation_master
-            LEFT JOIN am_condemnation_details 
-            ON am_condemnation_details.condem_mast_slno = am_condemnation_master.condem_mast_slno
-            left join co_employee_master inch_emp on inch_emp.em_id=am_condemnation_master.inch_emp
-            left join co_employee_master hod_emp on hod_emp.em_id=am_condemnation_master.hod_emp
-            left join co_employee_master gm_emp on gm_emp.em_id=am_condemnation_master.gm_emp
-            left join co_employee_master ac_emp on ac_emp.em_id=am_condemnation_master.acc_emp
-            left join co_employee_master mm_emp on mm_emp.em_id=am_condemnation_master.material_mang_emp
-            left join co_employee_master st_emp on st_emp.em_id=am_condemnation_master.store_approve_emp
+            LEFT JOIN am_condemnation_details  ON am_condemnation_details.condem_mast_slno = am_condemnation_master.condem_mast_slno       
             WHERE am_condemnation_master.req_dept = ?
             AND condem_status < ?
             AND condem_status > ?
             GROUP BY 
             am_condemnation_master.condem_mast_slno, condem_form_prefix, condem_form_no, 
-            reg_date, req_dept, condem_status, incharge_approve_status, incharge_remarks, 
-            hod_approve_status, hod_remarks, gm_approve_status, gm_approve_remarks, 
-            acc_approve_status, acc_approve_remarks, material_mangmnt_mangr_apprv_status, 
-            material_mangmnt_mangr_apprv_remark,am_condemnation_master.create_user
+            reg_date, req_dept, condem_status
             order by condem_status desc`,
-
             [
 
                 data.empdept,
@@ -286,60 +298,72 @@ module.exports = {
 
     getAllpendingApprovals: (data, callback) => {
         pool.query(
-            `SELECT
-            am_condemnation_master.condem_mast_slno,
-            inch_emp.em_name as incharge_employee,
-            hod_emp.em_name as hod_employee,
-            gm_emp.em_name as gm_opr_employee,
-            ac_emp.em_name as accounts_employee,
-            mm_emp.em_name as material_mangm_employee,
-            st_emp.em_name as store_approve_employee,              
-            inch_apprv_reject_date,
-            hod_apprv_reject_date,
-            gm_apprv_reject_date,
-            acc_apprv_reject_date,
-            material_mange_apprv_reject_date,
-            condem_form_prefix,
-            condem_form_no,
-            am_condem_reason,
-            reg_date, 
-            req_dept, 
-            condem_status, 
-            incharge_approve_status, 
-            incharge_remarks, 
-            hod_approve_status,
-            store_approve_status,
-            store_approve_remarks,
-            hod_remarks, 
-            gm_approve_status, 
-            gm_approve_remarks, 
-            acc_approve_status, 
-            acc_approve_remarks, 
-            store_approve_reject_date,
-            material_mangmnt_mangr_apprv_status, 
-            material_mangmnt_mangr_apprv_remark, 
-            am_condemnation_master.create_user,
+            // `SELECT
+            // am_condemnation_master.condem_mast_slno,
+            // inch_emp.em_name as incharge_employee,
+            // hod_emp.em_name as hod_employee,
+            // gm_emp.em_name as gm_opr_employee,
+            // ac_emp.em_name as accounts_employee,
+            // mm_emp.em_name as material_mangm_employee,
+            // st_emp.em_name as store_approve_employee,              
+            // inch_apprv_reject_date,
+            // hod_apprv_reject_date,
+            // gm_apprv_reject_date,
+            // acc_apprv_reject_date,
+            // material_mange_apprv_reject_date,
+            // condem_form_prefix,
+            // condem_form_no,
+            // am_condem_reason,
+            // reg_date, 
+            // req_dept, 
+            // condem_status, 
+            // incharge_approve_status, 
+            // incharge_remarks, 
+            // hod_approve_status,
+            // store_approve_status,
+            // store_approve_remarks,
+            // hod_remarks, 
+            // gm_approve_status, 
+            // gm_approve_remarks, 
+            // acc_approve_status, 
+            // acc_approve_remarks, 
+            // store_approve_reject_date,
+            // material_mangmnt_mangr_apprv_status, 
+            // material_mangmnt_mangr_apprv_remark, 
+            // am_condemnation_master.create_user,
+            // COUNT(CASE WHEN am_spare_item_slno IS NOT NULL THEN 1 END) AS count_of_spare,
+            // COUNT(CASE WHEN am_asset_item_slno IS NOT NULL THEN 1 END) AS count_of_asset
+            // FROM am_condemnation_master
+            // LEFT JOIN am_condemnation_details 
+            // ON am_condemnation_details.condem_mast_slno = am_condemnation_master.condem_mast_slno
+            // left join co_employee_master inch_emp on inch_emp.em_id=am_condemnation_master.inch_emp
+            // left join co_employee_master hod_emp on hod_emp.em_id=am_condemnation_master.hod_emp
+            // left join co_employee_master gm_emp on gm_emp.em_id=am_condemnation_master.gm_emp
+            // left join co_employee_master ac_emp on ac_emp.em_id=am_condemnation_master.acc_emp
+            // left join co_employee_master mm_emp on mm_emp.em_id=am_condemnation_master.material_mang_emp
+            // left join co_employee_master st_emp on st_emp.em_id=am_condemnation_master.store_approve_emp
+            // WHERE
+            // condem_status < ?
+            // AND condem_status > ?
+            // GROUP BY 
+            // am_condemnation_master.condem_mast_slno, condem_form_prefix, condem_form_no, 
+            // reg_date, req_dept, condem_status, incharge_approve_status, incharge_remarks, 
+            // hod_approve_status, hod_remarks, gm_approve_status, gm_approve_remarks, 
+            // acc_approve_status, acc_approve_remarks, material_mangmnt_mangr_apprv_status, 
+            // material_mangmnt_mangr_apprv_remark,am_condemnation_master.create_user
+            // order by condem_status desc `,
+            ` SELECT
+                *,
             COUNT(CASE WHEN am_spare_item_slno IS NOT NULL THEN 1 END) AS count_of_spare,
             COUNT(CASE WHEN am_asset_item_slno IS NOT NULL THEN 1 END) AS count_of_asset
             FROM am_condemnation_master
-            LEFT JOIN am_condemnation_details 
-            ON am_condemnation_details.condem_mast_slno = am_condemnation_master.condem_mast_slno
-            left join co_employee_master inch_emp on inch_emp.em_id=am_condemnation_master.inch_emp
-            left join co_employee_master hod_emp on hod_emp.em_id=am_condemnation_master.hod_emp
-            left join co_employee_master gm_emp on gm_emp.em_id=am_condemnation_master.gm_emp
-            left join co_employee_master ac_emp on ac_emp.em_id=am_condemnation_master.acc_emp
-            left join co_employee_master mm_emp on mm_emp.em_id=am_condemnation_master.material_mang_emp
-            left join co_employee_master st_emp on st_emp.em_id=am_condemnation_master.store_approve_emp
-            WHERE
-            condem_status < ?
+            LEFT JOIN am_condemnation_details  ON am_condemnation_details.condem_mast_slno = am_condemnation_master.condem_mast_slno       
+            WHERE condem_status < ?
             AND condem_status > ?
             GROUP BY 
             am_condemnation_master.condem_mast_slno, condem_form_prefix, condem_form_no, 
-            reg_date, req_dept, condem_status, incharge_approve_status, incharge_remarks, 
-            hod_approve_status, hod_remarks, gm_approve_status, gm_approve_remarks, 
-            acc_approve_status, acc_approve_remarks, material_mangmnt_mangr_apprv_status, 
-            material_mangmnt_mangr_apprv_remark,am_condemnation_master.create_user
-            order by condem_status desc `,
+            reg_date, req_dept, condem_status
+            order by condem_status desc`,
             [
                 data.condemStatusFrom,
                 data.condemstatusTo

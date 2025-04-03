@@ -278,7 +278,6 @@ module.exports = {
 
     ApproveData: (req, res) => {
         const data = req.body;
-
         if (!data.condem_mast_slno) {
             return res.status(400).json({ error: "Missing condem_mast_slno" });
         }

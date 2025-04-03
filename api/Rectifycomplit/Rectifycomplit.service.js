@@ -371,6 +371,7 @@ module.exports = {
             complaint_slno DESC   `,
             [
                 data.assigned_emp
+
             ],
             (error, results, feilds) => {
                 if (error) {

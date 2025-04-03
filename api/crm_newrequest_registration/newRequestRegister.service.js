@@ -13,9 +13,10 @@ module.exports = {
                 emer_slno,
                 emergeny_remarks,
                 user_deptsec,
-                create_user               
+                create_user,
+                company_slno               
                )
-                VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.request_deptsec_slno,
                 data.actual_requirement,
@@ -27,7 +28,8 @@ module.exports = {
                 data.emer_slno,
                 data.emergeny_remarks,
                 data.user_deptsec,
-                data.create_user
+                data.create_user,
+                data.company_slno
             ],
             (error, results, fields) => {
 
@@ -424,7 +426,7 @@ module.exports = {
                     managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
                    hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
                    TD.dept_name,TD.dept_type,TD.dept_id,internally_arranged_status,crf_view_remark,crf_view_status,VD.dept_name as viewDep,
-                   VE.em_name as viewName,
+                   VE.em_name as viewName,company_name,crm_request_master.company_slno,
 
                    ack_status, ack_remarks,PA.em_name as purchase_ackuser,crm_purchase_mast.create_date as ack_date,
                    quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
@@ -467,6 +469,7 @@ module.exports = {
                 LEFT JOIN co_department_mast VD ON VD.dept_id = crm_request_approval.crf_view_dep
               LEFT JOIN co_employee_master VE ON  VE.em_id = crm_request_approval.crf_view_Emid
               LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno
+                 LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno
             
         WHERE
              user_deptsec IN (?) AND user_acknldge is null
@@ -484,6 +487,9 @@ module.exports = {
             }
         );
     },
+
+
+
 
     // crf Registartion page, View table data
     getAllReqBasedDeptreq: (id, callBack) => {
@@ -710,7 +716,7 @@ module.exports = {
                      managing_director_req, managing_director_approve, managing_director_remarks, managing_director_analysis,
                     managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
                    hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
-                   TD.dept_name,TD.dept_type,TD.dept_id,
+                   TD.dept_name,TD.dept_type,TD.dept_id,company_name,crm_request_master.company_slno,
 
                    ack_status, ack_remarks,PA.em_name as purchase_ackuser,crm_purchase_mast.create_date as ack_date,
                    quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
@@ -754,6 +760,7 @@ module.exports = {
                 LEFT JOIN co_employee_master STR ON STR.em_id=crm_req_item_collect_details.substore_user
                 LEFT JOIN crm_purchase_po_details on crm_purchase_po_details.crm_purchase_slno = crm_purchase_mast.crm_purchase_slno
                 LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno
+                 LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno
                       WHERE 1=1   `;
 
         const params = [];
@@ -1212,6 +1219,141 @@ module.exports = {
             ],
             (error, results, feilds) => {
 
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getCommonMasterInsert: (data, callback) => {
+        pool.query(
+            `INSERT INTO crm_common (
+             company_slno,
+             incharge_name,
+             hod_name,
+             dms_name,
+             ms_name,
+             mo_name,
+             smo_name,
+             gmo_name,
+             md_name,
+             ed_name,
+             managing_director,
+              hod_status_name,
+            incharge_status_name,
+            dms_status_name,
+            ms_status_name,
+            smo_status_name,
+            mo_status_name,
+            gmo_status_name,
+            md_status_name,
+            ed_status_name,
+            managing_director_name
+
+             )
+             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+            [
+                data.companyslno,
+                data.Incharge_approval,
+                data.Hod_approval,
+                data.DMS_approval,
+                data.MS_approval,
+                data.MO_approval,
+                data.SMO_approval,
+                data.GMO_approval,
+                data.MD_approval,
+                data.ED_approval,
+                data.Managing_Director_approval,
+                data.hod_name,
+                data.incharge_name,
+                data.dms_name,
+                data.ms_name,
+                data.smo_name,
+                data.mo_name,
+                data.gmo_name,
+                data.md_name,
+                data.ed_name,
+                data.managing_director_name,
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getCommonMasterSettingGet: (data, callback) => {
+        pool.query(
+            `SELECT crm_common_slno, crm_common.company_slno,company_name, incharge_name, hod_name, dms_name, ms_name, mo_name, smo_name, gmo_name,
+             md_name, ed_name, managing_director ,hod_status_name,incharge_status_name,dms_status_name,ms_status_name,smo_status_name,mo_status_name,
+            gmo_status_name,md_status_name,ed_status_name,managing_director_name FROM crm_common
+              LEFT JOIN crm_company_master ON crm_common.company_slno=crm_company_master.company_slno `,
+            [
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getCommonMasterSettingUpdate: (data, callback) => {
+        pool.query(
+            ` UPDATE crm_common 
+            SET company_slno = ? ,
+            incharge_name=?,
+            hod_name=?,
+            dms_name=?,
+            ms_name=?,
+            mo_name=?,
+            smo_name=?,
+            gmo_name=?,
+            md_name=?,
+            ed_name=?,
+            managing_director=?,
+            hod_status_name=?,
+            incharge_status_name=?,
+            dms_status_name=?,
+            ms_status_name=?,
+            smo_status_name=?,
+            mo_status_name=?,
+            gmo_status_name=?,
+            md_status_name=?,
+            ed_status_name=?,
+            managing_director_name=?
+            `,
+            [
+                data.companyslno,
+                data.Incharge_approval,
+                data.Hod_approval,
+                data.DMS_approval,
+                data.MS_approval,
+                data.MO_approval,
+                data.SMO_approval,
+                data.GMO_approval,
+                data.MD_approval,
+                data.ED_approval,
+                data.Managing_Director_approval,
+                data.hod_name,
+                data.incharge_name,
+                data.dms_name,
+                data.ms_name,
+                data.smo_name,
+                data.mo_name,
+                data.gmo_name,
+                data.md_name,
+                data.ed_name,
+                data.managing_director_name,
+
+            ],
+            (error, results, feilds) => {
                 if (error) {
                     return callback(error);
                 }

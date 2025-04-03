@@ -51,7 +51,7 @@ module.exports = {
                    md_approve_req, md_approve, md_approve_remarks, md_detial_analysis, md_approve_date, MD.em_name AS md_user,
                    managing_director_req, crm_request_approval.managing_director_approve, managing_director_remarks, managing_director_analysis,
                     managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
-                   ed_image, md_image, ack_status, ack_remarks
+                   ed_image, md_image, ack_status, ack_remarks,company_name,crm_request_master.company_slno
             FROM
                    crm_request_master
                  LEFT JOIN crm_request_approval ON crm_request_approval.req_slno = crm_request_master.req_slno
@@ -66,7 +66,8 @@ module.exports = {
                  LEFT JOIN co_department_mast TD ON TD.dept_id = R.dept_id
                  LEFT JOIN crm_purchase_mast ON crm_purchase_mast.req_slno = crm_request_master.req_slno
                  LEFT JOIN serial_nos ON serial_nos.serial_slno = 6  
-                 LEFT JOIN crm_approval_mapping_master ON crm_approval_mapping_master.company_slno = serial_nos.serial_current  
+                 LEFT JOIN crm_approval_mapping_master ON crm_approval_mapping_master.company_slno = serial_nos.serial_current
+                LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno 
             WHERE
                  serial_nos.serial_current IS NOT NULL 
                  AND ((crm_approval_mapping_master.medical_director_approve = 1 
@@ -110,7 +111,7 @@ module.exports = {
                     quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
                     quatation_negotiation,quatation_negotiation_remarks,quatation_negotiation_date,QN.em_name as quatation_neguser,
                     quatation_fixing,quatation_fixing_remarks,quatation_fixing_date,QF.em_name as quatation_fixuser,
-                    po_prepartion, po_complete,po_complete_date
+                    po_prepartion, po_complete,po_complete_date,company_name,crm_request_master.company_slno
              FROM
                  crm_request_master
                    LEFT JOIN crm_request_approval ON crm_request_approval.req_slno=crm_request_master.req_slno
@@ -129,6 +130,7 @@ module.exports = {
                    LEFT JOIN co_employee_master QN On QN.em_id=crm_purchase_mast.quatation_negotiation_user
                    LEFT JOIN co_employee_master QF ON QF.em_id=crm_purchase_mast.quatation_fixing_user
                    LEFT JOIN crm_purchase_po_details on crm_purchase_po_details.crm_purchase_slno=crm_purchase_mast.crm_purchase_slno
+                    LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno 
 			WHERE
                    ack_status=1 AND user_acknldge is null  AND ( crm_purchase_po_details.po_to_supplier is null
                    OR crm_purchase_po_details.po_to_supplier=0)  AND crf_close IS NULL
@@ -468,7 +470,7 @@ module.exports = {
                    quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
                    quatation_negotiation,quatation_negotiation_remarks,quatation_negotiation_date,QN.em_name as quatation_neguser,
                    quatation_fixing,quatation_fixing_remarks,quatation_fixing_date,QF.em_name as quatation_fixuser,
-                   po_prepartion                    
+                   po_prepartion,company_name,crm_request_master.company_slno                    
   			 FROM
                    crm_request_master
                 LEFT JOIN am_item_type ON JSON_CONTAINS(crm_request_master.category, cast(am_item_type.item_type_slno as json), '$')
@@ -485,6 +487,7 @@ module.exports = {
                 LEFT JOIN co_employee_master QC ON QC.em_id=crm_purchase_mast.quatation_calling_user
                 LEFT JOIN co_employee_master QN On QN.em_id=crm_purchase_mast.quatation_negotiation_user
                 LEFT JOIN co_employee_master QF ON QF.em_id=crm_purchase_mast.quatation_fixing_user
+                LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno 
              WHERE
                   crf_dept_status is null AND crm_purchase_mast.req_slno = crm_data_collection.crf_requst_slno 
               GROUP BY crm_request_master.req_slno
@@ -612,13 +615,14 @@ module.exports = {
             `SELECT 
                    crm_purchase_po_details.po_detail_slno, crm_purchase_po_details.req_slno, po_number,po_date, supply_store,
                    expected_delivery,main_store, sub_store_name,sub_store_slno,supplier_name,po_delivery, po_amount,
-                   approval_level, po_type,po_expiry,item_code,item_name,item_qty,item_rate,item_mrp,tax,tax_amount,net_amount
+                   approval_level, po_type,po_expiry,item_code,item_name,item_qty,item_rate,item_mrp,tax,tax_amount,net_amount,company_name,crm_request_master.company_slno
             FROM 
                    crm_purchase_po_details
                 LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno 
                 LEFT JOIN crm_purchase_item_details ON crm_purchase_item_details.po_detail_slno=crm_purchase_po_details.po_detail_slno
                 LEFT JOIN crm_purchase_mast On crm_purchase_mast.crm_purchase_slno=crm_purchase_po_details.crm_purchase_slno
                 LEFT JOIN crm_request_master ON crm_request_master.req_slno=crm_purchase_po_details.req_slno
+                 LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno 
             WHERE  
                    po_status=1 AND crm_purchase_po_details.po_to_supplier=0 AND crm_purchase_mast.po_complete=1 AND
                    crm_purchase_po_details.crf_po_complete_status=1 AND crm_request_master.user_acknldge is null 

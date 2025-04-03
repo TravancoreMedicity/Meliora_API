@@ -4,7 +4,7 @@ const { requestRegistInsert, InHodExist, getAllReqBasedDept, getDetailItemList, 
     getAllReqBasedDeptreq, deleteItemDetails, getAllPendingApprovalsAboveHOD, getPoList, searchCrfDetails, getStoreMasterInsert, getGetStoreMaster,
     getAllHoldAndRejectItems, getackPending, UpdateItemReceiveStatus, checkStoreReturnItem, insertReturnItemDetails, getCommonMasterUpdate,
     itemReturnDetailsForViewStore, returnReplyDetails, viewItemReturnDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet,
-    getCommonMasterGetCat, getGetStoreMasterById, getStoreMasterUpdate } = require('./newRequestRegister.controller');
+    getCommonMasterGetCat, getGetStoreMasterById, getStoreMasterUpdate, getCommonMasterInsert, getCommonMasterSettingGet, getCommonMasterSettingUpdate } = require('./newRequestRegister.controller');
 
 router.post("/InsertRegMast", checkToken, requestRegistInsert);
 router.patch("/deleteItemList", checkToken, deleteItemDetails);
@@ -45,6 +45,9 @@ router.post("/StoreMaster", checkToken, getStoreMasterInsert);
 router.get("/GetStoreMaster", checkToken, getGetStoreMaster);
 router.post("/GetStoreMasterById", checkToken, getGetStoreMasterById);
 router.post("/StoreMaster/update", checkToken, getStoreMasterUpdate);
+router.post("/CommonMasterInsert", checkToken, getCommonMasterInsert);
+router.post("/CommonMasterSettingGet", checkToken, getCommonMasterSettingGet);
+router.post("/CommonMasterSetting/update", checkToken, getCommonMasterSettingUpdate);
 
 
 

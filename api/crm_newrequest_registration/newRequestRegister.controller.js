@@ -3,8 +3,8 @@ const { requestRegistInsert, deleteCrfReq, requestRegistInsertDetl, requestAppro
     deleteItemDetails, getAllPendingApprovalsAboveHOD, getPoList, searchCrfDetails, getAllHoldAndRejectItems, getStoreMasterUpdate,
     insertApprvitemsStatus, deleteCrfReqApproval, deleteCrfRegItemDetl, updateApproveStatus, getackPending, getGetStoreMasterById,
     UpdateItemReceiveStatus, checkStoreReturnItem, insertReturnItemDetails, itemReturnDetailsForViewStore, getCommonMasterUpdate, getCommonMasterGetCat,
-    viewItemReturnDetails, returnReplyDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet, getStoreMasterInsert, getGetStoreMaster
-} = require('./newRequestRegister.service');
+    viewItemReturnDetails, returnReplyDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet, getStoreMasterInsert, getGetStoreMaster,
+    getCommonMasterInsert, getCommonMasterSettingGet, getCommonMasterSettingUpdate } = require('./newRequestRegister.service');
 const logger = require('../../logger/logger');
 module.exports = {
 
@@ -35,7 +35,8 @@ module.exports = {
                     gm_approve_req: body.gm_approve_req,
                     ed_approve_req: body.ed_approve_req,
                     md_approve_req: body.md_approve_req,
-                    managing_director_req: body.managing_director_req
+                    managing_director_req: body.managing_director_req,
+                    company_slno: body.company_slno
                 };
                 // Insert approval details
                 requestApprovalInsert(apprvlInsert, (approvalErr, approvalResults) => {
@@ -667,7 +668,7 @@ module.exports = {
                     managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
                     hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
                     TD.dept_id, TD.dept_name,TD.dept_type,internally_arranged_status,crf_view_remark,crf_view_status,VD.dept_name as viewDep,
-                   VE.em_name as viewName,
+                   VE.em_name as viewName,company_name,crm_request_master.company_slno,
 
                     ack_status, ack_remarks,PA.em_name as purchase_ackuser,crm_purchase_mast.create_date as ack_date,
                     quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
@@ -709,7 +710,8 @@ module.exports = {
                     LEFT JOIN co_department_mast TD on TD.dept_id=R.dept_id
                       LEFT JOIN co_department_mast VD ON VD.dept_id = crm_request_approval.crf_view_dep
                     LEFT JOIN co_employee_master VE ON  VE.em_id = crm_request_approval.crf_view_Emid
-                    LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno 
+                    LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno
+                     LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno
                 WHERE
                     (incharge_approve=1 OR hod_approve=1) ${filterSql}
                 GROUP BY crm_request_master.req_slno,po_number
@@ -1207,6 +1209,76 @@ module.exports = {
     getStoreMasterUpdate: (req, res) => {
         const body = req.body;
         getStoreMasterUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    dataCat: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+
+    getCommonMasterInsert: (req, res) => {
+        const body = req.body;
+        getCommonMasterInsert(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    dataCat: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+
+    getCommonMasterSettingGet: (req, res) => {
+        const body = req.body;
+        getCommonMasterSettingGet(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    dataCat: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+
+    getCommonMasterSettingUpdate: (req, res) => {
+        const body = req.body;
+
+        getCommonMasterSettingUpdate(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,

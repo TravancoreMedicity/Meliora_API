@@ -884,7 +884,7 @@ module.exports = {
                 AND emp.em_department = CompltDept.department_slno
                 ORDER BY 
                 closed_count DESC
-                LIMIT 20 `,
+                LIMIT 10 `,
             [
                 data.from,
                 data.to,

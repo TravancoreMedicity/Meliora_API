@@ -589,7 +589,8 @@ const validateComplaintRegist = Joi.object({
     priority_reason: Joi.optional(),
     priority_check: Joi.number().optional(),
     rm_room_slno: Joi.optional(),
-    cm_asset_status: Joi.optional()
+    cm_asset_status: Joi.optional(),
+    cm_complaint_location: Joi.optional()
 
 })
 

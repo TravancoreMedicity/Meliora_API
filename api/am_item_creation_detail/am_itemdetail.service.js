@@ -608,6 +608,7 @@ module.exports = {
     },
 
     WarentGarantInsertOrNot: (id, callBack) => {
+
         pool.query(
             `SELECT *           
             FROM am_item_map_wargrarnt_detail
@@ -678,6 +679,46 @@ module.exports = {
             }
         );
     },
+
+    // WarentGraruntyUpdate: (data, callback) => {
+    //     pool.query(
+    //         `UPDATE am_item_map_wargrarnt_detail SET 
+    //         warrenty_status=?,
+    //         guarenty_status=?,
+    //         from_date=?,
+    //         to_date=?,
+    //         troll_free=?,
+    //         ph_one=?,
+    //         ph_two=?,
+    //         address=?,   
+    //         edit_user=?,
+    //         address=?,
+    //         file_upload_status=?,
+    //         edit_user=?,
+    //         remarks=?
+    //         WHERE 
+    //         am_item_wargar_slno=?`,
+    //         [
+    //             data.warrenty_status,
+    //             data.guarenty_status,
+    //             data.from_date,
+    //             data.to_date,
+    //             data.troll_free,
+    //             data.ph_one,
+    //             data.ph_two,
+    //             data.address,
+    //             data.edit_user,
+    //             data.remarks,
+    //             data.am_item_wargar_slno,
+    //         ],
+    //         (error, results, feilds) => {
+    //             if (error) {
+    //                 return callback(error);
+    //             }
+    //             return callback(null, results);
+    //         }
+    //     )
+    // },
     WarentGraruntyUpdate: (data, callback) => {
         pool.query(
             `UPDATE am_item_map_wargrarnt_detail SET 
@@ -767,7 +808,8 @@ module.exports = {
             troll_free=?,
             ph_one=?,
             ph_two=?,
-            address=?, 
+            address=?,
+            remarks=?,
             edit_user=?
             WHERE 
             am_item_wargar_slno=?`,
@@ -780,6 +822,7 @@ module.exports = {
                 data.ph_one,
                 data.ph_two,
                 data.address,
+                data.remarks,
                 data.edit_user,
                 data.am_item_wargar_slno,
             ],

@@ -9,17 +9,26 @@ const socketUtils = require('./socketio/socketUltil')
 
 const app = express();
 const fs = require('fs');
-
+const https = require('https');
 //sockect io configuration
 app.use(cors());
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+const key = fs.readFileSync('./ssl/key.pem');
+const cert = fs.readFileSync('./ssl/cert.pem');
+
+const httpsOptions = {
+    key: key,
+    cert: cert
+};
 
 
 
 const server = http.createServer(app);
+const httpsServer = https.createServer(httpsOptions, app);
+
 const io = socketUtils.WSIO(server)
 socketUtils.connection(io);
 
@@ -444,10 +453,15 @@ app.use('/api/approvalMapping', approvalMapping)
 
 
 server.listen(process.env.APP_PORT, () =>
-    
-    console.log(`Server Up and Running ${process.env.APP_PORT}`),
+    console.log(`Server Up and Running 5000 `),
     logger.productionLogger.log('info', `Server Up and Running ${process.env.APP_PORT}`, { meta1: 'meta1' })
 );
+
+
+// Start servers
+httpsServer.listen(process.env.APP_HTTPS_PORT, () => {
+    console.log('HTTPS Server running on port 9999');
+});
 
 
 /***

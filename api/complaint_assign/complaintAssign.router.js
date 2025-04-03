@@ -6,8 +6,8 @@ const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign,
     assignedListNotRectifiedOnly, rectifiedListForVErify, AssistMultiple,
     getALLAssignedComList, transferInsert, EmployeeInactive,
     beforAssignHold, empTransInactive, sendMeassageUser, ReadMeassageUser, AssistReqListAll,
-    getAssistRequestEmps, assistTransInactive, AssisttransferInsert, SupervsrVerifyPending,
-    SupervsrVerify
+    getAssistRequestEmps, assistTransInactive, AssisttransferInsert, SupervsrVerifyPending, getQuery,
+    SupervsrVerify, AskQuery, replyQuery, AssistanceReject, AssistReqEmployee, getAssistRequestDetails
 } = require('../complaint_assign/complaintAssign.controller');
 
 router.get("/:id", checkToken, getcomplaintAssign);
@@ -21,6 +21,7 @@ router.get("/allcomplaint/:id", checkToken, getALLcomplaintbyEmployee);
 router.get("/individual/assist/:id", checkToken, getIndividualassitemployee)
 router.patch("/assistant/recieved", checkToken, AssistantRecieved);
 router.patch("/complaint/transfer", checkToken, TransferDept); // transfer complaint departement
+router.patch("/assistant/reject", checkToken, AssistanceReject);
 
 router.get("/assignedList/:id", checkToken, assignedListNotRectifiedOnly); // Not Rectified Only
 router.get("/forVerifyList/:id", checkToken, rectifiedListForVErify); // Rectified Complaint For Verify List
@@ -42,4 +43,13 @@ router.post("/assistTrans/Inactive", checkToken, assistTransInactive);
 router.post("/Assisttransfer/insert", checkToken, AssisttransferInsert);
 router.get("/SupervsrVerifyPending/:id", checkToken, SupervsrVerifyPending);
 router.patch("/SupervsrVerify", checkToken, SupervsrVerify);
+
+router.post('/askQuery', checkToken, AskQuery)
+router.post('/getQuery', checkToken, getQuery)
+router.post('/replyQuery', checkToken, replyQuery)
+
+router.post('/AssistReqEmployee', checkToken, AssistReqEmployee)
+
+router.get("/getAssistRequestDetails/:id", checkToken, getAssistRequestDetails)
+
 module.exports = router;

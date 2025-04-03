@@ -40,7 +40,7 @@ module.exports = {
     },
     checkInservalue: (data, callBack) => {
         pool.query(
-            ` select esc_mapping_slno FROM meliora.co_time_esc_mapping where esc_mapping_slno=? `,
+            ` select esc_mapping_slno FROM co_time_esc_mapping where esc_mapping_slno=? `,
             [
                 data.esc_mapping_slno
             ],

@@ -175,8 +175,8 @@ module.exports = {
                 const jsontoken = sign({ result: results }, "@dhj$&$(*)dndkm76$%#jdn(^$6GH%^#73*#*", {
                     expiresIn: "10h"
                 });
-              
-                
+
+
                 return res.json({
                     success: 1,
                     message: "login successfully",

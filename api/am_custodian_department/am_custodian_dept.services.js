@@ -92,10 +92,19 @@ module.exports = {
 
     CustodianDepSelect: (callback) => {
         pool.query(
-            `select am_custodian_slno, am_custodian_name,am_custodian_deptsec_slno,
-            am_custdn_asset_no_first,am_custdn_asset_no_second
-            from am_custodian_department
-            where status=1 `, [],
+            `select
+                am_custodian_slno,
+                am_custodian_deptsec_slno,
+                am_custodian_name,
+                am_custodian_dept_slno,
+                am_custdn_asset_no_first,
+                am_custdn_asset_no_second,
+                sec_name
+                from 
+                am_custodian_department
+                left join co_deptsec_mast on co_deptsec_mast.sec_id=am_custodian_department.am_custodian_deptsec_slno
+                where
+                status=1`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
@@ -125,4 +134,36 @@ module.exports = {
             }
         );
     },
+    // getDeptSecAsset: (data, callback) => {
+
+
+    //     pool.query(
+    //         `select
+    //         am_item_map_slno,
+    //         item_asset_no,
+    //         item_asset_no_only,
+    //         item_custodian_dept,
+    //         item_deptsec_slno
+    //         from
+    //         am_asset_item_map_master
+    //         where
+    //         item_custodian_dept=?
+    //         and
+    //         item_deptsec_slno=?
+    //         and
+    //         item_create_status=1`,
+    //         [
+    //             data.item_custodian_dept,
+    //             data.item_deptsec_slno
+
+    //         ],
+    //         (error, results, fields) => {
+    //             if (error) {
+    //                 return callback(error);
+    //             }
+    //             return callback(null, results);
+    //         }
+    //     );
+
+    // },
 }

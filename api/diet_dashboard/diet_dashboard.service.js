@@ -29,7 +29,7 @@ module.exports = {
             ptc_ptname,bdc_no,diet_patient.bd_code,plan_status,ora_roommaster.rmc_desc,ora_roomtype.rtc_desc, 
             diet_name,  plan_remark,plan_slno,diet_plan.dietpt_slno,diet_plan.diet_slno,ora_nurstation.nsc_desc,
            ( case when plan_status = 1 then 'approved' else 'approval pending' end) as plan
-            FROM meliora.diet_plan
+            FROM diet_plan
             left join diet_patient on diet_plan.dietpt_slno = diet_patient.dietpt_slno
             left join ora_doctor on diet_patient.do_code=ora_doctor.do_code
             left join ora_bed on diet_plan.bd_code =ora_bed.bd_code

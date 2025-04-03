@@ -19,7 +19,7 @@ module.exports = {
              ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date,ED.em_name as ed_user,
              md_approve_req, md_approve, md_approve_remarks, md_detial_analysis, md_approve_date,MD.em_name as md_user,
               crf_close, crf_close_remark, crf_close_user, crf_closed_one, close_date
-            FROM meliora.crf_request_master
+            FROM crf_request_master
              left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
              left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
              left join co_deptsec_mast R on R.sec_id=crf_request_master.request_deptsec_slno
@@ -68,7 +68,7 @@ module.exports = {
              ed_approve_req, ed_approve, ed_approve_remarks, ed_detial_analysis, ed_approve_date,ED.em_name as ed_user,
              md_approve_req, md_approve, md_approve_remarks, md_detial_analysis, md_approve_date,MD.em_name as md_user,
               crf_close, crf_close_remark, crf_close_user, crf_closed_one, close_date
-            FROM meliora.crf_request_master
+            FROM crf_request_master
             left join crf_request_approval on crf_request_approval.req_slno=crf_request_master.req_slno
             left join co_department_mast on co_department_mast.dept_id=crf_request_master.request_dept_slno
             left join co_deptsec_mast R on R.sec_id=crf_request_master.request_deptsec_slno

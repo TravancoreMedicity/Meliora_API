@@ -72,7 +72,7 @@ module.exports = {
     },
     escmappingByid: (id, callBack) => {
         pool.query(
-            ` select escalaion_slno,complaint_dept FROM meliora.co_time_esc_mapping where escalaion_slno=?`,
+            ` select escalaion_slno,complaint_dept FROM co_time_esc_mapping where escalaion_slno=?`,
             [
                 id
             ],
@@ -86,8 +86,7 @@ module.exports = {
     },
     getescmappingByidcount: (callBack) => {
         pool.query(
-            // ` select escalaion_slno,complaint_dept FROM meliora.co_time_esc_mapping where esc_mapping_slno=?`,
-            `select * from meliora.co_time_esc_mapping  `,
+            `select * from co_time_esc_mapping  `,
             [
 
             ],

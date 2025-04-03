@@ -3,7 +3,7 @@ const { pool } = require('../../config/database');
 module.exports = {
     dietOrderInsert: (data, callBack) => {
         pool.query(
-            `INSERT into  meliora.diet_order_list 
+            `INSERT into  diet_order_list 
             (
       
             order_date,
@@ -43,7 +43,7 @@ module.exports = {
             dmenu_slno,
             cancel,
             cancel_time,
-            em_id FROM meliora.diet_order_list;
+            em_id FROM diet_order_list;
             `, [],
             function (err, results) {
 
@@ -57,7 +57,7 @@ module.exports = {
 
     updateDietOrder: (data, callBack) => {
         pool.query(
-            `update meliora.diet_order_list 
+            `update diet_order_list 
             set order_date = ?,
             proc_slno = ?,
             process_date = ?,

@@ -304,6 +304,7 @@ module.exports = {
 
         );
     },
+  
     detailedAssigncompstatus: (data, callBack) => {
         pool.query(
             `UPDATE cm_complaint_mast
@@ -498,6 +499,7 @@ module.exports = {
             }
         );
     },
+  
     AssistantRecieved: (data, callBack) => {
         pool.query(
             `UPDATE cm_complaint_detail
@@ -602,7 +604,8 @@ module.exports = {
             }
         );
     },
-    rectifiedListForVErify: (id, callBack) => {
+  
+   rectifiedListForVErify: (id, callBack) => {
         pool.query(
             `select
             cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,
@@ -645,7 +648,6 @@ module.exports = {
             }
         );
     },
-
 
     AssistMultiple: (data, callBack) => {
         pool.query(

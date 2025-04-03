@@ -4,7 +4,7 @@ const { update } = require('../module_user_right/userRight.service');
 module.exports = {
     dietPlanInsert: (data, callBack) => {
         pool.query(
-            `insert into meliora.diet_plan 
+            `insert into diet_plan 
             (
             ip_no,
             pt_no,
@@ -75,7 +75,7 @@ module.exports = {
             plan_date,
             plan_remark,
             if(discharge = 'N','No','yes') as discharge
-             FROM meliora.diet_plan             
+             FROM diet_plan             
              left join diet_master on diet_plan.diet_slno=diet_master.diet_slno
              left join ora_bed on diet_plan.bd_code = ora_bed.bd_code 
              left join diet_patient on diet_patient.dietpt_slno=diet_plan.dietpt_slno
@@ -92,7 +92,7 @@ module.exports = {
     },
     updateDietplan: (data, callBack) => {
         pool.query(
-            `update meliora.diet_plan
+            `update diet_plan
             set 
             ip_no = ?,
             pt_no = ?,
@@ -213,7 +213,7 @@ module.exports = {
             plan_remark,
             diet_name,
             case when plan_status = 1 then 'approved' else 'approval pending'  end "plan status"
-             FROM meliora.diet_plan
+             FROM diet_plan
              left join diet_master on diet_plan.diet_slno = diet_master.diet_slno
               left join diet_patient on diet_patient.dietpt_slno=diet_plan.dietpt_slno
             left join ora_bed on  diet_plan.bd_code=ora_bed.bd_code`,
@@ -339,7 +339,7 @@ module.exports = {
             ptc_ptname,bdc_no,diet_patient.bd_code,plan_status,ora_roommaster.rmc_desc,ora_roomtype.rtc_desc, 
             diet_name,  plan_remark,plan_slno,diet_plan.dietpt_slno,diet_plan.diet_slno,
             case when plan_status = 1 then 'approved' else 'approval pending'  end "plan status"
-            FROM meliora.diet_plan
+            FROM diet_plan
             left join diet_patient on diet_plan.dietpt_slno = diet_patient.dietpt_slno
             left join ora_doctor on diet_patient.do_code=ora_doctor.do_code
             left join ora_bed on diet_plan.bd_code =ora_bed.bd_code
@@ -367,7 +367,7 @@ module.exports = {
             ptc_ptname,bdc_no,diet_patient.bd_code,plan_status,ora_roommaster.rmc_desc,ora_roomtype.rtc_desc, 
             diet_name,  plan_remark,plan_slno,diet_plan.dietpt_slno,diet_plan.diet_slno,
             case when plan_status = 1 then 'approved' else 'approval pending'  end "plan status"
-            FROM meliora.diet_plan
+            FROM diet_plan
             left join diet_patient on diet_plan.dietpt_slno = diet_patient.dietpt_slno
             left join ora_doctor on diet_patient.do_code=ora_doctor.do_code
             left join ora_bed on diet_plan.bd_code =ora_bed.bd_code
@@ -395,7 +395,7 @@ module.exports = {
             ptc_ptname,bdc_no,diet_patient.bd_code,plan_status,ora_roommaster.rmc_desc,ora_roomtype.rtc_desc, 
             diet_name,  plan_remark,plan_slno,diet_plan.dietpt_slno,diet_plan.diet_slno,
             case when plan_status = 1 then 'approved' else 'approval pending'  end "plan status"
-          FROM meliora.diet_plan
+          FROM diet_plan
           left join diet_patient on diet_plan.dietpt_slno = diet_patient.dietpt_slno
           left join ora_doctor on diet_patient.do_code=ora_doctor.do_code
           left join ora_bed on diet_plan.bd_code =ora_bed.bd_code
@@ -424,7 +424,7 @@ module.exports = {
             ptc_ptname,bdc_no,diet_patient.bd_code,plan_status,ora_roommaster.rmc_desc,ora_roomtype.rtc_desc, 
             diet_name,  plan_remark,plan_slno,diet_plan.dietpt_slno,diet_plan.diet_slno,ora_nurstation.nsc_desc,
             case when plan_status = 1 then 'approved' else 'approval pending'  end "plan status"
-            FROM meliora.diet_plan
+            FROM diet_plan
             left join diet_patient on diet_plan.dietpt_slno = diet_patient.dietpt_slno
             left join ora_doctor on diet_patient.do_code=ora_doctor.do_code
             left join ora_bed on diet_plan.bd_code =ora_bed.bd_code

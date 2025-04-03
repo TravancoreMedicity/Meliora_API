@@ -18,7 +18,7 @@ module.exports = {
             ora_nurstation.nsc_desc,
             act_disc_status,
             wework_patient.ipd_disc as DOD
-            FROM meliora.wework_patient
+            FROM wework_patient
             left join ora_roomcategory on wework_patient.rc_code = ora_roomcategory.rc_code
             left join ora_doctor on wework_patient.do_code = ora_doctor.do_code
             left join ora_ipadmiss on wework_patient.ip_no = ora_ipadmiss.ip_no
@@ -171,7 +171,7 @@ module.exports = {
     },
     getsurvslno: (id, callBack) => {
         pool.query(
-            ` SELECT surv_slno FROM meliora.we_patient_survillance
+            ` SELECT surv_slno FROM we_patient_survillance
             where ip_no=?`,
 
             [
@@ -189,7 +189,7 @@ module.exports = {
     },
     getsurvslnoonly: (id, callBack) => {
         pool.query(
-            ` SELECT surv_slno FROM meliora.we_patient_survillance
+            ` SELECT surv_slno FROM we_patient_survillance
             where ip_no=?`,
 
             [
@@ -434,7 +434,7 @@ module.exports = {
             if_dama,
             bhrc_patient,
             remarks_we,we_surv_slno,surv_log_slno
-             FROM meliora.we_patient_surv_log
+             FROM we_patient_surv_log
              left join ora_nurstation on we_patient_surv_log.shift_from = ora_nurstation.ns_code
              left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
              where we_patient_surv_log.ip_no = ? and we_patient_surv_log.bd_code = ?`,
@@ -643,7 +643,7 @@ module.exports = {
             dama_remarks,
             doc_name,
             (case when payment_mode = 1 then "Cash" when payment_mode = 2 then "Insurence" when payment_mode = 3 then "Other credit" else "no payemnt" end) payment_mode
-            FROM meliora.we_patient_surv_log
+            FROM we_patient_surv_log
             left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
             left join ora_bed on wework_patient.bd_code =ora_bed.bd_code
             left join room_master on  ora_bed.rm_code = room_master.rm_code
@@ -671,7 +671,7 @@ module.exports = {
             ipd_status,
             stat_recived_time,
             doc_name
-            FROM meliora.we_patient_surv_log
+            FROM we_patient_surv_log
             left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
             left join ora_nurstation t on t.ns_code = we_patient_surv_log.shift_from
             left join ora_nurstation f on f.ns_code = we_patient_surv_log.shift_to
@@ -703,7 +703,7 @@ module.exports = {
             t.ns_code as shift_from,
              f.ns_code as shift_to,
             time(dr_visit_time) as visit_tme
-            FROM meliora.we_daily_activity
+            FROM we_daily_activity
             left join we_patient_survillance on we_daily_activity.srv_slno = we_patient_survillance.surv_slno
             left join wework_patient on we_patient_survillance.ip_no = wework_patient.ip_no
             left join ora_doctor on wework_patient.do_code = ora_doctor.do_code
@@ -761,7 +761,7 @@ module.exports = {
             doc_name,
                         ora_roommaster.rmc_desc,
                         f.nsc_desc as shift_to,bdc_no
-                        FROM meliora.we_patient_surv_log
+                        FROM we_patient_surv_log
                         left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
                         left join ora_nurstation t on t.ns_code =  we_patient_surv_log.shift_to
                         left join ora_nurstation f on f.ns_code =  we_patient_surv_log.shift_from
@@ -823,7 +823,7 @@ module.exports = {
             stat_medicine,
             stat_recived_time,
             doc_name
-            FROM meliora.we_patient_surv_log
+            FROM we_patient_surv_log
             left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
             left join ora_nurstation t on t.ns_code = we_patient_surv_log.shift_from
             left join ora_nurstation f on f.ns_code = we_patient_surv_log.shift_to
@@ -854,7 +854,7 @@ module.exports = {
         stat_medicine,
         stat_recived_time,
         doc_name
-        FROM meliora.we_patient_surv_log
+        FROM we_patient_surv_log
         left join wework_patient on we_patient_surv_log.ip_no = wework_patient.ip_no
         left join ora_nurstation t on t.ns_code = we_patient_surv_log.shift_from
         left join ora_nurstation f on f.ns_code = we_patient_surv_log.shift_to
@@ -1182,7 +1182,7 @@ module.exports = {
         SELECT transfer_from,trasfer_to,transfer_time,counseling_status,counciling_remarks,
                 sfa_mfa_status,sfa_mfa_clearence,room_amenties,bystander_room_retain,
                 remarks,ip_no,bystander_room_retain_remark,transfer_in_time
-                FROM meliora.we_patient_bed_transfer
+                FROM we_patient_bed_transfer
                 where trasfer_to = ? and ip_no = ?`,
             [
                 data.trasfer_to,

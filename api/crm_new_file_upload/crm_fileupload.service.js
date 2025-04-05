@@ -173,4 +173,24 @@ module.exports = {
             }
         )
     },
+
+    ImageInsertMAangeStatusUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE
+                   crm_request_approval
+             SET
+                    managing_director_image=1
+             WHERE 
+                    req_slno=?`,
+            [
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
 }

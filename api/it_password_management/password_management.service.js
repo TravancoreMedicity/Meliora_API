@@ -123,7 +123,7 @@ module.exports = {
     },
 
 
-    PasswordMasterView: (callback) => {
+PasswordMasterView: (callback) => {
         pool.query(
             `SELECT 
             pswd_mast_slno,

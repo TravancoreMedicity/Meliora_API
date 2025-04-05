@@ -45,7 +45,7 @@ module.exports = {
             if( diet_detail.status = 1,'yes','no') as dietdetlstatus,
             diet_detail.status,
             diet_detail.em_id
-            FROM meliora.diet_detail
+            FROM diet_detail
             left join diet_master on diet_detail.diet_slno = diet_master.diet_slno
             left join diet_type on diet_detail.type_slno = diet_type.type_slno`, [],
             (error, results, feilds) => {

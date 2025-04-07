@@ -192,7 +192,8 @@ module.exports = {
                     dept_name: results.dept_name,
                     logintime: results.login,
                     supervisor: results.supervisor,
-                    logOutTime: format(addHours(new Date(results.login), logout_time), 'yyyy-MM-dd HH:mm:ss')
+                    logOutTime: format(addHours(new Date(results.login), logout_time), 'yyyy-MM-dd HH:mm:ss'),
+                    desg_name: results.desg_name,
                 });
             } else {
                 return res.json({

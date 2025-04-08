@@ -5,7 +5,8 @@ const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign, getcomplai
     AssistMultiple, getALLAssignedComList, EmployeeInactive, beforAssignHold, empTransInactive,
     sendMeassageUser, ReadMeassageUser, AssistReqListAll, getAssistRequestEmps, assistTransInactive, AssistReqEmployee,
     AssisttransferInsert, SupervsrVerifyPending, SupervsrVerify, ReopenComplaintInsert, AskQuery, changeQueryStatus, getQuery, replyQuery, AssistanceReject,
-    getAssistRequestDetails
+    getAssistRequestDetails, getAssistRequestCount, getDeptPengingTicketCount
+
 } = require('../complaint_assign/complaintAssign.service');
 const logger = require('../../logger/logger');
 const { default: Expo } = require('expo-server-sdk');
@@ -872,4 +873,53 @@ module.exports = {
             });
         });
     },
+    getAssistRequestCount: (req, res) => {
+        const id = req.params.id
+        getAssistRequestCount(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Pending Request"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getDeptPengingTicketCount: (req, res) => {
+        const id = req.params.id
+        getDeptPengingTicketCount(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Pending Request"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+
+
 }

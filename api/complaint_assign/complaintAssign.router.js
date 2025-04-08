@@ -7,7 +7,7 @@ const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign,
     getALLAssignedComList, transferInsert, EmployeeInactive,
     beforAssignHold, empTransInactive, sendMeassageUser, ReadMeassageUser, AssistReqListAll,
     getAssistRequestEmps, assistTransInactive, AssisttransferInsert, SupervsrVerifyPending, getQuery,
-    SupervsrVerify, AskQuery, replyQuery, AssistanceReject, AssistReqEmployee, getAssistRequestDetails
+    SupervsrVerify, AskQuery, replyQuery, AssistanceReject, AssistReqEmployee, getAssistRequestDetails, getAssistRequestCount, getDeptPengingTicketCount
 } = require('../complaint_assign/complaintAssign.controller');
 
 router.get("/:id", checkToken, getcomplaintAssign);
@@ -37,19 +37,21 @@ router.post("/employeeTrans/Inactive", checkToken, empTransInactive);
 router.patch("/sendMeassage", checkToken, sendMeassageUser);
 router.patch("/ReadMeassage", checkToken, ReadMeassageUser);
 router.get("/AssistReqListAll/:id", checkToken, AssistReqListAll);
-
 router.get('/getAssistRequest/:id', checkToken, getAssistRequestEmps)
 router.post("/assistTrans/Inactive", checkToken, assistTransInactive);
 router.post("/Assisttransfer/insert", checkToken, AssisttransferInsert);
 router.get("/SupervsrVerifyPending/:id", checkToken, SupervsrVerifyPending);
 router.patch("/SupervsrVerify", checkToken, SupervsrVerify);
-
 router.post('/askQuery', checkToken, AskQuery)
 router.post('/getQuery', checkToken, getQuery)
 router.post('/replyQuery', checkToken, replyQuery)
-
 router.post('/AssistReqEmployee', checkToken, AssistReqEmployee)
-
 router.get("/getAssistRequestDetails/:id", checkToken, getAssistRequestDetails)
+
+
+router.get("/getAssistRequestCount/:id", checkToken, getAssistRequestCount)
+router.get("/getDeptPengingTicketCount/:id", checkToken, getDeptPengingTicketCount)
+
+
 
 module.exports = router;

@@ -516,7 +516,7 @@ module.exports = {
                    md_approve_remarks,md_detial_analysis,md_approve_date,MD.em_name as md_user,
                    managing_director_req, managing_director_approve, managing_director_remarks, managing_director_analysis,
                    managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
-                   hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
+                   hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,company_name,crm_request_master.company_slno,
 
                    ack_status, ack_remarks,PA.em_name as purchase_ackuser,crm_purchase_mast.create_date as ack_date,
                    quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
@@ -556,7 +556,8 @@ module.exports = {
               LEFT JOIN co_employee_master CRS ON CRS.em_id=crm_purchase_mast.store_receive_user
               LEFT JOIN co_employee_master STR ON STR.em_id=crm_req_item_collect_details.substore_user
               LEFT JOIN crm_purchase_po_details on crm_purchase_po_details.crm_purchase_slno = crm_purchase_mast.crm_purchase_slno
-              LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno 
+              LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno
+                LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno
         WHERE
               user_deptsec=?
              GROUP BY crm_request_master.req_slno,crm_purchase_mast.crm_purchase_slno

@@ -400,9 +400,9 @@ module.exports = {
                 });
             }
             else {
-                const hasApproved = items?.filter((item) => item.item_status_approved === 1);
-                const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
-                const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
+                const hasApproved = items?.filter((item) => item?.item_status_approved === 1);
+                const reject_status = items?.some(item => item?.item_status_approved === 2) ? 1 : 0;
+                const onhold_status = items?.some(item => item?.item_status_approved === 3) ? 1 : 0;
                 const internally_arranged_status = 0;
                 const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
@@ -489,9 +489,9 @@ module.exports = {
                 });
             }
             else {
-                const hasApproved = items?.filter((item) => item.item_status_approved === 1);
-                const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
-                const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
+                const hasApproved = items?.filter((item) => item?.item_status_approved === 1);
+                const reject_status = items?.some(item => item?.item_status_approved === 2) ? 1 : 0;
+                const onhold_status = items?.some(item => item?.item_status_approved === 3) ? 1 : 0;
                 const internally_arranged_status = 0;
                 const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
@@ -579,10 +579,10 @@ module.exports = {
             }
 
             else {
-                const hasApproved = items?.filter((item) => item.item_status_approved === 1);
-                const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
-                const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
-                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 0 : 0;
+                const hasApproved = items?.filter((item) => item?.item_status_approved === 1);
+                const reject_status = items?.some(item => item?.item_status_approved === 2) ? 1 : 0;
+                const onhold_status = items?.some(item => item?.item_status_approved === 3) ? 1 : 0;
+                const internally_arranged_status = items.some(item => item?.item_status_approved === 4) ? 0 : 0;
                 const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
                 const handleResponse = (message, success = 1) => {
@@ -693,10 +693,10 @@ module.exports = {
                 });
             }
             else {
-                const hasApproved = items?.filter((item) => item.item_status_approved === 1);
-                const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
-                const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
-                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 0 : 0;
+                const hasApproved = items?.filter((item) => item?.item_status_approved === 1);
+                const reject_status = items?.some(item => item?.item_status_approved === 2) ? 1 : 0;
+                const onhold_status = items?.some(item => item?.item_status_approved === 3) ? 1 : 0;
+                const internally_arranged_status = items?.some(item => item?.item_status_approved === 4) ? 0 : 0;
                 const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
                 const handleResponse = (message, success = 1) => {
@@ -810,10 +810,10 @@ module.exports = {
             }
 
             else {
-                const hasApproved = items?.filter((item) => item.item_status_approved === 1);
-                const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
-                const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
-                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 0 : 0;
+                const hasApproved = items?.filter((item) => item?.item_status_approved === 1);
+                const reject_status = items?.some(item => item?.item_status_approved === 2) ? 1 : 0;
+                const onhold_status = items?.some(item => item?.item_status_approved === 3) ? 1 : 0;
+                const internally_arranged_status = items.some(item => item?.item_status_approved === 4) ? 0 : 0;
                 const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
                 const handleResponse = (message, success = 1) => {
@@ -925,10 +925,10 @@ module.exports = {
             }
 
             else {
-                const hasApproved = items?.filter((item) => item.item_status_approved === 1);
-                const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
-                const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
-                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 0 : 0;
+                const hasApproved = items?.filter((item) => item?.item_status_approved === 1);
+                const reject_status = items?.some(item => item?.item_status_approved === 2) ? 1 : 0;
+                const onhold_status = items?.some(item => item?.item_status_approved === 3) ? 1 : 0;
+                const internally_arranged_status = items?.some(item => item?.item_status_approved === 4) ? 0 : 0;
                 const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
                 const handleResponse = (message, success = 1) => {
@@ -1041,10 +1041,10 @@ module.exports = {
             }
 
             else {
-                const hasApproved = items?.filter((item) => item.item_status_approved === 1);
-                const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
-                const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
-                const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 0 : 0;
+                const hasApproved = items?.filter((item) => item?.item_status_approved === 1);
+                const reject_status = items?.some(item => item?.item_status_approved === 2) ? 1 : 0;
+                const onhold_status = items?.some(item => item?.item_status_approved === 3) ? 1 : 0;
+                const internally_arranged_status = items?.some(item => item?.item_status_approved === 4) ? 0 : 0;
                 const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
                 const handleResponse = (message, success = 1) => {
@@ -1156,10 +1156,10 @@ module.exports = {
             }
 
             const { req_slno, md_user, md_approve, items, md_approve_date } = body;
-            const hasApproved = items?.filter((item) => item.item_status_approved === 1);
-            const reject_status = items.some(item => item.item_status_approved === 2) ? 1 : 0;
-            const onhold_status = items.some(item => item.item_status_approved === 3) ? 1 : 0;
-            const internally_arranged_status = items.some(item => item.item_status_approved === 4) ? 0 : 0;
+            const hasApproved = items?.filter((item) => item?.item_status_approved === 1);
+            const reject_status = items?.some(item => item?.item_status_approved === 2) ? 1 : 0;
+            const onhold_status = items?.some(item => item?.item_status_approved === 3) ? 1 : 0;
+            const internally_arranged_status = items?.some(item => item?.item_status_approved === 4) ? 0 : 0;
             const dataupdate = { reject_status, onhold_status, req_slno, internally_arranged_status };
 
             const handleResponse = (message, success = 1) => {

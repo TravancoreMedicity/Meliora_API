@@ -533,6 +533,7 @@ module.exports = {
                   req_slno=?`,
             [
                 id
+
             ],
             (error, results, feilds) => {
                 if (error) {

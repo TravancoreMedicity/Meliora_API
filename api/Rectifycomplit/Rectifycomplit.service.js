@@ -1,7 +1,7 @@
 const { pool } = require('../../config/database')
 
 module.exports = {
-    getRectifycomplt: (id, callBack) => {
+      getRectifycomplt: (id, callBack) => {
         pool.query(
             `select 
             cm_complaint_mast.complaint_slno,
@@ -371,6 +371,7 @@ module.exports = {
             complaint_slno DESC   `,
             [
                 data.assigned_emp
+
             ],
             (error, results, feilds) => {
                 if (error) {

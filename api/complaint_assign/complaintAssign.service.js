@@ -304,7 +304,7 @@ module.exports = {
 
         );
     },
-  
+
     detailedAssigncompstatus: (data, callBack) => {
         pool.query(
             `UPDATE cm_complaint_mast
@@ -499,7 +499,7 @@ module.exports = {
             }
         );
     },
-  
+
     AssistantRecieved: (data, callBack) => {
         pool.query(
             `UPDATE cm_complaint_detail
@@ -604,8 +604,8 @@ module.exports = {
             }
         );
     },
-  
-   rectifiedListForVErify: (id, callBack) => {
+
+    rectifiedListForVErify: (id, callBack) => {
         pool.query(
             `select
             cm_complaint_mast.complaint_slno,complaint_desc,compalint_date,
@@ -1299,4 +1299,49 @@ module.exports = {
             }
         );
     },
+
+    getAssistRequestCount: (id, callBack) => {
+        pool.query(
+            `SELECT COUNT(*) AS assist_req_count
+            FROM cm_complaint_detail
+            LEFT JOIN cm_complaint_mast 
+            ON cm_complaint_mast.complaint_slno = cm_complaint_detail.complaint_slno
+            WHERE cm_complaint_detail.assigned_emp = ?
+            AND cm_complaint_detail.assist_flag = 1 
+            AND (cm_complaint_detail.assign_status != 1 OR cm_complaint_detail.assign_status IS NULL) 
+            AND cm_complaint_mast.compalint_status != 2 
+            AND cm_complaint_mast.compalint_status != 3 `,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getDeptPengingTicketCount: (id, callBack) => {
+        pool.query(
+            `select
+           COUNT(*) AS pending_ticket_count
+            from
+            cm_complaint_mast
+            where
+            compalint_status = 0
+            and
+            complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
 }

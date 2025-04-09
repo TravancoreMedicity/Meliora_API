@@ -1,4 +1,5 @@
 
+const { loggers } = require('winston');
 const { CondemnationList, ServiceList, pmDueOverList, AssetServiceList, getAssetCondemnationList } = require('../am_spare_condemnation/am_spare_condemnation.service')
 module.exports = {
 
@@ -30,7 +31,7 @@ module.exports = {
         const id = req.params.id;
         getAssetCondemnationList(id, (err, results) => {
             if (err) {
-                logger.logwindow(err)
+                loggers.logwindow(err)
                 return res.status(400).json({
                     success: 0,
                     message: err

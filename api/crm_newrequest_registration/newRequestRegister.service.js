@@ -516,7 +516,7 @@ module.exports = {
                    md_approve_remarks,md_detial_analysis,md_approve_date,MD.em_name as md_user,
                    managing_director_req, managing_director_approve, managing_director_remarks, managing_director_analysis,
                    managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
-                   hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,company_name,crm_request_master.company_slno,
+                   hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,company_name,crm_request_master.company_slno,crm_request_master.work_order_status,
 
                    ack_status, ack_remarks,PA.em_name as purchase_ackuser,crm_purchase_mast.create_date as ack_date,
                    quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
@@ -727,7 +727,7 @@ module.exports = {
                    crm_request_master.sub_store_recieve,approval_level,crm_purchase_po_details.store_recieve,
                    user_acknldge,user_acknldge_remarks,ackUser.em_name as acknowUser,user_ack_date,sub_store_name,
                    sub_store_slno, crm_purchase_mast.store_receive_date,CRS.em_name as crs_user,STR.em_name as store_user,substore_ack_date,
-                   po_number,user_acknldge,internally_arranged_status
+                   po_number,user_acknldge,internally_arranged_status,crf_view_remark,crf_view_status,VE.em_name as viewName
              FROM
                   crm_request_master
                 LEFT JOIN crm_request_mast_detail on crm_request_mast_detail.req_slno=crm_request_master.req_slno
@@ -762,6 +762,7 @@ module.exports = {
                 LEFT JOIN crm_purchase_po_details on crm_purchase_po_details.crm_purchase_slno = crm_purchase_mast.crm_purchase_slno
                 LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno
                  LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno
+                LEFT JOIN co_employee_master VE ON  VE.em_id = crm_request_approval.crf_view_Emid
                       WHERE 1=1   `;
 
         const params = [];
@@ -1353,6 +1354,95 @@ module.exports = {
                 data.ed_name,
                 data.managing_director_name,
 
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+
+    getDashBoardMaster: (data, callback) => {
+        pool.query(
+            `INSERT INTO crm_dashboard_master (
+                dash_view,department,dp_section,emid
+                           
+               )
+                VALUES(?,?,?,?)`,
+            [
+                JSON.stringify(data.selectedValues),
+                data.dept,
+                data.deptsec,
+                data.empId
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    GetDashBoardMaster: (data, callback) => {
+        pool.query(
+            `SELECT
+             department,
+              dp_section,
+              emid,
+              dept_name,
+              sec_name,
+              dash_view,
+              em_name
+               FROM crm_dashboard_master
+              LEFT JOIN co_department_mast ON co_department_mast.dept_id = crm_dashboard_master.department
+              LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id = crm_dashboard_master.dp_section       
+              LEFT JOIN co_employee_master OM ON OM.em_id = crm_dashboard_master.emid `,
+            [
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getDashboardUpdate: (data, callback) => {
+
+        pool.query(
+            `UPDATE crm_dashboard_master 
+            SET 
+            dash_view=?,
+            department=?,
+            dp_section=?
+            WHERE emid = ?`,
+            [
+                JSON.stringify(data.selectedValues),
+                data.dept,
+                data.deptsec,
+                data.empId,
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    getDashright: (data, callback) => {
+        pool.query(
+            `SELECT * FROM crm_dashboard_master where emid =?`,
+            [
+                data.empsecid
             ],
             (error, results, feilds) => {
                 if (error) {

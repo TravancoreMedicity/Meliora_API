@@ -1,4 +1,6 @@
-const logger = require('../../logger/logger')
+const { pool } = require('../../config/database');
+const logger = require('../../logger/logger');
+
 const { checkDetailInsertOrNot, GRNDetailsInsert, GRNDetailsUpdate, BillDetailsInsert,
     BillDetailsUpdate, CustodianDetailsInsert, CustodianDetailsUpdate, DeviceDetailsInsert,
     DeviceDetailsUpdate, LeaseDetailsInsert, LeaseDetailsUpdate, WarentGarantInsertOrNot, WarentGraruntyInsert, WarentGraruntyUpdate,
@@ -7,13 +9,19 @@ const { checkDetailInsertOrNot, GRNDetailsInsert, GRNDetailsUpdate, BillDetailsI
     BillDetailsUpdateSpare, DeviceDetailsInsertSpare, DeviceDetailsUpdateSpare, LeaseDetailsInsertSpare,
     LeaseDetailsUpdateSpare, WarentGraruntyInsertSpare, WarentGraruntyUpdateSpare, getdeptsecBsedonCustdept,
     getdeptsecBsedonCustdeptSpare, SpecificationInsertOrNot,
-    SpecificationInsert, SepcifiDelete, GetFreespareList, SpareDetailsInsert, SpareDetailsInsertOrNot,
+    SpecificationInsert, SepcUpdate, GetFreespareList, SpareDetailsInsert, SpareDetailsInsertOrNot,
     SpareDelete, AmcCMCInsert, AmcCmcview, AmcCmcUpdate, AmcCmcviewSelect, BillMasterInsert,
     BillMasterview, BillMasterUpdate, BillMasterviewSelect, GetBillMasterById,
     GetAmcCmcMasterById, GetSupplierSelect, GetBillBySupplNDate, SupplierAdding, GetAMCBySupplNDate,
     GetCMCBySupplNDate, LeaseMasterInsert, LeaseMasterview, GetLeaseBySupplNDate,
     leaseMasterUpdate, AMLeaseDetailsUpdate, spareContamination, spareService, DeviceRackUpdateAsset,
-    DeviceRackUpdateSpare
+    DeviceRackUpdateSpare, InsertAmcCmcLog, AmcCmcDetailList, amcCmcLogUpdate, PmInsert, InsertPMLog, PmUpdate, PmDetailsList, UpdatePmLog,
+    InsertLeaseLog, LeaseDetailsList, UpdateLeaseLog, updateTransLog, spareRemoveFromAsset,
+    InsertTransferMaster,
+    InsertTransferDetails,
+    UpdateAssetService, SpareCondm
+
+
 
 } = require('../am_item_creation_detail/am_itemdetail.service')
 module.exports = {
@@ -78,7 +86,6 @@ module.exports = {
                 message: "Custodian Department inserted successfully"
             })
         })
-
     },
     GRNDetailsUpdate: (req, res) => {
         const body = req.body;
@@ -447,6 +454,29 @@ module.exports = {
             })
         })
     },
+    // WarentGarantInsertOrNot: (req, res) => {
+    //     const id = req.params.id;
+    //     WarentGarantInsertOrNot(id, (err, results) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(400).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         if (results.length === 0) {
+    //             return res.status(200).json({
+    //                 success: 2,
+    //                 message: "No Record Found"
+    //             });
+    //         }
+
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: results
+    //         });
+    //     });
+    // },
     WarentGarantInsertOrNot: (req, res) => {
         const id = req.params.id;
         WarentGarantInsertOrNot(id, (err, results) => {
@@ -505,7 +535,8 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Warrenty/Guaranty Details inserted successfully"
+                message: "Warrenty/Guaranty Details inserted successfully",
+                insertId: result.insertId,
             })
         })
 
@@ -544,7 +575,8 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Warrenty/Guaranty Details inserted successfully"
+                message: "Warrenty/Guaranty Details inserted successfully",
+                insertId: result.insertId,
             })
         })
 
@@ -571,6 +603,8 @@ module.exports = {
             })
         })
     },
+
+
     AmcPmInsertOrNot: (req, res) => {
         const id = req.params.id;
         AmcPmInsertOrNot(id, (err, results) => {
@@ -604,13 +638,62 @@ module.exports = {
                     message: err
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                message: "ACM/PM Details inserted successfully"
+            const postdata = {
+                am_item_amc_cmc_slno: result.insertId,
+                am_cmc_slno: body.amc_slno,
+                am_amc_cmc_log_status: 1
+            }
+            InsertAmcCmcLog(postdata, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    message: "ACM/PM Details inserted successfully",
+                    insertId: result.insertId,
+                })
+
             })
         })
-
     },
+    PmInsert: (req, res) => {
+        const body = req.body;
+        PmInsert(body, (err, result) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            const postdata = {
+                am_item_map_slno: body.am_item_map_slno,
+                am_pm_fromdate: body.instalation_date,
+                am_pm_dutedate: body.due_date,
+                create_user: body.create_user,
+                am_pm_log_status: 1
+            }
+            InsertPMLog(postdata, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    message: "PM Details Added successfully",
+
+                })
+
+            })
+        })
+    },
+
     AmcPmUpdate: (req, res) => {
         const body = req.body;
         AmcPmUpdate(body, (err, results) => {
@@ -627,9 +710,62 @@ module.exports = {
 
                 })
             }
-            return res.status(200).json({
-                success: 2,
-                message: "ACM/PM Details Updated successfully"
+            const postdata = {
+                am_item_amc_cmc_slno: body.am_item_amcpm_slno,
+                am_cmc_slno: body.amc_slno,
+                am_amc_cmc_log_status: 1
+            }
+            InsertAmcCmcLog(postdata, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 2,
+                    message: "ACM/PM Details Updated successfully"
+                })
+            })
+        })
+    },
+    PmUpdate: (req, res) => {
+        const body = req.body;
+        PmUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+
+                })
+            }
+            const postdata = {
+                am_item_map_slno: body.am_item_map_slno,
+                am_pm_fromdate: body.instalation_date,
+                am_pm_dutedate: body.due_date,
+                create_user: body.edit_user,
+                am_pm_log_status: 1
+            }
+            InsertPMLog(postdata, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 2,
+                    message: "PM Details Updated successfully",
+                })
+
             })
         })
     },
@@ -705,29 +841,27 @@ module.exports = {
             });
         });
     },
+
     SpecificationInsert: (req, res) => {
         const body = req.body;
-        var newList = body.map((val, index) => {
-            return [val.am_item_map_slno, val.specifications, val.status, val.create_user]
-        })
-        SpecificationInsert(newList, (err, results) => {
+        SpecificationInsert(body, (err, result) => {
             if (err) {
-                logger.logwindow(err)
                 return res.status(200).json({
-                    success: 2,
+                    success: 0,
                     message: err
                 });
-            } return res.status(200).json({
+            }
+            return res.status(200).json({
                 success: 1,
-                message: "Specification inserted Successfully"
-            });
-
-        });
+                message: "Specification inserted Successfully",
+            })
+        })
     },
 
-    SepcifiDelete: (req, res) => {
+
+    SepcUpdate: (req, res) => {
         const body = req.body;
-        SepcifiDelete(body, (err, results) => {
+        SepcUpdate(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({
@@ -744,7 +878,6 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Item Removed successfully"
             });
         });
     },
@@ -1043,6 +1176,75 @@ module.exports = {
             });
         });
     },
+    AmcCmcDetailList: (req, res) => {
+        const id = req.params.id;
+        AmcCmcDetailList(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    PmDetailsList: (req, res) => {
+        const id = req.params.id;
+        PmDetailsList(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    LeaseDetailsList: (req, res) => {
+        const id = req.params.id;
+        LeaseDetailsList(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
 
     GetSupplierSelect: (req, res) => {
 
@@ -1260,16 +1462,101 @@ module.exports = {
 
                 })
             }
+            const postdata = {
+                am_item_map_slno: body.am_item_map_slno,
+                am_lease_mast_slno: body.am_lease_mast_slno,
+                am_lease_log_status: 1
+
+            }
+            InsertLeaseLog(postdata, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 2,
+                    message: "Lease Details Updated successfully",
+
+                })
+
+            })
+        })
+    },
+    amcCmcLogUpdate: (req, res) => {
+        const body = req.body;
+        amcCmcLogUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+
+                })
+            }
             return res.status(200).json({
                 success: 2,
-                message: "Lease Details Updated successfully"
+                message: "Amc/Cmc Detail Deleted"
             })
         })
     },
 
+    UpdatePmLog: (req, res) => {
+        const body = req.body;
+        UpdatePmLog(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "PM Detail Deleted"
+            })
+        })
+    },
+    UpdateLeaseLog: (req, res) => {
+        const body = req.body;
+        UpdateLeaseLog(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Lease Detail Deleted"
+            })
+        })
+    },
+
+
     spareContamination: (req, res) => {
         const body = req.body;
-        SpareDelete(body, (err, results) => {
+        SpareCondm(body, (err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(200).json({
@@ -1343,5 +1630,72 @@ module.exports = {
             })
         });
     },
+
+    spareRemoveFromAsset: (req, res) => {
+        const body = req.body;
+        spareRemoveFromAsset(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Spare Removed From Asset And Add Back to Stock successfully"
+            })
+        })
+    },
+
+    AssetService: async (req, res) => {
+        const body = req.body;
+        try {
+            const masterData = {
+                transfrd_dept: body.item_dept_slno || null,
+                transfrd_dept_sec: body.item_deptsec_slno || null,
+                transfrd_room: body.item_room_slno || null,
+                transfrd_sub_room: body.item_subroom_slno || null,
+                transfrd_employee: body.transfer_user || null,
+                transfrd_date: new Date(),
+                transfrd_type: body.am_custodian_trans_status || null,
+                transfrd_from_dept: body.am_trans_from_dept || null,
+                transfrd_from_dept_sec: body.am_trans_from_dept_sec || null,
+                transfrd_from_room: body.am_trans_from_room || null,
+                transfrd_from_sub_room: body.am_trans_from_subroom || null,
+            };
+            const masterId = await InsertTransferMaster(masterData);
+            const detailData = {
+                asset_item_map_slno: body.am_item_map_slno,
+                transfr_mast_slno: masterId,
+            };
+            await InsertTransferDetails(detailData);
+            const updatePromise = UpdateAssetService({
+                asset_item_service: 1,
+                asset_item_service_user: body.asset_item_service_user || null,
+                item_dept_slno: body.item_dept_slno || null,
+                item_deptsec_slno: body.item_deptsec_slno || null,
+                am_item_map_slno: body.am_item_map_slno || null,
+            });
+
+            await updatePromise;
+
+            return res.status(200).json({
+                success: 2,
+                message: "Asset Added To Service List",
+            });
+        } catch (err) {
+            return res.status(500).json({
+                success: 0,
+                message: err.message || "Internal Server Error",
+            });
+        }
+    }
 
 }

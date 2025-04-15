@@ -44,7 +44,7 @@ module.exports = {
             it_bill_category_name,
             it_bill_type_name,          
             bill_cug_simtype             
-            FROM meliora.it_bill_add
+            FROM it_bill_add
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_bill_add.bill_category
             left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
             left join it_sim_type_master on it_sim_type_master.it_sim_type_slno=it_bill_add.bill_cug_simtype
@@ -185,7 +185,7 @@ module.exports = {
             it_supplier_name,
             payed_status,            
             bill_description
-            FROM meliora.it_other_bills
+            FROM it_other_bills
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_other_bills.bill_category
             left join it_bill_supplier_details_mast on it_bill_supplier_details_mast.it_supplier_slno=it_other_bills.supplier_details`
             , [],
@@ -419,7 +419,7 @@ module.exports = {
             bill_description,
             it_bill_type_mast.it_bill_type_slno,
             it_bill_type_mast.it_bill_type_name
-            FROM meliora.it_other_bills
+            FROM it_other_bills
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_other_bills.bill_category
              left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
             where payed_status is null || payed_status=0`
@@ -448,7 +448,7 @@ module.exports = {
             file_upload_status,
             it_bill_type_mast.it_bill_type_slno,
             it_bill_type_mast.it_bill_type_name
-            FROM meliora.it_other_bills
+            FROM it_other_bills
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_other_bills.bill_category
             left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
             where (payed_status is null || payed_status=0)and (it_bill_type_mast.it_bill_type_slno=1)`
@@ -477,7 +477,7 @@ module.exports = {
             bill_description,
             it_bill_type_mast.it_bill_type_slno,
             it_bill_type_mast.it_bill_type_name
-            FROM meliora.it_other_bills
+            FROM it_other_bills
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_other_bills.bill_category
             left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
             where (payed_status is null || payed_status=0)and (it_bill_type_mast.it_bill_type_slno=2) `
@@ -507,7 +507,7 @@ module.exports = {
             am_item_map_slno,
             it_bill_type_mast.it_bill_type_slno,
             it_bill_type_mast.it_bill_type_name
-            FROM meliora.it_other_bills
+            FROM it_other_bills
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_other_bills.bill_category
             left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
             where (payed_status is null || payed_status=0)and (it_bill_type_mast.it_bill_type_slno=3)`

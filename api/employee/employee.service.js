@@ -126,6 +126,7 @@ module.exports = {
             co_employee_master.em_name,
             emp_username,
             emp_password,
+            desg_name,
             app_token,
             co_employee_master.em_department,
             co_employee_master.em_id,
@@ -134,10 +135,11 @@ module.exports = {
             sec_name,dept_name,
             current_timestamp() as login,
             co_employee_master.supervisor
-         FROM meliora.co_employee
+         FROM co_employee
             LEFT JOIN co_employee_master ON co_employee_master.em_no=co_employee.emp_no
             LEFT JOIN co_department_mast ON co_department_mast.dept_id=co_employee_master.em_department
             LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id=co_employee_master.em_dept_section
+             LEFT JOIN co_designation ON co_designation.desg_slno=co_employee_master.em_designation
              WHERE emp_username = ? AND emp_status = '1'`,
             [userName],
             (error, results, fields) => {

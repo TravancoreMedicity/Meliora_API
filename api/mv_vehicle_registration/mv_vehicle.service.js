@@ -45,7 +45,7 @@ WHERE vehicle_status = 1
         pool.query(
             `
             SELECT vehicle_number,create_date
-FROM  meliora.mv_vehicle_registration 
+FROM  mv_vehicle_registration 
 WHERE token_number = ?
 AND DATE(create_date) = CURDATE()
             `,

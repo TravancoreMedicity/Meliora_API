@@ -28,7 +28,6 @@ module.exports = {
         })
     },
     EmergncyTypeView: (req, res) => {
-
         EmergncyTypeView((err, results) => {
             if (err) {
                 return res.status(200).json({
@@ -56,7 +55,7 @@ module.exports = {
         if (body_result.error) {
             logger.warnlogwindow(body_result.error.details[0].message)
             return res.status(200).json({
-                success: 2,
+                success: 7,
                 message: body_result.error.details[0].message
             });
         }

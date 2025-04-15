@@ -7,7 +7,7 @@ module.exports = {
             device_type_slno,
             device_type_name
             FROM
-            meliora.it_communication_device_type
+            it_communication_device_type
             WHERE device_type_status=1`, [],
             (error, results, feilds) => {
                 if (error) {
@@ -24,7 +24,7 @@ module.exports = {
             device_type_slno,
             device_type_name
             FROM
-            meliora.it_password_device_type
+            it_password_device_type
             WHERE device_type_status=1`, [],
             (error, results, feilds) => {
                 if (error) {
@@ -41,7 +41,7 @@ module.exports = {
             credential_slno,
             credential_name
             FROM
-            meliora.it_passwrd_credential_type
+            it_passwrd_credential_type
             WHERE credential_status=1`, [],
             (error, results, feilds) => {
                 if (error) {
@@ -59,7 +59,7 @@ module.exports = {
             it_sim_type_slno,
             it_sim_type_name
             FROM
-            meliora.it_sim_type_master
+            it_sim_type_master
             WHERE it_sim_type_status=1`, [],
             (error, results, feilds) => {
                 if (error) {
@@ -76,7 +76,7 @@ module.exports = {
             it_bill_type_slno,
             it_bill_type_name
             FROM
-            meliora.it_bill_type_mast
+            it_bill_type_mast
             WHERE it_bill_type_status=1`, [],
             (error, results, feilds) => {
                 if (error) {
@@ -93,7 +93,7 @@ module.exports = {
             it_bill_category_slno,
             it_bill_category_name
             FROM
-            meliora.it_bill_category_mast
+            it_bill_category_mast
             WHERE it_bill_category_status=1`, [],
             (error, results, feilds) => {
                 if (error) {
@@ -110,13 +110,31 @@ module.exports = {
             it_supplier_slno,
             it_supplier_name
             FROM
-            meliora.it_bill_supplier_details_mast`, [],
+            it_bill_supplier_details_mast`, [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);
                 }
                 return callback(null, results);
 
+            }
+        );
+    },
+    getSupplierData: (id, callBack) => {
+        pool.query(
+            `SELECT 
+            *
+            FROM
+            it_bill_supplier_details_mast
+            Where it_supplier_slno=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
             }
         );
     },

@@ -177,7 +177,7 @@ const wifiManagement = require('./api/it_wifi_management/wifi.router')
 const itemCreationDeptmap = require('./api/am_Item_creation_mast/item_creation_mast.router')
 const CustodianDeptMast = require('./api/am_custodian_department/am_custodian_dept.router')
 const ItemMapDetails = require('./api/am_item_creation_detail/am_itemdetail.router')
-const CrfImageUpload = require('./api/crf_fileupload/crf_fileupload.router')
+// const CrfImageUpload = require('./api/crf_fileupload/crf_fileupload.router')
 const IiImageUpload = require('./api/it_managemnt_file_upload/it_file_upload.router')
 const PasswordManagementMain = require('./api/it_password_management/password_management.router')
 const PasswordCredentialType = require('./api/it_password_credential_type_master/password_credential.router')
@@ -228,14 +228,31 @@ const SpareCondemService = require('./api/am_spare_condemnation/am_spare_condemn
 const opAseessment = require('./api/qi_initial_assessment_details/assessment.router')
 const feedbackdata = require('./api/feedback_module/feedback.router')
 const qideptAccess = require('./api/qi_dept_access_mast/dept_access_router')
+const complaintFileUpload = require('./api/cm_file_upload/cm_file_upload.router')
+const complaintHoldReason = require('./api/cm_complaint_hold_reason_mast/hold_reason.router')
+const assetSpareDetails = require('./api/am_spare_service_details/spare_service_details.router')
+const AmServiceFileUpload = require('./api/am_asset_serviced_file_upload/service_file_upload.router')
+const Amdashboard = require('./api/am_dashboard/am_dashboard.router')
+const Ticketdashboard = require('./api/cm_dashboard/cm_dashboard.router')
 const med_vallet_master = require('./api/med_vallet/med_vallet.router')
 const mv_vehicle_registration = require('./api/mv_vehicle_registration/mv_vehicle.router');
 const userRegistration = require("./api/usermanagement/user.router");
 const feedbackforms = require('./api/Feedback/Feedback.router')
 const backuptypemast = require('./api/it_backup_type_master/backup_type.router')
 const simOperators = require('./api/it_sim_operators/sim_operators.router')
-const { validateTokenFrontend } = require("./authentication/ValidationCheck");
 const { validateAccessToken } = require("./api/tokenValidation/tokenValidation");
+const AssetCondemnation = require('./api/am_condem_details/am_condem.router');
+const backuptypemast = require('./api/it_backup_type_master/backup_type.router')
+const simOperators = require('./api/it_sim_operators/sim_operators.router')
+// const condemApprovalLevel = require('./api/am_asset_condem_approval_level_mast/approval_level_mast.router')
+
+
+const { validateTokenFrontend } = require("./authentication/ValidationCheck");
+const crfDeliveryMarking = require('./api/crm_delivery_marking/delivery_marking_router')
+const companyMast = require('./api/crm_company_mast/company.router')
+const crmDashboard = require('./api/crm_dashboard/crmDasboard.router')
+const approvalMapping = require('./api/crm_approval_mapping/approval.router')
+
 
 
 app.use(express.json({ limit: '50mb' }));
@@ -376,7 +393,7 @@ app.use('/api/wifiManagement', wifiManagement)
 app.use('/api/itemCreationDeptmap', itemCreationDeptmap)
 app.use('/api/CustodianDeptMast', CustodianDeptMast)
 app.use('/api/ItemMapDetails', ItemMapDetails)
-app.use('/api/CrfImageUpload', CrfImageUpload)
+// app.use('/api/CrfImageUpload', CrfImageUpload)
 app.use('/api/ItImageUpload', IiImageUpload)
 app.use('/api/PasswordManagementMain', PasswordManagementMain)
 app.use('/api/PasswordCredentialType', PasswordCredentialType)
@@ -427,14 +444,25 @@ app.use('/api/SpareCondemService', SpareCondemService)
 app.use('/api/InitialAsessment', opAseessment)
 app.use('/api/feedback', feedbackdata)
 app.use('/api/qideptAccess', qideptAccess)
+app.use('/api/complaintFileUpload', complaintFileUpload)
+app.use('/api/complaintHoldReason', complaintHoldReason)
+app.use('/api/assetSpareDetails', assetSpareDetails)
+app.use('/api/AmServiceFileUpload', AmServiceFileUpload)
+app.use('/api/Amdashboard', Amdashboard)
+app.use('/api/Ticketdashboard', Ticketdashboard)
 app.use('/api/medvallet', med_vallet_master)
 app.use('/api/medvehilces', mv_vehicle_registration)
 app.use("/api/user", userRegistration);
 app.use("/api/feedback", feedbackforms);
-app.get('/api/validateToken', validateTokenFrontend)
 app.get('/api/validateAccessToken', validateAccessToken)
 app.use('/api/backuptypemast', backuptypemast)
 app.use('/api/simOperators', simOperators)
+app.use('/api/AssetCondemnation', AssetCondemnation)
+
+app.use('/api/backuptypemast', backuptypemast)
+app.use('/api/simOperators', simOperators)
+// app.use('/api/condemApprovalLevel', condemApprovalLevel)
+
 app.get('/api/validateToken', validateTokenFrontend)
 
 /*
@@ -443,6 +471,11 @@ app.use('/api/validatetoken',validateToken)
 app
 
 */
+app.use('/api/deliveryMarking', crfDeliveryMarking)
+app.use('/api/companyMast', companyMast)
+app.use('/api/CRFDashboard', crmDashboard)
+app.use('/api/approvalMapping', approvalMapping)
+
 
 
 server.listen(process.env.APP_PORT, () =>

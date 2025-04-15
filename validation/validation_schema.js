@@ -588,6 +588,10 @@ const validateComplaintRegist = Joi.object({
     priority: Joi.string().optional(),
     priority_reason: Joi.optional(),
     priority_check: Joi.number().optional(),
+    rm_room_slno: Joi.optional(),
+    cm_asset_status: Joi.optional(),
+    cm_complaint_location: Joi.optional()
+
 })
 
 
@@ -919,6 +923,7 @@ const validateCategoryCreate = Joi.object({
         }),
     category_slno: Joi.number().optional(),
     category_status: Joi.number().min(0).max(1).required(),
+    am_category_pm_days: Joi.string().optional(),
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
 });
@@ -1280,31 +1285,31 @@ const validateQiTypeList = Joi.object({
     edit_user: Joi.number().optional()
 });
 
-const validateCRMRequestRegister = Joi.object({
-    // request_dept_slno: Joi.number().min(1).required().messages({
-    //     'string.empty': 'Select Department'
-    // }),
-    request_deptsec_slno: Joi.number().min(1).required().messages({
-        'string.empty': 'Select Department Section'
-    }),
-    category: Joi.optional(),
-    location: Joi.optional(),
-    actual_requirement: Joi.optional(),
-    needed: Joi.optional(),
-    expected_date: Joi.date().optional(),
-    emergency_flag: Joi.number().optional(),
-    emer_slno: Joi.optional(),
-    emergeny_remarks: Joi.optional(),
-    // total_approx_cost: Joi.number().optional(),
-    user_deptsec: Joi.number().optional(),
-    rm_ndrf: Joi.optional(),
-    req_status: Joi.optional(),
-    image_status: Joi.optional(),
-    create_user: Joi.number().optional(),
-    edit_user: Joi.number().optional(),
-    req_slno: Joi.number().optional()
-});
-// equip_no, equip_name, procedure_names, asset_no, equip_status, create_user, edit_user, create_date, update_date
+// const validateCRMRequestRegister = Joi.object({
+//     // request_dept_slno: Joi.number().min(1).required().messages({
+//     //     'string.empty': 'Select Department'
+//     // }),
+//     request_deptsec_slno: Joi.number().min(1).required().messages({
+//         'string.empty': 'Select Department Section'
+//     }),
+//     category: Joi.optional(),
+//     location: Joi.optional(),
+//     actual_requirement: Joi.optional(),
+//     needed: Joi.optional(),
+//     expected_date: Joi.date().optional(),
+//     emergency_flag: Joi.number().optional(),
+//     emer_slno: Joi.optional(),
+//     emergeny_remarks: Joi.optional(),
+//     // total_approx_cost: Joi.number().optional(),
+//     user_deptsec: Joi.number().optional(),
+//     rm_ndrf: Joi.optional(),
+//     req_status: Joi.optional(),
+//     image_status: Joi.optional(),
+//     create_user: Joi.number().optional(),
+//     edit_user: Joi.number().optional(),
+//     req_slno: Joi.number().optional()
+// });
+
 const validateQiEquipment = Joi.object({
     equip_no: Joi.number().optional(),
     qi_dept_no: Joi.number().required(),
@@ -1322,7 +1327,11 @@ const validateQiEquipment = Joi.object({
     create_user: Joi.number().optional(),
     edit_user: Joi.number().optional(),
 });
-
+const validateCompanyName = Joi.object({
+    company_name: Joi.string().trim().uppercase().required(),
+    comp_status: Joi.number().required(),
+    company_slno: Joi.number().optional()
+});
 module.exports = {
     validateFloors,
     validateRoomCategory,
@@ -1398,9 +1407,10 @@ module.exports = {
     validateAssetRackMaster,
     validateEmergncyType,
     validateCensusNursingStation,
-    validateCRMRequestRegister,
+    // validateCRMRequestRegister,
     validateQiDepartment,
     validateQiTypeList,
     validateQiEquipment,
+    validateCompanyName,
 
 }

@@ -3,7 +3,7 @@ const { CategoryInsert, CategoryView, CategoryUpdate } = require('../am_category
 module.exports = {
     CategoryInsert: (req, res) => {
         const body = req.body;
-        //validate category Instert function
+        // validate category Instert function
         const body_result = validateCategoryCreate.validate(body);
         if (body_result.error) {
             return res.status(200).json({
@@ -26,6 +26,22 @@ module.exports = {
             })
         })
     },
+    // CategoryInsert: (req, res) => {
+    //     const body = req.body;
+    //     CategoryInsert(body, (err, result) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             message: "Category inserted successfully",
+    //             insertId: result.insertId,
+    //         })
+    //     })
+    // },
 
     CategoryView: (req, res) => {
         CategoryView((err, results) => {

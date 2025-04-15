@@ -151,10 +151,8 @@ module.exports = {
 
 
     getMenuName: (req, res) => {
-
         const body = req.body;
         const body_result = body;
-
         if (body_result.error) {
             return res.status(200).json({
                 success: 2,
@@ -167,7 +165,6 @@ module.exports = {
             if (Object.keys(value).length === 0) {
                 // Insert the values
                 getMenuSlno(body, (err, results) => {
-
                     const postData = {
                         user_group_slno: body.user_group_slno,
                         module_slno: body.module_slno,

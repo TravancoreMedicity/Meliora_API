@@ -131,7 +131,7 @@ module.exports = {
     },
     getComplaintDeptStatus: (callBack) => {
         pool.query(
-            `SELECT complaint_dept_slno,complaint_dept_name FROM cm_complaint_dept WHERE complaint_dept_status=1`,
+            `SELECT complaint_dept_slno,complaint_dept_name,department_slno FROM cm_complaint_dept WHERE complaint_dept_status=1`,
             (error, results, feilds) => {
                 if (error) {
                     return callBack(error);

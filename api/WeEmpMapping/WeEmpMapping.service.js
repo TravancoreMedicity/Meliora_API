@@ -43,7 +43,7 @@ module.exports = {
                  GROUP_CONCAT(co_nurse_desc) as   co_nurse_desc,
                  map_nsurse_station,
                   JSON_EXTRACT(map_nsurse_station,'$ [*]')
-                  FROM meliora.we_emp_map
+                  FROM we_emp_map
                   left join co_department_mast on we_emp_map.map_dept_slno = co_department_mast.dept_id
                   left join co_deptsec_mast on we_emp_map.map_deptsec_slno = co_deptsec_mast.sec_id
                   left join floor_master on we_emp_map.map_floor = floor_master.floor_code
@@ -115,7 +115,6 @@ module.exports = {
             [id],
 
             (error, results, feilds) => {
-                // console.log(results);
                 if (error) {
                     return callBack(error);
                 }

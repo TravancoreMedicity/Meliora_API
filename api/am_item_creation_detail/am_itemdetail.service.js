@@ -1630,7 +1630,7 @@ module.exports = {
             am_bill_image, am_bill_supplier,it_supplier_name         
             from am_bill_master
             left join it_bill_supplier_details_mast on it_bill_supplier_details_mast.it_supplier_slno=am_bill_master.am_bill_supplier
-            where am_bill_supplier=? and am_bill_date>=?`,
+            where am_bill_supplier=? and am_bill_date = ?`,
             [
                 data.am_bill_supplier,
                 data.am_bill_date
@@ -1684,7 +1684,7 @@ module.exports = {
             to_date, amccmc_status, image_upload,it_supplier_name
             from am_amc_cmc_master
              left join it_bill_supplier_details_mast on it_bill_supplier_details_mast.it_supplier_slno=am_amc_cmc_master.suplier_slno
-             where amc_status=1 and suplier_slno=? and from_date>=?`,
+             where amc_status=1 and suplier_slno=? and from_date = ?`,
             [
                 data.suplier_slno,
                 data.from_date
@@ -1703,7 +1703,7 @@ module.exports = {
             to_date, amccmc_status, image_upload,it_supplier_name
             from am_amc_cmc_master
              left join it_bill_supplier_details_mast on it_bill_supplier_details_mast.it_supplier_slno=am_amc_cmc_master.suplier_slno
-             where cmc_status=1 and suplier_slno=? and from_date>=?`,
+             where cmc_status=1 and suplier_slno=? and from_date = ?`,
             [
                 data.suplier_slno,
                 data.from_date

@@ -111,7 +111,7 @@ module.exports = {
                     quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
                     quatation_negotiation,quatation_negotiation_remarks,quatation_negotiation_date,QN.em_name as quatation_neguser,
                     quatation_fixing,quatation_fixing_remarks,quatation_fixing_date,QF.em_name as quatation_fixuser,
-                    po_prepartion, po_complete,po_complete_date,company_name,crm_request_master.company_slno
+                    po_prepartion, po_complete,po_complete_date,company_name,crm_request_master.company_slno,crm_request_master.work_order_status
              FROM
                  crm_request_master
                    LEFT JOIN crm_request_approval ON crm_request_approval.req_slno=crm_request_master.req_slno
@@ -133,7 +133,7 @@ module.exports = {
                     LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno 
 			WHERE
                    ack_status=1 AND user_acknldge is null  AND ( crm_purchase_po_details.po_to_supplier is null
-                   OR crm_purchase_po_details.po_to_supplier=0)  AND crf_close IS NULL
+                   OR crm_purchase_po_details.po_to_supplier=0)  AND crf_close IS NULL 
                GROUP BY crm_request_master.req_slno ,crm_purchase_mast.crm_purchase_slno                 
                ORDER BY crm_request_master.req_slno DESC`,
             [],
@@ -745,5 +745,53 @@ module.exports = {
     },
 
 
+    InsertWorkOrder: (data, callback) => {
 
+        pool.query(
+            `UPDATE
+                   crm_purchase_mast
+             SET         
+                   work_Order_no = ?,
+                   work_Order_date = ?,
+                   work_Order_status = ?,
+                   work_order_remark=?                
+             WHERE
+                   req_slno =?`,
+            [
+                data.work_orderNo,
+                data.order_date,
+                data.ack_status,
+                data.ack_remarks,
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    InsertWorkOrderDetails: (data, callback) => {
+        pool.query(
+            `UPDATE
+                   crm_request_master
+             SET         
+                 
+                   work_order_status=?                
+             WHERE
+                   req_slno =?`,
+            [
+                data.ack_status,
+                data.req_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 }

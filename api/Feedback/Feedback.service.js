@@ -47,7 +47,7 @@ module.exports = {
         pool.query(
             `
             UPDATE  fb_category_master
-            SET 
+            SET
             fb_category_name = ?,
             fb_catgory_status = ?,
             edit_user = ?
@@ -116,7 +116,7 @@ ON
         pool.query(
             `
             UPDATE  fb_subcategory_master
-            SET 
+            SET
             fb_subcategory_name = ?,
             fb_category_slno=?,
             fb_subcategory_status = ?,
@@ -183,7 +183,7 @@ ON
         pool.query(
             `
             UPDATE  fb_rating_type
-            SET 
+            SET
             fb_rateing_name = ?,
             fb_rateing_status = ?,
             edit_user = ?
@@ -293,7 +293,7 @@ WHERE meliora.fb_subcategory_master.fb_category_slno= ?`,
         pool.query(
             `
             UPDATE  fb_mast
-            SET 
+            SET
             feedback_name = ?,
             feedback_status = ?,
             update_user = ?
@@ -1011,7 +1011,7 @@ WHERE
         pool.query(
             `
             UPDATE  fb_module_mast
-            SET 
+            SET
             fb_module_name = ?,
             fb_module_status = ?,
             edit_user = ?
@@ -1121,7 +1121,7 @@ ON
         pool.query(
             `
             UPDATE  fb_menu_mast
-            SET 
+            SET
             fb_menu_name = ?,
             fb_module_slno=?,
             fb_menu_status = ?,
@@ -1210,7 +1210,7 @@ ON
         pool.query(
             `
             UPDATE  fb_usrgrp_mast
-            SET 
+            SET
             fb_usrgrp_name = ?,
             fb_usrgrp_status = ?,
             edit_user = ?
@@ -1285,7 +1285,7 @@ WHERE
         pool.query(
             `
             UPDATE  fb_user_right_mast
-            SET 
+            SET
             fb_menu_view = ?,
             edit_user = ?
             WHERE fb_usr_right_slno = ?
@@ -1441,7 +1441,7 @@ left join  co_employee_master on fb_employee_user_rights.fb_empid =  co_employee
         pool.query(
             `
             UPDATE  fb_employee_user_rights
-            SET 
+            SET
            fb_grp_slno=?, 
             fb_depid=?,
             fb_secid=?, 
@@ -1558,7 +1558,7 @@ where fb_usrgrp_slno=? and fb_module_slno=?
         pool.query(
             `
             UPDATE  fb_user_module_master
-            SET 
+            SET
             fb_usrgrp_slno = ?,
             fb_module_slno = ?,
             fb_usr_module_status=?,
@@ -1703,7 +1703,7 @@ left join rm_floor_creation  on fb_nurse_station_master.fb_floor_code = rm_floor
         pool.query(
             `
             UPDATE  fb_nurse_station_master
-            SET 
+            SET
             fb_ns_code = ?,
             fb_ns_name = ?,
             fb_floor_code = ?,
@@ -2151,7 +2151,7 @@ left join rm_floor_creation  on fb_nurse_station_master.fb_floor_code = rm_floor
                 pool.query(
                     `
                     UPDATE fb_ipadmiss
-                    SET 
+                    SET
                         fb_ip_no = ?, 
                         fb_ipd_date = ?, 
                         fb_pt_no = ?, 
@@ -2675,13 +2675,15 @@ ORDER BY
                        AND fb_nurse_station_master.fb_ns_code=fb_bed.fb_ns_code
                        AND fb_nurse_station_master.fb_ns_code = ?
                        AND fb_ipadmiss.fb_bd_code = ?
+                       AND fb_ipadmiss.create_date = (
+						    SELECT MAX(create_date) FROM fb_ipadmiss WHERE fb_ipadmiss.fb_bd_code = ?
+					   )
                        ORDER BY fb_ipadmiss.fb_ip_no
-    
             `,
             [
                 data.fb_ns_code,
                 data.fb_bd_code,
-
+                data.fb_bd_code
             ]
             , (error, results, fields) => {
                 if (error) {
@@ -2693,7 +2695,7 @@ ORDER BY
     getallblockedbed: (callBack) => {
         pool.query(
             `
-               SELECT 
+              SELECT 
                fb_bed.fb_bed_slno, 
                fb_bed.fb_bd_code,
                fb_bed.fb_bdc_no,
@@ -2710,13 +2712,16 @@ ORDER BY
                fb_rtc_desc,
                fb_rtc_alias,
                fb_bed.create_date,
-               fb_bed_remarks.fb_bed_reason,
-               fb_bed_remarks.fb_bed_status
+               fb_bed_remarks.fb_bed_remark,
+               fb_bed_remarks.fb_bed_status,
+               fb_rm_room_slno
                FROM meliora.fb_bed
                LEFT JOIN fb_nurse_station_master 
-               ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code
+               ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code   
                LEFT JOIN fb_room_type 
                ON fb_bed.fb_rt_code = fb_room_type.fb_rt_code
+			   LEFT JOIN fb_roomcreation_master 
+               ON fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
                LEFT JOIN fb_bed_remarks 
                ON fb_bed.fb_bdc_no = fb_bed_remarks.fb_bdc_no 
                AND fb_bed_remarks.fb_bed_status = 1 
@@ -2731,50 +2736,72 @@ ORDER BY
                 return callBack(null, results)
             })
     },
+    getallroomassetdata: (data, callBack) => {
+        pool.query(
+            `select 
+	fb_assets_map_slno,
+	 fb_rc_roomslno, 
+     fb_asset_map_master.fb_dep_id   ,
+     fb_ismultiple,
+     fb_asset_count,
+     fb_asset_map_status,
+     fb_asset_item_master.fb_asset_name,
+	rm_room_name,
+    complaint_dept_name,
+    fb_complaint_dep
+from 
+	fb_asset_map_master
+left join rm_newroom_creation on rm_newroom_creation.rm_room_slno = fb_asset_map_master.fb_rc_roomslno
+left join fb_asset_item_master on fb_asset_item_master.fb_asset_slno = fb_asset_map_master.fb_asset_id	
+left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno = fb_asset_map_master.fb_complaint_dep		
+where fb_rc_roomslno = ?
+            `,
+            [
+                data
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+
     insertbedremarks: (data, callBack) => {
         pool.query(
             `
             INSERT INTO  fb_bed_remarks(
-            fb_bed_slno,
+             fb_bed_slno,
             fb_bd_code,
             fb_bdc_no,
             fb_ns_code,
-            fb_overall_condition,
-            fb_overall_remarks,
-            fb_it_status,
-            fb_maintenance_status,
-            fb_biomedical_status,
-            fb_biomedical_emp_assign, 
-            fb_it_emp_assign, 
-            fb_maintenace_emp_assign,
-            fb_bed_reason,
-            fb_it_remark,
-            fb_biomedical_remarks,
-            fb_maintenace_remark,
             fb_bed_status,
+            fb_bed_service_status,
+            fb_bed_remark,
+            fb_overall_remarks,
+            fb_overall_condition,
+            fb_initail_checked,
+            fb_initial_emp_assign,
+            fb_emp_assign,
             create_user
             ) 
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)
             `,
             [
                 data.fb_bed_slno,
                 data.fb_bd_code,
                 data.fb_bdc_no,
                 data.fb_ns_code,
-                data.fb_overall_condition,
-                data.fb_overall_remarks,
-                data.fb_it_status,
-                data.fb_maintenance_status,
-                data.fb_biomedical_status,
-                data.fb_biomedical_emp_assign,
-                data.fb_it_emp_assign,
-                data.fb_maintenace_emp_assign,
-                data.fb_bed_reason,
-                data.fb_it_remark,
-                data.fb_biomedical_remarks,
-                data.fb_maintenace_remark,
                 data.fb_bed_status,
+                data.fb_bed_service_status,
+                data.fb_bed_remark,
+                data.fb_overall_remarks,
+                data.fb_overall_condition,
+                data.fb_initail_checked,
+                data.fb_initial_emp_assign,
+                data.fb_emp_assign,
                 data.create_user
+
             ],
             (error, results, fields) => {
                 if (error) {
@@ -2794,6 +2821,7 @@ ORDER BY
                 fb_bed_reason,
                 fb_bed_remarks,
                 fb_bed_status,
+                fb_initail_checked,
                 create_date
             from 
                 fb_bed_remarks
@@ -2850,48 +2878,39 @@ ORDER BY
             })
     },
     InsertBedRemarkDetail: (data, callBack) => {
+        const { detail, fb_bed_rmk_slno, create_user } = data;
         // Create promises for each item in the data
-        const promises = data?.map((item) => {
-            const { name, values, fb_bed_rmk_slno, create_user } = item;
-            return values?.map((value) => {
-                const fb_dep_name = name;
-                // Use Object.keys() to get the keys (asset names) from the value object
-                return Object.keys(value).map((fb_asset_name) => {
-                    const fb_asset_status = value[fb_asset_name]; // Get the status (1 or 0)
-
-                    const query = `
-                        INSERT INTO fb_bed_remark_detail (
-                            fb_bed_rmk_slno,
-                            fb_dep_name,
-                            fb_asset_name,
-                            fb_asset_status,
-                            create_user
-                        )
-                        VALUES (?, ?, ?, ?, ?)
-                    `;
-                    const valuesToInsert = [
+        const promises = detail?.map((item) => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    `
+                    INSERT INTO fb_bed_remark_detail(
                         fb_bed_rmk_slno,
-                        fb_dep_name,
+                        fb_dep_id,
                         fb_asset_name,
                         fb_asset_status,
+                        create_user 
+                    )
+                    VALUES(?,?,?,?,?)       
+                    `,
+                    [
+                        fb_bed_rmk_slno,
+                        item.fb_dep_id,
+                        item.fb_asset_name,
+                        item.status,
                         create_user
-                    ];
-
-                    // Return the promise for the query execution
-                    return new Promise((resolve, reject) => {
-                        pool.query(query, valuesToInsert, (error, results) => {
-                            if (error) {
-                                reject(error);
-                            } else {
-                                resolve(results);
-                            }
-                        });
-                    });
-                });
-            }).flat();
-        }).flat(); // Flatten the outer array of promises
-
-        // Use Promise.all to wait for all insertions to complete
+                    ],
+                    (error, results, fields) => {
+                        if (error) {
+                            reject(error); // Reject the promise if there's an error
+                        } else {
+                            resolve(results); // Resolve the promise if successful
+                        }
+                    }
+                );
+            });
+        });
+        // Use Promise.all to wait for all insertions
         Promise.all(promises)
             .then((results) => {
                 callBack(null, results);
@@ -2899,29 +2918,24 @@ ORDER BY
             .catch((error) => {
                 callBack(error);
             });
+
     },
     getbedremarkDetail: (data, callBack) => {
         pool.query(
-            `select  fb_bed_slno, 
+            `select  fb_bed_slno,
                 fb_bd_code,
-                fb_bdc_no, 
+                fb_bdc_no,
                 fb_ns_code,
-                fb_bed_status,
-                fb_bed_reason,
-                fb_biomedical_emp_assign,
-                fb_it_emp_assign,
-                fb_maintenace_emp_assign,
-                fb_overall_condition,
+                fb_bed_remark,
                 fb_overall_remarks,
-                fb_it_status,
-                fb_maintenance_status,
-                fb_biomedical_status,
-                fb_it_remark,
-                fb_biomedical_remarks,
-                fb_maintenace_remark,
-                fb_dep_name,
+                fb_overall_condition,
+                fb_emp_assign,
+                fb_bed_service_status,
+                fb_bed_status ,
+                fb_dep_id,
                 fb_asset_name,
-                fb_asset_status
+                fb_asset_status,
+                fb_initail_checked
             from fb_bed_remarks 
                 left join fb_bed_remark_detail on fb_bed_remarks.fb_bed_rmk_slno = fb_bed_remark_detail.fb_bed_rmk_slno
                 where fb_bd_code = ?`,
@@ -2940,41 +2954,29 @@ ORDER BY
             `
             UPDATE fb_bed_remarks
             SET
-                fb_bd_code = ?,
-                fb_bdc_no = ?,
-                fb_ns_code = ?,
-                fb_overall_condition = ?,
-                fb_overall_remarks = ?,
-                fb_it_status = ?,
-                fb_maintenance_status = ?,
-                fb_biomedical_status = ?,
-                fb_biomedical_emp_assign = ?, 
-                fb_it_emp_assign = ?, 
-                fb_maintenace_emp_assign = ?,
-                fb_bed_reason = ?,
-                fb_it_remark = ?,
-                fb_biomedical_remarks = ?,
-                fb_maintenace_remark = ?,
-                fb_bed_status = ?,
+                fb_bed_slno=?,
+                fb_bd_code=?,
+                fb_bdc_no=?,
+                fb_ns_code=?,
+                fb_bed_status=?,
+                fb_bed_service_status=?,
+                fb_bed_remark=?,
+                fb_overall_remarks=?,
+                fb_overall_condition=?,
+                fb_emp_assign=?,
                 edit_user = ?
             WHERE fb_bed_rmk_slno = ?`,
             [
+                data.fb_bed_slno,
                 data.fb_bd_code,
                 data.fb_bdc_no,
                 data.fb_ns_code,
-                data.fb_overall_condition,
-                data.fb_overall_remarks,
-                data.fb_it_status,
-                data.fb_maintenance_status,
-                data.fb_biomedical_status,
-                data.fb_biomedical_emp_assign,
-                data.fb_it_emp_assign,
-                data.fb_maintenace_emp_assign,
-                data.fb_bed_reason,
-                data.fb_it_remark,
-                data.fb_biomedical_remarks,
-                data.fb_maintenace_remark,
                 data.fb_bed_status,
+                data.fb_bed_service_status,
+                data.fb_bed_remark,
+                data.fb_overall_remarks,
+                data.fb_overall_condition,
+                data.fb_emp_assign,
                 data.edit_user,
                 data.fb_bed_rmk_slno
             ],
@@ -2986,67 +2988,116 @@ ORDER BY
             }
         );
     },
-    UpdateBedRemarkDetail: (data, callBack) => {
-        // Create promises for each item in the data
-        const promises = data?.map((item) => {
-            const { name, values, fb_bed_rmk_slno, create_user } = item;
-            return values?.map((value) => {
-                const fb_dep_name = name;
-                return Object.keys(value).map((fb_asset_name) => {
-                    const fb_asset_status = value[fb_asset_name];
-                    const query = `
-                        UPDATE fb_bed_remark_detail
-                        SET
-                            fb_dep_name = ?, 
-                            fb_asset_name = ?, 
-                            fb_asset_status = ?, 
-                            edit_user = ?
-                        WHERE fb_bed_rmk_slno = ? AND fb_asset_name = ?
-                    `;
-                    const valuesToUpdate = [
-                        fb_dep_name,
-                        fb_asset_name,
-                        fb_asset_status,
-                        create_user,
-                        fb_bed_rmk_slno,
-                        fb_asset_name
-                    ];
-                    return new Promise((resolve, reject) => {
-                        pool.query(query, valuesToUpdate, (error, results) => {
-                            if (error) {
-                                reject(error);
-                            } else {
-                                resolve(results);
-                            }
-                        });
-                    });
-                });
-            }).flat();
-        }).flat();
-        // Use Promise.all to wait for all updates to complete
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
+    updatebedremarksfromComplaint: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE fb_bed_remarks
+            SET
+                fb_bed_slno=?,
+                fb_bd_code=?,
+                fb_bdc_no=?,
+                fb_ns_code=?
+            WHERE fb_bed_rmk_slno = ?`,
+            [
+                data.fb_bed_slno,
+                data.fb_bd_code,
+                data.fb_bdc_no,
+                data.fb_ns_code,
+                data.fb_bed_rmk_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    // UpdateBedRemarkDetail: (data, callBack) => {
+    //     const { detail, fb_bed_rmk_slno, create_user } = data;
+    //     // Create promises for each item in the data
+    //     const promises = detail?.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 UPDATE fb_bed_remark_detail
+    //                     SET
+    //                         fb_dep_id = ?, 
+    //                         fb_asset_name = ?, 
+    //                         fb_asset_status = ?, 
+    //                         edit_user = ?
+    //                     WHERE fb_bed_rmk_slno = ? AND fb_asset_name = ?      
+    //                 `,
+    //                 [
+    //                     item.fb_dep_id,
+    //                     item.fb_asset_name,
+    //                     item.status,
+    //                     create_user,
+    //                     fb_bed_rmk_slno,
+    //                     item.fb_asset_name
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+
+    // },
+    getroomassetdetail: (callBack) => {
+        pool.query(
+            `select 
+            fb_assets_map_slno,
+	        fb_rc_roomslno, 
+            fb_asset_map_master.fb_dep_id,
+            fb_asset_map_master.fb_asset_id ,
+            fb_ismultiple,
+            fb_asset_count,
+            fb_asset_map_status,
+            fb_asset_item_master.fb_asset_name,
+	        rm_room_name,
+            complaint_dept_name,
+            fb_complaint_dep
+        from 
+	        fb_asset_map_master
+        left join rm_newroom_creation on rm_newroom_creation.rm_room_slno = fb_asset_map_master.fb_rc_roomslno
+        left join fb_asset_item_master on fb_asset_item_master.fb_asset_slno = fb_asset_map_master.fb_asset_id	
+        left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno = fb_asset_map_master.fb_complaint_dep		 
+                `,
+            [
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
             })
-            .catch((error) => {
-                callBack(error);
-            });
     },
     getberremarkstatus: (callBack) => {
         pool.query(
-            `select  fb_bed_slno, 
-                fb_bd_code,
-                fb_bdc_no, 
-                fb_ns_code,
-                fb_bed_status,
-                fb_bed_reason,
-                fb_overall_condition,
-                fb_it_status,
-                fb_maintenance_status,
-                fb_biomedical_status,
-                fb_it_remark,
-                fb_biomedical_remarks,
-                fb_maintenace_remark
+            `select  fb_bed_slno,
+             fb_bd_code,
+             fb_bdc_no,
+             fb_ns_code,
+             fb_bed_remark,
+             fb_overall_remarks,
+             fb_overall_condition,
+             fb_emp_assign,
+             fb_bed_service_status,
+             fb_initail_checked,
+             fb_bed_status   
             from 
                 fb_bed_remarks 
                 `,
@@ -3067,7 +3118,7 @@ ORDER BY
                 fb_bd_code,
                 fb_bdc_no,
                 fb_ns_code,
-                fb_bed_reason,
+                fb_bed_remark,
                 fb_overall_remarks,
                 fb_bed_status,
                 create_date
@@ -3084,6 +3135,875 @@ ORDER BY
                 return callBack(null, results)
             })
     },
+    getallroomdetail: (callBack) => {
+        pool.query(
+            `select 	
+	            rm_room_slno,
+	            rm_room_name
+            from 
+                rm_newroom_creation
+            where 
+                rm_room_status = 1 and rm_build_slno = 1 and rm_building_block_slno = 1 and (rm_room_floor_slno = 1 or rm_room_floor_slno = 3)
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getallbedmaster: (callBack) => {
+        pool.query(
+            `select 	
+	            fb_bed_slno, fb_bd_code, fb_bdc_no
+            from 
+                fb_bed
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getallassetItems: (callBack) => {
+        pool.query(
+            `select 	
+	            fb_asset_slno,
+                fb_asset_name,
+                fb_dep_id,
+                fb_asset_status,
+                complaint_dept_name
+            from 
+                fb_asset_item_master
+			left join cm_complaint_dept on fb_asset_item_master.fb_dep_id = cm_complaint_dept.complaint_dept_slno
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getroomchecklist: (callBack) => {
+        pool.query(
+            `select 	
+	            fb_item_slno,
+                fb_item_name, 
+                fb_item_status
+            from 
+                fb_patient_rm_checklist
+            where fb_item_status =  1
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getprocheckbed: (callBack) => {
+        pool.query(
+            `select 	
+	            fb_check_bed_slno,
+                fb_bed_slno, 
+                fb_bd_code, 
+                fb_bdc_no, 
+                fb_ns_code, 
+                fb_initial_check, 
+                fb_final_check
+            from 
+                fb_pro_check_bed
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getdepassetonly: (data, callBack) => {
+        pool.query(
+            `select 	
+	            fb_asset_slno,
+                fb_asset_name,
+                fb_dep_id,
+                fb_asset_status,
+                complaint_dept_name
+            from 
+                fb_asset_item_master
+			left join cm_complaint_dept on fb_asset_item_master.fb_dep_id = cm_complaint_dept.complaint_dept_slno
+                where fb_dep_id = ?`,
+            [
+                data
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    FindRoomAlreadyPresent: (data, callBack) => {
+        pool.query(
+            `select 	
+	            fb_nw_room_slno, fb_rm_bd_code, fb_rm_room_slno
+            from 
+                fb_roomcreation_master
+            where fb_rm_bd_code = ?  or fb_rm_room_slno= ?
+            `,
+            [
+                data.fb_rm_bd_code,
+                data.fb_rm_room_slno
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    insertroommaster: (data, callBack) => {
+        pool.query(
+            `
+            INSERT INTO  fb_roomcreation_master(
+                fb_rm_bd_code,
+                fb_rm_room_slno,
+                fb_nw_room_status,
+                create_user
+            ) 
+            VALUES(?,?,?,?)
+            `,
+            [
+                data.fb_rm_bd_code,
+                data.fb_rm_room_slno,
+                data.fb_nw_room_status,
+                data.create_user
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    updateroommaster: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE  fb_roomcreation_master
+            SET
+            fb_rm_bd_code = ?,
+            fb_rm_room_slno = ?,
+            fb_nw_room_status=?,
+            edit_user = ?
+            WHERE fb_nw_room_slno = ?
+            `,
+            [
+                data.fb_rm_bd_code,
+                data.fb_rm_room_slno,
+                data.fb_nw_room_status,
+                data.edit_user,
+                data.fb_nw_room_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getallnewroomdetail: (callBack) => {
+        pool.query(
+            `
+select
+            ROW_NUMBER() OVER () AS slno, 	
+	           fb_nw_room_slno, 
+               fb_rm_bd_code,
+               fb_rm_room_slno,
+               fb_nw_room_status,
+               rm_room_name,
+               fb_bdc_no
+            from 
+                fb_roomcreation_master
+			left join rm_newroom_creation on rm_newroom_creation.rm_room_slno = fb_roomcreation_master.fb_rm_room_slno
+            left join fb_bed on fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getAllComplaintDetail: (callBack) => {
+        pool.query(
+            `select 	
+	            complaint_dept_slno,
+                complaint_dept_name,
+                department_slno,
+                complaint_dept_status
+            from 
+                cm_complaint_dept
+            where 
+                complaint_dept_status = 1 
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    complaintregistraion: (data, callBack) => {
+        const promises = data?.map((item) => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    ` INSERT INTO  cm_complaint_mast(
+                    complaint_slno,
+                    complaint_deptslno,
+                    complaint_desc,
+                    complaint_request_slno,
+                    compalint_date,
+                    compalint_status,
+                    cm_location,
+                    create_user
+                ) 
+                VALUES(?,?,?,?,?,?,?,?)
+            `,
+                    [
+                        item.complaint_slno,
+                        item.complaint_deptslno,
+                        item.complaint_desc,
+                        item.complaint_request_slno,
+                        item.compalint_date,
+                        item.compalint_status,
+                        item.cm_location,
+                        item.create_user
+                    ],
+                    (error, results, fields) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(results);
+                        }
+                    }
+                );
+            });
+        });
+        // Use Promise.all to wait for all insertions
+        Promise.all(promises)
+            .then((results) => {
+                callBack(null, results);
+            })
+            .catch((error) => {
+                callBack(error);
+            });
+
+    },
+    UpdateSeiralNos: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE 
+                serial_nos 
+            SET
+                serial_current = serial_current + ?
+            WHERE serial_slno = 5
+            `,
+            [
+                data
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    fetchcurrentserialnos: (callBack) => {
+        pool.query(
+            `
+            SELECT serial_current FROM serial_nos where serial_slno = 5
+            `,
+            [],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    // insertAssetDetail: (data, callBack) => {
+    //     const { complaint_slno, asset, create_user, asset_status } = data;
+    //     // Create promises for each item in the data
+    //     const promises = asset?.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 INSERT INTO cm_comasset_mapping(
+    //                     cm_complait_slno,
+    //                     create_user,
+    //                     asset_status,
+    //                     am_item_map_slno,
+    //                     cm_asset_dept,
+    //                     cm_am_assetmap_slno 
+    //                 )
+    //                 VALUES(?,?,?,?,?,?)       
+    //                 `,
+    //                 [
+    //                     complaint_slno,
+    //                     create_user,
+    //                     asset_status,
+    //                     item.slno,
+    //                     item.item_asset_no,
+    //                     item.item_assent_no_only
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error);
+    //                     } else {
+    //                         resolve(results);
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+    getcomplaintdetail: (data, callBack) => {
+        pool.query(
+            `select  complaint_slno,
+                complaint_deptslno,
+                complaint_desc,
+                complaint_request_slno,
+                compalint_date,
+                compalint_status,
+                cm_location,
+                fb_bd_code,
+                fb_bdc_no,
+                complaint_dept_name,
+                cm_asset_dept,
+                cm_am_assetmap_slno
+            from cm_complaint_mast 
+                left join fb_bed on cm_complaint_mast.cm_location = fb_bed.fb_bed_slno
+                left join cm_complaint_dept on cm_complaint_mast.complaint_deptslno = cm_complaint_dept.complaint_dept_slno
+                left join cm_comasset_mapping on cm_complaint_mast.complaint_slno = cm_comasset_mapping.cm_complait_slno
+                where cm_location = ?`,
+            [
+                data
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    rectifycomplaint: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE cm_complaint_mast
+            SET
+                compalint_status = ?
+            WHERE
+                complaint_slno = ?
+            `,
+            [
+                data.status,
+                data.complaint_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    insertassetitem: (data, callBack) => {
+        pool.query(
+            `
+            INSERT INTO  fb_asset_item_master(
+                    fb_asset_name,
+                    fb_dep_id,
+                    fb_asset_status,
+                    create_user
+                ) 
+                VALUES(?,?,?,?)
+            `,
+            [
+                data.fb_asset_name,
+                data.fb_dep_id,
+                data.fb_asset_status,
+                data.create_user
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    insertroomchecklist: (data, callBack) => {
+        pool.query(
+            `
+            INSERT INTO  fb_patient_rm_checklist(
+                    fb_item_name,
+                    fb_item_status,
+                    create_user
+                ) 
+                VALUES(?,?,?)
+            `,
+            [
+                data.fb_item_name,
+                data.fb_item_status,
+                data.create_user
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    updateassetitem: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE  fb_asset_item_master
+                SET
+                    fb_asset_name = ?,
+                    fb_dep_id = ?,
+                    fb_asset_status = ?,
+                    edit_user = ?
+                where 
+                    fb_asset_slno = ?
+            `,
+            [
+                data.fb_asset_name,
+                data.fb_dep_id,
+                data.fb_asset_status,
+                data.edit_user,
+                data.fb_assets_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+
+    UpdateComplaintDetailTable: (data, callBack) => {
+        const promises = data?.flatMap((item) =>
+            item.assigned_user?.map((user) =>
+                new Promise((resolve, reject) => {
+                    pool.query(
+                        ` INSERT INTO cm_complaint_detail(
+                            complaint_slno,
+                            assigned_emp,
+                            assigned_date,
+                            assigned_user
+                        ) 
+                        VALUES(?,?,?,?)`,
+                        [
+                            item.complaint_slno,
+                            user,
+                            item.compalint_date,
+                            item.create_user,
+                        ],
+                        (error, results, fields) => {
+                            if (error) {
+                                reject(error);
+                            } else {
+                                resolve(results);
+                            }
+                        }
+                    );
+                })
+            )
+        );
+
+        Promise.all(promises)
+            .then((results) => {
+                callBack(null, results);
+            })
+            .catch((error) => {
+                callBack(error);
+            });
+    },
+    FindAlreadyAssetExist: (data, callBack) => {
+        pool.query(
+            `
+            select 
+            fb_assets_map_slno,
+	        fb_rc_roomslno, 
+            fb_asset_map_master.fb_dep_id,
+            fb_asset_map_master.fb_asset_id ,
+            fb_ismultiple,
+            fb_asset_count,
+            fb_asset_map_status
+        from 
+	        fb_asset_map_master
+        where fb_rc_roomslno = ? and fb_dep_id= ? and fb_asset_id = ?
+            `,
+            [
+                data.fb_rc_roomslno,
+                data.fb_dep_id,
+                data.fb_asset_id
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    insertroomassetdetail: (data, callBack) => {
+        pool.query(
+            `
+            INSERT INTO  fb_asset_map_master(
+                    fb_rc_roomslno,
+                    fb_dep_id,
+                    fb_complaint_dep,
+                    fb_asset_id,
+                    fb_ismultiple,
+                    fb_asset_count ,
+                    fb_asset_map_status,
+                    create_user
+                ) 
+                VALUES(?,?,?,?,?,?,?,?)
+            `,
+            [
+                data.fb_rc_roomslno,
+                data.fb_dep_id,
+                data.fb_complaint_dep,
+                data.fb_asset_id,
+                data.fb_ismultiple,
+                data.fb_asset_count,
+                data.fb_asset_map_status,
+                data.create_user
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+
+    updateroomassetdetail: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE  fb_asset_map_master
+                SET
+                    fb_rc_roomslno= ?,
+                    fb_dep_id= ?,
+                    fb_complaint_dep=?,
+                    fb_asset_id= ?,
+                    fb_ismultiple= ?,
+                    fb_asset_count = ?,
+                    fb_asset_map_status= ?,
+                    edit_user = ?
+                WHERE
+                    fb_assets_map_slno = ?
+            `,
+            [
+                data.fb_rc_roomslno,
+                data.fb_dep_id,
+                data.fb_complaint_dep,
+                data.fb_asset_id,
+                data.fb_ismultiple,
+                data.fb_asset_count,
+                data.fb_asset_map_status,
+                data.edit_user,
+                data.fb_assets_map_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    updateroomchecklist: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE  fb_patient_rm_checklist
+                SET
+                    fb_item_name = ?,
+                    fb_item_status = ?,
+                    edit_user =?
+                WHERE
+                    fb_item_slno = ?
+            `,
+            [
+                data.fb_item_name,
+                data.fb_item_status,
+                data.edit_user,
+                data.fb_item_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    getdischargeentrybed: (callBack) => {
+        pool.query(
+            `
+              SELECT 
+               fb_bed.fb_bed_slno, 
+               fb_bed.fb_bd_code,
+               fb_bed.fb_bdc_no,
+               fb_bed.fb_ns_code,
+               fb_bed.fb_rt_code,
+               fb_bed.fb_bdc_occup,
+               fb_bed.fb_bdn_cccno,
+               fb_bed.fb_bdc_status,
+               fb_bed.fb_hkd_cleaningreq,
+               fb_bed.fb_rm_code,
+               fb_bed.fb_bdc_mhcode,
+               fb_bed.fb_bdc_vipbed,
+               fb_ns_name,
+               fb_rtc_desc,
+               fb_rtc_alias,
+               fb_bed.create_date,
+               fb_bed_remarks.fb_bed_remark,
+               fb_bed_remarks.fb_bed_status,
+               fb_rm_room_slno
+               FROM meliora.fb_bed
+               LEFT JOIN fb_nurse_station_master 
+               ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code   
+               LEFT JOIN fb_room_type 
+               ON fb_bed.fb_rt_code = fb_room_type.fb_rt_code
+			   LEFT JOIN fb_roomcreation_master 
+               ON fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
+               LEFT JOIN fb_bed_remarks 
+               ON fb_bed.fb_bdc_no = fb_bed_remarks.fb_bdc_no 
+               AND fb_bed_remarks.fb_bed_status = 1 
+               WHERE fb_bed.fb_bdc_occup = "T"
+               
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    insertprocheckbed: (data, callBack) => {
+        pool.query(
+            `
+            INSERT INTO  fb_pro_check_bed(
+            fb_bed_slno,
+            fb_bd_code,
+            fb_bdc_no,
+            fb_ns_code,
+            fb_initial_check,
+            fb_initial_ovc,
+            fb_initial_remark,
+            create_user
+            ) 
+            VALUES(?,?,?,?,?,?,?,?)
+            `,
+            [
+                data.fb_bed_slno,
+                data.fb_bd_code,
+                data.fb_bdc_no,
+                data.fb_ns_code,
+                data.fb_initial_check,
+                data.fb_initial_ovc,
+                data.fb_initial_remark,
+                data.create_user
+
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, { insertId: results.insertId });
+            })
+    },
+    updateprocheckbed: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE  fb_pro_check_bed
+            SET
+                fb_final_check = ?,
+                fb_final_ovc=?,
+                fb_final_remark=?,
+                edit_user = ?
+            WHERE
+                fb_check_bed_slno = ?
+            `,
+            [
+                data.fb_final_check,
+                data.fb_final_ovc,
+                data.fb_final_remark,
+                data.create_user,
+                data.fb_check_bed_slno
+
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, { insertId: results.insertId });
+            })
+    },
+    CheckProCheckBedPresent: (data, callBack) => {
+        pool.query(
+            `select fb_check_bed_slno,fb_bd_code from fb_pro_check_bed where fb_bed_slno = ? and fb_bd_code = ?`,
+            [
+                data.fb_bed_slno,
+                data.fb_bd_code
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    InsertProCheckListDetail: (data, callBack) => {
+        const { detail, fb_check_bed_slno, create_user } = data;
+        const promises = detail?.map((item) => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    ` INSERT INTO  fb_pro_checklist_detail(
+                    fb_check_bed_slno,
+                    fb_item_slno,
+                    fb_item_present,
+                    fb_present_condition,
+                    create_user
+                ) 
+                VALUES(?,?,?,?,?)
+            `,
+                    [
+                        fb_check_bed_slno,
+                        item.fb_item_slno,
+                        item.ispresent,
+                        item.ispresentcondition,
+                        create_user
+                    ],
+                    (error, results, fields) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(results);
+                        }
+                    }
+                );
+            });
+        });
+        // Use Promise.all to wait for all insertions
+        Promise.all(promises)
+            .then((results) => {
+                callBack(null, results);
+            })
+            .catch((error) => {
+                callBack(error);
+            });
+    },
+    UpdateProCheckListDetail: (data, callBack) => {
+        // console.log(data, "UpdateProCheckListDetail");
+        const { detail, fb_check_bed_slno, create_user } = data;
+        const promises = detail?.map((item) => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    ` UPDATE fb_pro_checklist_detail
+                    SET
+                        fb_item_condition = ?,
+                        edit_user = ?
+                    WHERE
+                        fb_check_bed_slno = ? and fb_item_slno = ?
+            `,
+                    [
+                        item.iscondtion,
+                        create_user,
+                        fb_check_bed_slno,
+                        item.fb_item_slno
+                    ],
+                    (error, results, fields) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(results);
+                        }
+                    }
+                );
+            });
+        });
+        // Use Promise.all to wait for all insertions
+        Promise.all(promises)
+            .then((results) => {
+                callBack(null, results);
+            })
+            .catch((error) => {
+                callBack(error);
+            });
+    },
+    getprochecklistdetail: (data, callBack) => {
+        pool.query(
+            `select 
+    fb_check_dt_slno,
+    fb_pro_checklist_detail.fb_check_bed_slno,
+    fb_patient_rm_checklist.fb_item_slno,
+    fb_item_present,
+    fb_item_condition,
+    fb_bed_slno,
+    fb_bdc_no,
+    fb_initial_check,
+    fb_final_check,
+    fb_item_name,
+    fb_present_condition,
+    fb_initial_remark,
+    fb_initial_ovc,
+    fb_final_ovc,
+    fb_final_remark,
+    creator.em_name as created_by,
+    editor.em_name as edited_by
+from fb_pro_check_bed
+left join fb_pro_checklist_detail  on fb_pro_checklist_detail.fb_check_bed_slno = fb_pro_check_bed.fb_check_bed_slno
+left join fb_patient_rm_checklist on fb_patient_rm_checklist.fb_item_slno = fb_pro_checklist_detail.fb_item_slno
+left join co_employee_master as creator on creator.em_id = fb_pro_check_bed.create_user
+left join co_employee_master as editor on editor.em_id = fb_pro_check_bed.edit_user
+where fb_bd_code = ?`,
+            [
+                data
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+
 
 
 }

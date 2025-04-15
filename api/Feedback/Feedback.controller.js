@@ -102,7 +102,43 @@ const {
     updatebedremarks,
     UpdateBedRemarkDetail,
     getberremarkstatus,
-    getallHousekeepingBeds
+    getallHousekeepingBeds,
+    getallroomdetail,
+    getallbedmaster,
+    FindRoomAlreadyPresent,
+    insertroommaster,
+    updateroommaster,
+    getallnewroomdetail,
+    getAllComplaintDetail,
+    complaintregistraion,
+    UpdateSeiralNos,
+    fetchcurrentserialnos,
+    insertAssetDetail,
+    getcomplaintdetail,
+    rectifycomplaint,
+    UpdateComplaintDetailTable,
+    insertassetitem,
+    getallassetItems,
+    updateassetitem,
+    getdepassetonly,
+    insertroomassetdetail,
+    getroomassetdetail,
+    updateroomassetdetail,
+    FindAlreadyAssetExist,
+    getallroomassetdata,
+    updatebedremarksfromComplaint,
+    insertroomchecklist,
+    updateroomchecklist,
+    getroomchecklist,
+    getdischargeentrybed,
+    insertprocheckdetl,
+    CheckProCheckBedPresent,
+    insertprocheckbed,
+    InsertProCheckListDetail,
+    UpdateProCheckListDetail,
+    getprochecklistdetail,
+    updateprocheckbed,
+    getprocheckbed
 } = require("./Feedback.service");
 
 module.exports = {
@@ -824,7 +860,6 @@ module.exports = {
     getalluserfeedback: (req, res) => {
         // console.log(req.body, "date");
         const body = req.body;
-
         getalluserfeedback(body, (error, results) => {
             if (error) {
                 return res.status(200).json({
@@ -1924,30 +1959,38 @@ module.exports = {
     },
     insertbedremarks: (req, res) => {
         const Body = req.body;
-        const { fb_bed_slno, fb_bd_code, fb_bdc_no, data, fb_overall_condition, fb_bed_reason, create_user, fb_ns_code, fb_bed_status, fb_it_status, fb_maintenance_status, fb_biomedical_status, fb_it_remark, fb_biomedical_remarks, fb_maintenace_remark, fb_biomedical_emp_assign, fb_it_emp_assign, fb_maintenace_emp_assign, fb_overall_remarks } = Body;
+        const { fb_bed_slno,
+            fb_bd_code,
+            fb_bdc_no,
+            fb_ns_code,
+            fb_bed_status,
+            fb_bed_remark,
+            fb_bed_service_status,
+            fb_overall_remarks,
+            fb_overall_condition,
+            fb_initail_checked,
+            fb_initial_emp_assign,
+            fb_emp_assign,
+            create_user,
+            fb_complaint_postdata,
+            data } = Body;
 
-        const bioemployee = JSON.stringify(fb_biomedical_emp_assign);
-        const itemployee = JSON.stringify(fb_it_emp_assign);
-        const maintenaceemployee = JSON.stringify(fb_maintenace_emp_assign);
+        const assignEmployeee = JSON.stringify(fb_emp_assign);
+        const assingintialEmployye = JSON.stringify(fb_initial_emp_assign)
 
         const insertdata = {
             fb_bed_slno: fb_bed_slno,
             fb_bd_code: fb_bd_code,
             fb_bdc_no: fb_bdc_no,
-            fb_overall_condition: fb_overall_condition,
-            fb_overall_remarks: fb_overall_remarks,
             fb_ns_code: fb_ns_code,
-            fb_it_status: fb_it_status,
-            fb_maintenance_status: fb_maintenance_status,
-            fb_biomedical_status: fb_biomedical_status,
-            fb_maintenace_emp_assign: maintenaceemployee,
-            fb_it_emp_assign: itemployee,
-            fb_biomedical_emp_assign: bioemployee,
-            fb_bed_reason: fb_bed_reason,
-            fb_it_remark: fb_it_remark,
-            fb_biomedical_remarks: fb_biomedical_remarks,
-            fb_maintenace_remark: fb_maintenace_remark,
             fb_bed_status: fb_bed_status,
+            fb_bed_service_status: fb_bed_service_status,
+            fb_bed_remark: fb_bed_remark,
+            fb_overall_remarks: fb_overall_remarks,
+            fb_overall_condition: fb_overall_condition,
+            fb_initail_checked: fb_initail_checked,
+            fb_initial_emp_assign: assingintialEmployye,
+            fb_emp_assign: assignEmployeee,
             create_user: create_user
         }
         const searchData = {
@@ -1966,7 +2009,6 @@ module.exports = {
                 insertbedremarks(insertdata, (error, results) => {
                     if (error) {
                         console.log(error, "error");
-
                         return res.status(200).json({
                             success: 0,
                             message: error
@@ -1980,13 +2022,11 @@ module.exports = {
                             })
                         }
                         const DetailId = results[0]?.fb_bed_rmk_slno
-                        const detailData = data.map((item) => {
-                            return {
-                                ...item,
-                                fb_bed_rmk_slno: DetailId,
-                                create_user: create_user
-                            };
-                        });
+                        const detailData = {
+                            detail: data,
+                            fb_bed_rmk_slno: DetailId,
+                            create_user: create_user
+                        }
                         if (results.length > 0 && DetailId) {
                             InsertBedRemarkDetail(detailData, (error, results) => {
                                 if (error) {
@@ -2000,69 +2040,58 @@ module.exports = {
                             return res.status(200).json({
                                 success: 0,
                                 message: 'Error in inserting Bed Detail'
-
                             });
                         }
                     })
 
                 })
             }
-            const update_data = {
-                fb_bed_slno: fb_bed_slno,
-                fb_bd_code: fb_bd_code,
-                fb_bdc_no: fb_bdc_no,
-                fb_overall_condition: fb_overall_condition,
-                fb_overall_remarks: fb_overall_remarks,
-                fb_ns_code: fb_ns_code,
-                fb_it_status: fb_it_status,
-                fb_maintenance_status: fb_maintenance_status,
-                fb_biomedical_status: fb_biomedical_status,
-                fb_maintenace_emp_assign: maintenaceemployee,
-                fb_it_emp_assign: itemployee,
-                fb_biomedical_emp_assign: bioemployee,
-                fb_bed_reason: fb_bed_reason,
-                fb_it_remark: fb_it_remark,
-                fb_biomedical_remarks: fb_biomedical_remarks,
-                fb_maintenace_remark: fb_maintenace_remark,
-                fb_bed_status: fb_bed_status,
-                create_user: create_user,
-                fb_bed_rmk_slno: searchDetailId
-            }
+
             if (results.length > 0) {
-                updatebedremarks(update_data, (error, results) => {
-                    if (error) {
-                        return res.status(200).json({
-                            success: 0,
-                            message: error
-                        })
-                    }
+                const isComplaint = fb_complaint_postdata === 1;
+                const update_data = isComplaint ? {
+                    fb_bed_slno,
+                    fb_bd_code,
+                    fb_bdc_no,
+                    fb_ns_code,
+                    fb_bed_rmk_slno: searchDetailId
+                } : {
+                    fb_bed_slno,
+                    fb_bd_code,
+                    fb_bdc_no,
+                    fb_ns_code,
+                    fb_bed_status,
+                    fb_bed_service_status,
+                    fb_bed_remark,
+                    fb_overall_remarks,
+                    fb_overall_condition,
+                    fb_emp_assign: assignEmployeee,
+                    edit_user: create_user,
+                    fb_bed_rmk_slno: searchDetailId
+                };
 
-                    const updatedetailData = data.map((item) => {
-                        return {
-                            ...item,
-                            fb_bed_rmk_slno: searchDetailId,
-                            edit_user: create_user
-                        };
+                const updateFn = isComplaint ? updatebedremarksfromComplaint : updatebedremarks;
+
+                updateFn(update_data, (err) => {
+                    if (err) return res.status(200).json({ success: 0, message: err });
+                    const detailData = {
+                        detail: data,
+                        fb_bed_rmk_slno: searchDetailId,
+                        create_user
+                    };
+
+                    InsertBedRemarkDetail(detailData, (err) => {
+                        if (err) return res.status(200).json({ success: 0, message: err });
                     });
-
-                    UpdateBedRemarkDetail(updatedetailData, (error, results) => {
-                        if (error) {
-                            return res.status(200).json({
-                                success: 0,
-                                message: error
-                            })
-                        }
-                    })
-                })
-
+                });
             }
+
             return res.status(200).json({
                 success: 2,
                 message: 'Successfully Inseted Data'
 
             });
         })
-
     },
     getllbedremarks: (req, res) => {
         getllbedremarks((error, results) => {
@@ -2075,6 +2104,29 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 1,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+
+            });
+        })
+    },
+    getprochecklistdetail: (req, res) => {
+        const id = req.params.id;
+        getprochecklistdetail(id, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
                     message: 'No Data Found',
                     data: [],
                 })
@@ -2114,6 +2166,204 @@ module.exports = {
             if (err) {
                 console.log(err);
 
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    complaintregistraion: (req, res) => {
+        const data = req.body;
+        const { cm_assets, complaint_request_slno, compalint_date, cm_location, create_user } = data;
+
+        console.log();
+
+
+        const assetLength = cm_assets?.length;
+        fetchcurrentserialnos((error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "Error in fetching Data!"
+                })
+            }
+            let serialCurrentValue = results[0]?.serial_current;
+            let complaint_slno = serialCurrentValue;
+
+            if (!serialCurrentValue) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No data found"
+                })
+            }
+
+            const datas = cm_assets?.map((val, index) => {
+                const insertData = {
+                    complaint_slno: complaint_slno + index,
+                    complaint_deptslno: val?.complaint_dept_slno,
+                    complaint_desc: val?.fb_asset_name,
+                    complaint_request_slno: complaint_request_slno,
+                    compalint_date: compalint_date,
+                    compalint_status: val.complaint_status,
+                    cm_location: cm_location,
+                    create_user: create_user,
+                    assigned_user: val.assigned_employee
+                }
+                return insertData
+            });
+
+
+
+            complaintregistraion(datas, (err, results) => {
+                if (err) {
+                    return res.status(400).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                UpdateSeiralNos(assetLength, (error, results) => {
+                    if (error) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: "Error in updating Value"
+                        })
+                    }
+                    UpdateComplaintDetailTable(datas, (err, results) => {
+                        if (err) {
+                            return res.status(400).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Successfully Inserted"
+                        });
+
+                    })
+
+                })
+
+            });
+
+
+        })
+    },
+    getdepassetonly: (req, res) => {
+        const id = req.params.id;
+        getdepassetonly(id, (err, results) => {
+            if (err) {
+                console.log(err);
+
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
+    rectifycomplaint: (req, res) => {
+        const data = req.body;
+        const insertData = Array.isArray(data) ? data : [data];
+        rectifycomplaint(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            UpdateComplaintDetailTable(insertData, (err, results) => {
+                if (err) {
+                    return res.status(400).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 2,
+                    message: "Successfully Inserted"
+                });
+
+            })
+        });
+    },
+    insertassetitem: (req, res) => {
+        const data = req.body;
+        insertassetitem(data, (err, results) => {
+            if (err) {
+                console.log(err, "err");
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Successfully Inserted"
+            });
+        });
+    },
+    insertroomchecklist: (req, res) => {
+        const data = req.body;
+        insertroomchecklist(data, (err, results) => {
+            if (err) {
+                console.log(err, "err");
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Successfully Inserted"
+            });
+        });
+    },
+    updateassetitem: (req, res) => {
+        const data = req.body;
+        updateassetitem(data, (err, results) => {
+            if (err) {
+                console.log(err, "err");
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Successfully Inserted"
+            });
+        });
+    },
+    getroomassetdetail: (req, res) => {
+        getroomassetdetail((err, results) => {
+            if (err) {
                 return res.status(400).json({
                     success: 0,
                     message: err
@@ -2174,6 +2424,413 @@ module.exports = {
             });
         });
     },
+    getallroomdetail: (req, res) => {
+        getallroomdetail((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getAllComplaintDetail: (req, res) => {
+        getAllComplaintDetail((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getallbedmaster: (req, res) => {
+        getallbedmaster((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getallassetItems: (req, res) => {
+        getallassetItems((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getroomchecklist: (req, res) => {
+        getroomchecklist((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getprocheckbed: (req, res) => {
+        getprocheckbed((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found",
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    insertroommaster: (req, res) => {
+        const body = req.body;
+        FindRoomAlreadyPresent(body, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Error in fetchin data"
+                })
+            }
+            if (results.length > 0) {
+                return res.status(200).json({
+                    success: 3,
+                    message: 'The FeedBack Already Present'
+                })
+            }
+            insertroommaster(body, (error, results) => {
+                if (error) {
+                    return res.status(200).json({
+                        success: 1,
+                        message: error
+                    })
+                }
+                return res.status(200).json({
+                    success: 2,
+                    message: "Inserted Successfully",
+                })
+
+            })
+
+        })
+    },
+    updateroommaster: (req, res) => {
+        const body = req.body;
+        updateroommaster(body, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 1,
+                    message: error
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Updated Successfully",
+            })
+
+        })
+    },
+    getallnewroomdetail: (req, res) => {
+        getallnewroomdetail((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getcomplaintdetail: (req, res) => {
+        const id = req.params.id;
+        getcomplaintdetail(id, (err, results) => {
+            if (err) {
+                console.log(err);
+
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getallroomassetdata: (req, res) => {
+        const id = req.params.id;
+        getallroomassetdata(id, (err, results) => {
+            if (err) {
+                console.log(err);
+
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    insertroomassetdetail: (req, res) => {
+        const data = req.body;
+        FindAlreadyAssetExist(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results && results?.length > 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Already Exist"
+                });
+            }
+
+            insertroomassetdetail(data, (err, results) => {
+                if (err) {
+                    return res.status(400).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                return res.status(200).json({
+                    success: 2,
+                    data: results
+                });
+            });
+        });
+    },
+    updateroomassetdetail: (req, res) => {
+        const data = req.body;
+        updateroomassetdetail(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    updateroomchecklist: (req, res) => {
+        const data = req.body;
+        updateroomchecklist(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getdischargeentrybed: (req, res) => {
+        getdischargeentrybed((error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+
+            });
+        })
+    },
+    insertprocheckdetl: (req, res) => {
+        const IncomingData = req.body;
+        const { data, fb_bed_slno, fb_bd_code, fb_bdc_no, fb_ns_code, fb_initial_check, create_user, fb_final_check, fb_check_bed_slno, fb_initial_ovc, fb_initial_remark, fb_final_ovc, fb_final_remark } = IncomingData;
+        const InsertData = { fb_bed_slno, fb_bd_code, fb_bdc_no, fb_ns_code, fb_initial_check, create_user, fb_initial_ovc, fb_initial_remark };
+        const ProBedUpdateData = { fb_final_check, create_user, fb_check_bed_slno, fb_final_ovc, fb_final_remark }
+
+        const SearchData = {
+            fb_bed_slno,
+            fb_bd_code
+        }
+        CheckProCheckBedPresent(SearchData, (error, results) => {
+            if (error) {
+                return res.status(200).status({
+                    success: 0,
+                    message: error
+                })
+            }
+            const updateDate = results[0]?.fb_check_bed_slno;
+            if (results.length === 0 && !updateDate) {
+                insertprocheckbed(InsertData, (err, results) => {
+                    if (err) {
+                        return res.status(400).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    const InsertId = results?.insertId
+                    const DetialData = {
+                        detail: data,
+                        fb_check_bed_slno: InsertId,
+                        create_user
+                    }
+                    if (InsertId) {
+                        InsertProCheckListDetail(DetialData, (error, results) => {
+                            if (error) {
+                                return res.status(400).json({
+                                    success: 0,
+                                    message: err
+                                });
+                            }
+                        })
+                    }
+                });
+            }
+
+            const updateData = {
+                detail: data,
+                fb_check_bed_slno: updateDate,
+                create_user
+            }
+            if (updateDate && results.length > 0) {
+                updateprocheckbed(ProBedUpdateData, (err, results) => {
+                    if (err) {
+                        return res.status(400).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    UpdateProCheckListDetail(updateData, (error, results) => {
+                        if (error) {
+                            return res.status(400).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                    })
+                });
+
+            }
+
+
+            return res.status(200).json({
+                success: 2,
+                message: "Initail Checklist Completed Successfully",
+            })
+
+
+        })
+
+
+    },
+
 
 
 

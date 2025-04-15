@@ -57,7 +57,31 @@ const {
     getempdetail,
     getbedremarkDetail,
     getberremarkstatus,
-    getallHousekeepingBeds
+    getallHousekeepingBeds,
+    getallroomdetail,
+    getallbedmaster,
+    insertroommaster,
+    updateroommaster,
+    getallnewroomdetail,
+    getAllComplaintDetail,
+    complaintregistraion,
+    getcomplaintdetail,
+    rectifycomplaint,
+    insertassetitem,
+    getallassetItems,
+    updateassetitem,
+    getdepassetonly,
+    insertroomassetdetail,
+    getroomassetdetail,
+    updateroomassetdetail,
+    getallroomassetdata,
+    insertroomchecklist,
+    updateroomchecklist,
+    getroomchecklist,
+    getdischargeentrybed,
+    insertprocheckdetl,
+    getprochecklistdetail,
+    getprocheckbed,
 } = require("./Feedback.controller");
 
 
@@ -132,7 +156,6 @@ router.post('/getbed', getNursingBed)
 router.post('/inpatientdetil', getCurrentPatient)
 router.get('/getallblockedbed', getallblockedbed)
 
-
 router.post('/insertbedremarks', insertbedremarks)
 router.get('/getllbedremarks', getllbedremarks)
 
@@ -141,6 +164,40 @@ router.get('/getempdetail/:id', getempdetail)
 router.get('/getbedremarkDetail/:id', getbedremarkDetail)
 router.get('/getberremarkstatus', getberremarkstatus)
 router.get('/getallhkbeds', getallHousekeepingBeds)
+
+router.get('/getcomplaintdetail/:id', getcomplaintdetail)
+router.get('/getallroomassetdata/:id', getallroomassetdata)
+
+
+router.get('/getallroomdetail', getallroomdetail)
+router.get('/getallnewroomdetail', getallnewroomdetail)
+router.get('/getallbedmaster', getallbedmaster)
+router.post('/insertroommaster', insertroommaster)
+router.post('/updateroommaster', updateroommaster)
+
+router.get('/getallcomplaintdetail', getAllComplaintDetail)
+router.post('/complaintregistraion', complaintregistraion)
+
+router.post('/rectifycom', rectifycomplaint)
+router.post('/insertroomassetdetail', insertroomassetdetail)
+router.post('/updateroomassetdetail', updateroomassetdetail)
+
+router.post('/insertassetitem', insertassetitem)
+router.post('/updateassetitem', updateassetitem)
+router.get('/getassetitem', getallassetItems)
+
+router.post('/insertprocheckdetl', insertprocheckdetl)
+
+router.post('/insertroomchecklist', insertroomchecklist)
+router.post('/updateroomchecklist', updateroomchecklist)
+router.get('/getroomchecklist', getroomchecklist)
+router.get('/getprocheckbed', getprocheckbed)
+
+router.get('/getprochecklistdetail/:id', getprochecklistdetail)
+
+router.get('/getdischargeentrybed', getdischargeentrybed)
+router.get('/getdepassetonly/:id', getdepassetonly)
+router.get('/getroomassetdetail', getroomassetdetail)
 
 //edlider meliora table
 router.post('/insertbddetail', insertbddetail)

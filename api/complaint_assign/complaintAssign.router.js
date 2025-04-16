@@ -7,7 +7,7 @@ const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign,
     getALLAssignedComList, transferInsert, EmployeeInactive,
     beforAssignHold, empTransInactive, sendMeassageUser, ReadMeassageUser, AssistReqListAll,
     getAssistRequestEmps, assistTransInactive, AssisttransferInsert, SupervsrVerifyPending, getQuery,
-    SupervsrVerify, AskQuery, replyQuery, AssistanceReject, AssistReqEmployee, getAssistRequestDetails, getAssistRequestCount, getDeptPengingTicketCount
+    SupervsrVerify, AskQuery, replyQuery, AssistanceReject, AssistReqEmployee, getAssistRequestDetails, getAssistRequestCount, getDeptPengingTicketCount,getDeptEmployees
 } = require('../complaint_assign/complaintAssign.controller');
 
 router.get("/:id", checkToken, getcomplaintAssign);
@@ -51,6 +51,8 @@ router.get("/getAssistRequestDetails/:id", checkToken, getAssistRequestDetails)
 
 router.get("/getAssistRequestCount/:id", checkToken, getAssistRequestCount)
 router.get("/getDeptPengingTicketCount/:id", checkToken, getDeptPengingTicketCount)
+
+router.post("/getDeptEmployees", checkToken, getDeptEmployees);
 
 
 

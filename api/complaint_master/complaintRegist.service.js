@@ -756,9 +756,36 @@ module.exports = {
                 return callBack(null, results);
             }
         );
-    }
+    },
 
-
-
+    getVerificationPending: (id, callBack) => {
+        pool.query(
+            ` SELECT
+            complaint_slno,
+            cm_rectify_status,
+            compalint_date,
+            compalint_status,
+            cm_rectify_time,
+            cm_location,
+            complaint_dept_secslno
+            FROM
+            meliora_asset_test.cm_complaint_mast
+            WHERE
+            compalint_status = 2
+            AND complaint_dept_secslno = ?
+            AND cm_rectify_time <= DATE_SUB(NOW(), INTERVAL 8 HOUR)
+            and cm_rectify_status='R'`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+ 
 }
 

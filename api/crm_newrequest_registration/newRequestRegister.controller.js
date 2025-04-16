@@ -4,7 +4,7 @@ const { requestRegistInsert, deleteCrfReq, requestRegistInsertDetl, requestAppro
     insertApprvitemsStatus, deleteCrfReqApproval, deleteCrfRegItemDetl, updateApproveStatus, getackPending, getGetStoreMasterById,
     UpdateItemReceiveStatus, checkStoreReturnItem, insertReturnItemDetails, itemReturnDetailsForViewStore, getCommonMasterUpdate, getCommonMasterGetCat,
     viewItemReturnDetails, returnReplyDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet, getStoreMasterInsert, getGetStoreMaster,
-    getCommonMasterInsert, getCommonMasterSettingGet, getCommonMasterSettingUpdate } = require('./newRequestRegister.service');
+    getCommonMasterInsert, getCommonMasterSettingGet, getCommonMasterSettingUpdate, getDashBoardMaster, GetDashBoardMaster, getDashboardUpdate, getDashright } = require('./newRequestRegister.service');
 const logger = require('../../logger/logger');
 module.exports = {
 
@@ -1279,6 +1279,98 @@ module.exports = {
         const body = req.body;
 
         getCommonMasterSettingUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    dataCat: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+
+    getDashBoardMaster: (req, res) => {
+        const body = req.body;
+        getDashBoardMaster(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    dataCat: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                dataCat: results
+            })
+        })
+    },
+    GetDashBoardMaster: (req, res) => {
+        const body = req.body;
+        GetDashBoardMaster(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    dataCat: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+
+    getDashboardUpdate: (req, res) => {
+        const body = req.body;
+        getDashboardUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    dataCat: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+
+
+    getDashright: (req, res) => {
+        const body = req.body;
+        getDashright(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,

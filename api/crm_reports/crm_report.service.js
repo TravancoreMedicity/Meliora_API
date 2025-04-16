@@ -34,7 +34,7 @@ module.exports = {
                    po_prepartion, po_complete,po_complete_date,PC.em_name as pocomplete_user,crm_purchase_po_details.po_to_supplier,po_to_supplier_date,
                    crm_request_master.sub_store_recieve,approval_level,crm_purchase_po_details.store_recieve,store_receive,
                    user_acknldge,user_acknldge_remarks,ackUser.em_name as acknowUser,user_ack_date,sub_store_name,
-                   sub_store_slno, store_receive_date,CRS.em_name as crs_user,STR.em_name as store_user,substore_ack_date,
+                   sub_store_slno, crm_purchase_mast.store_receive_date,CRS.em_name as crs_user,STR.em_name as store_user,substore_ack_date,
                    po_number
              FROM
                   crm_request_master

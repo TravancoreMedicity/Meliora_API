@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { getPurchaseAckPending, InsertPurchaseAck, getAllApprovedForPurchase, QuatationCalling, QuatationNegotiation,
     QuatationFixing, InsertMultiplePO, getPOList, PoComplete, PoFinals, PurchsDataCollectionPending, getCRSStores,
-    getPOItemDetails, getPendingPOItemDetails, getPendingPo, updatePoApprovals, CheckPOExist, getSubstores, getPoDetails
+    getPOItemDetails, getPendingPOItemDetails, getPendingPo, updatePoApprovals, CheckPOExist, getSubstores, getPoDetails, InsertWorkOrder
 } = require('../crm_new_purchase/crm_purchase.controller')
 
 router.get("/getPurchaseAckPending", checkToken, getPurchaseAckPending);
@@ -27,6 +27,7 @@ router.get("/getPoDetails/:id", checkToken, getPoDetails);
 
 // used only for reportss
 router.get("/getPOList/:id", checkToken, getPOList);
+router.post("/InsertWorkOrder", checkToken, InsertWorkOrder);
 
 
 module.exports = router;

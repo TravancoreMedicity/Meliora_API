@@ -28,11 +28,6 @@ router.delete("/deleteTicket/:id", checkToken, deleteTicket)
 router.get("/getVerificationPending/:id",checkToken,  getVerificationPending);
 
 
-
-console.log("vvvv");
-
-
-
 module.exports = router;
 
 

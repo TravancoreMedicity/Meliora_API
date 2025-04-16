@@ -715,7 +715,7 @@ module.exports = {
             left join am_item_name_creation on am_item_name_creation.item_creation_slno = am_asset_item_map_master.item_creation_slno
             left join it_bill_supplier_details_mast on it_bill_supplier_details_mast.it_supplier_slno= am_amc_cmc_master.suplier_slno
             WHERE
-            am_item_map_amcpm_detail.amc_status = 1
+            am_amc_cmc_master.amccmc_status = 1
             AND am_asset_item_map_master.item_custodian_dept = (
                 SELECT am_custodian_slno 
                 FROM am_custodian_department 
@@ -767,7 +767,7 @@ module.exports = {
             am_spare_item_map_master 
             ON am_spare_item_map_master.am_spare_item_map_slno = am_item_map_wargrarnt_detail.am_spare_item_map_slno
             left join am_item_name_creation item_name_asset on item_name_asset.item_creation_slno = am_asset_item_map_master.item_creation_slno
-            left join am_item_name_creation items_name_spare on items_name_spare.item_creation_slno = am_asset_item_map_master.item_creation_slno
+            left join am_item_name_creation items_name_spare on items_name_spare.item_creation_slno = am_spare_item_map_master.spare_creation_slno
             WHERE
             (
                 am_asset_item_map_master.item_custodian_dept = (
@@ -835,7 +835,7 @@ module.exports = {
             am_spare_item_map_master 
             ON am_spare_item_map_master.am_spare_item_map_slno = am_item_map_wargrarnt_detail.am_spare_item_map_slno
             left join am_item_name_creation item_name_asset on item_name_asset.item_creation_slno = am_asset_item_map_master.item_creation_slno
-            left join am_item_name_creation items_name_spare on items_name_spare.item_creation_slno = am_asset_item_map_master.item_creation_slno
+            left join am_item_name_creation items_name_spare on items_name_spare.item_creation_slno = am_spare_item_map_master.spare_creation_slno
             WHERE
             (                
             am_asset_item_map_master.item_custodian_dept = (                    

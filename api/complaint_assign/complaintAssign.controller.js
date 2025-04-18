@@ -10,7 +10,7 @@ const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign, getcomplai
 } = require('../complaint_assign/complaintAssign.service');
 const logger = require('../../logger/logger');
 const { default: Expo } = require('expo-server-sdk');
-const { log } = require('winston');
+const { log, createLogger } = require('winston');
 
 const expo = new Expo()
 module.exports = {

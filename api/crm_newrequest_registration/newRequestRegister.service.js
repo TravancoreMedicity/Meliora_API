@@ -727,7 +727,7 @@ module.exports = {
                    crm_request_master.sub_store_recieve,approval_level,crm_purchase_po_details.store_recieve,
                    user_acknldge,user_acknldge_remarks,ackUser.em_name as acknowUser,user_ack_date,sub_store_name,
                    sub_store_slno, crm_purchase_mast.store_receive_date,CRS.em_name as crs_user,STR.em_name as store_user,substore_ack_date,
-                   po_number,user_acknldge,internally_arranged_status,crf_view_remark,crf_view_status,VE.em_name as viewName
+                   po_number,user_acknldge,internally_arranged_status,crf_view_remark,crf_view_status,VE.em_name as viewName,crm_request_master.work_order_status
              FROM
                   crm_request_master
                 LEFT JOIN crm_request_mast_detail on crm_request_mast_detail.req_slno=crm_request_master.req_slno
@@ -1042,12 +1042,15 @@ module.exports = {
 
         pool.query(
             `INSERT INTO crm_common_master (
-                category
+                category,department,dp_section,emid
                            
                )
-                VALUES(?)`,
+                VALUES(?,?,?,?)`,
             [
-                JSON.stringify(data.category)
+                JSON.stringify(data.category),
+                data.dept,
+                data.deptsec,
+                data.empname,
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -1060,9 +1063,34 @@ module.exports = {
 
 
     getCommonMasterGet: (data, callback) => {
-
         pool.query(
-            `Select category,common_master_slno From crm_common_master`,
+            `SELECT
+             ccm.common_master_slno,
+             category,
+             ccm.department,
+             ccm.dp_section,
+             ccm.emid,
+             cdm.dept_name,
+             cds.sec_name,
+             om.em_name,
+             GROUP_CONCAT(DISTINCT ait.item_type_name ORDER BY ait.item_type_name SEPARATOR ', ') AS category_names
+             FROM crm_common_master ccm
+             LEFT JOIN co_department_mast cdm ON cdm.dept_id = ccm.department
+             LEFT JOIN co_deptsec_mast cds ON cds.sec_id = ccm.dp_section
+             LEFT JOIN co_employee_master om ON om.em_id = ccm.emid
+             LEFT JOIN JSON_TABLE(
+             ccm.category,
+            '$[*]' COLUMNS (category_id INT PATH '$')
+             ) AS jt ON TRUE
+             LEFT JOIN am_item_type ait ON ait.item_type_slno = jt.category_id
+             GROUP BY
+             ccm.common_master_slno,
+             ccm.department,
+             ccm.dp_section,
+             ccm.emid,
+             cdm.dept_name,
+             cds.sec_name,
+             om.em_name;`,
             [
             ],
             (error, results, feilds) => {
@@ -1075,13 +1103,18 @@ module.exports = {
     },
 
     getCommonMasterUpdate: (data, callback) => {
-
         pool.query(
             `UPDATE crm_common_master 
-            SET category = ?
+            SET category = ?,
+            department=?,
+            dp_section=?,
+            emid=?
             WHERE common_master_slno = ?`,
             [
                 JSON.stringify(data.category),
+                data.dept,
+                data.deptsec,
+                data.empname,
                 data.id
             ],
             (error, results, feilds) => {
@@ -1443,6 +1476,48 @@ module.exports = {
             `SELECT * FROM crm_dashboard_master where emid =?`,
             [
                 data.empsecid
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getCommonMasterGetByID: (data, callback) => {
+        pool.query(
+            `SELECT
+             ccm.common_master_slno,
+             category,
+             ccm.department,
+             ccm.dp_section,
+             ccm.emid,
+             cdm.dept_name,
+             cds.sec_name,
+             om.em_name,
+             GROUP_CONCAT(DISTINCT ait.item_type_name ORDER BY ait.item_type_name SEPARATOR ', ') AS category_names
+             FROM crm_common_master ccm
+             LEFT JOIN co_department_mast cdm ON cdm.dept_id = ccm.department
+             LEFT JOIN co_deptsec_mast cds ON cds.sec_id = ccm.dp_section
+             LEFT JOIN co_employee_master om ON om.em_id = ccm.emid
+             LEFT JOIN JSON_TABLE(
+             ccm.category,
+            '$[*]' COLUMNS (category_id INT PATH '$')
+             ) AS jt ON TRUE
+             LEFT JOIN am_item_type ait ON ait.item_type_slno = jt.category_id
+             WHERE ccm.emid = ?
+             GROUP BY
+             ccm.common_master_slno,
+             ccm.department,
+             ccm.dp_section,
+             ccm.emid,
+             cdm.dept_name,
+             cds.sec_name,
+             om.em_name;`,
+            [
+                data.id
             ],
             (error, results, feilds) => {
                 if (error) {

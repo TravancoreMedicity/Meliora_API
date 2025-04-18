@@ -1,7 +1,7 @@
 const { getPurchaseAckPending, getAllApprovedForPurchase, InsertPurchaseAck, QuatationCalling, QuatationNegotiation,
     QuatationFixing, updatePOAdd, InsertMultiplePO, getPOList, PoComplete, PoFinals, PurchsDataCollectionPending,
-    getCRSStores, InsertPOItems, getPOItemDetails, getPendingPOItemDetails, CheckCRfPurchaseExist, getPendingPo,
-    updatePoApprovals, CheckPOExist, getSubstores, getPoDetails, updateApprvdPOItems, updatePurchaseAck, updateCRFPOComplte
+    getCRSStores, InsertPOItems, getPOItemDetails, getPendingPOItemDetails, CheckCRfPurchaseExist, getPendingPo, InsertWorkOrderDetails,
+    updatePoApprovals, CheckPOExist, getSubstores, getPoDetails, updateApprvdPOItems, updatePurchaseAck, updateCRFPOComplte, InsertWorkOrder
 } = require('../crm_new_purchase/crm_purchase.service');
 const logger = require('../../logger/logger');
 
@@ -545,6 +545,67 @@ module.exports = {
             });
         });
     },
+    // InsertWorkOrder: (req, res) => {
+    //     const body = req.body;
+    //     InsertWorkOrder(body, (err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (results.length === 0) {
+    //             return res.status(200).json({
+    //                 success: 2,
+    //                 message: "No record found"
+
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: results,
+    //             message: "Updated successfully"
+    //         })
+    //     })
+    // },
+
+
+    InsertWorkOrder: (req, res) => {
+        const body = req.body;
+
+        InsertWorkOrder(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No record found"
+                });
+            }
+            InsertWorkOrderDetails(body, (err2, results2) => {
+                if (err2) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: "WorkOrder inserted, but failed to insert details: " + err2
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: {
+                        workOrder: results,
+                        workOrderDetails: results2
+                    },
+                    message: "Work order and details inserted successfully"
+                });
+            });
+        });
+    }
 
 }
 

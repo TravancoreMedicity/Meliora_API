@@ -641,10 +641,12 @@ module.exports = {
         pool.query(
             `SELECT
             am_item_map_amcpm_detail.am_item_map_slno,
+            am_item_map_details.am_manufacture_no as asset_serial_no,
             item_name,
             item_asset_no,
             item_asset_no_only,
-            it_supplier_name,     
+            amc_cmc_supplier.it_supplier_name as service_agree_supp,    
+            purchase_supplier.it_supplier_name as purchased_asset_supp,
             CASE 
             WHEN am_amc_cmc_master.amc_status = 1 THEN 'AMC'
             WHEN am_amc_cmc_master.cmc_status = 1 THEN 'CMC'
@@ -655,14 +657,13 @@ module.exports = {
             am_amc_cmc_master.from_date
             FROM
             am_item_map_amcpm_detail
-            LEFT JOIN 
-            am_asset_item_map_master 
-            ON am_asset_item_map_master.am_item_map_slno = am_item_map_amcpm_detail.am_item_map_slno
-            LEFT JOIN 
-            am_amc_cmc_master 
-            ON am_amc_cmc_master.amccmc_slno = am_item_map_amcpm_detail.amc_slno
+            LEFT JOIN am_asset_item_map_master ON am_asset_item_map_master.am_item_map_slno = am_item_map_amcpm_detail.am_item_map_slno
+            LEFT JOIN  am_item_map_details ON am_item_map_details.am_Item_map_slno = am_asset_item_map_master.am_item_map_slno
+            LEFT JOIN am_amc_cmc_master  ON am_amc_cmc_master.amccmc_slno = am_item_map_amcpm_detail.amc_slno
             left join am_item_name_creation on am_item_name_creation.item_creation_slno = am_asset_item_map_master.item_creation_slno
-            left join it_bill_supplier_details_mast on it_bill_supplier_details_mast.it_supplier_slno= am_amc_cmc_master.suplier_slno
+            left join it_bill_supplier_details_mast amc_cmc_supplier on amc_cmc_supplier.it_supplier_slno= am_amc_cmc_master.suplier_slno
+            left join am_bill_master on am_bill_master.am_bill_mastslno=am_item_map_details.am_bill_mast_slno
+             left join it_bill_supplier_details_mast purchase_supplier on purchase_supplier.it_supplier_slno= am_bill_master.am_bill_supplier
             WHERE
             am_item_map_amcpm_detail.amc_status = 1
             AND am_asset_item_map_master.item_custodian_dept = (
@@ -692,10 +693,12 @@ module.exports = {
         pool.query(
             `SELECT
             am_item_map_amcpm_detail.am_item_map_slno,
+            am_item_map_details.am_manufacture_no as asset_serial_no,
             item_name,
             item_asset_no,
             item_asset_no_only,
-            it_supplier_name,     
+            amc_cmc_supplier.it_supplier_name as service_agree_supp,    
+            purchase_supplier.it_supplier_name as purchased_asset_supp,
             CASE 
             WHEN am_amc_cmc_master.amc_status = 1 THEN 'AMC'
             WHEN am_amc_cmc_master.cmc_status = 1 THEN 'CMC'
@@ -706,15 +709,14 @@ module.exports = {
             am_amc_cmc_master.from_date
             FROM
             am_item_map_amcpm_detail
-            LEFT JOIN 
-            am_asset_item_map_master 
-            ON am_asset_item_map_master.am_item_map_slno = am_item_map_amcpm_detail.am_item_map_slno
-            LEFT JOIN 
-            am_amc_cmc_master 
-            ON am_amc_cmc_master.amccmc_slno = am_item_map_amcpm_detail.amc_slno
+            LEFT JOIN am_asset_item_map_master ON am_asset_item_map_master.am_item_map_slno = am_item_map_amcpm_detail.am_item_map_slno
+            LEFT JOIN  am_item_map_details ON am_item_map_details.am_Item_map_slno = am_asset_item_map_master.am_item_map_slno
+            LEFT JOIN am_amc_cmc_master  ON am_amc_cmc_master.amccmc_slno = am_item_map_amcpm_detail.amc_slno
             left join am_item_name_creation on am_item_name_creation.item_creation_slno = am_asset_item_map_master.item_creation_slno
-            left join it_bill_supplier_details_mast on it_bill_supplier_details_mast.it_supplier_slno= am_amc_cmc_master.suplier_slno
-            WHERE
+            left join it_bill_supplier_details_mast amc_cmc_supplier on amc_cmc_supplier.it_supplier_slno= am_amc_cmc_master.suplier_slno
+            left join am_bill_master on am_bill_master.am_bill_mastslno=am_item_map_details.am_bill_mast_slno
+             left join it_bill_supplier_details_mast purchase_supplier on purchase_supplier.it_supplier_slno= am_bill_master.am_bill_supplier
+               WHERE
             am_amc_cmc_master.amccmc_status = 1
             AND am_asset_item_map_master.item_custodian_dept = (
                 SELECT am_custodian_slno 
@@ -739,11 +741,15 @@ module.exports = {
         );
     },
     getActveWarrentyGaurentee: (data, callback) => {
-        pool.query(
+        pool.query(          
             `SELECT
             am_item_wargar_slno,
             am_item_map_wargrarnt_detail.am_item_map_slno,
             am_item_map_wargrarnt_detail.am_spare_item_map_slno,
+            asset_item_map.am_manufacture_no as asset_serial_no,
+            spare_item_map.am_manufacture_no as spare_serial_no,
+            purchase_supplier_asset.it_supplier_name as purchased_asset_supp,
+             purchase_supplier_spare.it_supplier_name as purchased_spare_supp,
             item_name_asset.item_name as item_name,
             items_name_spare.item_name as item_spare,
             am_item_map_wargrarnt_detail.address,
@@ -760,14 +766,16 @@ module.exports = {
             to_date
             FROM 
             am_item_map_wargrarnt_detail
-            LEFT JOIN 
-            am_asset_item_map_master 
-            ON am_asset_item_map_master.am_item_map_slno = am_item_map_wargrarnt_detail.am_item_map_slno
-            LEFT JOIN 
-            am_spare_item_map_master 
-            ON am_spare_item_map_master.am_spare_item_map_slno = am_item_map_wargrarnt_detail.am_spare_item_map_slno
+            LEFT JOIN am_asset_item_map_master  ON am_asset_item_map_master.am_item_map_slno = am_item_map_wargrarnt_detail.am_item_map_slno
+            LEFT JOIN  am_item_map_details asset_item_map ON asset_item_map.am_Item_map_slno = am_asset_item_map_master.am_item_map_slno
+            LEFT JOIN am_spare_item_map_master  ON am_spare_item_map_master.am_spare_item_map_slno = am_item_map_wargrarnt_detail.am_spare_item_map_slno
+               LEFT JOIN  am_item_map_details spare_item_map ON spare_item_map.am_spare_item_map_slno = am_spare_item_map_master.am_spare_item_map_slno
             left join am_item_name_creation item_name_asset on item_name_asset.item_creation_slno = am_asset_item_map_master.item_creation_slno
             left join am_item_name_creation items_name_spare on items_name_spare.item_creation_slno = am_spare_item_map_master.spare_creation_slno
+            left join am_bill_master asset_bill on asset_bill.am_bill_mastslno=asset_item_map.am_bill_mast_slno
+           left join am_bill_master spare_bill on spare_bill.am_bill_mastslno=spare_item_map.am_bill_mast_slno
+             left join it_bill_supplier_details_mast purchase_supplier_asset on purchase_supplier_asset.it_supplier_slno= asset_bill.am_bill_supplier
+               left join it_bill_supplier_details_mast purchase_supplier_spare on purchase_supplier_spare.it_supplier_slno= spare_bill.am_bill_supplier
             WHERE
             (
                 am_asset_item_map_master.item_custodian_dept = (
@@ -786,9 +794,7 @@ module.exports = {
                             OR guarenty_status = 1
                             )
                             And am_item_map_wargrarnt_detail.status=1
-                            AND to_date >= CURRENT_DATE 
-                            
-                        `,
+                            AND to_date >= CURRENT_DATE `,
             [
                 data.am_custodian_dept_slno,
                 data.am_custodian_dept_slno
@@ -812,6 +818,10 @@ module.exports = {
             am_item_wargar_slno,
             am_item_map_wargrarnt_detail.am_item_map_slno,
             am_item_map_wargrarnt_detail.am_spare_item_map_slno,
+            asset_item_map.am_manufacture_no as asset_serial_no,
+            spare_item_map.am_manufacture_no as spare_serial_no,
+            purchase_supplier_asset.it_supplier_name as purchased_asset_supp,
+             purchase_supplier_spare.it_supplier_name as purchased_spare_supp,
             item_name_asset.item_name as item_name,
             items_name_spare.item_name as item_spare,
             am_item_map_wargrarnt_detail.address,
@@ -819,23 +829,25 @@ module.exports = {
             spare_asset_no_only,
             item_asset_no,
             item_asset_no_only,
-            CASE 
+              CASE 
             WHEN warrenty_status = 1 THEN 'Warrenty'
             WHEN guarenty_status = 1 THEN 'Guarentee'
             ELSE NULL
-            END AS service_agreement,
+               END AS service_agreement,
             from_date,
             to_date
             FROM 
             am_item_map_wargrarnt_detail
-            LEFT JOIN 
-            am_asset_item_map_master 
-            ON am_asset_item_map_master.am_item_map_slno = am_item_map_wargrarnt_detail.am_item_map_slno
-            LEFT JOIN 
-            am_spare_item_map_master 
-            ON am_spare_item_map_master.am_spare_item_map_slno = am_item_map_wargrarnt_detail.am_spare_item_map_slno
+            LEFT JOIN am_asset_item_map_master  ON am_asset_item_map_master.am_item_map_slno = am_item_map_wargrarnt_detail.am_item_map_slno
+            LEFT JOIN  am_item_map_details asset_item_map ON asset_item_map.am_Item_map_slno = am_asset_item_map_master.am_item_map_slno
+            LEFT JOIN am_spare_item_map_master  ON am_spare_item_map_master.am_spare_item_map_slno = am_item_map_wargrarnt_detail.am_spare_item_map_slno
+            LEFT JOIN  am_item_map_details spare_item_map ON spare_item_map.am_spare_item_map_slno = am_spare_item_map_master.am_spare_item_map_slno
             left join am_item_name_creation item_name_asset on item_name_asset.item_creation_slno = am_asset_item_map_master.item_creation_slno
             left join am_item_name_creation items_name_spare on items_name_spare.item_creation_slno = am_spare_item_map_master.spare_creation_slno
+            left join am_bill_master asset_bill on asset_bill.am_bill_mastslno=asset_item_map.am_bill_mast_slno
+            left join am_bill_master spare_bill on spare_bill.am_bill_mastslno=spare_item_map.am_bill_mast_slno
+            left join it_bill_supplier_details_mast purchase_supplier_asset on purchase_supplier_asset.it_supplier_slno= asset_bill.am_bill_supplier
+            left join it_bill_supplier_details_mast purchase_supplier_spare on purchase_supplier_spare.it_supplier_slno= spare_bill.am_bill_supplier
             WHERE
             (                
             am_asset_item_map_master.item_custodian_dept = (                    

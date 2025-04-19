@@ -214,7 +214,7 @@ module.exports = {
                 LEFT JOIN cm_complaint_detail ON cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
                 LEFT JOIN cm_hold_reason_mast ON cm_hold_reason_mast.cm_hold_id = cm_complaint_mast.cm_hold_reason_slno
                 WHERE 
-                complaint_dept_secslno = ?
+                cm_location = ?
                 AND compalint_status != 3
                 GROUP BY 
                 cm_complaint_mast.complaint_slno

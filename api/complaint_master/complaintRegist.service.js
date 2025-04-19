@@ -214,7 +214,7 @@ module.exports = {
                 LEFT JOIN cm_complaint_detail ON cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
                 LEFT JOIN cm_hold_reason_mast ON cm_hold_reason_mast.cm_hold_id = cm_complaint_mast.cm_hold_reason_slno
                 WHERE 
-                complaint_dept_secslno = ?
+                cm_location = ?
                 AND compalint_status != 3
                 GROUP BY 
                 cm_complaint_mast.complaint_slno
@@ -756,9 +756,133 @@ module.exports = {
                 return callBack(null, results);
             }
         );
-    }
+    },
 
-
-
+    getVerificationPending: (id, callBack) => {
+        pool.query(
+            `SELECT
+            cm_complaint_dept.department_slno as compl_dept,
+            cm_complaint_mast.complaint_slno,
+            aprrox_date,
+            cm_asset_status,
+            S.sec_name AS sec_name,
+            cm_file_status,
+            cm_hold_reason,
+            IFNULL(L.sec_name, "Nil") AS location,
+            complaint_desc,
+            req_type_name,
+            suprvsr_verify_time,
+            cm_rectify_time,
+            assigned_date,
+            pending_onhold_time,
+            pending_onhold_user,
+            compalint_status,
+            cm_query_status,                          
+            complaint_dept_secslno,
+            complaint_request_slno,
+            complaint_hicslno,
+            compalint_priority,
+            complaint_dept_name,
+            complaint_deptslno,
+            complaint_typeslno,
+            complaint_type_name,
+            cm_complaint_mast.rm_room_slno,
+            cm_complaint_mast.cm_complaint_location,
+            rm_room_name,
+            rm_newroom_creation.rm_roomtype_slno,
+            rm_room_floor_slno,
+            rm_insidebuilldblock_slno,
+            rm_insidebuildblock_name,
+            rm_floor_name,
+            rm_roomtype_name,
+            cm_complaint_mast.create_user,
+            cm_location,
+            priority_check,
+            compalint_status,
+            priority_reason,
+            hic_policy_status,
+            cm_rectify_status,
+            compdept_message,
+            compdept_message_flag,
+            rectify_pending_hold_remarks,
+            message_reply_emp,
+            (CASE 
+            WHEN rectify_pending_hold_remarks IS NULL THEN "not updated" 
+            ELSE rectify_pending_hold_remarks 
+            END) AS rectify_pending_hold_remarks1,
+            (CASE 
+            WHEN priority_check = '1' THEN "Yes"  
+            ELSE "No" 
+            END) AS priority,
+            (CASE 
+            WHEN hic_policy_name IS NOT NULL THEN hic_policy_name 
+            ELSE 'Not Suggested' 
+            END) AS hic_policy_name,
+            (CASE 
+            WHEN compalint_status = '0' THEN "not assigned" 
+            WHEN compalint_status = '1' THEN "assigned" 
+            WHEN compalint_status = '2' THEN "Rectified"  
+            WHEN compalint_status = '3' THEN "Verified"  
+            ELSE "Not" 
+            END) AS compalint_status1,
+            (CASE 
+            WHEN cm_rectify_status = 'R' THEN "Rectified" 
+            WHEN cm_rectify_status = 'P' THEN "Pending" 
+            WHEN cm_rectify_status = 'O' THEN "On Hold" 
+            ELSE "Not" 
+            END) AS cm_rectify_status1,
+            verify_spervsr,
+            compalint_date,
+            compalint_status,
+            cm_rectify_status,
+            M.em_name AS send_user,
+            R.em_name AS read_user,
+            O.em_name AS holduser,
+            V.em_name AS verify_spervsr_name,
+            U.em_name AS verified_user_name,
+            (SELECT GROUP_CONCAT(em_name SEPARATOR ', ') 
+            FROM cm_complaint_detail
+            LEFT JOIN co_employee_master ON co_employee_master.em_id = cm_complaint_detail.assigned_emp
+            WHERE cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno 
+            AND cm_complaint_detail.assign_status = 1) AS assigned_employees
+            FROM 
+            cm_complaint_mast
+            LEFT JOIN co_employee_master C ON cm_complaint_mast.create_user = C.em_id
+            LEFT JOIN co_employee_master M ON cm_complaint_mast.message_send_emp = M.em_id
+            LEFT JOIN co_employee_master R ON cm_complaint_mast.message_read_emp = R.em_id
+            LEFT JOIN co_employee_master O ON cm_complaint_mast.pending_onhold_user = O.em_id
+            LEFT JOIN co_employee_master V ON cm_complaint_mast.verify_spervsr_user = V.em_id 
+            LEFT JOIN co_employee_master U ON cm_complaint_mast.verified_user = U.em_id 
+            LEFT JOIN co_request_type ON cm_complaint_mast.complaint_request_slno = co_request_type.req_type_slno
+            LEFT JOIN cm_complaint_dept ON cm_complaint_mast.complaint_deptslno = cm_complaint_dept.complaint_dept_slno
+            LEFT JOIN cm_complaint_type ON cm_complaint_mast.complaint_typeslno = cm_complaint_type.complaint_type_slno
+            LEFT JOIN co_deptsec_mast S ON S.sec_id = cm_complaint_mast.complaint_dept_secslno
+            LEFT JOIN co_deptsec_mast L ON L.sec_id = cm_complaint_mast.cm_location
+            LEFT JOIN cm_hic_policy ON cm_complaint_mast.complaint_hicslno = cm_hic_policy.hic_policy_slno
+            LEFT JOIN rm_newroom_creation ON rm_newroom_creation.rm_room_slno = cm_complaint_mast.rm_room_slno
+            LEFT JOIN rm_room_type_master ON rm_room_type_master.rm_roomtype_slno = rm_newroom_creation.rm_roomtype_slno
+            LEFT JOIN rm_floor_creation ON rm_floor_creation.rm_floor_slno = rm_newroom_creation.rm_room_floor_slno
+            LEFT JOIN cm_complaint_detail ON cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
+            LEFT JOIN rm_insidebuildblock_mast ON rm_insidebuildblock_mast.rm_insidebuildblock_slno = rm_newroom_creation.rm_insidebuilldblock_slno
+            LEFT JOIN cm_hold_reason_mast ON cm_hold_reason_mast.cm_hold_id = cm_complaint_mast.cm_hold_reason_slno
+            WHERE 
+            compalint_status = 2
+            AND cm_location = ?        
+            AND cm_rectify_time <= DATE_SUB(NOW(), INTERVAL 8 HOUR)
+            and cm_rectify_status='R'
+            GROUP BY complaint_slno
+            order by compalint_date desc`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+ 
 }
 

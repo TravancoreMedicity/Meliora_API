@@ -94,7 +94,8 @@ module.exports = {
         pool.query(
 
             `SELECT 
-            am_spare_item_map_master.am_spare_item_map_slno,                
+            am_spare_item_map_master.am_spare_item_map_slno,   
+            am_manufacture_no,             
             hold_color,      
             am_bill_mastslno,
             am_bill_master.am_bill_no,

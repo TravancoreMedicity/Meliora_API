@@ -275,6 +275,12 @@ module.exports = {
                     });
                 })
             }
+            else {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Item Approved successfully"
+                });
+            }
         });
     },
 

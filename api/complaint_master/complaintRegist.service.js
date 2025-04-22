@@ -121,6 +121,7 @@ module.exports = {
             aprrox_date,
             cm_asset_status,
             S.sec_name AS sec_name, 
+            C .em_name as ticket_reg_employee,
             cm_hold_reason,
             IFNULL(L.sec_name, 'Nil') AS location,
             complaint_desc,
@@ -219,7 +220,7 @@ module.exports = {
                 GROUP BY 
                 cm_complaint_mast.complaint_slno
                 ORDER BY 
-                compalint_date DESC;`,
+                compalint_date DESC`,
 
             [
                 id
@@ -626,6 +627,7 @@ module.exports = {
             aprrox_date,
             cm_asset_status,
             S.sec_name AS sec_name,
+            C .em_name as ticket_reg_employee,
             cm_file_status,
             cm_hold_reason,
             IFNULL(L.sec_name, "Nil") AS location,

@@ -5,7 +5,8 @@ const { getcomplaintAssign, quickAssign, getEmployee, detailedAssign, getcomplai
     AssistMultiple, getALLAssignedComList, EmployeeInactive, beforAssignHold, empTransInactive,
     sendMeassageUser, ReadMeassageUser, AssistReqListAll, getAssistRequestEmps, assistTransInactive, AssistReqEmployee,
     AssisttransferInsert, SupervsrVerifyPending, SupervsrVerify, ReopenComplaintInsert, AskQuery, changeQueryStatus, getQuery, replyQuery, AssistanceReject,
-    getAssistRequestDetails, getAssistRequestCount, getDeptPengingTicketCount
+    getAssistRequestDetails, getAssistRequestCount, getDeptPengingTicketCount,
+    getDeptEmployees
 
 } = require('../complaint_assign/complaintAssign.service');
 const logger = require('../../logger/logger');
@@ -919,7 +920,29 @@ module.exports = {
             });
         });
     },
-
+    getDeptEmployees: (req, res) => {
+        const body = req.body
+        getDeptEmployees(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }          
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
 
 
 }

@@ -1,9 +1,8 @@
-const { pool } = require('../../config/database')
+const { pool } = require("../../config/database");
 module.exports = {
-
-    getAssetDetails: (data, callback) => {
-        pool.query(
-            `select 
+  getAssetDetails: (data, callback) => {
+    pool.query(
+      `select 
             am_spare_item_map_slno,
             item_name,
             spare_status,
@@ -16,20 +15,18 @@ module.exports = {
             where
             am_spare_item_map_slno=?`,
 
-            [
-                data.am_spare_item_map_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
-    getAssetListUnderCustodian: (data, callback) => {
-        pool.query(
-            `SELECT            
+      [data.am_spare_item_map_slno],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
+  getAssetListUnderCustodian: (data, callback) => {
+    pool.query(
+      `SELECT            
         am_item_map_slno,
         category_name,
         item_name,
@@ -60,23 +57,19 @@ module.exports = {
         and
         asset_in_stock=1
         `,
-            [
-                data.am_custodian_dept_slno,
-                data.item_dept_slno,
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
+      [data.am_custodian_dept_slno, data.item_dept_slno],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
 
-
-    getcomplaintDetails: (data, callback) => {
-        pool.query(
-            `SELECT            
+  getcomplaintDetails: (data, callback) => {
+    pool.query(
+      `SELECT            
             cm_complaint_mast.complaint_slno,
             am_spare_item_map_slno,
             item_name,
@@ -184,23 +177,19 @@ module.exports = {
             cm_complaint_id desc
             limit 1`,
 
+      [data.am_spare_item_map_slno],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
 
-            [
-                data.am_spare_item_map_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
-
-    getAssetcomplaintDetails: (data, callback) => {
-
-        pool.query(
-            `select            
+  getAssetcomplaintDetails: (data, callback) => {
+    pool.query(
+      `select            
             cm_complaint_mast.complaint_slno,
             cm_asset_status,
             item_asset_no_only,
@@ -300,30 +289,24 @@ module.exports = {
                 limit 1;
                 `,
 
-            [
-                data.item_asset_no,
-                data.item_asset_no_only
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
+      [data.item_asset_no, data.item_asset_no_only],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
 
-    serviceDetailsInsert: (data, callback) => {
-        pool.query(
-            `INSERT INTO am_service_details
+  serviceDetailsInsert: (data, callback) => {
+    pool.query(
+      `INSERT INTO am_service_details
             (
                 service_item_slno,
                 service_asset_spare,
                 complaint_slno,           
-                serviced_emp_details_slno,
-                supplier_slno,                      
-                expcted_service_date,
-                expcted_service_remarks,
+                serviced_emp_details_slno,          
                 service_hold,
                 service_on_hold_reason,
                 service_done_status,
@@ -334,58 +317,51 @@ module.exports = {
                  add_to_store_date,
                 service_close_status,
                 suppl_serviced_date,
-                suppl_serviced_remarks,
-                suppl_concted_emp,
+                suppl_serviced_remarks,      
                 create_user,
                 am_asset_item_slno,
-                am_spare_item_slno
+                am_spare_item_slno,
+                serviced_supplier
             )
-            VALUES (?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)`,
-            [
-                data.service_item_slno || null,
-                data.service_asset_spare || null,
-                data.complaint_slno || null,
-                data.serviced_emp_details_slno || null,
-                data.supplier_slno || null,
-                data.expcted_service_date || null,
-                data.expcted_service_remarks || null,
-                data.service_hold || null,
-                data.service_on_hold_reason || null,
-                data.service_done_status || 0,
-                data.condm_transfr_status || 0,
-                data.condm_transfr_emp || null,
-                data.condm_transf_remarks || null,
-                data.add_to_store_user || null,
-                data.add_to_store_date || null,
-                data.service_close_status || 0,
-                data.suppl_serviced_date || null,
-                data.suppl_serviced_remarks || null,
-                data.suppl_concted_emp || null,
-                data.create_user || null,
-                data.am_asset_item_slno || null,
-                data.am_spare_item_slno || null
-            ],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
+            VALUES (?, ?, ?, ?,  ?, ?, ?,  ?, ?, ?,  ?, ?, ?, ?,?,?,?,?,?)`,
+      [
+        data.service_item_slno || null,
+        data.service_asset_spare || null,
+        data.complaint_slno || null,
+        data.serviced_emp_details_slno || null,
+        data.service_hold || null,
+        data.service_on_hold_reason || null,
+        data.service_done_status || 0,
+        data.condm_transfr_status || 0,
+        data.condm_transfr_emp || null,
+        data.condm_transf_remarks || null,
+        data.add_to_store_user || null,
+        data.add_to_store_date || null,
+        data.service_close_status || 0,
+        data.suppl_serviced_date || null,
+        data.suppl_serviced_remarks || null,
+        data.create_user || null,
+        data.am_asset_item_slno || null,
+        data.am_spare_item_slno || null,
+        data.serviced_supplier || null,
+      ],
+      (error, results, fields) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
 
-    },
-
-    getserviceDetails: (data, callback) => {
-        pool.query(
-            `SELECT            
+  getserviceDetails: (data, callback) => {
+    pool.query(
+      `SELECT            
                 am_service_details_slno,
                 service_item_slno,
                 service_asset_spare,
                 complaint_slno,            
-                serviced_emp_details_slno,
-                supplier_slno, 
-                expcted_service_date,
-                expcted_service_remarks,
+                serviced_emp_details_slno,                
                 service_on_hold_reason,
                 service_hold,
                 service_done_status,
@@ -397,44 +373,38 @@ module.exports = {
                 service_close_status, 
                 suppl_serviced_date,
                 suppl_serviced_remarks,
-                suppl_concted_emp             
+                serviced_supplier          
              FROM
                 am_service_details
              WHERE
                 service_item_slno = ? 
                 AND service_asset_spare = ?
                 AND service_close_status != 1`,
-            [
-                data.service_item_slno,
-                data.service_asset_spare
-            ],
-            (error, results) => {
-                if (error) {
-                    return callback(error);
-                }
+      [data.service_item_slno, data.service_asset_spare],
+      (error, results) => {
+        if (error) {
+          return callback(error);
+        }
 
-                if (results.length > 0) {
-                    return callback(null, results);
-                } else {
-                    return callback(null, []);
-                }
-            }
-        );
-    },
+        if (results.length > 0) {
+          return callback(null, results);
+        } else {
+          return callback(null, []);
+        }
+      }
+    );
+  },
 
-    serviceDetailsUpdate: (data, callback) => {
-        pool.query(
-            `UPDATE
+  serviceDetailsUpdate: (data, callback) => {
+    pool.query(
+      `UPDATE
             am_service_details
             SET           
             service_item_slno=?,
             service_asset_spare=?,
             complaint_slno=?,
-            serviced_emp_details_slno=?,                   
-            supplier_slno=?,
-            expcted_service_date=?,
-            expcted_service_remarks=?,
-            service_hold=?,
+            serviced_emp_details_slno=?,                  
+             service_hold=?,
             service_on_hold_reason=?,
             service_done_status=?,
             condm_transfr_status=?,
@@ -444,57 +414,50 @@ module.exports = {
             add_to_store_date=?,
             service_close_status=?,
             suppl_serviced_date=?,
-            suppl_serviced_remarks=?,
-            suppl_concted_emp=?,
-            edit_user=?
+            suppl_serviced_remarks=?, 
+            edit_user=?,
+            serviced_supplier=?
  			WHERE 
              am_service_details_slno=?`,
-            [
-
-                data.service_item_slno,
-                data.service_asset_spare,
-                data.complaint_slno,
-                data.serviced_emp_details_slno,
-                data.supplier_slno,
-                data.expcted_service_date,
-                data.expcted_service_remarks,
-                data.service_hold,
-                data.service_on_hold_reason,
-                data.service_done_status,
-                data.condm_transfr_status,
-                data.condm_transfr_emp,
-                data.condm_transf_remarks,
-                data.add_to_store_user,
-                data.add_to_store_date,
-                data.service_close_status,
-                data.suppl_serviced_date,
-                data.suppl_serviced_remarks,
-                data.suppl_concted_emp,
-                data.edit_user,
-                data.am_service_details_slno,
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        )
-    },
-    getAllserviceDetails: (data, callback) => {
-        pool.query(
-
-            `SELECT
+      [
+        data.service_item_slno,
+        data.service_asset_spare,
+        data.complaint_slno,
+        data.serviced_emp_details_slno,
+        data.service_hold,
+        data.service_on_hold_reason,
+        data.service_done_status,
+        data.condm_transfr_status,
+        data.condm_transfr_emp,
+        data.condm_transf_remarks,
+        data.add_to_store_user,
+        data.add_to_store_date,
+        data.service_close_status,
+        data.suppl_serviced_date,
+        data.suppl_serviced_remarks,
+        data.edit_user,
+        data.serviced_supplier,
+        data.am_service_details_slno,
+      ],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
+  getAllserviceDetails: (data, callback) => {
+    pool.query(
+      `SELECT
             cm_asset_status,
+            it_supplier_name as serviced_supplier,
             am_service_details_slno,
             service_item_slno,
             service_asset_spare,
             am_service_details.complaint_slno,
             cm_complaint_mast.complaint_slno,
-            serviced_emp_details_slno,
-            supplier_slno,
-            expcted_service_date,
-            expcted_service_remarks,
+            serviced_emp_details_slno,         
             condm_transfr_status,
             condm_transfr_emp,
             condm_transf_remarks,
@@ -502,8 +465,7 @@ module.exports = {
             add_to_store_user,
             add_to_store_date,
             add_to_store_user,
-            em_name,
-            suppl_concted_emp,
+            em_name,          
             suppl_serviced_date,
             suppl_serviced_remarks,
             service_hold,
@@ -542,7 +504,6 @@ module.exports = {
             ) AS assigned_employees
             FROM
             am_service_details
-            LEFT JOIN it_bill_supplier_details_mast ON it_bill_supplier_details_mast.it_supplier_slno = am_service_details.supplier_slno
             LEFT JOIN cm_complaint_mast ON cm_complaint_mast.complaint_slno = am_service_details.complaint_slno
             left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno=cm_complaint_mast.complaint_deptslno
             left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
@@ -553,32 +514,29 @@ module.exports = {
             LEFT JOIN rm_floor_creation ON rm_floor_creation.rm_floor_slno =rm_newroom_creation.rm_room_floor_slno
             LEFT JOIN co_employee_master ON co_employee_master.em_id =am_service_details.add_to_store_user
             LEFT JOIN rm_insidebuildblock_mast ON rm_insidebuildblock_mast.rm_insidebuildblock_slno =rm_newroom_creation.rm_insidebuilldblock_slno
+            LEFT JOIN it_bill_supplier_details_mast ON it_bill_supplier_details_mast.it_supplier_slno =am_service_details.serviced_supplier
             WHERE
             service_item_slno = ?
             AND service_asset_spare = ?
             ORDER BY am_service_details_slno desc`,
-            [
-                data.service_item_slno,
-                data.service_asset_spare
+      [data.service_item_slno, data.service_asset_spare],
+      (error, results) => {
+        if (error) {
+          return callback(error);
+        }
 
-            ],
-            (error, results) => {
-                if (error) {
-                    return callback(error);
-                }
+        if (results.length > 0) {
+          return callback(null, results);
+        } else {
+          return callback(null, []);
+        }
+      }
+    );
+  },
 
-                if (results.length > 0) {
-                    return callback(null, results);
-                } else {
-                    return callback(null, []);
-                }
-            }
-        );
-    },
-
-    AssetDetailsUpdate: (data, callback) => {
-        pool.query(
-            `UPDATE
+  AssetDetailsUpdate: (data, callback) => {
+    pool.query(
+      `UPDATE
             am_asset_item_map_master
             SET           
             item_dept_slno=?,
@@ -595,49 +553,45 @@ module.exports = {
  			WHERE 
              am_item_map_slno=?`,
 
-            [
-                data.item_dept_slno,
-                data.item_deptsec_slno,
-                data.item_room_slno,
-                data.item_subroom_slno,
-                data.item_rack_slno,
-                data.asset_item_service,
-                data.asset_item_condmnation,
-                data.asset_item_condm_user,
-                data.asset_item_service_hold,
-                data.am_item_map_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        )
-    },
+      [
+        data.item_dept_slno,
+        data.item_deptsec_slno,
+        data.item_room_slno,
+        data.item_subroom_slno,
+        data.item_rack_slno,
+        data.asset_item_service,
+        data.asset_item_condmnation,
+        data.asset_item_condm_user,
+        data.asset_item_service_hold,
+        data.am_item_map_slno,
+      ],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
 
-    updateTransLogStatus: (data, callback) => {
-        pool.query(
-            `UPDATE am_asset_transfer_log
+  updateTransLogStatus: (data, callback) => {
+    pool.query(
+      `UPDATE am_asset_transfer_log
             SET
             am_trans_status=?           
             WHERE  am_asset_log_slno=?`,
-            [
-                data.am_trans_status,
-                data.am_asset_log_slno
-            ],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
-    SpareDetailsUpdate: (data, callback) => {
-
-        pool.query(
-            `UPDATE
+      [data.am_trans_status, data.am_asset_log_slno],
+      (error, results, fields) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
+  SpareDetailsUpdate: (data, callback) => {
+    pool.query(
+      `UPDATE
             am_spare_item_map_master
             SET           
             spare_dept_slno=?,
@@ -650,50 +604,45 @@ module.exports = {
  			WHERE 
              am_spare_item_map_slno=?`,
 
-            [
-                data.spare_dept_slno,
-                data.spare_deptsec_slno,
-                data.spare_room_slno,
-                data.spare_subroom_slno,
-                data.spare_rack_slno,
-                data.spare_service,
-                data.spare_service_hold,
-                data.am_spare_item_map_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        )
-    },
-    spareServiceUpdate: (data, callback) => {
-
-        pool.query(
-            `UPDATE
+      [
+        data.spare_dept_slno,
+        data.spare_deptsec_slno,
+        data.spare_room_slno,
+        data.spare_subroom_slno,
+        data.spare_rack_slno,
+        data.spare_service,
+        data.spare_service_hold,
+        data.am_spare_item_map_slno,
+      ],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
+  spareServiceUpdate: (data, callback) => {
+    pool.query(
+      `UPDATE
             am_asset_spare_details
             SET           
             spare_status=?
  			WHERE 
              asset_spare_slno=?`,
 
-            [
-                data.spare_status,
-                data.asset_spare_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        )
-    },
-    servicedEmpDetailsInsert: (data, callback) => {
-
-        pool.query(
-            `INSERT INTO am_serviced_emp_details
+      [data.spare_status, data.asset_spare_slno],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
+  servicedEmpDetailsInsert: (data, callback) => {
+    pool.query(
+      `INSERT INTO am_serviced_emp_details
             (          
             serviced_emp,
             serviced_date,
@@ -702,33 +651,30 @@ module.exports = {
             serviced_create_user
             )
             VALUES (?, ?, ?, ?, ?)`,
-            [
-                data.serviced_emp || null,
-                data.serviced_date || null,
-                data.service_issues_identified || null,
-                data.serviced_issue_remarks || null,
-                data.serviced_create_user || null
+      [
+        data.serviced_emp || null,
+        data.serviced_date || null,
+        data.service_issues_identified || null,
+        data.serviced_issue_remarks || null,
+        data.serviced_create_user || null,
+      ],
+      (error, results, fields) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
 
-            ],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
+  getDeptServiceDetailsData: (data, callBack) => {
+    const servicedEmpDetailSlno =
+      typeof data.serviced_emp_detail_slno === "string"
+        ? JSON.parse(data.serviced_emp_detail_slno)
+        : data.serviced_emp_detail_slno;
 
-    },
-
-
-    getDeptServiceDetailsData: (data, callBack) => {
-
-        const servicedEmpDetailSlno = typeof data.serviced_emp_detail_slno === 'string'
-            ? JSON.parse(data.serviced_emp_detail_slno)
-            : data.serviced_emp_detail_slno;
-
-        pool.query(
-            `SELECT
+    pool.query(
+      `SELECT
                 serviced_emp_detail_slno,
                 serviced_emp,
                 co_employee_master.em_name,
@@ -742,19 +688,19 @@ module.exports = {
                  left join co_employee_master on co_employee_master.em_id=am_serviced_emp_details.serviced_emp
             WHERE 
                 serviced_emp_detail_slno IN (?)`,
-            [servicedEmpDetailSlno],
-            (error, results, fields) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
+      [servicedEmpDetailSlno],
+      (error, results, fields) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      }
+    );
+  },
 
-    servicedEmpDetailsUpdate: (data, callback) => {
-        pool.query(
-            `UPDATE
+  servicedEmpDetailsUpdate: (data, callback) => {
+    pool.query(
+      `UPDATE
             am_serviced_emp_details
             SET           
             serviced_emp=?,
@@ -764,73 +710,64 @@ module.exports = {
             serviced_edit_user=?
  			WHERE 
              serviced_emp_detail_slno=?`,
-            [
+      [
+        data.serviced_emp,
+        data.serviced_date,
+        data.service_issues_identified,
+        data.serviced_issue_remarks,
+        data.serviced_edit_user,
+        data.serviced_emp_detail_slno,
+      ],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
 
-                data.serviced_emp,
-                data.serviced_date,
-                data.service_issues_identified,
-                data.serviced_issue_remarks,
-                data.serviced_edit_user,
-                data.serviced_emp_detail_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        )
-    },
-
-    AssetServiceHoldUpdate: (data, callback) => {
-
-        pool.query(
-            `update 
+  AssetServiceHoldUpdate: (data, callback) => {
+    pool.query(
+      `update 
             am_asset_item_map_master
             set
             asset_item_service_hold=?
             where
             am_item_map_slno=?`,
 
-            [
-                data.asset_item_service_hold,
-                data.am_item_map_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        )
-    },
+      [data.asset_item_service_hold, data.am_item_map_slno],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
 
-    SpareServiceHoldUpdate: (data, callback) => {
-        pool.query(
-            `update 
+  SpareServiceHoldUpdate: (data, callback) => {
+    pool.query(
+      `update 
             am_spare_item_map_master
             set
             spare_service_hold=?
             where
             am_spare_item_map_slno=?`,
 
-            [
-                data.spare_service_hold,
-                data.am_spare_item_map_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        )
-    },
+      [data.spare_service_hold, data.am_spare_item_map_slno],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
 
-
-    getAssetAlllDetails: (data, callback) => {
-        pool.query(
-            `SELECT
+  getAssetAlllDetails: (data, callback) => {
+    pool.query(
+      `SELECT
             am_item_name_creation.item_creation_slno,
             am_category_pm_days,
             instalation_date,
@@ -928,21 +865,19 @@ module.exports = {
             am_item_map_details.am_item_map_slno=?
             GROUP BY item_creation_slno
             ORDER BY item_creation_slno DESC `,
-            [
-                data.am_item_map_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
+      [data.am_item_map_slno],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
 
-    getAssetUnderSelectdDeptAndSec: (data, callback) => {
-        pool.query(
-            `SELECT            
+  getAssetUnderSelectdDeptAndSec: (data, callback) => {
+    pool.query(
+      `SELECT            
         am_item_map_slno,
         item_name,
         am_asset_item_map_master.item_creation_slno,
@@ -974,24 +909,23 @@ module.exports = {
         asset_in_stock=0
         `,
 
-            [
-                data.item_dept_slno,
-                data.item_deptsec_slno,
-                data.am_custodian_dept_slno
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
+      [
+        data.item_dept_slno,
+        data.item_deptsec_slno,
+        data.am_custodian_dept_slno,
+      ],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
 
-
-    getPendingAsset: (data, callback) => {
-        pool.query(
-            `SELECT 
+  getPendingAsset: (data, callback) => {
+    pool.query(
+      `SELECT 
             category_name,
             instalation_date,
             am_category_pm_days,
@@ -1018,20 +952,18 @@ module.exports = {
             and item_create_status=1 
             and am_manufacture_no is null        
             ORDER BY am_asset_item_map_master.am_item_map_slno DESC`,
-            [
-                data.am_custodian_dept_slno,
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
-    getPendingSpare: (data, callback) => {
-        pool.query(
-            `SELECT
+      [data.am_custodian_dept_slno],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
+  getPendingSpare: (data, callback) => {
+    pool.query(
+      `SELECT
             
             am_spare_item_map_master.am_spare_item_map_slno,  am_spare_item_map_master.spare_creation_slno,spare_dept_slno,spare_deptsec_slno,
             co_department_mast.dept_name as deptname,co_deptsec_mast.sec_name as secname,spare_custodian_dept,
@@ -1053,20 +985,18 @@ module.exports = {
              and am_manufacture_no is null
        
             ORDER BY am_spare_item_map_master.am_spare_item_map_slno DESC`,
-            [
-                data.am_custodian_dept_slno,
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
-    CmSpareComplaintService: (data, callback) => {
-        pool.query(
-            `INSERT INTO cm_spare_complaint_service
+      [data.am_custodian_dept_slno],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
+  CmSpareComplaintService: (data, callback) => {
+    pool.query(
+      `INSERT INTO cm_spare_complaint_service
           ( 
             cm_complaint_slno,
             cm_spare_asset_no,
@@ -1075,20 +1005,113 @@ module.exports = {
             create_user
           )
           VALUES(?,?,?,?,?)`,
-            [
-                data.cm_complaint_slno,
-                data.cm_spare_asset_no,
-                data.cm_spare_asset_no_only,
-                data.cm_spare_item_map_slno,
-                data.create_user
-            ],
+      [
+        data.cm_complaint_slno,
+        data.cm_spare_asset_no,
+        data.cm_spare_asset_no_only,
+        data.cm_spare_item_map_slno,
+        data.create_user,
+      ],
 
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
-            }
-        );
-    },
-}
+      (error, results, fields) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
+
+  InsertSupplierContactDetails: (data, callback) => {
+    pool.query(
+      `INSERT INTO am_service_supplier_details
+            (          
+            service_details_slno,
+            supplier_slno,
+            contact_status,
+            contacted_emp,                    
+            contacted_date,
+             expected_service_vists,                    
+            supplier_response,
+            create_user
+            )
+            VALUES (?, ?, ?, ?, ?,?,?,?)`,
+      [
+        data.service_details_slno || null,
+        data.supplier_slno || null,
+        data.contact_status || null,
+        data.contacted_emp || null,
+        data.contacted_date || null,
+        data.expected_service_vists || null,
+        data.supplier_response || null,
+        data.create_user || null,
+      ],
+      (error, results, fields) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
+  UpdateSupplierContactDetails: (data, callback) => {
+    pool.query(
+      `UPDATE am_service_supplier_details SET 
+            service_details_slno=?,
+            supplier_slno=?   ,
+            contacted_emp=?,     
+            contacted_date=?,
+            expected_service_vists=?,
+            supplier_response=?,
+            edit_user=?
+            WHERE 
+            supplier_service_slno=?`,
+      [
+        data.service_details_slno,
+        data.supplier_slno,
+        data.contacted_emp,
+        data.contacted_date,
+        data.expected_service_vists,
+        data.supplier_response,
+        data.edit_user,
+        data.supplier_service_slno,
+      ],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
+
+  viewSupplierContactDetails: (id, callBack) => {
+    pool.query(
+      `SELECT 
+            supplier_service_slno, 
+            em_name,
+            it_supplier_name,
+            service_details_slno,
+            supplier_slno, contact_status,
+            contacted_emp, contacted_date, 
+            expected_service_vists,
+            supplier_response                
+            FROM
+            am_service_supplier_details
+            left join it_bill_supplier_details_mast on it_bill_supplier_details_mast.it_supplier_slno = am_service_supplier_details.supplier_slno
+            left join co_employee_master on co_employee_master.em_id=am_service_supplier_details.contacted_emp
+            where
+            service_details_slno=?
+            and
+            contact_status=1`,
+
+      [id],
+      (error, results, fields) => {
+        if (error) {
+          callBack(error);
+        }
+        return callBack(null, results);
+      }
+    );
+  },
+};

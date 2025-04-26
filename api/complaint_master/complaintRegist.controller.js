@@ -1,13 +1,15 @@
 const { complaintRegistInsert, complaintRegistUpdate,
     getcomplaintRegistByID, getcomplaintListbylogin, getcomplaintListbydept, insertAssetArray, assetinactive,
     getcomplaintAll, getapptokenbydept, updateserialnum, getAssetinComplaint, UpdateAssetinComplaint, getRoomsNameNdTypeList, getAssetsInRoom, getDeptSecWiseTicket,
-    SpareDetailsUndercomplaint, viewAllPendingTicket, deleteTicket
+    SpareDetailsUndercomplaint, viewAllPendingTicket, deleteTicket,getVerificationPending
 } = require('../complaint_master/complaintRegist.service');
 const { validateComplaintRegist } = require('../../validation/validation_schema');
 const logger = require('../../logger/logger');
 const { default: Expo } = require('expo-server-sdk');
 const { getCompSerialno } = require('../commoncode/common.service');
 const expo = new Expo()
+
+
 
 module.exports = {
 
@@ -601,8 +603,31 @@ module.exports = {
                 message: "Ticket deleted successfully",
             });
         });
-    }
+    },
 
+    getVerificationPending: (req, res) => {
+        const id = req.params.id
+        getVerificationPending(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Pending Request"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
 
 }
 

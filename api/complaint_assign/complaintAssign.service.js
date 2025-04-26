@@ -1343,5 +1343,21 @@ module.exports = {
             }
         );
     },
+    getDeptEmployees: (data, callBack) => {
+        pool.query(
+            ` SELECT em_id, em_name FROM co_employee_master where em_department=?
+            and em_status=1 and em_no!=1 and em_id!=1606`,
+            [
+                data.em_department,
+                data.em_id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 
 }

@@ -5,7 +5,8 @@ const { requestRegistInsert, InHodExist, getAllReqBasedDept, getDetailItemList, 
     getAllHoldAndRejectItems, getackPending, UpdateItemReceiveStatus, checkStoreReturnItem, insertReturnItemDetails, getCommonMasterUpdate,
     itemReturnDetailsForViewStore, returnReplyDetails, viewItemReturnDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet,
     getCommonMasterGetCat, getGetStoreMasterById, getStoreMasterUpdate, getCommonMasterInsert, getCommonMasterSettingGet, getCommonMasterSettingUpdate,
-    getDashBoardMaster, GetDashBoardMaster, getDashboardUpdate, getDashright, getCommonMasterGetByID } = require('./newRequestRegister.controller');
+    getDashBoardMaster, GetDashBoardMaster, getDashboardUpdate, getDashright, getCommonMasterGetByID, GetDataCollectionMasterUpdate, GetDataCollectionMaster,
+    Getdatacollection, getdefaultRights } = require('./newRequestRegister.controller');
 
 router.post("/InsertRegMast", checkToken, requestRegistInsert);
 router.patch("/deleteItemList", checkToken, deleteItemDetails);
@@ -54,6 +55,12 @@ router.get("/GetDashBoardMaster", checkToken, GetDashBoardMaster);
 router.post("/DashBoardMaster/update", checkToken, getDashboardUpdate);
 router.post("/Dashright", checkToken, getDashright);
 router.post("/CommonMasterGetByID", checkToken, getCommonMasterGetByID);
+router.get("/Getdatacollection", checkToken, Getdatacollection);
 
+router.post("/DataCollectionMaster", checkToken, GetDataCollectionMasterUpdate);
+router.post("/DataCollectionMaster/update", checkToken, GetDataCollectionMaster);
+// router.post("/datacollectionRights", checkToken, getdefaultRights);
+
+router.get("/datacollectionRights/:id", checkToken, getdefaultRights);
 
 module.exports = router;

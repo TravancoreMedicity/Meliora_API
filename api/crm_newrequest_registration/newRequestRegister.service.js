@@ -1527,4 +1527,108 @@ module.exports = {
             }
         );
     },
+
+
+    GetDataCollectionMasterUpdate: (data, callback) => {
+
+        pool.query(
+            `INSERT INTO crm_datacollection_master (
+                Depid,Depsec,empid,status   
+               )
+                VALUES(?,?,?,?)`,
+            [
+                data.dept,
+                data.deptsec,
+                data.empId,
+                data.View_Status
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    Getdatacollection: (data, callback) => {
+        pool.query(
+            `SELECT
+             Depid,
+              empid,
+              Depsec,
+              dept_name,
+              sec_name,
+              em_name,
+              status
+               FROM crm_datacollection_master
+              LEFT JOIN co_department_mast ON co_department_mast.dept_id = crm_datacollection_master.Depid
+              LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id = crm_datacollection_master.Depsec       
+              LEFT JOIN co_employee_master OM ON OM.em_id = crm_datacollection_master.empid `,
+            [
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    GetDataCollectionMaster: (data, callback) => {
+        pool.query(
+            `UPDATE crm_datacollection_master 
+            SET 
+            Depid=?,
+            empid=?,
+            Depsec=?,
+            status=?
+            WHERE empid = ?`,
+            [
+                data.dept,
+                data.empId,
+                data.deptsec,
+                data.View_Status,
+                data.empId,
+
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+
+
+
+    getdefaultRights: (id, callback) => {
+        pool.query(
+            `SELECT
+             Depid,
+              empid,
+              Depsec,
+              dept_name,
+              sec_name,
+              em_name,
+              status
+               FROM crm_datacollection_master
+              LEFT JOIN co_department_mast ON co_department_mast.dept_id = crm_datacollection_master.Depid
+              LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id = crm_datacollection_master.Depsec       
+              LEFT JOIN co_employee_master OM ON OM.em_id = crm_datacollection_master.empid
+              where empid = ?`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
 }

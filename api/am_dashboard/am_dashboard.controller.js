@@ -1,10 +1,7 @@
 const { getCategoryDetails, getCategoryDetailsSpare, getCountCategory, getCountCategorySpare, getAssetCount, getSpareCount, getAssetValue, getSpareValue, getTotAssetValue,
-    getTotspareValue, getTotAssetCount, getTotSpareCount,
-    getTotalCountCategory,
-    getTotalCountCategorySpare,
-    getTotalCountItemType,
-    getTotalCountItemTypeSpare, getTotalCountAssetType,
-    getTotalCountAssetSpareType } = require('./am_dashboard.service')
+    getTotspareValue, getTotAssetCount, getTotSpareCount, getTotalCountCategory, getTotalCountCategorySpare, getTotalCountItemType, getTotalCountItemTypeSpare,
+    getTotalCountAssetType, getTotalCountAssetSpareType, getAllAmcCmcUnderCustodian, getExpiredAmcCmc, getActveWarrentyGaurentee, getExpiredWarGaur
+} = require('./am_dashboard.service')
 const logger = require('../../logger/logger');
 module.exports = {
 
@@ -302,27 +299,7 @@ module.exports = {
             })
         })
     },
-    // getTotalCountItemType: (req, res) => {
-    //     const body = req.body;
-    //     getTotalCountItemType(body, (err, results) => {
-    //         if (err) {
-    //             return res.status(200).json({
-    //                 success: 0,
-    //                 message: err
-    //             })
-    //         }
-    //         if (results.length === 0) {
-    //             return res.status(200).json({
-    //                 success: 1,
-    //                 message: "No Records"
-    //             })
-    //         }
-    //         return res.status(200).json({
-    //             success: 2,
-    //             data: results
-    //         })
-    //     })
-    // },
+
     getTotalCountItemType: (req, res) => {
         getTotalCountItemType((err, results) => {
             if (err) {
@@ -365,27 +342,7 @@ module.exports = {
             })
         })
     },
-    // getTotalCountAssetType: (req, res) => {
-    //     const body = req.body;
-    //     getTotalCountAssetType(body, (err, results) => {
-    //         if (err) {
-    //             return res.status(200).json({
-    //                 success: 0,
-    //                 message: err
-    //             })
-    //         }
-    //         if (results.length === 0) {
-    //             return res.status(200).json({
-    //                 success: 1,
-    //                 message: "No Records"
-    //             })
-    //         }
-    //         return res.status(200).json({
-    //             success: 2,
-    //             data: results
-    //         })
-    //     })
-    // },
+
     getTotalCountAssetSpareType: (req, res) => {
         const body = req.body;
         getTotalCountAssetSpareType(body, (err, results) => {
@@ -428,4 +385,93 @@ module.exports = {
 
         })
     },
+
+    getAllAmcCmcUnderCustodian: (req, res) => {
+        const body = req.body;
+        getAllAmcCmcUnderCustodian(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getExpiredAmcCmc: (req, res) => {
+        const body = req.body;
+        getExpiredAmcCmc(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getActveWarrentyGaurentee: (req, res) => {
+        const body = req.body;
+        getActveWarrentyGaurentee(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getExpiredWarGaur: (req, res) => {
+        const body = req.body;
+        getExpiredWarGaur(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Records"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+
+
+
+
 }

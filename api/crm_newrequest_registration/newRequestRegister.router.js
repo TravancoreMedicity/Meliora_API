@@ -5,7 +5,7 @@ const { requestRegistInsert, InHodExist, getAllReqBasedDept, getDetailItemList, 
     getAllHoldAndRejectItems, getackPending, UpdateItemReceiveStatus, checkStoreReturnItem, insertReturnItemDetails, getCommonMasterUpdate,
     itemReturnDetailsForViewStore, returnReplyDetails, viewItemReturnDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet,
     getCommonMasterGetCat, getGetStoreMasterById, getStoreMasterUpdate, getCommonMasterInsert, getCommonMasterSettingGet, getCommonMasterSettingUpdate,
-    getDashBoardMaster, GetDashBoardMaster, getDashboardUpdate, getDashright } = require('./newRequestRegister.controller');
+    getDashBoardMaster, GetDashBoardMaster, getDashboardUpdate, getDashright, getCommonMasterGetByID } = require('./newRequestRegister.controller');
 
 router.post("/InsertRegMast", checkToken, requestRegistInsert);
 router.patch("/deleteItemList", checkToken, deleteItemDetails);
@@ -53,6 +53,7 @@ router.post("/DashBoardMaster", checkToken, getDashBoardMaster);
 router.get("/GetDashBoardMaster", checkToken, GetDashBoardMaster);
 router.post("/DashBoardMaster/update", checkToken, getDashboardUpdate);
 router.post("/Dashright", checkToken, getDashright);
+router.post("/CommonMasterGetByID", checkToken, getCommonMasterGetByID);
 
 
 module.exports = router;

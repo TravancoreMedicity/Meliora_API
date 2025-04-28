@@ -1,4 +1,3 @@
-const { error } = require("winston");
 const {
     insertfeedbackcategory,
     getallcategories,
@@ -100,7 +99,6 @@ const {
     InsertBedRemarkDetail,
     getbedremarkDetail,
     updatebedremarks,
-    UpdateBedRemarkDetail,
     getberremarkstatus,
     getallHousekeepingBeds,
     getallroomdetail,
@@ -113,7 +111,6 @@ const {
     complaintregistraion,
     UpdateSeiralNos,
     fetchcurrentserialnos,
-    insertAssetDetail,
     getcomplaintdetail,
     rectifycomplaint,
     UpdateComplaintDetailTable,
@@ -131,14 +128,26 @@ const {
     updateroomchecklist,
     getroomchecklist,
     getdischargeentrybed,
-    insertprocheckdetl,
     CheckProCheckBedPresent,
     insertprocheckbed,
     InsertProCheckListDetail,
     UpdateProCheckListDetail,
     getprochecklistdetail,
     updateprocheckbed,
-    getprocheckbed
+    getprocheckbed,
+    getprocheckcompletebed,
+    insertAssetDetail,
+    insertprocheckdetl,
+    UpdateBedRemarkDetail,
+    insertdischargeroomitem,
+    updatedischargeroomitem,
+    getallhkitem,
+    getallhkactiveitem,
+    inserthkempdtl,
+    updatehkempdtl,
+    getallhkempdtl,
+    CheckEmployeeAlreadyExist,
+    getfeedbackcount,
 } = require("./Feedback.service");
 
 module.exports = {
@@ -840,8 +849,6 @@ module.exports = {
 
                     insertFeedbackQuestAnswer(userAnswer, (error, results) => {
                         if (error) {
-                            console.log(error);
-
                             return res.status(200).json({
                                 success: 1,
                                 message: error
@@ -858,7 +865,6 @@ module.exports = {
         })
     },
     getalluserfeedback: (req, res) => {
-        // console.log(req.body, "date");
         const body = req.body;
         getalluserfeedback(body, (error, results) => {
             if (error) {
@@ -869,8 +875,9 @@ module.exports = {
             }
             if (results.length === 0) {
                 return res.status(200).json({
-                    success: 0,
-                    message: 'No Data founded'
+                    success: 2,
+                    message: 'No Data founded',
+                    data: []
                 })
             }
             if (results.length > 0) {
@@ -964,8 +971,6 @@ module.exports = {
         }
         findMenuAlreadyExists(checkData, (error, results) => {
             if (error) {
-                console.log(error)
-
                 return res.status(200).json({
                     success: 1,
                     message: "Error in fetchin data"
@@ -1517,6 +1522,30 @@ module.exports = {
             }
         })
     },
+    getfeedbackcount: (req, res) => {
+        getfeedbackcount((error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Error in fetching data!"
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No data Found',
+                    data: 0
+                })
+            }
+            if (results.length > 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "Successfully Fetched Data",
+                    data: results
+                })
+            }
+        })
+    },
     updatenursestation: (req, res) => {
         const body = req.body;
         updatenursestation(body, (error, results) => {
@@ -1914,8 +1943,6 @@ module.exports = {
         const body = req.body;
         getCurrentPatient(body, (err, results) => {
             if (err) {
-                console.log(err);
-
                 return res.status(200).json({
                     success: 0,
                     message: err
@@ -1973,6 +2000,7 @@ module.exports = {
             fb_emp_assign,
             create_user,
             fb_complaint_postdata,
+            fb_final_checked,
             data } = Body;
 
         const assignEmployeee = JSON.stringify(fb_emp_assign);
@@ -1991,6 +2019,7 @@ module.exports = {
             fb_initail_checked: fb_initail_checked,
             fb_initial_emp_assign: assingintialEmployye,
             fb_emp_assign: assignEmployeee,
+            fb_final_checked: fb_final_checked,
             create_user: create_user
         }
         const searchData = {
@@ -2008,7 +2037,6 @@ module.exports = {
             if (results.length === 0 || !results) {
                 insertbedremarks(insertdata, (error, results) => {
                     if (error) {
-                        console.log(error, "error");
                         return res.status(200).json({
                             success: 0,
                             message: error
@@ -2051,9 +2079,6 @@ module.exports = {
                 const isComplaint = fb_complaint_postdata === 1;
                 const update_data = isComplaint ? {
                     fb_bed_slno,
-                    fb_bd_code,
-                    fb_bdc_no,
-                    fb_ns_code,
                     fb_bed_rmk_slno: searchDetailId
                 } : {
                     fb_bed_slno,
@@ -2065,6 +2090,7 @@ module.exports = {
                     fb_bed_remark,
                     fb_overall_remarks,
                     fb_overall_condition,
+                    fb_final_checked,
                     fb_emp_assign: assignEmployeee,
                     edit_user: create_user,
                     fb_bed_rmk_slno: searchDetailId
@@ -2093,6 +2119,7 @@ module.exports = {
             });
         })
     },
+    //this is not uisng
     getllbedremarks: (req, res) => {
         getllbedremarks((error, results) => {
             if (error) {
@@ -2164,8 +2191,6 @@ module.exports = {
         const id = req.params.id;
         getbedremarkDetail(id, (err, results) => {
             if (err) {
-                console.log(err);
-
                 return res.status(400).json({
                     success: 0,
                     message: err
@@ -2187,10 +2212,6 @@ module.exports = {
     complaintregistraion: (req, res) => {
         const data = req.body;
         const { cm_assets, complaint_request_slno, compalint_date, cm_location, create_user } = data;
-
-        console.log();
-
-
         const assetLength = cm_assets?.length;
         fetchcurrentserialnos((error, results) => {
             if (error) {
@@ -2266,7 +2287,7 @@ module.exports = {
         const id = req.params.id;
         getdepassetonly(id, (err, results) => {
             if (err) {
-                console.log(err);
+
 
                 return res.status(400).json({
                     success: 0,
@@ -2317,7 +2338,7 @@ module.exports = {
         const data = req.body;
         insertassetitem(data, (err, results) => {
             if (err) {
-                console.log(err, "err");
+
                 return res.status(400).json({
                     success: 0,
                     message: err
@@ -2333,7 +2354,7 @@ module.exports = {
         const data = req.body;
         insertroomchecklist(data, (err, results) => {
             if (err) {
-                console.log(err, "err");
+
                 return res.status(400).json({
                     success: 0,
                     message: err
@@ -2345,11 +2366,59 @@ module.exports = {
             });
         });
     },
+    insertdischargeroomitem: (req, res) => {
+        const data = req.body;
+        insertdischargeroomitem(data, (err, results) => {
+            if (err) {
+
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Successfully Inserted"
+            });
+        });
+    },
+    inserthkempdtl: (req, res) => {
+        const data = req.body;
+        CheckEmployeeAlreadyExist(data, (error, results) => {
+            if (error) {
+
+                return res.status(400).json({
+                    success: 0,
+                    message: error
+                });
+            }
+            if (results?.length > 0) {
+                return res.status(200).json({
+                    success: 3,
+                    message: "Already Exist"
+                });
+            }
+            inserthkempdtl(data, (err, results) => {
+                if (err) {
+                    return res.status(400).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                return res.status(200).json({
+                    success: 2,
+                    message: "Successfully Inserted"
+                });
+            });
+
+        })
+
+    },
     updateassetitem: (req, res) => {
         const data = req.body;
         updateassetitem(data, (err, results) => {
             if (err) {
-                console.log(err, "err");
+
                 return res.status(400).json({
                     success: 0,
                     message: err
@@ -2529,6 +2598,70 @@ module.exports = {
             });
         });
     },
+    getallhkitem: (req, res) => {
+        getallhkitem((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getallhkempdtl: (req, res) => {
+        getallhkempdtl((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getallhkactiveitem: (req, res) => {
+        getallhkactiveitem((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
     getprocheckbed: (req, res) => {
         getprocheckbed((err, results) => {
             if (err) {
@@ -2551,6 +2684,29 @@ module.exports = {
             });
         });
     },
+    getprocheckcompletebed: (req, res) => {
+        getprocheckcompletebed((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found",
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
     insertroommaster: (req, res) => {
         const body = req.body;
         FindRoomAlreadyPresent(body, (error, results) => {
@@ -2623,8 +2779,6 @@ module.exports = {
         const id = req.params.id;
         getcomplaintdetail(id, (err, results) => {
             if (err) {
-                console.log(err);
-
                 return res.status(400).json({
                     success: 0,
                     message: err
@@ -2647,8 +2801,6 @@ module.exports = {
         const id = req.params.id;
         getallroomassetdata(id, (err, results) => {
             if (err) {
-                console.log(err);
-
                 return res.status(400).json({
                     success: 0,
                     message: err
@@ -2715,6 +2867,36 @@ module.exports = {
     updateroomchecklist: (req, res) => {
         const data = req.body;
         updateroomchecklist(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    updatedischargeroomitem: (req, res) => {
+        const data = req.body;
+        updatedischargeroomitem(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    updatehkempdtl: (req, res) => {
+        const data = req.body;
+        updatehkempdtl(data, (err, results) => {
             if (err) {
                 return res.status(400).json({
                     success: 0,

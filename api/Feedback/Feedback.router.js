@@ -82,6 +82,15 @@ const {
     insertprocheckdetl,
     getprochecklistdetail,
     getprocheckbed,
+    getprocheckcompletebed,
+    insertdischargeroomitem,
+    updatedischargeroomitem,
+    getallhkitem,
+    getallhkactiveitem,
+    inserthkempdtl,
+    updatehkempdtl,
+    getallhkempdtl,
+    getfeedbackcount,
 } = require("./Feedback.controller");
 
 
@@ -145,6 +154,8 @@ router.post('/updateusermodulemaster', updateusermodulemaster)
 router.get('/getallusermodulemaster', getallusermodulemaster)
 router.post('/getallmoduleitems', getallmoduleitems)
 
+router.get('/getfeedbackcount', getfeedbackcount)
+
 //nursingStation 
 
 router.post('/nursestationinsert', nursestationinsert)
@@ -154,11 +165,11 @@ router.post('/getpatientfeedback', getpatientfeedback)
 
 router.post('/getbed', getNursingBed)
 router.post('/inpatientdetil', getCurrentPatient)
-router.get('/getallblockedbed', getallblockedbed)
+router.get('/getallblockedbed', getallblockedbed) // check this later
 
 router.post('/insertbedremarks', insertbedremarks)
-router.get('/getllbedremarks', getllbedremarks)
 
+router.get('/getllbedremarks', getllbedremarks)// check later this 
 
 router.get('/getempdetail/:id', getempdetail)
 router.get('/getbedremarkDetail/:id', getbedremarkDetail)
@@ -192,6 +203,7 @@ router.post('/insertroomchecklist', insertroomchecklist)
 router.post('/updateroomchecklist', updateroomchecklist)
 router.get('/getroomchecklist', getroomchecklist)
 router.get('/getprocheckbed', getprocheckbed)
+router.get('/getprocheckcompletebed', getprocheckcompletebed)
 
 router.get('/getprochecklistdetail/:id', getprochecklistdetail)
 
@@ -199,6 +211,16 @@ router.get('/getdischargeentrybed', getdischargeentrybed)
 router.get('/getdepassetonly/:id', getdepassetonly)
 router.get('/getroomassetdetail', getroomassetdetail)
 
+
+router.post('/inserthkitem', insertdischargeroomitem)
+router.post('/updatehkitem', updatedischargeroomitem)
+router.get('/getallhkitem', getallhkitem)
+
+router.get('/getallhkactiveitem', getallhkactiveitem)
+
+router.post('/inserthkempdtl', inserthkempdtl)
+router.post('/updatehkempdtl', updatehkempdtl)
+router.get('/getallhkempdtl', getallhkempdtl)
 //edlider meliora table
 router.post('/insertbddetail', insertbddetail)
 router.post('/insertptdetailmlora', insertptdetailmlora)

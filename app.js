@@ -242,8 +242,8 @@ const backuptypemast = require('./api/it_backup_type_master/backup_type.router')
 const simOperators = require('./api/it_sim_operators/sim_operators.router')
 const { validateAccessToken } = require("./api/tokenValidation/tokenValidation");
 const AssetCondemnation = require('./api/am_condem_details/am_condem.router');
-const backuptypemast = require('./api/it_backup_type_master/backup_type.router')
-const simOperators = require('./api/it_sim_operators/sim_operators.router')
+// const backuptypemast = require('./api/it_backup_type_master/backup_type.router')
+// const simOperators = require('./api/it_sim_operators/sim_operators.router')
 // const condemApprovalLevel = require('./api/am_asset_condem_approval_level_mast/approval_level_mast.router')
 
 
@@ -459,8 +459,8 @@ app.use('/api/backuptypemast', backuptypemast)
 app.use('/api/simOperators', simOperators)
 app.use('/api/AssetCondemnation', AssetCondemnation)
 
-app.use('/api/backuptypemast', backuptypemast)
-app.use('/api/simOperators', simOperators)
+// app.use('/api/backuptypemast', backuptypemast)
+// app.use('/api/simOperators', simOperators)
 // app.use('/api/condemApprovalLevel', condemApprovalLevel)
 
 app.get('/api/validateToken', validateTokenFrontend)

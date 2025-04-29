@@ -6,7 +6,7 @@ const logger = require('./logger/logger');
 const http = require("http");
 const socketUtils = require('./socketio/socketUltil');
 const cookieParser = require('cookie-parser');
-const lusca = require('lusca')
+// const lusca = require('lusca')
 
 const app = express();
 const fs = require('fs');
@@ -16,7 +16,7 @@ const fs = require('fs');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(lusca.csrf());
+// app.use(lusca.csrf());
 
 
 app.use(cors({

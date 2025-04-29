@@ -803,7 +803,7 @@ module.exports = {
             if (error) {
                 return res.status(200).json({
                     success: 1,
-                    message: "Error in updation serial number"
+                    message: "Error in updation serial numbers"
                 })
             }
             fetchSerialAnswerMaster((error, results) => {

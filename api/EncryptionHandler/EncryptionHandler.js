@@ -1,6 +1,6 @@
 require("dotenv").config();
 const crypto = require("crypto");
-const secret = process.env.PASSWORD_SECRET || "f3ba9b335ed584ed44e15bb04a3593ed";
+const secret = process.env.PASSWORD_SECRET || process.env.ENCRYPT_HANDLER_KEY;
 
 const encrypt = (password) => {
     const iv = Buffer.from(crypto.randomBytes(16));

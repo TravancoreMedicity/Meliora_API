@@ -17,10 +17,11 @@ const validateUserLoginCheck = (
     // if (password_validity_end_date < new Date().getTime()) {
     //     return { ...result, message: "Password Expired", status: true }
     // }
+
     // check for login method allowed
-    if (method !== login_method_allowed && login_method_allowed !== 1) {
-        return { ...result, message: "Login method not allowed", status: true }
-    }
+    // if (method !== login_method_allowed && login_method_allowed !== 1) {
+    //     return { ...result, message: "Login method not allowed", status: true }
+    // }
 
     return { ...result, status: false }
 }

@@ -20,7 +20,14 @@ app.use(cookieParser());
 
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://192.168.22.8:3000'],
+    origin: [ 
+        'http://192.168.10.88:9741',
+        'http://192.168.10.88:9742',
+        'https://192.168.10.88:9742',
+        'https://travancoremedicity.in:9742',
+        'http://travancoremedicity.in:9741',
+        'http://192.168.10.88:3000',
+    ],
     credentials: true
 }));
 

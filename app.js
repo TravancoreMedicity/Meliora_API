@@ -6,6 +6,7 @@ const logger = require('./logger/logger');
 const http = require("http");
 const socketUtils = require('./socketio/socketUltil');
 const cookieParser = require('cookie-parser');
+// const lusca = require('lusca')
 
 const app = express();
 const fs = require('fs');
@@ -15,10 +16,18 @@ const fs = require('fs');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+// app.use(lusca.csrf());
 
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://192.168.22.8:3000'],
+    origin: [ 
+        'http://192.168.10.88:9741',
+        'http://192.168.10.88:9742',
+        'https://192.168.10.88:9742',
+        'https://travancoremedicity.in:9742',
+        'http://travancoremedicity.in:9741',
+        'http://192.168.10.88:3000',
+    ],
     credentials: true
 }));
 

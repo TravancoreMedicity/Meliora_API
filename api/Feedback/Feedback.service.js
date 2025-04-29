@@ -4016,7 +4016,8 @@ select
                fb_bed.create_date,
                fb_bed_remarks.fb_bed_remark,
                fb_bed_remarks.fb_bed_status,
-               fb_rm_room_slno
+               fb_rm_room_slno,
+               fb_ipadmiss.fb_ipc_curstatus
                FROM fb_bed
                LEFT JOIN fb_nurse_station_master 
                ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code   
@@ -4024,10 +4025,13 @@ select
                ON fb_bed.fb_rt_code = fb_room_type.fb_rt_code
 			   LEFT JOIN fb_roomcreation_master 
                ON fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
+               LEFT JOIN fb_ipadmiss 
+               ON fb_bed.fb_bd_code = fb_ipadmiss.fb_bd_code
                LEFT JOIN fb_bed_remarks 
                ON fb_bed.fb_bed_slno = fb_bed_remarks.fb_bed_slno 
                AND fb_bed_remarks.fb_bed_status = 1 
                WHERE fb_bed.fb_bdc_occup = "T"
+               AND (fb_ipc_curstatus IS NULL OR fb_ipc_curstatus <> 'PCO');
             `,
             []
             , (error, results, fields) => {

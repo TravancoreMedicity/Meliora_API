@@ -2690,7 +2690,7 @@ ORDER BY
                        AND fb_nurse_station_master.fb_ns_code=fb_bed.fb_ns_code
                        AND fb_nurse_station_master.fb_ns_code = ?
                        AND fb_ipadmiss.fb_bd_code = ?
-                       AND fb_ipadmiss.fb_ipc_curstatus = "ADM" ;
+                       AND fb_ipadmiss.fb_ipc_curstatus != "PCO" ;
             `,
             [
                 data.fb_ns_code,
@@ -2858,7 +2858,19 @@ where fb_rc_roomslno = ?
                 return callBack(null, results)
             })
     },
-
+    getallassignedbed: (data, callBack) => {
+        pool.query(
+            `select fb_hk_slno,fb_hk_bed_slno from fb_hk_check_bed where fb_hk_sv_assign = ?`,
+            [
+                data
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
     CheckIfRemarkAlreadyExist: (data, callBack) => {
         pool.query(
             `select fb_bed_rmk_slno,fb_bed_service_status from fb_bed_remarks where fb_bed_slno = ?`,
@@ -3906,6 +3918,31 @@ select
                 data.fb_asset_map_status,
                 data.edit_user,
                 data.fb_assets_map_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    inserthkbedassign: (data, callBack) => {
+        pool.query(
+            `
+            INSERT INTO  fb_hk_check_bed(
+                    fb_hk_bed_slno,
+                    fb_hk_sv_assign,
+                    fb_hk_status,
+                    create_user
+                ) 
+                VALUES(?,?,?,?)
+            `,
+            [
+                data.fb_hk_bed_slno,
+                data.fb_hk_sv_assign,
+                data.fb_hk_status,
+                data.create_user
             ],
             (error, results, fields) => {
                 if (error) {

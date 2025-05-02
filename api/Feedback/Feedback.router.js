@@ -91,6 +91,8 @@ const {
     updatehkempdtl,
     getallhkempdtl,
     getfeedbackcount,
+    inserthkbedassign,
+    getallassignedbed,
 } = require("./Feedback.controller");
 
 
@@ -198,6 +200,10 @@ router.post('/updateassetitem', updateassetitem)
 router.get('/getassetitem', getallassetItems)
 
 router.post('/insertprocheckdetl', insertprocheckdetl)
+router.post('/inserthkbedassign', inserthkbedassign)
+
+
+router.get('/getallassignedbed/:id', getallassignedbed)
 
 router.post('/insertroomchecklist', insertroomchecklist)
 router.post('/updateroomchecklist', updateroomchecklist)

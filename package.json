@@ -11,7 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "@rodrigogs/mysql-events": "^0.6.0",
+    "axios": "^1.7.7",
     "bcrypt": "^5.0.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "date-fns": "^2.28.0",
     "dotenv": "^8.2.0",
@@ -19,6 +21,7 @@
     "express": "^4.17.1",
     "joi": "^17.4.0",
     "jsonwebtoken": "^8.5.1",
+    "lusca": "^1.7.0",
     "moment": "^2.29.1",
     "multer": "^1.4.4",
     "mysql": "^2.18.1",

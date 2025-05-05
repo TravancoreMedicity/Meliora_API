@@ -5,6 +5,9 @@ const { FloorInsert, FloorView, FloorUpdate } = require('../rm_floor_creation/rm
 
 
 router.post('/insert', checkToken, FloorInsert)
-router.get('/view', checkToken, FloorView)
+// router.get('/view', checkToken, FloorView)
 router.patch('/updatee', checkToken, FloorUpdate)
+
+
+router.get('/view', FloorView)
 module.exports = router

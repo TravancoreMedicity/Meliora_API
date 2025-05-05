@@ -11,7 +11,7 @@ const { getItemListApproval, InactiveItemDetail, updateInchargeApproval, updateR
     updateApprovedSMOItemStatus, updateApprovedGMItemStatus, updateApprovedEDItemStatus,
     updateApprovedInchargeItemStatus, UpdateItemReceiveStatus, updateInternallyArranged, updateReqMstInternally,
     updateAllItemStatusForInternallArran, updateApprovedMDItemStatus, updateManagingApproval,
-    updateApprovedManageItemStatus, manageItemOnholdRejectUpdate, updateuserAckInternally, InsertCrfViewInsert
+    updateApprovedManageItemStatus, manageItemOnholdRejectUpdate, updateuserAckInternally, InsertCrfViewInsert, getEmnokmc
 } = require('../crm_req_approval/crmreq_approval.service');
 const { InsertPurchaseAck } = require('../crm_new_purchase/crm_purchase.service')
 const { updateApproveStatus, insertApprvitemsStatus } = require('../crm_newrequest_registration/newRequestRegister.service')
@@ -2422,6 +2422,31 @@ module.exports = {
     InsertCrfViewInsert: (req, res) => {
         const body = req.body;
         InsertCrfViewInsert(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(400).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+
+    getEmnokmc: (req, res) => {
+        const id = req.params.id
+        getEmnokmc(id, (err, results) => {
             if (err) {
                 logger.logwindow(err)
                 return res.status(400).json({

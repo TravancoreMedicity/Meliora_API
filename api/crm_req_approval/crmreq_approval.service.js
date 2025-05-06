@@ -1789,6 +1789,24 @@ module.exports = {
         );
     },
 
+    getEmnokmc: (id, callBack) => {
+        pool.query(
+            `SELECT *
+             FROM
+                    co_employee_master
+            WHERE
+                    em_no=?`,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 
     CrfDeptDataCollectInserttmc: (data, callBack) => {
         pool.query(

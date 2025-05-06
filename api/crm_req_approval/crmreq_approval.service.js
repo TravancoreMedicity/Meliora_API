@@ -1047,19 +1047,18 @@ module.exports = {
                    RE.sec_name as data_entered,company_name,crm_request_master.company_slno  ,tmc_data_collection_status                     
   			 FROM
                    crm_request_master
-                LEFT JOIN am_item_type ON JSON_CONTAINS(crm_request_master.category, cast(am_item_type.item_type_slno as json), '$')
-                LEFT JOIN crm_emergencytype_mast ON crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
-                LEFT JOIN co_deptsec_mast R ON R.sec_id=crm_request_master.request_deptsec_slno
-                LEFT JOIN co_deptsec_mast U ON U.sec_id=crm_request_master.user_deptsec
-                LEFT JOIN crm_data_collection On crm_data_collection.crf_requst_slno=crm_request_master.req_slno
-                LEFT JOIN co_employee_master CR ON CR.em_id=crm_request_master.create_user
-                LEFT JOIN co_employee_master RU ON RU.em_id=crm_data_collection.req_user           
-                LEFT JOIN co_employee_master SU ON SU.em_id=crm_data_collection.save_user
-                LEFT JOIN co_deptsec_mast RE ON RE.sec_id=crm_data_collection.crf_req_collect_dept
-                LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno
-
+                    LEFT JOIN am_item_type ON JSON_CONTAINS(crm_request_master.category, cast(am_item_type.item_type_slno as json), '$')
+                    LEFT JOIN crm_emergencytype_mast ON crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
+                    LEFT JOIN co_deptsec_mast R ON R.sec_id=crm_request_master.request_deptsec_slno
+                    LEFT JOIN co_deptsec_mast U ON U.sec_id=crm_request_master.user_deptsec
+                    LEFT JOIN crm_data_collection On crm_data_collection.crf_requst_slno=crm_request_master.req_slno
+                    LEFT JOIN co_employee_master CR ON CR.em_id=crm_request_master.create_user
+                    LEFT JOIN co_employee_master RU ON RU.em_id=crm_data_collection.req_user           
+                    LEFT JOIN co_employee_master SU ON SU.em_id=crm_data_collection.save_user
+                    LEFT JOIN co_deptsec_mast RE ON RE.sec_id=crm_data_collection.crf_req_collect_dept
+                    LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno
             WHERE
-                    crf_req_collect_dept=?
+                crf_req_collect_dept=?
               GROUP BY crm_request_master.req_slno, crf_data_collect_slno
               ORDER BY crm_request_master.req_slno DESC`,
             [
@@ -1807,6 +1806,27 @@ module.exports = {
                 data
             ],
             (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getDatakmcDep: (id, callBack) => {
+
+        pool.query(
+            `SELECT kmc_dept
+             FROM 
+                    crm_department_mapping
+             WHERE
+               tmc_dept =?`,
+
+            [
+                id
+            ],
+            (error, results, feilds) => {
+
                 if (error) {
                     return callBack(error);
                 }

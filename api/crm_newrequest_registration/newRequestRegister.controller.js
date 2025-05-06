@@ -5,7 +5,7 @@ const { requestRegistInsert, deleteCrfReq, requestRegistInsertDetl, requestAppro
     UpdateItemReceiveStatus, checkStoreReturnItem, insertReturnItemDetails, itemReturnDetailsForViewStore, getCommonMasterUpdate, getCommonMasterGetCat,
     viewItemReturnDetails, returnReplyDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet, getStoreMasterInsert, getGetStoreMaster,
     getCommonMasterInsert, getCommonMasterSettingGet, getCommonMasterSettingUpdate, getDashBoardMaster, GetDashBoardMaster, getDashboardUpdate,
-    getDashright, getCommonMasterGetByID, GetDataCollectionMasterUpdate, Getdatacollection, GetDataCollectionMaster, getdefaultRights } = require('./newRequestRegister.service');
+    getDashright, getCommonMasterGetByID, GetDataCollectionMasterUpdate, Getdatacollection, GetDataCollectionMaster, getdefaultRights, insertDepartmentMapping } = require('./newRequestRegister.service');
 const logger = require('../../logger/logger');
 module.exports = {
 
@@ -1505,6 +1505,27 @@ module.exports = {
             });
         });
     },
-
+    insertDepartmentMapping: (req, res) => {
+        const body = req.body;
+        insertDepartmentMapping(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
 }
 

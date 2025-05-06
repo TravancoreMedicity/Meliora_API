@@ -1630,5 +1630,23 @@ module.exports = {
             }
         );
     },
+    insertDepartmentMapping: (data, callback) => {
+        pool.query(
+            `INSERT INTO crm_department_mapping 
+            ( tmc_dept,kmc_dept)
+              VALUES(?,?)`,
+            [
+                data.dept,
+                data.crfdeptKmc,
 
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+
+            }
+        );
+    },
 }

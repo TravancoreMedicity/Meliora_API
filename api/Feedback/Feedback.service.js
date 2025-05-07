@@ -2690,7 +2690,7 @@ ORDER BY
                        AND fb_nurse_station_master.fb_ns_code=fb_bed.fb_ns_code
                        AND fb_nurse_station_master.fb_ns_code = ?
                        AND fb_ipadmiss.fb_bd_code = ?
-                       AND fb_ipadmiss.fb_ipc_curstatus != "PCO" ;
+                       AND fb_ipadmiss.fb_ipc_curstatus != "PCO";
             `,
             [
                 data.fb_ns_code,
@@ -2845,9 +2845,39 @@ where fb_rc_roomslno = ?
                 return callBack(null, results)
             })
     },
+    getalldischargeform: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                fdmast_slno,
+                fb_ip_num,
+                fb_patient_num,
+                fb_patient_name
+            FROM 
+                fb_transaction_mast
+            WHERE 
+                fdmast_slno = ?
+                AND create_date BETWEEN ? AND ?;`,
+            [
+                data.feedbackId,
+                data.FROM_DATE,
+                data.TO_DATE
+            ],
+            (error, results) => {
+                if (error) return callBack(error);
+                return callBack(null, results);
+            }
+        );
+    },
     getempdetail: (data, callBack) => {
         pool.query(
-            `select em_department,em_dept_section from co_employee_master where em_id = ?`,
+            `select 
+                em_department,em_dept_section,em_name,desg_name
+            from 
+                co_employee_master
+            left join 
+                co_designation on co_employee_master.em_designation = co_designation.desg_slno
+             where 
+                em_id = ?`,
             [
                 data
             ]

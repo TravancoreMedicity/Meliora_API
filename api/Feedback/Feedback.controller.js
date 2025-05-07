@@ -150,6 +150,7 @@ const {
     getfeedbackcount,
     inserthkbedassign,
     getallassignedbed,
+    getalldischargeform,
 } = require("./Feedback.service");
 
 module.exports = {
@@ -2144,6 +2145,30 @@ module.exports = {
             });
         })
     },
+
+    getalldischargeform: (req, res) => {
+        const data = req.body;
+        getalldischargeform(data, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+
+            });
+        })
+    },
     getprochecklistdetail: (req, res) => {
         const id = req.params.id;
         getprochecklistdetail(id, (error, results) => {
@@ -2592,7 +2617,7 @@ module.exports = {
                 return res.status(200).json({
                     success: 2,
                     message: "No Record Found",
-                    data:[]
+                    data: []
                 });
             }
 

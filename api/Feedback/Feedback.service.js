@@ -2694,7 +2694,6 @@ ORDER BY
             `,
             [
                 data.fb_ns_code,
-                data.fb_bd_code,
                 data.fb_bd_code
             ]
             , (error, results, fields) => {

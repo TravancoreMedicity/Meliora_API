@@ -550,6 +550,7 @@ module.exports = {
                 val: 1, name: 'dmspending', sql: `AND dms_req = 1 AND dms_approve is null AND ms_approve is null AND 
                 manag_operation_approv is null AND senior_manage_approv is null AND gm_approve is null AND ed_approve is null
                  AND md_approve is null AND crf_close is null AND user_acknldge is null   and  (req_status!='R' and req_status!='P' OR req_status is null)`
+
             },
             {
                 val: 2, name: 'dmsapprvl', sql: `AND (dms_req = 1 OR ms_approve_req=1) AND crf_close is null AND user_acknldge is null 

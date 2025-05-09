@@ -4,8 +4,8 @@ const { requestRegistInsert, deleteCrfReq, requestRegistInsertDetl, requestAppro
     insertApprvitemsStatus, deleteCrfReqApproval, deleteCrfRegItemDetl, updateApproveStatus, getackPending, getGetStoreMasterById,
     UpdateItemReceiveStatus, checkStoreReturnItem, insertReturnItemDetails, itemReturnDetailsForViewStore, getCommonMasterUpdate, getCommonMasterGetCat,
     viewItemReturnDetails, returnReplyDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet, getStoreMasterInsert, getGetStoreMaster,
-    getCommonMasterInsert, getCommonMasterSettingGet, getCommonMasterSettingUpdate, getDashBoardMaster, GetDashBoardMaster, getDashboardUpdate,
-    getDashright, getCommonMasterGetByID, GetDataCollectionMasterUpdate, Getdatacollection, GetDataCollectionMaster, getdefaultRights } = require('./newRequestRegister.service');
+    getCommonMasterInsert, getCommonMasterSettingGet, getCommonMasterSettingUpdate, getDashBoardMaster, GetDashBoardMaster, getDashboardUpdate, GetDepartmentmappingGet,
+    getDashright, getCommonMasterGetByID, GetDataCollectionMasterUpdate, Getdatacollection, GetDataCollectionMaster, getdefaultRights, insertDepartmentMapping } = require('./newRequestRegister.service');
 const logger = require('../../logger/logger');
 module.exports = {
 
@@ -549,7 +549,7 @@ module.exports = {
             {
                 val: 1, name: 'dmspending', sql: `AND dms_req = 1 AND dms_approve is null AND ms_approve is null AND 
                 manag_operation_approv is null AND senior_manage_approv is null AND gm_approve is null AND ed_approve is null
-                 AND md_approve is null AND crf_close is null AND user_acknldge is null  or req_status is null AND req_status!='P' AND req_status!='R'`
+                 AND md_approve is null AND crf_close is null AND user_acknldge is null   and  (req_status!='R' and req_status!='P' OR req_status is null)`
             },
             {
                 val: 2, name: 'dmsapprvl', sql: `AND (dms_req = 1 OR ms_approve_req=1) AND crf_close is null AND user_acknldge is null 
@@ -581,7 +581,7 @@ module.exports = {
             {
                 val: 9, name: 'mspending', sql: `AND ms_approve_req = 1 AND ms_approve is null AND 
                 manag_operation_approv is null AND senior_manage_approv is null AND  gm_approve is null AND ed_approve is null
-                 AND md_approve is null AND crf_close is null AND user_acknldge is null or req_status is null  AND req_status!='P' AND req_status!='R'`
+                 AND md_approve is null AND crf_close is null AND user_acknldge is null and  (req_status!='R' and req_status!='P' OR req_status is null)`
             },
             // MO
             {
@@ -1505,6 +1505,76 @@ module.exports = {
             });
         });
     },
+    // insertDepartmentMapping: (req, res) => {
+    //     const body = req.body;
+    //     insertDepartmentMapping(body, (err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (Object.keys(results).length === 0) {
+    //             return res.status(200).json({
+    //                 success: 2,
+    //                 message: "No Report Found",
+    //                 data: []
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: results
+    //         })
+    //     })
+    // },
+    insertDepartmentMapping: (req, res) => {
+        const body = req.body;
+        insertDepartmentMapping(body, (err, results) => {
+            if (err) {
+                // Customize specific message
+                const message = err === "Department already exists" ? err : "Database error";
+                return res.status(200).json({
+                    success: 0,
+                    message: message
+                });
+            }
 
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    GetDepartmentmappingGet: (req, res) => {
+        const body = req.body;
+        GetDepartmentmappingGet(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    dataCat: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
 }
 

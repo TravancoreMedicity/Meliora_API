@@ -1,5 +1,5 @@
 const { checkInsertVal, AuthoriztnInsertData, AuthorizationGets, AuthUpdateData,
-    getDeptSeconId, getDeptSeconIncharge, getDeptSeconHod } = require("../co_inchhod_authriztn/inchod_authoriztn.service")
+    getDeptSeconId, getDeptSeconIncharge, getDeptSeconHod, getDeptSeconHodbyDep } = require("../co_inchhod_authriztn/inchod_authoriztn.service")
 const logger = require('../../logger/logger')
 
 module.exports = {
@@ -141,6 +141,31 @@ module.exports = {
                 return res.status(200).json({
                     success: 2,
                     message: "No Diet Plan under Selected Nursing Station"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    getDeptSeconHodbyDep: (req, res) => {
+        const id = req.params.id;
+        getDeptSeconHodbyDep(id, (err, results) => {
+            if (err) {
+                logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results.length == 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data found"
                 });
             }
 

@@ -1630,22 +1630,97 @@ module.exports = {
             }
         );
     },
+    // insertDepartmentMapping: (data, callback) => {
+    //     pool.query(
+    //         `INSERT INTO crm_department_mapping 
+    //         ( tmc_dept,kmc_dept,tmc_hod,tmc_incharge,kmc_hod,kmc_incharge)
+    //           VALUES(?,?,?,?,?,?)`,
+    //         [
+    //             data.dept,
+    //             data.crfdeptKmc,
+    //             data.HodId,
+    //             data.InchargeId,
+    //             data.HodIdkmc,
+    //             data.InchargeIdkmc,
+
+
+    //         ],
+    //         (error, results, fields) => {
+    //             if (error) {
+    //                 return callback(error);
+    //             }
+    //             return callback(null, results);
+
+    //         }
+    //     );
+    // },
     insertDepartmentMapping: (data, callback) => {
+        // First, check if tmc_dept already exists
         pool.query(
-            `INSERT INTO crm_department_mapping 
-            ( tmc_dept,kmc_dept)
-              VALUES(?,?)`,
+            `SELECT * FROM crm_department_mapping WHERE tmc_dept = ?`,
+            [data.dept],
+            (err, results) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (results.length > 0) {
+                    // Department already exists
+                    return callback("Department already exists");
+                }
+
+                // If not exists, insert the new mapping
+                pool.query(
+                    `INSERT INTO crm_department_mapping 
+                    (tmc_dept, kmc_dept, tmc_hod, tmc_incharge, kmc_hod, kmc_incharge)
+                    VALUES (?, ?, ?, ?, ?, ?)`,
+                    [
+                        data.dept,
+                        data.crfdeptKmc,
+                        data.HodId,
+                        data.InchargeId,
+                        data.HodIdkmc,
+                        data.InchargeIdkmc,
+                    ],
+                    (error, insertResults) => {
+                        if (error) {
+                            return callback(error);
+                        }
+                        return callback(null, insertResults);
+                    }
+                );
+            }
+        );
+    },
+
+    GetDepartmentmappingGet: (data, callback) => {
+        pool.query(
+            `SELECT
+    tmc_dept,
+    kmc_dept,
+    tmc_hod,
+    tmc_incharge,
+    kmc_hod,
+    kmc_incharge,
+    sec_name,
+    em_hod.em_name AS hod_name,
+    em_incharge.em_name AS incharge_name
+FROM crm_department_mapping
+LEFT JOIN co_deptsec_mast 
+    ON co_deptsec_mast.sec_id = crm_department_mapping.tmc_dept
+LEFT JOIN co_employee_master em_hod 
+    ON em_hod.em_id = crm_department_mapping.tmc_hod
+LEFT JOIN co_employee_master em_incharge 
+    ON em_incharge.em_id = crm_department_mapping.tmc_incharge;
+`,
             [
-                data.dept,
-                data.crfdeptKmc,
 
             ],
-            (error, results, fields) => {
+            (error, results, feilds) => {
                 if (error) {
                     return callback(error);
                 }
                 return callback(null, results);
-
             }
         );
     },

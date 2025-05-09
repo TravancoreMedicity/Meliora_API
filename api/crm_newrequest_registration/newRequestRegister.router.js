@@ -6,12 +6,11 @@ const { requestRegistInsert, InHodExist, getAllReqBasedDept, getDetailItemList, 
     itemReturnDetailsForViewStore, returnReplyDetails, viewItemReturnDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet,
     getCommonMasterGetCat, getGetStoreMasterById, getStoreMasterUpdate, getCommonMasterInsert, getCommonMasterSettingGet, getCommonMasterSettingUpdate,
     getDashBoardMaster, GetDashBoardMaster, getDashboardUpdate, getDashright, getCommonMasterGetByID, GetDataCollectionMasterUpdate, GetDataCollectionMaster,
-    Getdatacollection, getdefaultRights, insertDepartmentMapping } = require('./newRequestRegister.controller');
+    Getdatacollection, getdefaultRights, insertDepartmentMapping, GetDepartmentmappingGet } = require('./newRequestRegister.controller');
 
 router.post("/InsertRegMast", checkToken, requestRegistInsert);
 router.patch("/deleteItemList", checkToken, deleteItemDetails);
 router.patch("/UpdateReqMaster", checkToken, UpdateReqMaster);
-
 // router.post("/postDetails", checkToken, requestRegistInsertDetl);
 // router.post("/postReqApproval", checkToken, requestApprovalInsert);
 
@@ -63,5 +62,6 @@ router.post("/DataCollectionMaster/update", checkToken, GetDataCollectionMaster)
 
 router.get("/datacollectionRights/:id", checkToken, getdefaultRights);
 router.post("/DepartmentMapping", checkToken, insertDepartmentMapping);
+router.get("/DepartmentmappingGet", checkToken, GetDepartmentmappingGet);
 
 module.exports = router;

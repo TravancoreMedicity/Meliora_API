@@ -1834,11 +1834,17 @@ module.exports = {
     getDatakmcDep: (id, callBack) => {
 
         pool.query(
-            `SELECT kmc_dept
+            `SELECT
+             tmc_dept,
+             kmc_dept,
+             tmc_hod,
+             tmc_incharge,
+             kmc_hod,
+             kmc_incharge
              FROM 
-                    crm_department_mapping
+             crm_department_mapping
              WHERE
-               tmc_dept =?`,
+             tmc_dept =?`,
 
             [
                 id

@@ -2890,7 +2890,7 @@ where fb_rc_roomslno = ?
     },
     getallassignedbed: (data, callBack) => {
         pool.query(
-            `select fb_hk_slno,fb_hk_bed_slno from fb_hk_check_bed where fb_hk_sv_assign = ?  `,
+            `select fb_hk_slno,fb_hk_bed_slno from fb_hk_check_bed where fb_hk_sv_assign = 168 and fb_hk_status = 1 `,
             [
                 data
             ]

@@ -151,6 +151,7 @@ const {
     inserthkbedassign,
     getallassignedbed,
     getalldischargeform,
+    UpdateAssignedBed,
 } = require("./Feedback.service");
 
 module.exports = {
@@ -2930,6 +2931,22 @@ module.exports = {
             });
         });
     },
+    removeassign: (req, res) => {
+        const data = req.body;
+        UpdateAssignedBed(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
 
     updateroomchecklist: (req, res) => {
         const data = req.body;

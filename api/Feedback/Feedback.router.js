@@ -94,6 +94,7 @@ const {
     inserthkbedassign,
     getallassignedbed,
     getalldischargeform,
+    removeassign,
 } = require("./Feedback.controller");
 
 
@@ -208,6 +209,7 @@ router.post('/insertprocheckdetl', insertprocheckdetl)
 
 //get insethkbedassing
 router.post('/inserthkbedassign', inserthkbedassign)
+router.post('/removeassign', removeassign)
 //get assined bed
 router.get('/getallassignedbed/:id', getallassignedbed)
 // router.get('/gethktakenbed')

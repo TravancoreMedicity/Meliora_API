@@ -2110,7 +2110,7 @@ FROM meliora.fb_transaction_mast;
                         fb_ipc_mhcode,
                         fb_doc_name,
                         fb_ipc_curstatus
-                    ) VALUES ( ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     `,
                     [
                         item.IP_NO,
@@ -2137,7 +2137,7 @@ FROM meliora.fb_transaction_mast;
                         item.DMD_DATE,
                         item.PTC_MOBILE,
                         item.IPC_MHCODE,
-                        item.PTC_REFDOCTOR,
+                        item.DOC_NAME,
                         item.IPC_CURSTATUS
                     ],
                     (error, results, fields) => {
@@ -2218,7 +2218,7 @@ FROM meliora.fb_transaction_mast;
                         item.DMD_DATE,
                         item.PTC_MOBILE,
                         item.IPC_MHCODE,
-                        item.PTC_REFDOCTOR,
+                        item.DOC_NAME,
                         item.IPC_CURSTATUS,
                         item.fb_ipad_slno
                     ],
@@ -2682,7 +2682,8 @@ ORDER BY
                     fb_ptc_loadd4,
                     fb_ptc_mobile,
                     fb_ptn_yearage,
-                    fb_ipc_curstatus                          
+                    fb_ipc_curstatus,
+                    fb_doc_name                       
                 FROM 
                     fb_ipadmiss,fb_bed,fb_nurse_station_master
                 WHERE 
@@ -2889,7 +2890,7 @@ where fb_rc_roomslno = ?
     },
     getallassignedbed: (data, callBack) => {
         pool.query(
-            `select fb_hk_slno,fb_hk_bed_slno from fb_hk_check_bed where fb_hk_sv_assign = ?`,
+            `select fb_hk_slno,fb_hk_bed_slno from fb_hk_check_bed where fb_hk_sv_assign = ?  `,
             [
                 data
             ]
@@ -3972,6 +3973,29 @@ select
                 data.fb_hk_sv_assign,
                 data.fb_hk_status,
                 data.create_user
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    UpdateAssignedBed: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE  fb_hk_check_bed
+                SET
+                    fb_hk_status = ?,
+                    edit_user = ?
+                WHERE
+                    fb_hk_bed_slno=?
+            `,
+            [
+                data.fb_hk_status,
+                data.edit_user,
+                data.fb_hk_bed_slno
             ],
             (error, results, fields) => {
                 if (error) {

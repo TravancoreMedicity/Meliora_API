@@ -169,6 +169,7 @@ router.post('/getpatientfeedback', getpatientfeedback)
 
 router.post('/getbed', getNursingBed)
 router.post('/inpatientdetil', getCurrentPatient)
+
 router.get('/getallblockedbed', getallblockedbed) // check this later
 
 router.post('/insertbedremarks', insertbedremarks)

@@ -51,7 +51,17 @@ module.exports = {
                    md_approve_req, md_approve, md_approve_remarks, md_detial_analysis, md_approve_date, MD.em_name AS md_user,
                    managing_director_req, crm_request_approval.managing_director_approve, managing_director_remarks, managing_director_analysis,
                     managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
-                   ed_image, md_image, ack_status, ack_remarks,company_name,crm_request_master.company_slno
+                   ed_image, md_image, ack_status, ack_remarks,company_name,crm_request_master.company_slno,
+                     incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date,
+                   I.em_name as incharge_user,
+                   hod_req, hod_approve, hod_remarks, hod_detial_analysis, hod_approve_date, H.em_name as hod_user,
+                   dms_req, dms_approve, dms_remarks, dms_detail_analysis, dms_approve_date, D.em_name as dms_user,
+                   ms_approve_req, ms_approve, ms_approve_remark, ms_detail_analysis, ms_approve_date, M.em_name as ms_approve_user,
+                   manag_operation_req, manag_operation_approv, manag_operation_remarks, om_detial_analysis,
+                   om_approv_date, OM.em_name as manag_operation_user,senior_manage_remarks,senior_manage_req, senior_manage_approv,
+                   smo_detial_analysis, som_aprrov_date, SM.em_name as  senior_manage_user,gm_approve_req, gm_approve,
+                   gm_approve_remarks, gm_detial_analysis, gm_approv_date, GM.em_name as  gm_user,ed_approve_req, ed_approve,
+                    hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image
             FROM
                    crm_request_master
                  LEFT JOIN crm_request_approval ON crm_request_approval.req_slno = crm_request_master.req_slno
@@ -67,7 +77,15 @@ module.exports = {
                  LEFT JOIN crm_purchase_mast ON crm_purchase_mast.req_slno = crm_request_master.req_slno
                  LEFT JOIN serial_nos ON serial_nos.serial_slno = 6  
                  LEFT JOIN crm_approval_mapping_master ON crm_approval_mapping_master.company_slno = serial_nos.serial_current
-                LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno 
+                LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno
+                  LEFT JOIN co_employee_master I on I.em_id=crm_request_approval.incharge_user
+                LEFT JOIN co_employee_master H on H.em_id=crm_request_approval.hod_user
+                LEFT JOIN co_employee_master D on D.em_id=crm_request_approval.dms_user
+                LEFT JOIN co_employee_master M on M.em_id=crm_request_approval.ms_approve_user
+                LEFT JOIN co_employee_master C on C.em_id=crm_request_approval.crf_close_user
+                LEFT JOIN co_employee_master OM on OM.em_id=crm_request_approval.manag_operation_user
+                LEFT JOIN co_employee_master SM on SM.em_id=crm_request_approval.senior_manage_user
+                LEFT JOIN co_employee_master GM on GM.em_id=crm_request_approval.gm_user
             WHERE
                  serial_nos.serial_current IS NOT NULL 
                  AND ((crm_approval_mapping_master.medical_director_approve = 1 
@@ -111,7 +129,17 @@ module.exports = {
                     quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
                     quatation_negotiation,quatation_negotiation_remarks,quatation_negotiation_date,QN.em_name as quatation_neguser,
                     quatation_fixing,quatation_fixing_remarks,quatation_fixing_date,QF.em_name as quatation_fixuser,
-                    po_prepartion, po_complete,po_complete_date,company_name,crm_request_master.company_slno,crm_request_master.work_order_status
+                    po_prepartion, po_complete,po_complete_date,company_name,crm_request_master.company_slno,crm_request_master.work_order_status,
+                     incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date,
+                   I.em_name as incharge_user,
+                   hod_req, hod_approve, hod_remarks, hod_detial_analysis, hod_approve_date, H.em_name as hod_user,
+                   dms_req, dms_approve, dms_remarks, dms_detail_analysis, dms_approve_date, D.em_name as dms_user,
+                   ms_approve_req, ms_approve, ms_approve_remark, ms_detail_analysis, ms_approve_date, M.em_name as ms_approve_user,
+                   manag_operation_req, manag_operation_approv, manag_operation_remarks, om_detial_analysis,
+                   om_approv_date, OM.em_name as manag_operation_user,senior_manage_remarks,senior_manage_req, senior_manage_approv,
+                   smo_detial_analysis, som_aprrov_date, SM.em_name as  senior_manage_user,gm_approve_req, gm_approve,
+                   gm_approve_remarks, gm_detial_analysis, gm_approv_date, GM.em_name as  gm_user,ed_approve_req, ed_approve,
+                    hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image
              FROM
                  crm_request_master
                    LEFT JOIN crm_request_approval ON crm_request_approval.req_slno=crm_request_master.req_slno
@@ -131,6 +159,14 @@ module.exports = {
                    LEFT JOIN co_employee_master QF ON QF.em_id=crm_purchase_mast.quatation_fixing_user
                    LEFT JOIN crm_purchase_po_details on crm_purchase_po_details.crm_purchase_slno=crm_purchase_mast.crm_purchase_slno
                     LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno 
+                        LEFT JOIN co_employee_master I on I.em_id=crm_request_approval.incharge_user
+                LEFT JOIN co_employee_master H on H.em_id=crm_request_approval.hod_user
+                LEFT JOIN co_employee_master D on D.em_id=crm_request_approval.dms_user
+                LEFT JOIN co_employee_master M on M.em_id=crm_request_approval.ms_approve_user
+                LEFT JOIN co_employee_master C on C.em_id=crm_request_approval.crf_close_user
+                LEFT JOIN co_employee_master OM on OM.em_id=crm_request_approval.manag_operation_user
+                LEFT JOIN co_employee_master SM on SM.em_id=crm_request_approval.senior_manage_user
+                LEFT JOIN co_employee_master GM on GM.em_id=crm_request_approval.gm_user
 			WHERE
                    ack_status=1 AND user_acknldge is null  AND ( crm_purchase_po_details.po_to_supplier is null
                    OR crm_purchase_po_details.po_to_supplier=0)  AND crf_close IS NULL 

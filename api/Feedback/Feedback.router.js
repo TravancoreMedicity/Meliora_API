@@ -94,6 +94,7 @@ const {
     inserthkbedassign,
     getallassignedbed,
     getalldischargeform,
+    removeassign,
 } = require("./Feedback.controller");
 
 
@@ -168,6 +169,7 @@ router.post('/getpatientfeedback', getpatientfeedback)
 
 router.post('/getbed', getNursingBed)
 router.post('/inpatientdetil', getCurrentPatient)
+
 router.get('/getallblockedbed', getallblockedbed) // check this later
 
 router.post('/insertbedremarks', insertbedremarks)
@@ -208,6 +210,7 @@ router.post('/insertprocheckdetl', insertprocheckdetl)
 
 //get insethkbedassing
 router.post('/inserthkbedassign', inserthkbedassign)
+router.post('/removeassign', removeassign)
 //get assined bed
 router.get('/getallassignedbed/:id', getallassignedbed)
 // router.get('/gethktakenbed')

@@ -26,11 +26,11 @@ app.use(cors({
         'https://travancoremedicity.in:9742',
         'http://travancoremedicity.in:9741',
         'http://192.168.10.88:3000',
-        'http://localhost:3000',
         'http://tm.medicity.co.in:8888',
         'http://192.168.10.88:8888',
         'http://192.168.22.9:3000',
-
+        'http://195.168.34.25:3001',
+        'http://195.168.34.25:3000'
     ],
     credentials: true
 }));

@@ -5,7 +5,7 @@ const { updateInchargeApproval, InactiveItemDetail, getItemListApproval, Incharg
     updateGMApproval, updateMDApproval, updateEDApproval, CrfDeptDataCollectInsert, DataCollectComplete, getDataCollectList,
     CrfDataCollactnSave, getAllForPdfView, getFinalItemListApproval, getMaxItemSlno, AddMoreItemsDetails, updateUserAck, InsertCrfViewInsert,
     DetailItemReject, DetailItemOnHold, getStoreReceiveStatus, getItemStatus, updateInternallyArranged, updateManagingApproval, updateuserAckInternally,
-    getEmnokmc
+    CrfDeptDataCollectInserttmc, getDatakmcDep, getEmnokmc
 } = require('../crm_req_approval/crmreq_approval.controller');
 
 router.get("/getItemListApproval/:id", checkToken, getItemListApproval);
@@ -49,5 +49,10 @@ router.patch("/userAckInternally", checkToken, updateuserAckInternally);
 
 router.post("/CrfViewInsert", checkToken, InsertCrfViewInsert);
 router.get("/getemno/:id", checkToken, getEmnokmc);
+
+// tmc data collection
+router.post("/dataCollect/Insert/tmc", checkToken, CrfDeptDataCollectInserttmc);
+router.get("/getDatakmcDep/:id", checkToken, getDatakmcDep);
+
 
 module.exports = router;

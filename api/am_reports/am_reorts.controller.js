@@ -54,7 +54,6 @@ module.exports = {
     //         });
     //     })
     // },
-
     getItemsFronList: (req, res) => {
         const { item_dept_slno, item_deptsec_slno, item_custodian_slno } = req.body;
         let sql = `

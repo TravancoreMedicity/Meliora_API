@@ -2,69 +2,65 @@ const { pool } = require('../../config/database')
 module.exports = {
 
     getAllEmployee: (data, callback) => {
-        pool.query(
-            `SELECT 
-            emp.em_id,
-            emp.em_name,
-            emp.em_no,
-            desg_name,
-            IFNULL(complaint_data.complaint_count, 0) AS complaint_count,
-            IFNULL(closed_complaints.closed_count, 0) AS closed_count
-        FROM 
-            co_employee_master AS emp
-        LEFT JOIN 
-            co_designation AS desg 
-                ON 
-                emp.em_designation = desg.desg_slno
-        LEFT JOIN (
-            SELECT 
-                assigned_emp,
-                COUNT(cm_complaint_detail.complaint_slno) AS complaint_count
+            
+        pool.query(  
+                `SELECT 
+                emp.em_id,
+                emp.em_name,
+                emp.em_no,
+                desg_name,
+                IFNULL(complaint_data.complaint_count, 0) AS complaint_count,
+                IFNULL(closed_complaints.closed_count, 0) AS closed_count
             FROM 
-                cm_complaint_detail
+                co_employee_master AS emp
             LEFT JOIN 
-                cm_complaint_mast 
-            ON 
-                cm_complaint_mast.complaint_slno = cm_complaint_detail.complaint_slno
+                co_designation AS desg 
+                ON emp.em_designation = desg.desg_slno
+            LEFT JOIN (
+                SELECT 
+                    assigned_emp,
+                    COUNT(cm_complaint_detail.complaint_slno) AS complaint_count
+                FROM 
+                    meliora_asset_test.cm_complaint_detail
+                LEFT JOIN 
+                    cm_complaint_mast 
+                    ON cm_complaint_mast.complaint_slno = cm_complaint_detail.complaint_slno
+                WHERE 
+                    cm_complaint_detail.assign_status = 1
+                    AND cm_complaint_detail.assigned_date  BETWEEN ? AND ?
+                GROUP BY 
+                    assigned_emp
+            ) AS complaint_data
+                ON emp.em_id = complaint_data.assigned_emp
+            LEFT JOIN (
+                SELECT
+                    cm_complaint_detail.assigned_emp AS employee_id,
+                    COUNT(cm_complaint_mast.complaint_slno) AS closed_count
+                FROM
+                    cm_complaint_mast
+                LEFT JOIN 
+                    cm_complaint_detail
+                    ON cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
+                WHERE
+                    cm_complaint_mast.cm_rectify_time BETWEEN ? AND ?
+                    AND cm_complaint_mast.compalint_status IN (2, 3)
+                GROUP BY
+                    cm_complaint_detail.assigned_emp
+            ) AS closed_complaints
+                ON emp.em_id = closed_complaints.employee_id
             WHERE 
-                cm_complaint_detail.assign_status = 1
-                AND cm_complaint_detail.assigned_date BETWEEN ? AND ?
-            GROUP BY 
-                assigned_emp
-        ) AS complaint_data
-        ON 
-            emp.em_id = complaint_data.assigned_emp
-        LEFT JOIN (
-            SELECT
-                cm_complaint_detail.assigned_emp AS employee_id,
-                COUNT(cm_complaint_mast.complaint_slno) AS closed_count
-            FROM
-                cm_complaint_mast
-            LEFT JOIN 
-                cm_complaint_detail
-            ON 
-                cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
-            WHERE
-                cm_complaint_mast.cm_rectify_time BETWEEN ? AND ?
-                AND cm_complaint_mast.compalint_status IN (2, 3)
-            GROUP BY
-                cm_complaint_detail.assigned_emp
-        ) AS closed_complaints
-        ON 
-            emp.em_id = closed_complaints.employee_id
-        WHERE 
-            emp.em_department = ?
-            AND emp.em_status = 1 
-            AND emp.em_no != 1 
-            AND emp.em_id != 1606
-        ORDER BY 
-            closed_count DESC`,
+                emp.em_department = ?
+                AND emp.em_status = 1 
+                AND emp.em_no != 1 
+                AND emp.em_id != 1606
+            ORDER BY 
+                closed_count DESC`,
             [
-                data.from,
-                data.to,
-                data.from,
-                data.to,
-                data.empdept
+                data.fromDate,
+                data.toDate,
+                data.fromDate,
+                data.toDate,
+                data.empdept               
             ],
             (error, results, fields) => {
                 if (error) {

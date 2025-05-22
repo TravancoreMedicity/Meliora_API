@@ -1274,6 +1274,7 @@ module.exports = {
                 WHERE
                 am_item_map_amcpm_detail.am_item_map_slno =?
                 AND amccmc_status = 1
+                AND am_amc_cmc_log_status =1
                 )
                 SELECT 
                 am_item_amcpm_slno,

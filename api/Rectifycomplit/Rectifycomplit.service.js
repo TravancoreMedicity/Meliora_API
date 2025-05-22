@@ -467,7 +467,7 @@ module.exports = {
             LEFT JOIN rm_insidebuildblock_mast ON rm_insidebuildblock_mast.rm_insidebuildblock_slno = rm_newroom_creation.rm_insidebuilldblock_slno
             WHERE
             cm_complaint_detail.assigned_emp = ?
-            AND cm_rectify_status = 'R'
+            AND compalint_status IN (2,3)
             AND assign_status = 1
             AND cm_rectify_time BETWEEN ? AND ?
             ORDER BY complaint_slno DESC            
@@ -597,6 +597,7 @@ module.exports = {
             WHERE
             cm_complaint_detail.assigned_emp = ?            
             AND cm_rectify_status = 'V'
+            AND compalint_status = 3
             AND assign_status = 1
             AND cm_verfy_time BETWEEN ? AND ?
             ORDER BY complaint_slno DESC;`,
@@ -947,6 +948,7 @@ module.exports = {
         pool.query(
             `select            
             cm_complaint_mast.complaint_slno,
+            cm_verfy_time,
             cm_asset_status,
             S.sec_name as sec_name,
             cm_file_status,
@@ -987,6 +989,7 @@ module.exports = {
             compdept_message,
             compdept_message_flag,
             rectify_pending_hold_remarks,
+            U.em_name as verified_user_name,
             message_reply_emp,
             (case when rectify_pending_hold_remarks is null then "not updated" else rectify_pending_hold_remarks end) as rectify_pending_hold_remarks1,
             (case when priority_check = '1' then "Yes" else "No" end) as priority,
@@ -1038,10 +1041,11 @@ module.exports = {
             LEFT JOIN rm_room_type_master ON rm_room_type_master.rm_roomtype_slno = rm_newroom_creation.rm_roomtype_slno
             LEFT JOIN rm_floor_creation ON rm_floor_creation.rm_floor_slno = rm_newroom_creation.rm_room_floor_slno
             LEFT JOIN rm_insidebuildblock_mast ON rm_insidebuildblock_mast.rm_insidebuildblock_slno = rm_newroom_creation.rm_insidebuilldblock_slno
+            left join co_employee_master U on cm_complaint_mast.verified_user = U.em_id 
             where
             complaint_deptslno = (select complaint_dept_slno from cm_complaint_dept
             where department_slno = ?)
-            AND cm_rectify_status = 'R'
+            AND compalint_status IN (2,3)
             And cm_rectify_time between ? and ?
             GROUP BY 
             cm_complaint_mast.complaint_slno
@@ -1157,6 +1161,7 @@ module.exports = {
             WHERE                        
             complaint_deptslno = (select complaint_dept_slno from cm_complaint_dept where department_slno = ?)
             AND cm_rectify_status = 'V' 
+            AND compalint_status = 3
             AND cm_verfy_time between ? and ?
             GROUP BY 
             cm_complaint_mast.complaint_slno

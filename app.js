@@ -20,7 +20,6 @@ app.use(cookieParser());
 
 
 app.use(cors({
-
     origin: [
         'http://192.168.10.88:9741',
         'http://192.168.10.88:9742',
@@ -29,9 +28,9 @@ app.use(cors({
         'http://travancoremedicity.in:9741',
         'http://192.168.10.88:3000',
         'http://localhost:3000',
-        ' http://tm.medicity.co.in:8888',
-        ' http://192.168.10.88:8888',
-        ,
+        'http://tm.medicity.co.in:8888',
+        'http://192.168.10.88:8888',
+        'http://192.168.10.61:3000',
     ],
     credentials: true
 }));
@@ -300,7 +299,7 @@ app.use((req, res, next) => {
 
     // console.log(req)
     //     res.header("Access-Control-Allow-Origin", "http://192.168.10.170:8080
-    res.header("Access-Control-Allow-Origin", "*");
+    // res.header("Access-Control-Allow-Origin", "*");
     res.header(
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-Width, Content-Type, Accept, Authorization"

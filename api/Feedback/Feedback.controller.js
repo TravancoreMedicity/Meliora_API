@@ -148,6 +148,10 @@ const {
     getallhkempdtl,
     CheckEmployeeAlreadyExist,
     getfeedbackcount,
+    inserthkbedassign,
+    getallassignedbed,
+    getalldischargeform,
+    UpdateAssignedBed,
 } = require("./Feedback.service");
 
 module.exports = {
@@ -2142,6 +2146,30 @@ module.exports = {
             });
         })
     },
+
+    getalldischargeform: (req, res) => {
+        const data = req.body;
+        getalldischargeform(data, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+
+            });
+        })
+    },
     getprochecklistdetail: (req, res) => {
         const id = req.params.id;
         getprochecklistdetail(id, (error, results) => {
@@ -2577,6 +2605,29 @@ module.exports = {
             });
         });
     },
+    getallassignedbed: (req, res) => {
+        const id = req.params.id;
+        getallassignedbed(id, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found",
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
     getroomchecklist: (req, res) => {
         getroomchecklist((err, results) => {
             if (err) {
@@ -2864,6 +2915,39 @@ module.exports = {
             });
         });
     },
+
+    inserthkbedassign: (req, res) => {
+        const data = req.body;
+        inserthkbedassign(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    removeassign: (req, res) => {
+        const data = req.body;
+        UpdateAssignedBed(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
+
     updateroomchecklist: (req, res) => {
         const data = req.body;
         updateroomchecklist(data, (err, results) => {
@@ -2919,7 +3003,7 @@ module.exports = {
             }
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
-                    success: 1,
+                    success: 2,
                     message: 'No Data Found',
                     data: [],
                 })

@@ -2110,7 +2110,7 @@ FROM meliora.fb_transaction_mast;
                         fb_ipc_mhcode,
                         fb_doc_name,
                         fb_ipc_curstatus
-                    ) VALUES ( ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     `,
                     [
                         item.IP_NO,
@@ -2137,7 +2137,7 @@ FROM meliora.fb_transaction_mast;
                         item.DMD_DATE,
                         item.PTC_MOBILE,
                         item.IPC_MHCODE,
-                        item.PTC_REFDOCTOR,
+                        item.DOC_NAME,
                         item.IPC_CURSTATUS
                     ],
                     (error, results, fields) => {
@@ -2218,7 +2218,7 @@ FROM meliora.fb_transaction_mast;
                         item.DMD_DATE,
                         item.PTC_MOBILE,
                         item.IPC_MHCODE,
-                        item.PTC_REFDOCTOR,
+                        item.DOC_NAME,
                         item.IPC_CURSTATUS,
                         item.fb_ipad_slno
                     ],
@@ -2682,7 +2682,8 @@ ORDER BY
                     fb_ptc_loadd4,
                     fb_ptc_mobile,
                     fb_ptn_yearage,
-                    fb_ipc_curstatus                          
+                    fb_ipc_curstatus,
+                    fb_doc_name                       
                 FROM 
                     fb_ipadmiss,fb_bed,fb_nurse_station_master
                 WHERE 
@@ -2690,11 +2691,10 @@ ORDER BY
                        AND fb_nurse_station_master.fb_ns_code=fb_bed.fb_ns_code
                        AND fb_nurse_station_master.fb_ns_code = ?
                        AND fb_ipadmiss.fb_bd_code = ?
-                       AND fb_ipadmiss.fb_ipc_curstatus = "ADM" ;
+                       AND fb_ipadmiss.fb_ipc_curstatus != "PCO";
             `,
             [
                 data.fb_ns_code,
-                data.fb_bd_code,
                 data.fb_bd_code
             ]
             , (error, results, fields) => {
@@ -2845,9 +2845,39 @@ where fb_rc_roomslno = ?
                 return callBack(null, results)
             })
     },
+    getalldischargeform: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                fdmast_slno,
+                fb_ip_num,
+                fb_patient_num,
+                fb_patient_name
+            FROM 
+                fb_transaction_mast
+            WHERE 
+                fdmast_slno = ?
+                AND create_date BETWEEN ? AND ?;`,
+            [
+                data.feedbackId,
+                data.FROM_DATE,
+                data.TO_DATE
+            ],
+            (error, results) => {
+                if (error) return callBack(error);
+                return callBack(null, results);
+            }
+        );
+    },
     getempdetail: (data, callBack) => {
         pool.query(
-            `select em_department,em_dept_section from co_employee_master where em_id = ?`,
+            `select 
+                em_department,em_dept_section,em_name,desg_name
+            from 
+                co_employee_master
+            left join 
+                co_designation on co_employee_master.em_designation = co_designation.desg_slno
+             where 
+                em_id = ?`,
             [
                 data
             ]
@@ -2858,7 +2888,19 @@ where fb_rc_roomslno = ?
                 return callBack(null, results)
             })
     },
-
+    getallassignedbed: (data, callBack) => {
+        pool.query(
+            `select fb_hk_slno,fb_hk_bed_slno from fb_hk_check_bed where fb_hk_sv_assign = 168 and fb_hk_status = 1 `,
+            [
+                data
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
     CheckIfRemarkAlreadyExist: (data, callBack) => {
         pool.query(
             `select fb_bed_rmk_slno,fb_bed_service_status from fb_bed_remarks where fb_bed_slno = ?`,
@@ -3906,6 +3948,54 @@ select
                 data.fb_asset_map_status,
                 data.edit_user,
                 data.fb_assets_map_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    inserthkbedassign: (data, callBack) => {
+        pool.query(
+            `
+            INSERT INTO  fb_hk_check_bed(
+                    fb_hk_bed_slno,
+                    fb_hk_sv_assign,
+                    fb_hk_status,
+                    create_user
+                ) 
+                VALUES(?,?,?,?)
+            `,
+            [
+                data.fb_hk_bed_slno,
+                data.fb_hk_sv_assign,
+                data.fb_hk_status,
+                data.create_user
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    UpdateAssignedBed: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE  fb_hk_check_bed
+                SET
+                    fb_hk_status = ?,
+                    edit_user = ?
+                WHERE
+                    fb_hk_bed_slno=?
+            `,
+            [
+                data.fb_hk_status,
+                data.edit_user,
+                data.fb_hk_bed_slno
             ],
             (error, results, fields) => {
                 if (error) {

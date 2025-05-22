@@ -2,69 +2,65 @@ const { pool } = require('../../config/database')
 module.exports = {
 
     getAllEmployee: (data, callback) => {
-        pool.query(
-            `SELECT 
-            emp.em_id,
-            emp.em_name,
-            emp.em_no,
-            desg_name,
-            IFNULL(complaint_data.complaint_count, 0) AS complaint_count,
-            IFNULL(closed_complaints.closed_count, 0) AS closed_count
-        FROM 
-            co_employee_master AS emp
-        LEFT JOIN 
-            co_designation AS desg 
-                ON 
-                emp.em_designation = desg.desg_slno
-        LEFT JOIN (
-            SELECT 
-                assigned_emp,
-                COUNT(cm_complaint_detail.complaint_slno) AS complaint_count
+       
+    pool.query(  
+                `SELECT 
+                emp.em_id,
+                emp.em_name,
+                emp.em_no,
+                desg_name,
+                IFNULL(complaint_data.complaint_count, 0) AS complaint_count,
+                IFNULL(closed_complaints.closed_count, 0) AS closed_count
             FROM 
-                cm_complaint_detail
+                co_employee_master AS emp
             LEFT JOIN 
-                cm_complaint_mast 
-            ON 
-                cm_complaint_mast.complaint_slno = cm_complaint_detail.complaint_slno
+                co_designation AS desg 
+                ON emp.em_designation = desg.desg_slno
+            LEFT JOIN (
+                SELECT 
+                    assigned_emp,
+                    COUNT(cm_complaint_detail.complaint_slno) AS complaint_count
+                FROM 
+                    cm_complaint_detail
+                LEFT JOIN 
+                    cm_complaint_mast 
+                    ON cm_complaint_mast.complaint_slno = cm_complaint_detail.complaint_slno
+                WHERE 
+                    cm_complaint_detail.assign_status = 1
+                    AND cm_complaint_detail.assigned_date  BETWEEN ? AND ?
+                GROUP BY 
+                    assigned_emp
+            ) AS complaint_data
+                ON emp.em_id = complaint_data.assigned_emp
+            LEFT JOIN (
+                SELECT
+                    cm_complaint_detail.assigned_emp AS employee_id,
+                    COUNT(cm_complaint_mast.complaint_slno) AS closed_count
+                FROM
+                    cm_complaint_mast
+                LEFT JOIN 
+                    cm_complaint_detail
+                    ON cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
+                WHERE
+                    cm_complaint_mast.cm_rectify_time BETWEEN ? AND ?
+                    AND cm_complaint_mast.compalint_status IN (2, 3)
+                GROUP BY
+                    cm_complaint_detail.assigned_emp
+            ) AS closed_complaints
+                ON emp.em_id = closed_complaints.employee_id
             WHERE 
-                cm_complaint_detail.assign_status = 1
-                AND cm_complaint_detail.assigned_date BETWEEN ? AND ?
-            GROUP BY 
-                assigned_emp
-        ) AS complaint_data
-        ON 
-            emp.em_id = complaint_data.assigned_emp
-        LEFT JOIN (
-            SELECT
-                cm_complaint_detail.assigned_emp AS employee_id,
-                COUNT(cm_complaint_mast.complaint_slno) AS closed_count
-            FROM
-                cm_complaint_mast
-            LEFT JOIN 
-                cm_complaint_detail
-            ON 
-                cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
-            WHERE
-                cm_complaint_mast.cm_rectify_time BETWEEN ? AND ?
-                AND cm_complaint_mast.compalint_status IN (2, 3)
-            GROUP BY
-                cm_complaint_detail.assigned_emp
-        ) AS closed_complaints
-        ON 
-            emp.em_id = closed_complaints.employee_id
-        WHERE 
-            emp.em_department = ?
-            AND emp.em_status = 1 
-            AND emp.em_no != 1 
-            AND emp.em_id != 1606
-        ORDER BY 
-            closed_count DESC`,
+                emp.em_department = ?
+                AND emp.em_status = 1 
+                AND emp.em_no != 1 
+                AND emp.em_id != 1606
+            ORDER BY 
+                closed_count DESC`,
             [
-                data.from,
-                data.to,
-                data.from,
-                data.to,
-                data.empdept
+                data.fromDate,
+                data.toDate,
+                data.fromDate,
+                data.toDate,
+                data.empdept               
             ],
             (error, results, fields) => {
                 if (error) {
@@ -113,13 +109,15 @@ module.exports = {
     },
 
     getAlltodaysTickets: (data, callback) => {
-        pool.query(
-            `select
-            cm_complaint_mast.complaint_slno 
-            from cm_complaint_mast          
-            WHERE 
-            complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
-            and date(compalint_date)=current_date() `,
+        pool.query(         
+            `SELECT COUNT(*) AS today_reg_ticket_count
+            FROM cm_complaint_mast
+            WHERE complaint_deptslno = (
+                SELECT complaint_dept_slno 
+                FROM cm_complaint_dept 
+                WHERE department_slno = ?
+            )
+            AND DATE(compalint_date) = CURRENT_DATE()`,
             [
                 data.empdept
             ],
@@ -136,10 +134,10 @@ module.exports = {
     getAllDepttodaysTickets: (callback) => {
         pool.query(
             `select
-            cm_complaint_mast.complaint_slno 
+              COUNT(*) AS alldept_today_reg_ticket_count
             from cm_complaint_mast          
             WHERE
-            date(compalint_date)=current_date()  `
+            date(compalint_date)=current_date()`
             , [],
             (error, results, feilds) => {
                 if (error) {
@@ -152,7 +150,7 @@ module.exports = {
     getAllDeptopenTicketsCount: (callback) => {
         pool.query(
             `select
-            cm_complaint_mast.complaint_slno
+             COUNT(*) AS alldept_open_ticket_count
             from cm_complaint_mast          
             WHERE 
             compalint_status=1  `
@@ -168,13 +166,14 @@ module.exports = {
 
     getOpenTicketsCount: (data, callback) => {
         pool.query(
-            `select
-            cm_complaint_mast.complaint_slno
-            from cm_complaint_mast          
-            WHERE 
-            complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
-            and 
-            compalint_status=1`,
+            `SELECT COUNT(*) AS open_ticket_count
+                FROM cm_complaint_mast
+                WHERE complaint_deptslno = (
+                    SELECT complaint_dept_slno 
+                    FROM cm_complaint_dept 
+                    WHERE department_slno = ?
+                )
+                AND compalint_status = 1`,
             [
                 data.empdept
             ],
@@ -189,9 +188,9 @@ module.exports = {
     },
 
     getclosedTodayTicket: (data, callback) => {
-        pool.query(
+        pool.query(         
             `SELECT 
-                cm_complaint_mast.complaint_slno
+               COUNT(*) AS today_closed_ticket_count
              FROM 
                 cm_complaint_mast
              WHERE 
@@ -201,6 +200,7 @@ module.exports = {
                     WHERE department_slno = ?
                 )
                 AND DATE(cm_rectify_time) = CURRENT_DATE()`,
+
             [data.empdept],
             (error, results, fields) => {
                 if (error) {
@@ -546,24 +546,17 @@ module.exports = {
 
 
     getDeptPending: (data, callback) => {
-        pool.query(
-            `select
-            complaint_slno,
-            compalint_status,
-            compalint_date,
-            complaint_deptslno
-            from
-            cm_complaint_mast
-            where
-            compalint_status = 0
-            and
-            complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
-           `,
-
+        pool.query(          
+            `SELECT 
+            COUNT(*) AS new_ticket_count
+            FROM cm_complaint_mast
+            WHERE compalint_status = 0
+            AND complaint_deptslno = (
+                SELECT complaint_dept_slno
+                FROM cm_complaint_dept
+                WHERE department_slno = ?)`,
             [
-
                 data.empdept
-
             ],
             (error, results, fields) => {
                 if (error) {
@@ -604,8 +597,8 @@ module.exports = {
     },
     getPevRegTodayAssing: (data, callback) => {
         pool.query(
-            `SELECT            
-            cm_complaint_mast.complaint_slno 
+            `SELECT    
+            COUNT(DISTINCT cm_complaint_mast.complaint_slno) AS prev_reg_today_assing_ticket_count             
             FROM 
             cm_complaint_mast 
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
@@ -615,7 +608,7 @@ module.exports = {
             DATE(compalint_date) < CURRENT_DATE()
             and
             complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
-            AND compalint_status > 0;`,
+            AND compalint_status > 0`,
 
             [
                 data.empdept,
@@ -630,9 +623,9 @@ module.exports = {
     },
     getRegTodayAssignToday: (data, callback) => {
         pool.query(
-            `SELECT            
-            cm_complaint_mast.complaint_slno 
-            FROM 
+            `SELECT    
+            COUNT(DISTINCT cm_complaint_mast.complaint_slno) AS reg_today_assing_today_ticket_count       
+	          FROM 
             cm_complaint_mast 
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
             WHERE 
@@ -657,7 +650,7 @@ module.exports = {
     getRegistrdFromSixDays: (data, callback) => {
         pool.query(
             `SELECT
-            cm_complaint_detail.complaint_slno
+              COUNT(DISTINCT cm_complaint_mast.complaint_slno) AS dept_ticket_reg_from_sixdays           
             FROM
             cm_complaint_detail
             left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
@@ -669,7 +662,7 @@ module.exports = {
             assigned_date between ? and ?
             and
             complaint_deptslno=(select complaint_dept_slno from cm_complaint_dept where department_slno=?)
-            group by complaint_slno`,
+          `,
             [
                 data.from,
                 data.to,
@@ -687,8 +680,8 @@ module.exports = {
 
     getallDeptRegistrdFromSixDays: (data, callback) => {
         pool.query(
-            `SELECT
-            cm_complaint_detail.complaint_slno
+         `SELECT      
+            COUNT(DISTINCT cm_complaint_mast.complaint_slno) AS alldept_reg_from_six_days_ticket_count
             FROM
             cm_complaint_detail
             left join cm_complaint_mast on cm_complaint_mast.complaint_slno=cm_complaint_detail.complaint_slno
@@ -697,8 +690,7 @@ module.exports = {
             and
             assigned_date IS NOT NULL
             and    
-            assigned_date between ? and ?          
-            group by complaint_slno`,
+            assigned_date between ? and ?  `,
             [
                 data.from,
                 data.to
@@ -715,7 +707,7 @@ module.exports = {
     getclosedFromSixDays: (data, callback) => {
         pool.query(
             `select
-            complaint_slno
+			COUNT(*) AS closed_ticket_count_from_sixdays
             from
             cm_complaint_mast
             where
@@ -739,7 +731,7 @@ module.exports = {
     getallDeptClosedFromSixDays: (data, callback) => {
         pool.query(
             `select
-            complaint_slno
+            COUNT(*) AS alldept_closed_from_sixdays_ticket_count
             from
             cm_complaint_mast
             where          
@@ -762,8 +754,7 @@ module.exports = {
     getRegTodayInPend: (data, callback) => {
         pool.query(
             `SELECT            
-            cm_complaint_mast.complaint_slno
-            
+            COUNT(*) AS today_reg_pending            
             FROM 
             cm_complaint_mast   
             WHERE 
@@ -902,7 +893,7 @@ module.exports = {
     getPevAssingTodayRect: (data, callback) => {
         pool.query(
             `SELECT            
-            cm_complaint_mast.complaint_slno 
+            COUNT(*) AS prev_assing_today_rect_ticket_count
             FROM 
             cm_complaint_mast 
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
@@ -930,14 +921,11 @@ module.exports = {
     getallDeptPending: (callback) => {
         pool.query(
             `select
-            complaint_slno,
-            compalint_status,
-            compalint_date,
-            complaint_deptslno
+              COUNT(*) AS alldept_new_ticket_count
             from
             cm_complaint_mast
             where
-            compalint_status = 0 `
+            compalint_status = 0  `
             , [],
             (error, results, feilds) => {
                 if (error) {
@@ -951,8 +939,8 @@ module.exports = {
     getallDeptclosedTodayTicket: (callback) => {
         pool.query(
             `SELECT 
-                cm_complaint_mast.complaint_slno
-             FROM 
+                  COUNT(*) AS alldept_today_closed_ticket_count
+            FROM 
                 cm_complaint_mast
              WHERE 
             DATE(cm_rectify_time) = CURRENT_DATE()`
@@ -967,8 +955,9 @@ module.exports = {
     },
     getallDeptRegTodayInPend: (callback) => {
         pool.query(
-            `SELECT            
-            cm_complaint_mast.complaint_slno            
+       `
+            SELECT            
+                COUNT(*) AS alldept_reg_today_inpend_ticket_count       
             FROM 
             cm_complaint_mast   
             WHERE 
@@ -985,8 +974,8 @@ module.exports = {
     },
     getallDeptPevRegTodayAssing: (callback) => {
         pool.query(
-            `SELECT            
-            cm_complaint_mast.complaint_slno 
+          `SELECT            
+             COUNT(*) AS alldept_prev_reg_today_assing_ticket_count 
             FROM 
             cm_complaint_mast 
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
@@ -1007,15 +996,16 @@ module.exports = {
     getallDepttRegTodayAssignToday: (callback) => {
         pool.query(
             `SELECT            
-            cm_complaint_mast.complaint_slno 
-            FROM 
+            COUNT(DISTINCT cm_complaint_mast.complaint_slno) AS alldept_regtoday_assingtoday_ticket_count
+        FROM 
             cm_complaint_mast 
-            left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
-            WHERE 
-            DATE(assigned_date) = CURRENT_DATE()    
-            and
-            DATE(compalint_date) = CURRENT_DATE()           
-            AND compalint_status=1`
+        LEFT JOIN 
+            cm_complaint_detail 
+            ON cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
+        WHERE 
+            DATE(assigned_date) = CURRENT_DATE
+            AND DATE(cm_complaint_mast.compalint_date) = CURRENT_DATE
+            AND cm_complaint_mast.compalint_status = 1`
             , [],
             (error, results, feilds) => {
                 if (error) {
@@ -1028,7 +1018,7 @@ module.exports = {
     getallDeptPevAssingTodayRect: (callback) => {
         pool.query(
             `SELECT            
-            cm_complaint_mast.complaint_slno 
+            COUNT(*) AS alldept_prevassing_recttoday_ticket_count 
             FROM 
             cm_complaint_mast 
             left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno

@@ -5,7 +5,7 @@ const logger = require('../../logger/logger')
 module.exports = {
     verifyToken: (req, res, next) => {
         // let token = req.get('authorization')
-           // let token = req.headers["authorization"];  
+        // let token = req.headers["authorization"];  
         const token = req.cookies.accessToken;
 
         if (token) {
@@ -32,8 +32,10 @@ module.exports = {
         }
     },
 
-    validateAccessToken: (req, res) => {   
+    validateAccessToken: (req, res) => {
         const token = req.cookies.accessToken;
+        // console.log(token, "token");
+
         if (!token) {
             return res.status(401).json({ isValidToken: false, message: "No token provided" });
         }

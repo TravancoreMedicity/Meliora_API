@@ -1044,22 +1044,21 @@ module.exports = {
                    total_approx_cost,user_deptsec,req_status,crf_data_collect_slno, crf_requst_slno,crf_req_collect_dept,
                    crf_dept_status, crf_dept_remarks, reqest_one,RU.em_name as requser,SU.em_name  as saveuser, crf_req_remark,
                    crm_data_collection.create_date as dc_req_date,crm_data_collection.update_date,data_coll_image_status,
-                   RE.sec_name as data_entered,company_name,crm_request_master.company_slno                       
+                   RE.sec_name as data_entered,company_name,crm_request_master.company_slno  ,tmc_data_collection_status                     
   			 FROM
                    crm_request_master
-                LEFT JOIN am_item_type ON JSON_CONTAINS(crm_request_master.category, cast(am_item_type.item_type_slno as json), '$')
-                LEFT JOIN crm_emergencytype_mast ON crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
-                LEFT JOIN co_deptsec_mast R ON R.sec_id=crm_request_master.request_deptsec_slno
-                LEFT JOIN co_deptsec_mast U ON U.sec_id=crm_request_master.user_deptsec
-                LEFT JOIN crm_data_collection On crm_data_collection.crf_requst_slno=crm_request_master.req_slno
-                LEFT JOIN co_employee_master CR ON CR.em_id=crm_request_master.create_user
-                LEFT JOIN co_employee_master RU ON RU.em_id=crm_data_collection.req_user           
-                LEFT JOIN co_employee_master SU ON SU.em_id=crm_data_collection.save_user
-                LEFT JOIN co_deptsec_mast RE ON RE.sec_id=crm_data_collection.crf_req_collect_dept
-                LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno
-
+                    LEFT JOIN am_item_type ON JSON_CONTAINS(crm_request_master.category, cast(am_item_type.item_type_slno as json), '$')
+                    LEFT JOIN crm_emergencytype_mast ON crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
+                    LEFT JOIN co_deptsec_mast R ON R.sec_id=crm_request_master.request_deptsec_slno
+                    LEFT JOIN co_deptsec_mast U ON U.sec_id=crm_request_master.user_deptsec
+                    LEFT JOIN crm_data_collection On crm_data_collection.crf_requst_slno=crm_request_master.req_slno
+                    LEFT JOIN co_employee_master CR ON CR.em_id=crm_request_master.create_user
+                    LEFT JOIN co_employee_master RU ON RU.em_id=crm_data_collection.req_user           
+                    LEFT JOIN co_employee_master SU ON SU.em_id=crm_data_collection.save_user
+                    LEFT JOIN co_deptsec_mast RE ON RE.sec_id=crm_data_collection.crf_req_collect_dept
+                    LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno
             WHERE
-                    crf_req_collect_dept=?
+                crf_req_collect_dept=?
               GROUP BY crm_request_master.req_slno, crf_data_collect_slno
               ORDER BY crm_request_master.req_slno DESC`,
             [
@@ -1801,6 +1800,57 @@ module.exports = {
                 id
             ],
             (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    CrfDeptDataCollectInserttmc: (data, callBack) => {
+        pool.query(
+            `INSERT INTO crm_data_collection
+            (
+                crf_requst_slno,
+                crf_req_collect_dept,
+                crf_req_remark,
+                reqest_one,
+                req_user ,
+                tmc_data_collection_status  
+            ) 
+            VALUES ?`,
+            [
+                data
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getDatakmcDep: (id, callBack) => {
+
+        pool.query(
+            `SELECT
+             tmc_dept,
+             kmc_dept,
+             tmc_hod,
+             tmc_incharge,
+             kmc_hod,
+             kmc_incharge
+             FROM 
+             crm_department_mapping
+             WHERE
+             tmc_dept =?`,
+
+            [
+                id
+            ],
+            (error, results, feilds) => {
+
                 if (error) {
                     return callBack(error);
                 }

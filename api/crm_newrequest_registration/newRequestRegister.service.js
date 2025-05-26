@@ -1527,4 +1527,201 @@ module.exports = {
             }
         );
     },
+
+
+    GetDataCollectionMasterUpdate: (data, callback) => {
+
+        pool.query(
+            `INSERT INTO crm_datacollection_master (
+                Depid,Depsec,empid,status   
+               )
+                VALUES(?,?,?,?)`,
+            [
+                data.dept,
+                data.deptsec,
+                data.empId,
+                data.View_Status
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    Getdatacollection: (data, callback) => {
+        pool.query(
+            `SELECT
+             Depid,
+              empid,
+              Depsec,
+              dept_name,
+              sec_name,
+              em_name,
+              status
+               FROM crm_datacollection_master
+              LEFT JOIN co_department_mast ON co_department_mast.dept_id = crm_datacollection_master.Depid
+              LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id = crm_datacollection_master.Depsec       
+              LEFT JOIN co_employee_master OM ON OM.em_id = crm_datacollection_master.empid `,
+            [
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    GetDataCollectionMaster: (data, callback) => {
+        pool.query(
+            `UPDATE crm_datacollection_master 
+            SET 
+            Depid=?,
+            empid=?,
+            Depsec=?,
+            status=?
+            WHERE empid = ?`,
+            [
+                data.dept,
+                data.empId,
+                data.deptsec,
+                data.View_Status,
+                data.empId,
+
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+
+
+
+    getdefaultRights: (id, callback) => {
+        pool.query(
+            `SELECT
+             Depid,
+              empid,
+              Depsec,
+              dept_name,
+              sec_name,
+              em_name,
+              status
+               FROM crm_datacollection_master
+              LEFT JOIN co_department_mast ON co_department_mast.dept_id = crm_datacollection_master.Depid
+              LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id = crm_datacollection_master.Depsec       
+              LEFT JOIN co_employee_master OM ON OM.em_id = crm_datacollection_master.empid
+              where empid = ?`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    // insertDepartmentMapping: (data, callback) => {
+    //     pool.query(
+    //         `INSERT INTO crm_department_mapping 
+    //         ( tmc_dept,kmc_dept,tmc_hod,tmc_incharge,kmc_hod,kmc_incharge)
+    //           VALUES(?,?,?,?,?,?)`,
+    //         [
+    //             data.dept,
+    //             data.crfdeptKmc,
+    //             data.HodId,
+    //             data.InchargeId,
+    //             data.HodIdkmc,
+    //             data.InchargeIdkmc,
+
+
+    //         ],
+    //         (error, results, fields) => {
+    //             if (error) {
+    //                 return callback(error);
+    //             }
+    //             return callback(null, results);
+
+    //         }
+    //     );
+    // },
+    insertDepartmentMapping: (data, callback) => {
+        // First, check if tmc_dept already exists
+        pool.query(
+            `SELECT * FROM crm_department_mapping WHERE tmc_dept = ?`,
+            [data.dept],
+            (err, results) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (results.length > 0) {
+                    // Department already exists
+                    return callback("Department already exists");
+                }
+
+                // If not exists, insert the new mapping
+                pool.query(
+                    `INSERT INTO crm_department_mapping 
+                    (tmc_dept, kmc_dept, tmc_hod, tmc_incharge, kmc_hod, kmc_incharge)
+                    VALUES (?, ?, ?, ?, ?, ?)`,
+                    [
+                        data.dept,
+                        data.crfdeptKmc,
+                        data.HodId,
+                        data.InchargeId,
+                        data.HodIdkmc,
+                        data.InchargeIdkmc,
+                    ],
+                    (error, insertResults) => {
+                        if (error) {
+                            return callback(error);
+                        }
+                        return callback(null, insertResults);
+                    }
+                );
+            }
+        );
+    },
+
+    GetDepartmentmappingGet: (data, callback) => {
+        pool.query(
+            `SELECT
+    tmc_dept,
+    kmc_dept,
+    tmc_hod,
+    tmc_incharge,
+    kmc_hod,
+    kmc_incharge,
+    sec_name,
+    em_hod.em_name AS hod_name,
+    em_incharge.em_name AS incharge_name
+FROM crm_department_mapping
+LEFT JOIN co_deptsec_mast 
+    ON co_deptsec_mast.sec_id = crm_department_mapping.tmc_dept
+LEFT JOIN co_employee_master em_hod 
+    ON em_hod.em_id = crm_department_mapping.tmc_hod
+LEFT JOIN co_employee_master em_incharge 
+    ON em_incharge.em_id = crm_department_mapping.tmc_incharge;
+`,
+            [
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 }

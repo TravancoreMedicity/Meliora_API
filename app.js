@@ -30,7 +30,7 @@ app.use(cors({
         'http://localhost:3000',
         ' http://tm.medicity.co.in:8888',
         ' http://192.168.10.88:8888',
-        ,
+        'http://localhost:3002', ,
     ],
     credentials: true
 }));

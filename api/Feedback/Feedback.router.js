@@ -95,6 +95,11 @@ const {
     getallassignedbed,
     getalldischargeform,
     removeassign,
+    insertipfollowup,
+    getallipfollowup,
+    updateipfollowup,
+    getdischargepatient,
+    // getallscheduledate,
 } = require("./Feedback.controller");
 
 
@@ -177,6 +182,11 @@ router.get('/getllbedremarks', getllbedremarks)// check later this
 
 
 router.post('/getalldischargeform', getalldischargeform)
+router.post('/insertipfollowup', insertipfollowup)
+router.post("/getallipfollowup", getallipfollowup)
+router.post("/updateipfollowup", updateipfollowup)
+
+
 
 router.get('/getempdetail/:id', getempdetail)
 router.get('/getbedremarkDetail/:id', getbedremarkDetail)
@@ -237,6 +247,10 @@ router.get('/getallhkactiveitem', getallhkactiveitem)
 router.post('/inserthkempdtl', inserthkempdtl)
 router.post('/updatehkempdtl', updatehkempdtl)
 router.get('/getallhkempdtl', getallhkempdtl)
+
+
+router.post('/getdischargepatient',getdischargepatient)
+
 //edlider meliora table
 router.post('/insertbddetail', insertbddetail)
 router.post('/insertptdetailmlora', insertptdetailmlora)

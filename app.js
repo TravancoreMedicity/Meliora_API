@@ -29,10 +29,10 @@ app.use(cors({
         'http://localhost:3000',
         'http://tm.medicity.co.in:8888',
         'http://192.168.10.88:8888',
+        'http://192.168.22.8:3000',
     ],
     credentials: true
 }));
-
 
 
 // ----- logger display For Info ----
@@ -70,6 +70,7 @@ const socketIOMiddlewre = (req, res, next) => {
     req.io = io;
     next();
 }
+
 
 //Inside route Config 
 

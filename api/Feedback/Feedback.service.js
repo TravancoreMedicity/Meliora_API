@@ -922,6 +922,45 @@ WHERE serial_slno = 3
             });
         }))
     },
+    insertDefaultPtImpression: (data, callBack) => {
+        const { answer, fb_transact_slno } = data;
+        // This code destruct nested answer object to corresponding  details
+        const insertPromises = Object.entries(answer)
+            .flatMap(([fb_category_slno, questions]) =>
+                Object.entries(questions).map(([fb_subcategory_slno, qdata]) => {
+                    const rating = qdata.rating || 0;
+                    const details = JSON.stringify(qdata?.details || []);
+                    return new Promise((resolve, reject) => {
+                        pool.query(
+                            `
+                            INSERT INTO fb_imp_transact_mast (
+                            fb_transact_slno,
+                            fb_quest_id,
+                            fb_quest_sub,
+                            fb_imp_ans,
+                            fb_ans_detail
+                            ) VALUES (?, ?, ?, ?, ?)
+                            `,
+                            [
+                                fb_transact_slno,
+                                parseInt(fb_category_slno),
+                                fb_subcategory_slno,
+                                rating,
+                                details
+                            ],
+                            (err, results) => {
+                                if (err) return reject(err);
+                                resolve(results);
+                            }
+                        );
+                    });
+                })
+            );
+        Promise.all(insertPromises)
+            .then((results) => callBack(null, results))
+            .catch((err) => callBack(err));
+    },
+
     getalluserfeedback: (data, callBack) => {
         pool.query(
             `
@@ -2888,6 +2927,29 @@ where fb_rc_roomslno = ?
                 return callBack(null, results)
             })
     },
+    getallipfollowup: (data, callBack) => {
+        pool.query(
+            `select
+                fb_date_schedule_slno, 
+                fb_ip_no,
+                fb_schedule_date,
+                fb_pt_no
+            from 
+                fb_ip_date_schedule
+           where create_date BETWEEN ? AND ?;
+                `,
+            [
+                data?.FROM_DATE,
+                data?.TO_DATE
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+
     getallassignedbed: (data, callBack) => {
         pool.query(
             `select fb_hk_slno,fb_hk_bed_slno from fb_hk_check_bed where fb_hk_sv_assign = 168 and fb_hk_status = 1 `,
@@ -4084,6 +4146,44 @@ select
             }
         )
     },
+    getdischargepatient: (data, callBack) => {
+        pool.query(
+            `
+            SELECT 
+                fb_ip_no,
+                fb_ipd_date,
+                fb_pt_no,
+                fb_ptc_name,
+                fb_ptc_sex,
+                fb_ptd_dob,
+                fb_ptn_yearage,
+                fb_ptc_loadd1,
+                fb_ptc_loadd2,
+                fb_ptc_loadd3,
+                fb_ptc_loadd4,
+                fb_ipd_disc,
+                fb_ipc_status,
+                fb_dmd_date,
+                fb_ptc_mobile,
+                fb_doc_name
+            FROM
+                meliora.fb_ipadmiss
+            WHERE
+                fb_ipd_disc IS NOT NULL
+                    AND CAST(fb_ipd_date AS DATETIME) BETWEEN ? AND ?
+            `,
+            [
+                data.FROM_DATE,
+                data.TO_DATE
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
     getdischargeentrybed: (callBack) => {
         pool.query(
             `
@@ -4158,6 +4258,36 @@ select
                 return callBack(null, { insertId: results.insertId });
             })
     },
+
+
+    insertipfollowup: (data, callBack) => {
+        const scheduleDate = data.Schedule_date;
+        try {
+            pool.query(
+                `INSERT INTO fb_ip_date_schedule (
+                fb_ip_no,
+                fb_pt_no,
+                fb_schedule_date,
+                create_user
+            ) VALUES (?, ?, ?,?)
+            `,
+                [
+                    data.fb_ip_no,
+                    data.fb_pt_no,
+                    scheduleDate,
+                    data.create_user
+                ],
+                (error, results, fields) => {
+                    if (error) {
+                        return callBack(error);
+                    }
+                    return callBack(null, { insertId: results.insertId });
+                }
+            );
+        } catch (err) {
+            return callBack(err);
+        }
+    },
     updateprocheckbed: (data, callBack) => {
         pool.query(
             `
@@ -4177,6 +4307,28 @@ select
                 data.create_user,
                 data.fb_check_bed_slno
 
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, { insertId: results.insertId });
+            })
+    },
+    updateipfollowup: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE  fb_ip_date_schedule
+            SET
+                fb_schedule_date = ?,
+                edit_user=?
+            WHERE
+                fb_date_schedule_slno = ?
+            `,
+            [
+                data.Schedule_date,
+                data.edit_user,
+                data.slno
             ],
             (error, results, fields) => {
                 if (error) {

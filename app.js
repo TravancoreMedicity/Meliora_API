@@ -63,7 +63,6 @@ const socketIOMiddlewre = (req, res, next) => {
 }
 
 
-
 // ----- logger display For Info ----
 app.get('/info', (req, res) => {
     fs.readFile('./errorlog/info.log', (error, txtString) => {
@@ -89,6 +88,7 @@ app.get('/warn', (req, res) => {
         res.end();
     })
 })
+
 
 
 

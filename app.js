@@ -18,7 +18,6 @@ app.use(express.json());
 app.use(cookieParser());
 // app.use(lusca.csrf());
 
-
 app.use(cors({
     origin: [
         'http://192.168.10.88:9741',
@@ -28,9 +27,12 @@ app.use(cors({
         'http://travancoremedicity.in:9741',
         'http://192.168.10.88:3000',
         'http://localhost:3000',
+        'http://192.168.10.61:3000',
         'http://tm.medicity.co.in:8888',
         'http://192.168.10.88:8888',
-        'http://192.168.10.61:3000',
+        'http://192.168.22.9:3000',
+        'http://195.168.34.25:3001',
+        'http://195.168.34.25:3000'
     ],
     credentials: true
 }));
@@ -59,23 +61,6 @@ const socketIOMiddlewre = (req, res, next) => {
     req.io = io;
     next();
 }
-
-
-// const server = http.createServer(app);
-// const io = socketUtils.WSIO(server)
-// socketUtils.connection(io);
-
-// const socketIOMiddlewre = (req, res, next) => {
-//     req.io = io;
-//     next();
-// }
-
-
-// const socketIOMiddlewre = (req, res, next) => {
-//     req.io = io;
-//     next();
-// }
-
 
 
 
@@ -293,9 +278,12 @@ const approvalMapping = require('./api/crm_approval_mapping/approval.router')
 
 
 
+
 app.use(express.json({ limit: '50mb' }));
 
+
 app.use((req, res, next) => {
+
 
     // console.log(req)
     //     res.header("Access-Control-Allow-Origin", "http://192.168.10.170:8080
@@ -307,23 +295,6 @@ app.use((req, res, next) => {
 
 
 
-    //     res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-    //     res.header('Access-Control-Allow-Credentials', true);
-    //     res.header(
-    //         "Access-Control-Allow-Headers",
-    //         "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    //     );
-
-    //     if (req.method === "OPTIONS") {
-    //         res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
-    //         return res.status(200).json({});
-    //     }
-    //     next();
-    // });
-
-
-
-
 
     if (req.method === "OPTIONS") {
         res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
@@ -332,8 +303,6 @@ app.use((req, res, next) => {
 
     next();
 });
-
-
 
 
 // Outside Route Config

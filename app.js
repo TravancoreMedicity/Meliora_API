@@ -36,6 +36,7 @@ app.use(
   })
 );
 
+
 // ----- logger display For Info ----
 app.get("/info", (req, res) => {
   fs.readFile("./errorlog/info.log", (error, txtString) => {
@@ -83,7 +84,6 @@ const socketIOMiddlewre = (req, res, next) => {
   next();
 };
 
-//Inside route Config
 
 const userRouter = require("./api/user/user.router");
 const employeeRouter = require("./api/employee/employee.router");

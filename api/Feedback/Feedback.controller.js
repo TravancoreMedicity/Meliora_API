@@ -1,3 +1,4 @@
+const { replyQuery } = require("../complaint_assign/complaintAssign.service");
 const {
     insertfeedbackcategory,
     getallcategories,
@@ -152,6 +153,12 @@ const {
     getallassignedbed,
     getalldischargeform,
     UpdateAssignedBed,
+    insertipfollowup,
+    getallipfollowup,
+    getallscheduledate,
+    updateipfollowup,
+    insertDefaultPtImpression,
+    getdischargepatient,
 } = require("./Feedback.service");
 
 module.exports = {
@@ -801,7 +808,7 @@ module.exports = {
     },
     insertFeedbackanswers: (req, res) => {
         const body = req.body;
-        const { fb_answers, fb_ip_num, fb_patient_num, fb_patient_name, fb_patient_mob, fdmast_slno, create_user } = body;
+        const { fb_answers, fb_ip_num, fb_patient_num, fb_patient_name, fb_patient_mob, fdmast_slno, fb_default_quest, create_user } = body;
 
         UpdateSerialAnswerMaster((error, results) => {
             if (error) {
@@ -818,6 +825,7 @@ module.exports = {
                     })
                 }
 
+                // getting transaction slno for the each patients
                 let serialCurrentValue = results[0]?.serial_current;
 
                 if (!serialCurrentValue) {
@@ -843,6 +851,12 @@ module.exports = {
                     fb_transact_slno: fb_transact_slno_value,
                     create_user: create_user
                 }
+                // object contain defult question answer
+                const impanswers = {
+                    answer: fb_default_quest,
+                    fb_transact_slno: fb_transact_slno_value,
+                }
+
                 insertAllFeedBackTransactionMast(insertData, (error, results) => {
                     if (error) {
                         return res.status(200).json({
@@ -859,6 +873,19 @@ module.exports = {
                             })
                         }
                     })
+
+                    // insert default question answer and details
+                    if (fdmast_slno === 8 && fdmast_slno != undefined) {
+                        insertDefaultPtImpression(impanswers, (error, results) => {
+                            if (error) {
+                                console.log(error);
+                                return res.status(200).json({
+                                    success: 1,
+                                    message: error
+                                })
+                            }
+                        })
+                    }
                     return res.status(200).json({
                         success: 2,
                         message: "Inserted Successfully",
@@ -2170,6 +2197,45 @@ module.exports = {
             });
         })
     },
+    insertipfollowup: (req, res) => {
+        const { ipdata, Schedule_date, create_user } = req.body;
+        const combined = {
+            ...ipdata,
+            Schedule_date,
+            create_user
+        };
+        insertipfollowup(combined, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "inserted Sucessfully",
+
+            });
+        })
+    },
+    updateipfollowup: (req, res) => {
+        const data = req.body;
+        updateipfollowup(data, (error, results) => {
+            if (error) {
+                console.log(error);
+
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Updated Sucessfully",
+            });
+        })
+    },
+
     getprochecklistdetail: (req, res) => {
         const id = req.params.id;
         getprochecklistdetail(id, (error, results) => {
@@ -2215,6 +2281,31 @@ module.exports = {
             });
         });
     },
+    getallipfollowup: (req, res) => {
+        const data = req.body;
+        getallipfollowup(data, (err, results) => {
+            if (err) {
+                console.log(err);
+
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
     getbedremarkDetail: (req, res) => {
         const id = req.params.id;
         getbedremarkDetail(id, (err, results) => {
@@ -2981,6 +3072,20 @@ module.exports = {
     updatehkempdtl: (req, res) => {
         const data = req.body;
         updatehkempdtl(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    }, getdischargepatient: (req, res) => {
+        const data = req.body;
+        getdischargepatient(data, (err, results) => {
             if (err) {
                 return res.status(400).json({
                     success: 0,

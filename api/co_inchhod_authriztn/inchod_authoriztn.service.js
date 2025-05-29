@@ -161,4 +161,28 @@ module.exports = {
     },
 
 
+    getDeptSeconHodbyDep: (id, callBack) => {
+        pool.query(
+            `SELECT
+                   dept_section,AD.sec_name as auth_deptsec,emp_id,auth_post,em_name
+             FROM
+                  co_authorization
+               left join co_employee_master on co_employee_master.em_id=co_authorization.emp_id
+               left join co_deptsec_mast AD on AD.sec_id=co_authorization.dept_section
+            where
+                   auth_status=1 and dept_section=? 
+            `,
+            [
+                id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+
+    },
+
 }

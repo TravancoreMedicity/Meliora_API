@@ -26,10 +26,12 @@ app.use(cors({
         'https://travancoremedicity.in:9742',
         'http://travancoremedicity.in:9741',
         'http://192.168.10.88:3000',
-        'http://localhost:3000',
         'http://tm.medicity.co.in:8888',
         'http://192.168.10.88:8888',
-        'http://192.168.22.8:3000'
+        'http://192.168.22.8:3000',
+        'http://192.168.22.9:3000',
+        'http://195.168.34.25:3001',
+        'http://195.168.34.25:3000'
     ],
     credentials: true
 }));
@@ -241,10 +243,12 @@ const userRegistration = require("./api/usermanagement/user.router");
 const feedbackforms = require('./api/Feedback/Feedback.router')
 const backuptypemast = require('./api/it_backup_type_master/backup_type.router')
 const simOperators = require('./api/it_sim_operators/sim_operators.router')
+const notificationMenu = require('./api/notificationMenu/notification.router')
 const { validateAccessToken } = require("./api/tokenValidation/tokenValidation");
 const AssetCondemnation = require('./api/am_condem_details/am_condem.router');
 // const backuptypemast = require('./api/it_backup_type_master/backup_type.router')
 // const simOperators = require('./api/it_sim_operators/sim_operators.router')
+
 // const condemApprovalLevel = require('./api/am_asset_condem_approval_level_mast/approval_level_mast.router')
 
 
@@ -434,6 +438,10 @@ app.use('/api/Amdashboard', Amdashboard)
 app.use('/api/Ticketdashboard', Ticketdashboard)
 app.use('/api/medvallet', med_vallet_master)
 app.use('/api/medvehilces', mv_vehicle_registration)
+app.use('/api/AssetCondemnation', AssetCondemnation)
+app.use('/api/backuptypemast', backuptypemast)
+app.use('/api/simOperators', simOperators)
+app.use('/api/notificationMenu', notificationMenu)
 app.use("/api/user", userRegistration);
 app.use("/api/feedback", feedbackforms);
 app.get('/api/validateAccessToken', validateAccessToken)
@@ -443,6 +451,7 @@ app.use('/api/AssetCondemnation', AssetCondemnation)
 
 // app.use('/api/backuptypemast', backuptypemast)
 // app.use('/api/simOperators', simOperators)
+
 // app.use('/api/condemApprovalLevel', condemApprovalLevel)
 
 app.get('/api/validateToken', validateTokenFrontend)

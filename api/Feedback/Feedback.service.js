@@ -226,7 +226,7 @@ LEFT JOIN
 	fb_category_master
 ON
 	fb_category_master.fb_category_slno = fb_subcategory_master.fb_category_slno
-WHERE meliora.fb_subcategory_master.fb_category_slno= ?`,
+WHERE fb_subcategory_master.fb_category_slno= ?`,
             [
                 data.fb_category_slno
             ],
@@ -976,7 +976,7 @@ WHERE serial_slno = 3
     fb_detl.fdmast_slno,
 	fb_mast.feedback_name
 FROM
-  meliora.fb_transaction_detl
+  fb_transaction_detl
 LEFT JOIN 
     fb_detl ON fb_transaction_detl.fddet_slno = fb_detl.fddet_slno
 LEFT JOIN 
@@ -1373,7 +1373,7 @@ WHERE
     },
     getDepartmentEmpid: (id, callBack) => {
         pool.query(
-            `SELECT em_id, em_name FROM meliora.co_employee_master where em_dept_section=? 
+            `SELECT em_id, em_name FROM co_employee_master where em_dept_section=? 
             and em_status=1 and em_no!=1 and em_id!=1606 order by em_name ASC`,
             [
                 id
@@ -1737,7 +1737,7 @@ left join rm_floor_creation  on fb_nurse_station_master.fb_floor_code = rm_floor
         pool.query(
             `
 SELECT COUNT(*) AS total_rows
-FROM meliora.fb_transaction_mast;
+FROM fb_transaction_mast;
             `,
             []
             , (error, results, fields) => {
@@ -2766,7 +2766,7 @@ ORDER BY
                fb_bed_remarks.fb_bed_remark,
                fb_bed_remarks.fb_bed_status,
                fb_rm_room_slno
-               FROM meliora.fb_bed
+               FROM fb_bed
                LEFT JOIN fb_nurse_station_master 
                ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code   
                LEFT JOIN fb_room_type 
@@ -4167,7 +4167,7 @@ select
                 fb_ptc_mobile,
                 fb_doc_name
             FROM
-                meliora.fb_ipadmiss
+                fb_ipadmiss
             WHERE
                 fb_ipd_disc IS NOT NULL
                     AND CAST(fb_ipd_date AS DATETIME) BETWEEN ? AND ?

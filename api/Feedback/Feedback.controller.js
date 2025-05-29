@@ -875,7 +875,7 @@ module.exports = {
                     })
 
                     // insert default question answer and details
-                    if (fdmast_slno === 26 && fdmast_slno != undefined) {
+                    if (fdmast_slno === 8 && fdmast_slno != undefined) {
                         insertDefaultPtImpression(impanswers, (error, results) => {
                             if (error) {
                                 console.log(error);

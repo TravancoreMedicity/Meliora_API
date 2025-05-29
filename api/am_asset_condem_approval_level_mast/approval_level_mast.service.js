@@ -243,7 +243,7 @@ module.exports = {
 
     getCondemnationAllDetails: (data, callBack) => {
         pool.query(
-            `SELECT * FROM meliora_asset_test.am_condemnation_master where condem_mast_slno=?`,
+            `SELECT * FROM am_condemnation_master where condem_mast_slno=?`,
             [
                 data.condemMastslno
 

@@ -911,8 +911,6 @@ WHERE serial_slno = 3
                         create_user,
                     ],
                     (error, results, fields) => {
-                        // console.log(results, "result");
-
                         if (error) {
                             return callBack(error)
                         }
@@ -1799,850 +1797,891 @@ FROM fb_transaction_mast;
                 return callBack(null, results)
             })
     },
-    insertbddetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                    INSERT INTO fb_bed(
-                        fb_bd_code,
-                        fb_bdc_no,
-                        fb_ns_code,
-                        fb_rt_code,
-                        fb_bdc_occup,
-                        fb_bdn_cccno,
-                        fb_bdc_status,
-                        fb_hkd_cleaningreq,
-                        fb_rm_code,
-                        fb_bdc_mhcode,
-                        fb_bdc_vipbed
-                    )
-                    VALUES(?,?,?,?,?,?,?,?,?,?,?)       
-                    `,
-                    [
-                        item.BD_CODE,
-                        item.BDC_NO,
-                        item.NS_CODE,
-                        item.RT_CODE,
-                        item.BDC_OCCUP,
-                        item.OCCU,
-                        item.BDC_STATUS,
-                        item.HKD_CLEANINGREQ,
-                        item.RM_CODE,
-                        item.BDC_MHCODE,
-                        item.BDC_VIPBED
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    CheckBedAlreadyPresent: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     SELECT
-                        fb_bed_slno, 
-                        fb_bd_code,
-                        fb_bdc_no,
-                        fb_ns_code,
-                        fb_rt_code,
-                        fb_bdc_occup,
-                        fb_bdn_cccno,
-                        fb_bdc_status,
-                        fb_hkd_cleaningreq,
-                        fb_rm_code,
-                        fb_bdc_mhcode,
-                        fb_bdc_vipbed
-                    FROM 
-                        fb_bed 
-                    where 
-                    fb_bd_code = ?  and fb_bdc_no = ?  
-                    `,
-                    [
-                        item.BD_CODE,
-                        item.BDC_NO,
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    updatebeddetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     UPDATE fb_bed 
-                     SET
-                        fb_bd_code = ?,
-                        fb_bdc_no = ?,
-                        fb_ns_code = ?,
-                        fb_rt_code = ?,
-                        fb_bdc_occup = ?,
-                        fb_bdn_cccno = ?,
-                        fb_bdc_status = ?,
-                        fb_hkd_cleaningreq = ?,
-                        fb_rm_code = ?,
-                        fb_bdc_mhcode = ?,
-                        fb_bdc_vipbed = ?
-                    where 
-                        fb_bed_slno = ?  
-                    `,
-                    [
-                        item.BD_CODE,
-                        item.BDC_NO,
-                        item.NS_CODE,
-                        item.RT_CODE,
-                        item.BDC_OCCUP,
-                        item.OCCU,
-                        item.BDC_STATUS,
-                        item.HKD_CLEANINGREQ,
-                        item.RM_CODE,
-                        item.BDC_MHCODE,
-                        item.BDC_VIPBED,
-                        item.fb_bed_slno
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    CheckRoomTypeAlreadyPreseint: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     SELECT
-                        fb_rmtp_slno, 
-                        fb_rt_code,
-                        fb_rtc_desc,
-                        fb_rtc_alias,
-                        fb_rc_code,
-                        fb_rtc_status, 
-                        fb_icu,
-                        fb_rtc_mhcode     
-                    FROM 
-                        fb_room_type 
-                    where 
-                        fb_rt_code = ?  
-                    `,
-                    [
-                        item.RT_CODE,
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    insertrtdetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                    INSERT INTO fb_room_type(
-                        fb_rt_code,
-                        fb_rtc_desc,
-                        fb_rtc_alias,
-                        fb_rc_code,
-                        fb_rtc_status, 
-                        fb_icu,
-                        fb_rtc_mhcode
-                    )
-                    VALUES(?,?,?,?,?,?,?)       
-                    `,
-                    [
-                        item.RT_CODE,
-                        item.RTC_DESC,
-                        item.RCC_DESC,
-                        item.RC_CODE,
-                        item.RTC_STATUS,
-                        item.ICU,
-                        item.RTC_MHCODE
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    updatertdetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     UPDATE fb_room_type 
-                     SET
-                        fb_rt_code = ?,
-                        fb_rtc_desc = ?,
-                        fb_rtc_alias = ?,
-                        fb_rc_code = ?,
-                        fb_rtc_status = ?, 
-                        fb_icu = ?,
-                        fb_rtc_mhcode = ?
-                    where 
-                        fb_rmtp_slno = ?  
-                    `,
-                    [
-                        item.RT_CODE,
-                        item.RTC_DESC,
-                        item.RCC_DESC,
-                        item.RC_CODE,
-                        item.RTC_STATUS,
-                        item.ICU,
-                        item.RTC_MHCODE,
-                        item.fb_rmtp_slno
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    CheckpatientAlreadyPresent: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     SELECT
-                       fb_ipad_slno, fb_ip_no, fb_ipd_date, fb_pt_no, fb_ptc_name, fb_ptc_sex, fb_ptd_dob, fb_ptn_dayage, fb_ptn_monthage, fb_ptn_yearage, fb_ptc_loadd1, fb_ptc_loadd2, fb_ptc_loadd3, fb_ptc_loadd4, fb_ptc_lopin, fb_rc_code, fb_bd_code, fb_do_code, fb_rs_code, fb_ipd_disc, fb_ipc_status, fb_dmc_slno, fb_dmd_date, fb_ptc_mobile, fb_ipc_mhcode, fb_doc_name
-                    FROM 
-                        fb_ipadmiss 
-                    where 
-                    fb_ip_no = ?  and fb_pt_no = ?  
-                    `,
-                    [
-                        item.IP_NO,
-                        item.PT_NO,
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    insertPatientDetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                    INSERT INTO fb_ipadmiss (
-                        fb_ip_no,
-                        fb_ipd_date,
-                        fb_pt_no,
-                        fb_ptc_name,
-                        fb_ptc_sex,
-                        fb_ptd_dob,   
-                        fb_ptn_dayage,
-                        fb_ptn_monthage,
-                        fb_ptn_yearage,
-                        fb_ptc_loadd1,
-                        fb_ptc_loadd2, 
-                        fb_ptc_loadd3,
-                        fb_ptc_loadd4,
-                        fb_ptc_lopin,
-                        fb_rc_code,
-                        fb_bd_code,
-                        fb_do_code, 
-                        fb_rs_code, 
-                        fb_ipd_disc,
-                        fb_ipc_status,
-                        fb_dmc_slno,
-                        fb_dmd_date,
-                        fb_ptc_mobile, 
-                        fb_ipc_mhcode,
-                        fb_doc_name,
-                        fb_ipc_curstatus
-                    ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    `,
-                    [
-                        item.IP_NO,
-                        item.IPD_DATE,
-                        item.PT_NO,
-                        item.PTC_PTNAME,
-                        item.PTC_SEX,
-                        item.PTD_DOB,
-                        item.PTN_DAYAGE,
-                        item.PTN_MONTHAGE,
-                        item.PTN_YEARAGE,
-                        item.PTC_LOADD1,
-                        item.PTC_LOADD2,
-                        item.PTC_LOADD3,
-                        item.PTC_LOADD4,
-                        item.PTC_LOPIN,
-                        item.RC_CODE,
-                        item.BD_CODE,
-                        item.DO_CODE,
-                        item.RS_CODE,
-                        item.IPD_DISC,
-                        item.IPC_STATUS,
-                        item.DMC_SLNO,
-                        item.DMD_DATE,
-                        item.PTC_MOBILE,
-                        item.IPC_MHCODE,
-                        item.DOC_NAME,
-                        item.IPC_CURSTATUS
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error);
-                        } else {
-                            resolve(results);
-                        }
-                    }
-                );
-            });
-        });
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    updatePatientDetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                    UPDATE fb_ipadmiss
-                    SET
-                        fb_ip_no = ?, 
-                        fb_ipd_date = ?, 
-                        fb_pt_no = ?, 
-                        fb_ptc_name = ?, 
-                        fb_ptc_sex = ?, 
-                        fb_ptd_dob = ?, 
-                        fb_ptn_dayage = ?, 
-                        fb_ptn_monthage = ?, 
-                        fb_ptn_yearage = ?, 
-                        fb_ptc_loadd1 = ?, 
-                        fb_ptc_loadd2 = ?, 
-                        fb_ptc_loadd3 = ?, 
-                        fb_ptc_loadd4 = ?, 
-                        fb_ptc_lopin = ?, 
-                        fb_rc_code = ?, 
-                        fb_bd_code = ?, 
-                        fb_do_code = ?, 
-                        fb_rs_code = ?, 
-                        fb_ipd_disc = ?, 
-                        fb_ipc_status = ?, 
-                        fb_dmc_slno = ?, 
-                        fb_dmd_date = ?, 
-                        fb_ptc_mobile = ?, 
-                        fb_ipc_mhcode = ?, 
-                        fb_doc_name = ?,
-                        fb_ipc_curstatus = ?
-                    WHERE fb_ipad_slno = ?
-                    `,
-                    [
-                        item.IP_NO,
-                        item.IPD_DATE,
-                        item.PT_NO,
-                        item.PTC_PTNAME,
-                        item.PTC_SEX,
-                        item.PTD_DOB,
-                        item.PTN_DAYAGE,
-                        item.PTN_MONTHAGE,
-                        item.PTN_YEARAGE,
-                        item.PTC_LOADD1,
-                        item.PTC_LOADD2,
-                        item.PTC_LOADD3,
-                        item.PTC_LOADD4,
-                        item.PTC_LOPIN,
-                        item.RC_CODE,
-                        item.BD_CODE,
-                        item.DO_CODE,
-                        item.RS_CODE,
-                        item.IPD_DISC,
-                        item.IPC_STATUS,
-                        item.DMC_SLNO,
-                        item.DMD_DATE,
-                        item.PTC_MOBILE,
-                        item.IPC_MHCODE,
-                        item.DOC_NAME,
-                        item.IPC_CURSTATUS,
-                        item.fb_ipad_slno
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error);
-                        } else {
-                            resolve(results);
-                        }
-                    }
-                );
-            });
-        });
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
 
-    },
-    CheckRoomsinMasterPresent: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     SELECT
-                        fb_rm_slno,
-                        fb_rm_code,
-                        fb_rmc_desc,
-                        fb_rmc_alias,
-                        fb_rac_status,
-                        fb_rmc_mhcode,
-                        fb_ns_code      
-                    FROM 
-                        fb_room_master 
-                    where 
-                        fb_rm_code = ?  
-                    `,
-                    [
-                        item.RM_CODE,
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    insertRoomMasterdetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                    INSERT INTO fb_room_master(
-                        fb_rm_code,
-                        fb_rmc_desc,
-                        fb_rmc_alias,
-                        fb_rac_status,
-                        fb_rmc_mhcode,
-                        fb_ns_code
-                    )
-                    VALUES(?,?,?,?,?,?)       
-                    `,
-                    [
-                        item.RM_CODE,
-                        item.RMC_DESC,
-                        item.RMC_ALIAS,
-                        item.RMC_STATUS,
-                        item.RMC_MHCODE,
-                        item.NS_CODE
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    updateRoomMasterDetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     UPDATE fb_room_master 
-                     SET
-                        fb_rm_code = ?,
-                        fb_rmc_desc = ?,
-                        fb_rmc_alias = ?,
-                        fb_rac_status = ?,
-                        fb_rmc_mhcode = ?,
-                        fb_ns_code= ?
-                    where 
-                        fb_rm_slno = ?  
-                    `,
-                    [
-                        item.RM_CODE,
-                        item.RMC_DESC,
-                        item.RMC_ALIAS,
-                        item.RMC_STATUS,
-                        item.RMC_MHCODE,
-                        item.NS_CODE,
-                        item.fb_rm_slno
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    CheckadmnReasonsExits: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     SELECT
-                        fb_adrn_slno,
-                        fb_rs_code, 
-                        fb_rsc_desc,
-                        fb_rsc_alias,
-                        fb_rsc_status      
-                    FROM 
-                        fb_admn_reason 
-                    where 
-                        fb_rs_code = ?  
-                    `,
-                    [
-                        item.RS_CODE,
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    insertadminReasons: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                    INSERT INTO fb_admn_reason(
-                        fb_rs_code, 
-                        fb_rsc_desc,
-                        fb_rsc_alias,
-                        fb_rsc_status  
-                    )
-                    VALUES(?,?,?,?)       
-                    `,
-                    [
-                        item.RS_CODE,
-                        item.RSC_DESC,
-                        item.RSC_ALIAS,
-                        item.RSC_STATUS
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    updateadmnReasons: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     UPDATE fb_admn_reason 
-                     SET
-                        fb_rs_code = ?,
-                        fb_rsc_desc = ?,
-                        fb_rsc_alias = ?,
-                        fb_rsc_status = ?
-                    where 
-                        fb_adrn_slno = ?  
-                    `,
-                    [
-                        item.RS_CODE,
-                        item.RSC_DESC,
-                        item.RSC_ALIAS,
-                        item.RSC_STATUS,
-                        item.fb_adrn_slno
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    CheckRoomCategoryExists: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     SELECT
-                        fb_rc_slno,
-                        fb_rc_code,
-                        fb_rcc_desc,
-                        fb_rcc_alias,
-                        fb_rcc_status,
-                        fb_rcc_mhocde      
-                    FROM 
-                        fb_room_category 
-                    where 
-                        fb_rc_code = ?  
-                    `,
-                    [
-                        item.RC_CODE,
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    insertRoomCategoryDetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                    INSERT INTO fb_room_category(
-                        fb_rc_code,
-                        fb_rcc_desc,
-                        fb_rcc_alias,
-                        fb_rcc_status,
-                        fb_rcc_mhocde 
-                    )
-                    VALUES(?,?,?,?,?)       
-                    `,
-                    [
-                        item.RC_CODE,
-                        item.RCC_DESC,
-                        item.RCC_ALIAS,
-                        item.RCC_STATUS,
-                        item.RCC_MHCODE
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    UpdateRoomCategoryDetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     UPDATE fb_room_category 
-                     SET
-                        fb_rc_code = ?,
-                        fb_rcc_desc = ?,
-                        fb_rcc_alias = ?,
-                        fb_rcc_status = ?,
-                        fb_rcc_mhocde = ?
-                    where 
-                        fb_rc_slno = ?  
-                    `,
-                    [
-                        item.RC_CODE,
-                        item.RCC_DESC,
-                        item.RCC_ALIAS,
-                        item.RCC_STATUS,
-                        item.RCC_MHCODE,
-                        item.fb_rc_slno
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
+    //Not using  saved for later
+    // insertbddetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 INSERT INTO fb_bed(
+    //                     fb_bd_code,
+    //                     fb_bdc_no,
+    //                     fb_ns_code,
+    //                     fb_rt_code,
+    //                     fb_bdc_occup,
+    //                     fb_bdn_cccno,
+    //                     fb_bdc_status,
+    //                     fb_hkd_cleaningreq,
+    //                     fb_rm_code,
+    //                     fb_bdc_mhcode,
+    //                     fb_bdc_vipbed
+    //                 )
+    //                 VALUES(?,?,?,?,?,?,?,?,?,?,?)       
+    //                 `,
+    //                 [
+    //                     item.BD_CODE,
+    //                     item.BDC_NO,
+    //                     item.NS_CODE,
+    //                     item.RT_CODE,
+    //                     item.BDC_OCCUP,
+    //                     item.OCCU,
+    //                     item.BDC_STATUS,
+    //                     item.HKD_CLEANINGREQ,
+    //                     item.RM_CODE,
+    //                     item.BDC_MHCODE,
+    //                     item.BDC_VIPBED
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    //Not using  saved for later
+    // CheckBedAlreadyPresent: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  SELECT
+    //                     fb_bed_slno, 
+    //                     fb_bd_code,
+    //                     fb_bdc_no,
+    //                     fb_ns_code,
+    //                     fb_rt_code,
+    //                     fb_bdc_occup,
+    //                     fb_bdn_cccno,
+    //                     fb_bdc_status,
+    //                     fb_hkd_cleaningreq,
+    //                     fb_rm_code,
+    //                     fb_bdc_mhcode,
+    //                     fb_bdc_vipbed
+    //                 FROM 
+    //                     fb_bed 
+    //                 where 
+    //                 fb_bd_code = ?  and fb_bdc_no = ?  
+    //                 `,
+    //                 [
+    //                     item.BD_CODE,
+    //                     item.BDC_NO,
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    //Not using  saved for later
+    // updatebeddetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  UPDATE fb_bed 
+    //                  SET
+    //                     fb_bd_code = ?,
+    //                     fb_bdc_no = ?,
+    //                     fb_ns_code = ?,
+    //                     fb_rt_code = ?,
+    //                     fb_bdc_occup = ?,
+    //                     fb_bdn_cccno = ?,
+    //                     fb_bdc_status = ?,
+    //                     fb_hkd_cleaningreq = ?,
+    //                     fb_rm_code = ?,
+    //                     fb_bdc_mhcode = ?,
+    //                     fb_bdc_vipbed = ?
+    //                 where 
+    //                     fb_bed_slno = ?  
+    //                 `,
+    //                 [
+    //                     item.BD_CODE,
+    //                     item.BDC_NO,
+    //                     item.NS_CODE,
+    //                     item.RT_CODE,
+    //                     item.BDC_OCCUP,
+    //                     item.OCCU,
+    //                     item.BDC_STATUS,
+    //                     item.HKD_CLEANINGREQ,
+    //                     item.RM_CODE,
+    //                     item.BDC_MHCODE,
+    //                     item.BDC_VIPBED,
+    //                     item.fb_bed_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    //Not using  saved for later
+    // CheckRoomTypeAlreadyPreseint: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  SELECT
+    //                     fb_rmtp_slno, 
+    //                     fb_rt_code,
+    //                     fb_rtc_desc,
+    //                     fb_rtc_alias,
+    //                     fb_rc_code,
+    //                     fb_rtc_status, 
+    //                     fb_icu,
+    //                     fb_rtc_mhcode     
+    //                 FROM 
+    //                     fb_room_type 
+    //                 where 
+    //                     fb_rt_code = ?  
+    //                 `,
+    //                 [
+    //                     item.RT_CODE,
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    //Not using  saved for later
+    // insertrtdetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 INSERT INTO fb_room_type(
+    //                     fb_rt_code,
+    //                     fb_rtc_desc,
+    //                     fb_rtc_alias,
+    //                     fb_rc_code,
+    //                     fb_rtc_status, 
+    //                     fb_icu,
+    //                     fb_rtc_mhcode
+    //                 )
+    //                 VALUES(?,?,?,?,?,?,?)       
+    //                 `,
+    //                 [
+    //                     item.RT_CODE,
+    //                     item.RTC_DESC,
+    //                     item.RCC_DESC,
+    //                     item.RC_CODE,
+    //                     item.RTC_STATUS,
+    //                     item.ICU,
+    //                     item.RTC_MHCODE
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    //Not using  saved for later
+    // updatertdetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  UPDATE fb_room_type 
+    //                  SET
+    //                     fb_rt_code = ?,
+    //                     fb_rtc_desc = ?,
+    //                     fb_rtc_alias = ?,
+    //                     fb_rc_code = ?,
+    //                     fb_rtc_status = ?, 
+    //                     fb_icu = ?,
+    //                     fb_rtc_mhcode = ?
+    //                 where 
+    //                     fb_rmtp_slno = ?  
+    //                 `,
+    //                 [
+    //                     item.RT_CODE,
+    //                     item.RTC_DESC,
+    //                     item.RCC_DESC,
+    //                     item.RC_CODE,
+    //                     item.RTC_STATUS,
+    //                     item.ICU,
+    //                     item.RTC_MHCODE,
+    //                     item.fb_rmtp_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    // Not using  saved for later
+    // CheckpatientAlreadyPresent: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  SELECT
+    //                    fb_ipad_slno, fb_ip_no, fb_ipd_date, fb_pt_no, fb_ptc_name, fb_ptc_sex, fb_ptd_dob, fb_ptn_dayage, fb_ptn_monthage, fb_ptn_yearage, fb_ptc_loadd1, fb_ptc_loadd2, fb_ptc_loadd3, fb_ptc_loadd4, fb_ptc_lopin, fb_rc_code, fb_bd_code, fb_do_code, fb_rs_code, fb_ipd_disc, fb_ipc_status, fb_dmc_slno, fb_dmd_date, fb_ptc_mobile, fb_ipc_mhcode, fb_doc_name
+    //                 FROM 
+    //                     fb_ipadmiss 
+    //                 where 
+    //                 fb_ip_no = ?  and fb_pt_no = ?  
+    //                 `,
+    //                 [
+    //                     item.IP_NO,
+    //                     item.PT_NO,
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    // Not using  saved for later2917
+    // insertPatientDetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 INSERT INTO fb_ipadmiss (
+    //                     fb_ip_no,
+    //                     fb_ipd_date,
+    //                     fb_pt_no,
+    //                     fb_ptc_name,
+    //                     fb_ptc_sex,
+    //                     fb_ptd_dob,   
+    //                     fb_ptn_dayage,
+    //                     fb_ptn_monthage,
+    //                     fb_ptn_yearage,
+    //                     fb_ptc_loadd1,
+    //                     fb_ptc_loadd2, 
+    //                     fb_ptc_loadd3,
+    //                     fb_ptc_loadd4,
+    //                     fb_ptc_lopin,
+    //                     fb_rc_code,
+    //                     fb_bd_code,
+    //                     fb_do_code, 
+    //                     fb_rs_code, 
+    //                     fb_ipd_disc,
+    //                     fb_ipc_status,
+    //                     fb_dmc_slno,
+    //                     fb_dmd_date,
+    //                     fb_ptc_mobile, 
+    //                     fb_ipc_mhcode,
+    //                     fb_doc_name,
+    //                     fb_ipc_curstatus
+    //                 ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    //                 `,
+    //                 [
+    //                     item.IP_NO,
+    //                     item.IPD_DATE,
+    //                     item.PT_NO,
+    //                     item.PTC_PTNAME,
+    //                     item.PTC_SEX,
+    //                     item.PTD_DOB,
+    //                     item.PTN_DAYAGE,
+    //                     item.PTN_MONTHAGE,
+    //                     item.PTN_YEARAGE,
+    //                     item.PTC_LOADD1,
+    //                     item.PTC_LOADD2,
+    //                     item.PTC_LOADD3,
+    //                     item.PTC_LOADD4,
+    //                     item.PTC_LOPIN,
+    //                     item.RC_CODE,
+    //                     item.BD_CODE,
+    //                     item.DO_CODE,
+    //                     item.RS_CODE,
+    //                     item.IPD_DISC,
+    //                     item.IPC_STATUS,
+    //                     item.DMC_SLNO,
+    //                     item.DMD_DATE,
+    //                     item.PTC_MOBILE,
+    //                     item.IPC_MHCODE,
+    //                     item.DOC_NAME,
+    //                     item.IPC_CURSTATUS
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error);
+    //                     } else {
+    //                         resolve(results);
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+    // Not using  saved for later
+    // updatePatientDetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 UPDATE fb_ipadmiss
+    //                 SET
+    //                     fb_ip_no = ?, 
+    //                     fb_ipd_date = ?, 
+    //                     fb_pt_no = ?, 
+    //                     fb_ptc_name = ?, 
+    //                     fb_ptc_sex = ?, 
+    //                     fb_ptd_dob = ?, 
+    //                     fb_ptn_dayage = ?, 
+    //                     fb_ptn_monthage = ?, 
+    //                     fb_ptn_yearage = ?, 
+    //                     fb_ptc_loadd1 = ?, 
+    //                     fb_ptc_loadd2 = ?, 
+    //                     fb_ptc_loadd3 = ?, 
+    //                     fb_ptc_loadd4 = ?, 
+    //                     fb_ptc_lopin = ?, 
+    //                     fb_rc_code = ?, 
+    //                     fb_bd_code = ?, 
+    //                     fb_do_code = ?, 
+    //                     fb_rs_code = ?, 
+    //                     fb_ipd_disc = ?, 
+    //                     fb_ipc_status = ?, 
+    //                     fb_dmc_slno = ?, 
+    //                     fb_dmd_date = ?, 
+    //                     fb_ptc_mobile = ?, 
+    //                     fb_ipc_mhcode = ?, 
+    //                     fb_doc_name = ?,
+    //                     fb_ipc_curstatus = ?
+    //                 WHERE fb_ipad_slno = ?
+    //                 `,
+    //                 [
+    //                     item.IP_NO,
+    //                     item.IPD_DATE,
+    //                     item.PT_NO,
+    //                     item.PTC_PTNAME,
+    //                     item.PTC_SEX,
+    //                     item.PTD_DOB,
+    //                     item.PTN_DAYAGE,
+    //                     item.PTN_MONTHAGE,
+    //                     item.PTN_YEARAGE,
+    //                     item.PTC_LOADD1,
+    //                     item.PTC_LOADD2,
+    //                     item.PTC_LOADD3,
+    //                     item.PTC_LOADD4,
+    //                     item.PTC_LOPIN,
+    //                     item.RC_CODE,
+    //                     item.BD_CODE,
+    //                     item.DO_CODE,
+    //                     item.RS_CODE,
+    //                     item.IPD_DISC,
+    //                     item.IPC_STATUS,
+    //                     item.DMC_SLNO,
+    //                     item.DMD_DATE,
+    //                     item.PTC_MOBILE,
+    //                     item.IPC_MHCODE,
+    //                     item.DOC_NAME,
+    //                     item.IPC_CURSTATUS,
+    //                     item.fb_ipad_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error);
+    //                     } else {
+    //                         resolve(results);
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+
+    // },
+
+    //Not using  saved for later
+    // CheckRoomsinMasterPresent: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  SELECT
+    //                     fb_rm_slno,
+    //                     fb_rm_code,
+    //                     fb_rmc_desc,
+    //                     fb_rmc_alias,
+    //                     fb_rac_status,
+    //                     fb_rmc_mhcode,
+    //                     fb_ns_code      
+    //                 FROM 
+    //                     fb_room_master 
+    //                 where 
+    //                     fb_rm_code = ?  
+    //                 `,
+    //                 [
+    //                     item.RM_CODE,
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    // Not using  saved for later
+    // insertRoomMasterdetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 INSERT INTO fb_room_master(
+    //                     fb_rm_code,
+    //                     fb_rmc_desc,
+    //                     fb_rmc_alias,
+    //                     fb_rac_status,
+    //                     fb_rmc_mhcode,
+    //                     fb_ns_code
+    //                 )
+    //                 VALUES(?,?,?,?,?,?)       
+    //                 `,
+    //                 [
+    //                     item.RM_CODE,
+    //                     item.RMC_DESC,
+    //                     item.RMC_ALIAS,
+    //                     item.RMC_STATUS,
+    //                     item.RMC_MHCODE,
+    //                     item.NS_CODE
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    // Not using  saved for later
+    // updateRoomMasterDetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  UPDATE fb_room_master 
+    //                  SET
+    //                     fb_rm_code = ?,
+    //                     fb_rmc_desc = ?,
+    //                     fb_rmc_alias = ?,
+    //                     fb_rac_status = ?,
+    //                     fb_rmc_mhcode = ?,
+    //                     fb_ns_code= ?
+    //                 where 
+    //                     fb_rm_slno = ?  
+    //                 `,
+    //                 [
+    //                     item.RM_CODE,
+    //                     item.RMC_DESC,
+    //                     item.RMC_ALIAS,
+    //                     item.RMC_STATUS,
+    //                     item.RMC_MHCODE,
+    //                     item.NS_CODE,
+    //                     item.fb_rm_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    // Not using  saved for later
+    // CheckadmnReasonsExits: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  SELECT
+    //                     fb_adrn_slno,
+    //                     fb_rs_code, 
+    //                     fb_rsc_desc,
+    //                     fb_rsc_alias,
+    //                     fb_rsc_status      
+    //                 FROM 
+    //                     fb_admn_reason 
+    //                 where 
+    //                     fb_rs_code = ?  
+    //                 `,
+    //                 [
+    //                     item.RS_CODE,
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    // Not using  saved for later
+    // insertadminReasons: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 INSERT INTO fb_admn_reason(
+    //                     fb_rs_code, 
+    //                     fb_rsc_desc,
+    //                     fb_rsc_alias,
+    //                     fb_rsc_status  
+    //                 )
+    //                 VALUES(?,?,?,?)       
+    //                 `,
+    //                 [
+    //                     item.RS_CODE,
+    //                     item.RSC_DESC,
+    //                     item.RSC_ALIAS,
+    //                     item.RSC_STATUS
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+
+    // Not using  saved for later
+    // updateadmnReasons: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  UPDATE fb_admn_reason 
+    //                  SET
+    //                     fb_rs_code = ?,
+    //                     fb_rsc_desc = ?,
+    //                     fb_rsc_alias = ?,
+    //                     fb_rsc_status = ?
+    //                 where 
+    //                     fb_adrn_slno = ?  
+    //                 `,
+    //                 [
+    //                     item.RS_CODE,
+    //                     item.RSC_DESC,
+    //                     item.RSC_ALIAS,
+    //                     item.RSC_STATUS,
+    //                     item.fb_adrn_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+
+    // Not using  saved for later
+    // CheckRoomCategoryExists: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  SELECT
+    //                     fb_rc_slno,
+    //                     fb_rc_code,
+    //                     fb_rcc_desc,
+    //                     fb_rcc_alias,
+    //                     fb_rcc_status,
+    //                     fb_rcc_mhocde      
+    //                 FROM 
+    //                     fb_room_category 
+    //                 where 
+    //                     fb_rc_code = ?  
+    //                 `,
+    //                 [
+    //                     item.RC_CODE,
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    // Not using  saved for later
+    // insertRoomCategoryDetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 INSERT INTO fb_room_category(
+    //                     fb_rc_code,
+    //                     fb_rcc_desc,
+    //                     fb_rcc_alias,
+    //                     fb_rcc_status,
+    //                     fb_rcc_mhocde 
+    //                 )
+    //                 VALUES(?,?,?,?,?)       
+    //                 `,
+    //                 [
+    //                     item.RC_CODE,
+    //                     item.RCC_DESC,
+    //                     item.RCC_ALIAS,
+    //                     item.RCC_STATUS,
+    //                     item.RCC_MHCODE
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+
+    // Not using  saved for later
+    // UpdateRoomCategoryDetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  UPDATE fb_room_category 
+    //                  SET
+    //                     fb_rc_code = ?,
+    //                     fb_rcc_desc = ?,
+    //                     fb_rcc_alias = ?,
+    //                     fb_rcc_status = ?,
+    //                     fb_rcc_mhocde = ?
+    //                 where 
+    //                     fb_rc_slno = ?  
+    //                 `,
+    //                 [
+    //                     item.RC_CODE,
+    //                     item.RCC_DESC,
+    //                     item.RCC_ALIAS,
+    //                     item.RCC_STATUS,
+    //                     item.RCC_MHCODE,
+    //                     item.fb_rc_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+
+
     getNursingBed: (data, callBack) => {
         pool.query(
             `
@@ -4392,7 +4431,6 @@ select
             });
     },
     UpdateProCheckListDetail: (data, callBack) => {
-        // console.log(data, "UpdateProCheckListDetail");
         const { detail, fb_check_bed_slno, create_user } = data;
         const promises = detail?.map((item) => {
             return new Promise((resolve, reject) => {

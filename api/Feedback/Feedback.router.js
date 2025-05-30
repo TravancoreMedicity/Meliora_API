@@ -47,8 +47,8 @@ const {
     getallnursestation,
     updatenursestation,
     getpatientfeedback,
-    insertbddetail,
-    insertptdetailmlora,
+    // insertbddetail,
+    // insertptdetailmlora,
     getNursingBed,
     getCurrentPatient,
     getallblockedbed,
@@ -252,8 +252,8 @@ router.get('/getallhkempdtl', getallhkempdtl)
 router.post('/getdischargepatient',getdischargepatient)
 
 //edlider meliora table
-router.post('/insertbddetail', insertbddetail)
-router.post('/insertptdetailmlora', insertptdetailmlora)
+// router.post('/insertbddetail', insertbddetail)
+// router.post('/insertptdetailmlora', insertptdetailmlora)
 
 
 module.exports = router;

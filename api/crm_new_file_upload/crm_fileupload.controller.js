@@ -8,7 +8,7 @@ const { CrfImageStatusUpdate, CrfDataColectionImageStatusUpdate, ImageInsertHODS
 }
     = require('../crm_new_file_upload/crm_fileupload.service');
 const logger = require('../../logger/logger');
-
+const sanitize = require('sanitize-filename');
 
 const crfRegisterstorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -1511,8 +1511,13 @@ module.exports = {
 
     },
     crfDMimageGet: (req, res) => {
-        const id = req.params.id
-        const folderPath = `D:/DocMeliora/Meliora/CRF/DeliveryMarking/${id}`;
+        // const id = req.params.id
+        const baseDirectory = 'D:/DocMeliora/Meliora/CRF/DeliveryMarking/';
+        const id = sanitize(req.params.id);
+        console.log(id);
+
+        const folderPath = path.resolve(baseDirectory, id);
+        // const folderPath = `D:/DocMeliora/Meliora/CRF/DeliveryMarking/${id}`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
                 logger.logwindow(err)

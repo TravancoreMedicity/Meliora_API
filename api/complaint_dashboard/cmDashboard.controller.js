@@ -2,7 +2,8 @@ const logger = require('../../logger/logger');
 const { getTotalcomplaints, getComplaintcount, getAssistRectyEmpWise, getPendingOnholdEmpWise,getOnholdcomplaints, getTotalcomplaintsAllDpt, getOnholdcomplaintsAllDpt,
     getAllCompDeptwiseCount,getempAssignTicketCount,getempTodayRectifyTicketCount, getempHoldTicketCountt,getempTodayVerifiedTicketCount, getsuperviPendingVerifiTicketCount,
     getDeptAssignTicketCount, getDeptHoldTicketCount,getDeptTodayRectifyTicketCount,getDeptTodayVerifyTicketCount,getempAssistReceiveTicketCount,
-getDeptAssistReceiveTicketCount,getDeptAllAssistRequestTicketCount} = require('../complaint_dashboard/cmDashboard.service');
+getDeptAssistReceiveTicketCount,getDeptAllAssistRequestTicketCount,getVerifyTicketCountEmployeeDeptWise,
+getVerifyTicketCountDeptWise} = require('../complaint_dashboard/cmDashboard.service');
 module.exports = {
     getTotalcomplaints: (req, res) => {
         const id = req.params.id
@@ -456,6 +457,52 @@ module.exports = {
          getDeptAllAssistRequestTicketCount: (req, res) => {
         const id = req.params.id
         getDeptAllAssistRequestTicketCount(id, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+    },
+        getVerifyTicketCountEmployeeDeptWise: (req, res) => {
+        const id = req.params.id
+        getVerifyTicketCountEmployeeDeptWise(id, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    data: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+    },
+        getVerifyTicketCountDeptWise: (req, res) => {
+        const id = req.params.id
+        getVerifyTicketCountDeptWise(id, (err, results) => {
             if (err) {
                 return res.status(400).json({
                     success: 0,

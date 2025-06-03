@@ -486,20 +486,19 @@ module.exports = {
                     message: err
                 });
             }
-
             if (!results) {
                 return res.status(200).json({
                     success: 0,
                     data: "No Record Found"
                 });
             }
-
             return res.status(200).json({
                 success: 1,
                 data: results
             });
         })
     },
+    
         getVerifyTicketCountDeptWise: (req, res) => {
         const id = req.params.id
         getVerifyTicketCountDeptWise(id, (err, results) => {
@@ -509,14 +508,12 @@ module.exports = {
                     message: err
                 });
             }
-
             if (!results) {
                 return res.status(200).json({
                     success: 0,
                     data: "No Record Found"
                 });
             }
-
             return res.status(200).json({
                 success: 1,
                 data: results

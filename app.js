@@ -28,13 +28,14 @@ app.use(
       "http://travancoremedicity.in:9741",
       "http://192.168.10.88:3000",
       "http://tm.medicity.co.in:8888",
-      "http://192.168.10.88:8888",    
+      "http://192.168.10.88:8888",
       "http://195.168.34.25:3001",
-      "http://195.168.34.25:3000",
+      "http://195.168.34.25:3000"
     ],
     credentials: true,
   })
 );
+
 
 // ----- logger display For Info ----
 app.get("/info", (req, res) => {
@@ -42,8 +43,8 @@ app.get("/info", (req, res) => {
     if (error) throw err;
     res.write(
       '<div id="content"><pre>' +
-        txtString.toString().replace(/\n/g, "<br />") +
-        "</pre>"
+      txtString.toString().replace(/\n/g, "<br />") +
+      "</pre>"
     );
     res.end();
   });
@@ -54,8 +55,8 @@ app.get("/error", (req, res) => {
     if (error) throw err;
     res.write(
       '<div id="content"><pre>' +
-        txtString.toString().replace(/\n/g, "<br />") +
-        "</pre>"
+      txtString.toString().replace(/\n/g, "<br />") +
+      "</pre>"
     );
     res.end();
   });
@@ -67,8 +68,8 @@ app.get("/warn", (req, res) => {
     if (error) throw err;
     res.write(
       '<div id="content"><pre>' +
-        txtString.toString().replace(/\n/g, "<br />") +
-        "</pre>"
+      txtString.toString().replace(/\n/g, "<br />") +
+      "</pre>"
     );
     res.end();
   });
@@ -83,7 +84,6 @@ const socketIOMiddlewre = (req, res, next) => {
   next();
 };
 
-//Inside route Config
 
 const userRouter = require("./api/user/user.router");
 const employeeRouter = require("./api/employee/employee.router");

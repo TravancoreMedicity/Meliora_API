@@ -26,7 +26,6 @@ router.post("/AllDeptemployeeList", checkToken, getAllDeptemployeeList)
 router.post("/getPevRegTodayAssing", checkToken, getPevRegTodayAssing)
 router.post("/getRegTodayAssignToday", checkToken, getRegTodayAssignToday)
 router.post("/getPevAssingTodayRect", checkToken, getPevAssingTodayRect)
-
 router.get('/getallDeptPending', checkToken, getallDeptPending)
 router.get('/getAllDepttodaysTickets', checkToken, getAllDepttodaysTickets)
 router.get('/getAllDeptopenTicketsCount', checkToken, getAllDeptopenTicketsCount)
@@ -40,8 +39,6 @@ router.get('/getallDeptPevAssingTodayRect', checkToken, getallDeptPevAssingToday
 router.post("/getAllDeptPieTicketchart", checkToken, getAllDeptPieTicketchart)
 router.post("/AllDeptopenWithIn", checkToken, AllDeptopenWithIn)
 router.post("/AllDeptcloseWithIn", checkToken, AllDeptcloseWithIn)
-
-
 router.post("/getEmployeeuserrightsMenu", checkToken, getEmployeeuserrightsMenu)
 
 module.exports = router

@@ -1,3 +1,4 @@
+const { replyQuery } = require("../complaint_assign/complaintAssign.service");
 const {
     insertfeedbackcategory,
     getallcategories,
@@ -70,24 +71,24 @@ const {
     getallnursestation,
     updatenursestation,
     getpatientfeedback,
-    insertbddetail,
-    CheckBedAlreadyPresent,
-    updatebeddetail,
-    CheckRoomTypeAlreadyPreseint,
-    insertrtdetail,
-    updatertdetail,
-    CheckpatientAlreadyPresent,
-    insertPatientDetail,
-    updatePatientDetail,
-    CheckRoomsinMasterPresent,
-    insertRoomMasterdetail,
-    updateRoomMasterDetail,
-    updateadmnReasons,
-    insertadminReasons,
-    CheckadmnReasonsExits,
-    CheckRoomCategoryExists,
-    insertRoomCategoryDetail,
-    UpdateRoomCategoryDetail,
+    // CheckBedAlreadyPresent,
+    // insertbddetail,
+    // updatebeddetail,
+    // CheckRoomTypeAlreadyPreseint,
+    // insertrtdetail,
+    // updatertdetail,
+    // CheckpatientAlreadyPresent,
+    // insertPatientDetail,
+    // updatePatientDetail,
+    // CheckRoomsinMasterPresent,
+    // insertRoomMasterdetail,
+    // updateRoomMasterDetail,
+    // updateadmnReasons,
+    // insertadminReasons,
+    // CheckadmnReasonsExits,
+    // CheckRoomCategoryExists,
+    // insertRoomCategoryDetail,
+    // UpdateRoomCategoryDetail,
     getNursingBed,
     getCurrentPatient,
     getallblockedbed,
@@ -152,6 +153,12 @@ const {
     getallassignedbed,
     getalldischargeform,
     UpdateAssignedBed,
+    insertipfollowup,
+    getallipfollowup,
+    getallscheduledate,
+    updateipfollowup,
+    insertDefaultPtImpression,
+    getdischargepatient,
 } = require("./Feedback.service");
 
 module.exports = {
@@ -801,7 +808,7 @@ module.exports = {
     },
     insertFeedbackanswers: (req, res) => {
         const body = req.body;
-        const { fb_answers, fb_ip_num, fb_patient_num, fb_patient_name, fb_patient_mob, fdmast_slno, create_user } = body;
+        const { fb_answers, fb_ip_num, fb_patient_num, fb_patient_name, fb_patient_mob, fdmast_slno, fb_default_quest, create_user } = body;
 
         UpdateSerialAnswerMaster((error, results) => {
             if (error) {
@@ -818,6 +825,7 @@ module.exports = {
                     })
                 }
 
+                // getting transaction slno for the each patients
                 let serialCurrentValue = results[0]?.serial_current;
 
                 if (!serialCurrentValue) {
@@ -843,6 +851,12 @@ module.exports = {
                     fb_transact_slno: fb_transact_slno_value,
                     create_user: create_user
                 }
+                // object contain defult question answer
+                const impanswers = {
+                    answer: fb_default_quest,
+                    fb_transact_slno: fb_transact_slno_value,
+                }
+
                 insertAllFeedBackTransactionMast(insertData, (error, results) => {
                     if (error) {
                         return res.status(200).json({
@@ -859,6 +873,19 @@ module.exports = {
                             })
                         }
                     })
+
+                    // insert default question answer and details
+                    if (fdmast_slno === 8 && fdmast_slno != undefined) {
+                        insertDefaultPtImpression(impanswers, (error, results) => {
+                            if (error) {
+                                console.log(error);
+                                return res.status(200).json({
+                                    success: 1,
+                                    message: error
+                                })
+                            }
+                        })
+                    }
                     return res.status(200).json({
                         success: 2,
                         message: "Inserted Successfully",
@@ -1589,339 +1616,348 @@ module.exports = {
             })
         })
     },
-    insertbddetail: async (req, res) => {
-        const { bedinfo } = req.body;
-
-        try {
-            // Step 1: Check if beds already exist
-            const bedResults = await new Promise((resolve, reject) => {
-                CheckBedAlreadyPresent(bedinfo, (error, results) => {
-                    if (error) reject(error);
-                    resolve(results);
-                });
-            });
-
-            const existingBdcNos = bedResults.flat().map(item => ({
-                BDC_NO: item.fb_bdc_no,
-                fb_bed_slno: item.fb_bed_slno
-            }));
-
-            // Step 2: Filter beds to insert and beds to update
-            const bedsToInsert = bedinfo.filter(item =>
-                !existingBdcNos.some(existing => existing.BDC_NO === item.BDC_NO)
-            );
-
-            const bedsToUpdate = bedinfo.reduce((acc, item) => {
-                const matchingBed = existingBdcNos.find(existing => existing.BDC_NO === item.BDC_NO);
-                if (matchingBed) {
-                    return [...acc, { ...item, fb_bed_slno: matchingBed.fb_bed_slno }];
-                }
-                return acc;
-            }, []);
-
-            // Step 3: Insert beds if necessary
-            if (bedsToInsert.length > 0) {
-                await new Promise((resolve, reject) => {
-                    insertbddetail(bedsToInsert, (error, results) => {
-                        if (error) reject(error);
-                        resolve(results);
-                    });
-                });
-            }
-            // Step 4: Update beds if necessary
-            if (bedsToUpdate.length > 0) {
-                await new Promise((resolve, reject) => {
-                    updatebeddetail(bedsToUpdate, (error, results) => {
-                        if (error) reject(error);
-                        resolve(results);
-                    });
-                });
-            }
-
-            // Step 5: Check if room types already exist
-            const roomResults = await new Promise((resolve, reject) => {
-                CheckRoomTypeAlreadyPreseint(bedinfo, (error, results) => {
-                    if (error) reject(error);
-                    resolve(results);
-                });
-            });
-
-            const existingrtNos = roomResults.flat().map(item => ({
-                RT_CODE: item.fb_rt_code,
-                fb_rmtp_slno: item.fb_rmtp_slno
-            }));
-
-            // Step 6: Filter room types to insert and room types to update
-            const roomTypesToInsert = bedinfo.filter(item =>
-                !existingrtNos.some(existing => existing.RT_CODE === item.RT_CODE)).reduce((acc, item) => {
-                    // Add the item only if its RT_CODE is not already present in the accumulator
-                    if (!acc.some(existing => existing.RT_CODE === item.RT_CODE)) {
-                        return [...acc, item]; // Use spread operator to add the item
-                    }
-                    return acc;
-                }, []);
 
 
-            const roomTypesToUpdate = bedinfo.reduce((acc, item) => {
-                const matchingRoomType = existingrtNos.find(existing => existing.RT_CODE === item.RT_CODE);
-                if (matchingRoomType) {
-                    return [...acc, { ...item, fb_rmtp_slno: matchingRoomType.fb_rmtp_slno }];
-                }
-                return acc;
-            }, []);
 
-            // Step 7: Insert room types if necessary
-            if (roomTypesToInsert.length > 0) {
-                await new Promise((resolve, reject) => {
-                    insertrtdetail(roomTypesToInsert, (error, results) => {
-                        if (error) reject(error);
-                        resolve(results);
-                    });
-                });
-            }
+    // insertbddetail: async (req, res) => {
+    //     const { bedinfo } = req.body;
 
-            // Step 8: Update room types if necessary
-            if (roomTypesToUpdate.length > 0) {
-                await new Promise((resolve, reject) => {
-                    updatertdetail(roomTypesToUpdate, (error, results) => {
-                        if (error) reject(error);
-                        resolve(results);
-                    });
-                });
-            }
-            // Return success response if all operations are successful
-            return res.status(200).json({
-                success: 2,
-                message: 'Successfully inserted and updated Data!'
-            });
-        } catch (error) {
-            // Return error response if any operation fails
-            return res.status(200).json({
-                success: 0,
-                message: error.message || error
-            });
-        }
-    },
+    //     try {
+    //         // Step 1: Check if beds already exist
+    //         const bedResults = await new Promise((resolve, reject) => {
+    //             CheckBedAlreadyPresent(bedinfo, (error, results) => {
+    //                 if (error) reject(error);
+    //                 resolve(results);
+    //             });
+    //         });
 
-    // inserting patient detail RoomMaster detail Room Catergory Detail AdmsReasons and other 
-    insertptdetailmlora: async (req, res) => {
-        const { ptdetail } = req.body;
-        CheckpatientAlreadyPresent(ptdetail, (error, results) => {
-            if (error) {
-                return res.status(200).json({
-                    success: 1,
-                    message: error
-                })
-            }
+    //         const existingBdcNos = bedResults.flat().map(item => ({
+    //             BDC_NO: item.fb_bdc_no,
+    //             fb_bed_slno: item.fb_bed_slno
+    //         }));
 
-            const existingPatient = results.flat().map(pat => ({
-                IP_NO: pat.fb_ip_no,
-                PT_NO: pat.fb_pt_no,
-                fb_ipad_slno: pat.fb_ipad_slno
-            }));
+    //         // Step 2: Filter beds to insert and beds to update
+    //         const bedsToInsert = bedinfo.filter(item =>
+    //             !existingBdcNos.some(existing => existing.BDC_NO === item.BDC_NO)
+    //         );
 
-            const patientToInsert = ptdetail.filter(item =>
-                !existingPatient.some(exit => exit.IP_NO === item.IP_NO && exit.PT_NO === item.PT_NO)
-            );
+    //         const bedsToUpdate = bedinfo.reduce((acc, item) => {
+    //             const matchingBed = existingBdcNos.find(existing => existing.BDC_NO === item.BDC_NO);
+    //             if (matchingBed) {
+    //                 return [...acc, { ...item, fb_bed_slno: matchingBed.fb_bed_slno }];
+    //             }
+    //             return acc;
+    //         }, []);
 
-            const patientToUpdate =
-                ptdetail.reduce((acc, item) => {
-                    const matchingPatient =
-                        existingPatient.find(existing => existing.IP_NO === item.IP_NO && existing.PT_NO === item.PT_NO);
-                    if (matchingPatient) {
-                        return [...acc, { ...item, fb_ipad_slno: matchingPatient.fb_ipad_slno }];
-                    }
-                    return acc;
-                }, []);
+    //         // Step 3: Insert beds if necessary
+    //         if (bedsToInsert.length > 0) {
+    //             await new Promise((resolve, reject) => {
+    //                 insertbddetail(bedsToInsert, (error, results) => {
+    //                     if (error) reject(error);
+    //                     resolve(results);
+    //                 });
+    //             });
+    //         }
+    //         // Step 4: Update beds if necessary
+    //         if (bedsToUpdate.length > 0) {
+    //             await new Promise((resolve, reject) => {
+    //                 updatebeddetail(bedsToUpdate, (error, results) => {
+    //                     if (error) reject(error);
+    //                     resolve(results);
+    //                 });
+    //             });
+    //         }
 
-            if (patientToInsert.length > 0) {
-                insertPatientDetail(patientToInsert, (error, results) => {
-                    if (error) {
-                        return res.status(200).json({
-                            success: 1,
-                            message: error
-                        })
-                    }
-                })
-            }
+    //         // Step 5: Check if room types already exist
+    //         const roomResults = await new Promise((resolve, reject) => {
+    //             CheckRoomTypeAlreadyPreseint(bedinfo, (error, results) => {
+    //                 if (error) reject(error);
+    //                 resolve(results);
+    //             });
+    //         });
 
-            if (patientToUpdate.length > 0) {
-                updatePatientDetail(patientToUpdate, (error, results) => {
-                    if (error) {
-                        return res.status(200).json({
-                            success: 1,
-                            message: error
-                        })
-                    }
-                })
-            };
+    //         const existingrtNos = roomResults.flat().map(item => ({
+    //             RT_CODE: item.fb_rt_code,
+    //             fb_rmtp_slno: item.fb_rmtp_slno
+    //         }));
 
-            //room master details
-            CheckRoomsinMasterPresent(ptdetail, (error, results) => {
-                if (error) {
-                    return res.status(200).json({
-                        success: 1,
-                        message: error
-                    })
-                }
-                const existingRooms = results.flat().map(item => ({
-                    RM_CODE: item.fb_rm_code,
-                    fb_rm_slno: item.fb_rm_slno
-                }));
-
-                const roommasterToInsert = ptdetail.filter(item =>
-                    !existingRooms.some(existing => existing.RM_CODE === item.RM_CODE)).reduce((acc, item) => {
-                        // Add the item only if its RT_CODE is not already present in the accumulator
-                        if (!acc.some(existing => existing.RM_CODE === item.RM_CODE)) {
-                            return [...acc, item]; // Use spread operator to add the item
-                        }
-                        return acc;
-                    }, []);
-
-                const roommasterToUpdate = ptdetail.reduce((acc, item) => {
-                    const matchingRoomType = existingRooms.find(existing => existing.RM_CODE === item.RM_CODE);
-                    if (matchingRoomType) {
-                        return [...acc, { ...item, fb_rm_slno: matchingRoomType.fb_rm_slno }];
-                    }
-                    return acc;
-                }, []);
-
-                if (roommasterToInsert.length > 0) {
-                    insertRoomMasterdetail(roommasterToInsert, (error, results) => {
-                        if (error) {
-                            return res.status(200).json({
-                                success: 1,
-                                message: error
-                            })
-                        }
-                    })
-                }
-                if (roommasterToUpdate.length > 0) {
-                    updateRoomMasterDetail(roommasterToUpdate, (error, results) => {
-                        if (error) {
-                            return res.status(200).json({
-                                success: 1,
-                                message: error
-                            })
-                        }
-                    })
-                };
-            });
-
-            //admn reason master insertion and upadation
-            CheckadmnReasonsExits(ptdetail, (error, results) => {
-                if (error) {
-                    return res.status(200).json({
-                        success: 1,
-                        message: error
-                    })
-                }
-                const existingAdmnReason = results.flat().map(item => ({
-                    RS_CODE: item.fb_rs_code,
-                    fb_adrn_slno: item.fb_adrn_slno
-                }));
-
-                const admnReasonToInsert = ptdetail.filter(item =>
-                    !existingAdmnReason.some(existing => existing.RS_CODE === item.RS_CODE)).reduce((acc, item) => {
-                        // Add the item only if its RT_CODE is not already present in the accumulator
-                        if (!acc.some(existing => existing.RS_CODE === item.RS_CODE)) {
-                            return [...acc, item]; // Use spread operator to add the item
-                        }
-                        return acc;
-                    }, []);
-
-                const admnReasonToUpdate = ptdetail.reduce((acc, item) => {
-                    const matchingadmnreason = existingAdmnReason.find(existing => existing.RS_CODE === item.RS_CODE);
-                    if (matchingadmnreason) {
-                        return [...acc, { ...item, fb_adrn_slno: matchingadmnreason.fb_adrn_slno }];
-                    }
-                    return acc;
-                }, []);
+    //         // Step 6: Filter room types to insert and room types to update
+    //         const roomTypesToInsert = bedinfo.filter(item =>
+    //             !existingrtNos.some(existing => existing.RT_CODE === item.RT_CODE)).reduce((acc, item) => {
+    //                 // Add the item only if its RT_CODE is not already present in the accumulator
+    //                 if (!acc.some(existing => existing.RT_CODE === item.RT_CODE)) {
+    //                     return [...acc, item]; // Use spread operator to add the item
+    //                 }
+    //                 return acc;
+    //             }, []);
 
 
-                if (admnReasonToInsert.length > 0) {
-                    insertadminReasons(admnReasonToInsert, (error, results) => {
-                        if (error) {
-                            return res.status(200).json({
-                                success: 1,
-                                message: error
-                            })
-                        }
-                    })
-                }
+    //         const roomTypesToUpdate = bedinfo.reduce((acc, item) => {
+    //             const matchingRoomType = existingrtNos.find(existing => existing.RT_CODE === item.RT_CODE);
+    //             if (matchingRoomType) {
+    //                 return [...acc, { ...item, fb_rmtp_slno: matchingRoomType.fb_rmtp_slno }];
+    //             }
+    //             return acc;
+    //         }, []);
 
-                if (admnReasonToUpdate.length > 0) {
-                    updateadmnReasons(admnReasonToUpdate, (error, results) => {
-                        if (error) {
-                            return res.status(200).json({
-                                success: 1,
-                                message: error
-                            })
-                        }
-                    })
-                };
-            })
+    //         // Step 7: Insert room types if necessary
+    //         if (roomTypesToInsert.length > 0) {
+    //             await new Promise((resolve, reject) => {
+    //                 insertrtdetail(roomTypesToInsert, (error, results) => {
+    //                     if (error) reject(error);
+    //                     resolve(results);
+    //                 });
+    //             });
+    //         }
 
-            //Room Category Master insertion and updation
-            CheckRoomCategoryExists(ptdetail, (error, results) => {
-                if (error) {
-                    return res.status(200).json({
-                        success: 1,
-                        message: error
-                    })
-                }
-                const ExistingroomCategory = results.flat().map(item => ({
-                    RC_CODE: item.fb_rc_code,
-                    fb_rc_slno: item.fb_rc_slno
-                }));
-
-                const RoomCategoryInsert = ptdetail.filter(item =>
-                    !ExistingroomCategory.some(existing => existing.RC_CODE === item.RC_CODE)).reduce((acc, item) => {
-                        // Add the item only if its RT_CODE is not already present in the accumulator
-                        if (!acc.some(existing => existing.RC_CODE === item.RC_CODE)) {
-                            return [...acc, item]; // Use spread operator to add the item
-                        }
-                        return acc;
-                    }, []);
-
-                const RoomCategoryUpdate = ptdetail.reduce((acc, item) => {
-                    const matchingroomcategory = ExistingroomCategory.find(existing => existing.RC_CODE === item.RC_CODE);
-                    if (matchingroomcategory) {
-                        return [...acc, { ...item, fb_rc_slno: matchingroomcategory.fb_rc_slno }];
-                    }
-                    return acc;
-                }, []);
+    //         // Step 8: Update room types if necessary
+    //         if (roomTypesToUpdate.length > 0) {
+    //             await new Promise((resolve, reject) => {
+    //                 updatertdetail(roomTypesToUpdate, (error, results) => {
+    //                     if (error) reject(error);
+    //                     resolve(results);
+    //                 });
+    //             });
+    //         }
+    //         // Return success response if all operations are successful
+    //         return res.status(200).json({
+    //             success: 2,
+    //             message: 'Successfully inserted and updated Data!'
+    //         });
+    //     } catch (error) {
+    //         // Return error response if any operation fails
+    //         return res.status(200).json({
+    //             success: 0,
+    //             message: error.message || error
+    //         });
+    //     }
+    // },
 
 
-                if (RoomCategoryInsert.length > 0) {
-                    insertRoomCategoryDetail(RoomCategoryInsert, (error, results) => {
-                        if (error) {
-                            return res.status(200).json({
-                                success: 1,
-                                message: error
-                            })
-                        }
-                    })
-                }
 
-                if (RoomCategoryUpdate.length > 0) {
-                    UpdateRoomCategoryDetail(RoomCategoryUpdate, (error, results) => {
-                        if (error) {
-                            return res.status(200).json({
-                                success: 1,
-                                message: error
-                            })
-                        }
-                    })
-                };
-            })
 
-            return res.status(200).json({
-                success: 2,
-                message: "Success fully inserted and Created Data...?"
-            });
-        })
-    },
+    // not using saved for later
+    // inserting patient detail RoomMaster detail Room Catergory Detail AdmsReasons and other  1767
+    // insertptdetailmlora: async (req, res) => {
+    //     const { ptdetail } = req.body;
+    //     CheckpatientAlreadyPresent(ptdetail, (error, results) => {
+    //         if (error) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 message: error
+    //             })
+    //         }
+
+    //         const existingPatient = results.flat().map(pat => ({
+    //             IP_NO: pat.fb_ip_no,
+    //             PT_NO: pat.fb_pt_no,
+    //             fb_ipad_slno: pat.fb_ipad_slno
+    //         }));
+
+    //         const patientToInsert = ptdetail.filter(item =>
+    //             !existingPatient.some(exit => exit.IP_NO === item.IP_NO && exit.PT_NO === item.PT_NO)
+    //         );
+
+    //         const patientToUpdate =
+    //             ptdetail.reduce((acc, item) => {
+    //                 const matchingPatient =
+    //                     existingPatient.find(existing => existing.IP_NO === item.IP_NO && existing.PT_NO === item.PT_NO);
+    //                 if (matchingPatient) {
+    //                     return [...acc, { ...item, fb_ipad_slno: matchingPatient.fb_ipad_slno }];
+    //                 }
+    //                 return acc;
+    //             }, []);
+
+    //         if (patientToInsert.length > 0) {
+    //             insertPatientDetail(patientToInsert, (error, results) => {
+    //                 if (error) {
+    //                     return res.status(200).json({
+    //                         success: 1,
+    //                         message: error
+    //                     })
+    //                 }
+    //             })
+    //         }
+
+    //         if (patientToUpdate.length > 0) {
+    //             updatePatientDetail(patientToUpdate, (error, results) => {
+    //                 if (error) {
+    //                     return res.status(200).json({
+    //                         success: 1,
+    //                         message: error
+    //                     })
+    //                 }
+    //             })
+    //         };
+
+    //         //room master details
+    //         CheckRoomsinMasterPresent(ptdetail, (error, results) => {
+    //             if (error) {
+    //                 return res.status(200).json({
+    //                     success: 1,
+    //                     message: error
+    //                 })
+    //             }
+    //             const existingRooms = results.flat().map(item => ({
+    //                 RM_CODE: item.fb_rm_code,
+    //                 fb_rm_slno: item.fb_rm_slno
+    //             }));
+
+    //             const roommasterToInsert = ptdetail.filter(item =>
+    //                 !existingRooms.some(existing => existing.RM_CODE === item.RM_CODE)).reduce((acc, item) => {
+    //                     // Add the item only if its RT_CODE is not already present in the accumulator
+    //                     if (!acc.some(existing => existing.RM_CODE === item.RM_CODE)) {
+    //                         return [...acc, item]; // Use spread operator to add the item
+    //                     }
+    //                     return acc;
+    //                 }, []);
+
+    //             const roommasterToUpdate = ptdetail.reduce((acc, item) => {
+    //                 const matchingRoomType = existingRooms.find(existing => existing.RM_CODE === item.RM_CODE);
+    //                 if (matchingRoomType) {
+    //                     return [...acc, { ...item, fb_rm_slno: matchingRoomType.fb_rm_slno }];
+    //                 }
+    //                 return acc;
+    //             }, []);
+
+    //             if (roommasterToInsert.length > 0) {
+    //                 insertRoomMasterdetail(roommasterToInsert, (error, results) => {
+    //                     if (error) {
+    //                         return res.status(200).json({
+    //                             success: 1,
+    //                             message: error
+    //                         })
+    //                     }
+    //                 })
+    //             }
+    //             if (roommasterToUpdate.length > 0) {
+    //                 updateRoomMasterDetail(roommasterToUpdate, (error, results) => {
+    //                     if (error) {
+    //                         return res.status(200).json({
+    //                             success: 1,
+    //                             message: error
+    //                         })
+    //                     }
+    //                 })
+    //             };
+    //         });
+
+    //         //admn reason master insertion and upadation
+    //         CheckadmnReasonsExits(ptdetail, (error, results) => {
+    //             if (error) {
+    //                 return res.status(200).json({
+    //                     success: 1,
+    //                     message: error
+    //                 })
+    //             }
+    //             const existingAdmnReason = results.flat().map(item => ({
+    //                 RS_CODE: item.fb_rs_code,
+    //                 fb_adrn_slno: item.fb_adrn_slno
+    //             }));
+
+    //             const admnReasonToInsert = ptdetail.filter(item =>
+    //                 !existingAdmnReason.some(existing => existing.RS_CODE === item.RS_CODE)).reduce((acc, item) => {
+    //                     // Add the item only if its RT_CODE is not already present in the accumulator
+    //                     if (!acc.some(existing => existing.RS_CODE === item.RS_CODE)) {
+    //                         return [...acc, item]; // Use spread operator to add the item
+    //                     }
+    //                     return acc;
+    //                 }, []);
+
+    //             const admnReasonToUpdate = ptdetail.reduce((acc, item) => {
+    //                 const matchingadmnreason = existingAdmnReason.find(existing => existing.RS_CODE === item.RS_CODE);
+    //                 if (matchingadmnreason) {
+    //                     return [...acc, { ...item, fb_adrn_slno: matchingadmnreason.fb_adrn_slno }];
+    //                 }
+    //                 return acc;
+    //             }, []);
+
+
+    //             if (admnReasonToInsert.length > 0) {
+    //                 insertadminReasons(admnReasonToInsert, (error, results) => {
+    //                     if (error) {
+    //                         return res.status(200).json({
+    //                             success: 1,
+    //                             message: error
+    //                         })
+    //                     }
+    //                 })
+    //             }
+
+    //             if (admnReasonToUpdate.length > 0) {
+    //                 updateadmnReasons(admnReasonToUpdate, (error, results) => {
+    //                     if (error) {
+    //                         return res.status(200).json({
+    //                             success: 1,
+    //                             message: error
+    //                         })
+    //                     }
+    //                 })
+    //             };
+    //         })
+
+    //         //Room Category Master insertion and updation
+    //         CheckRoomCategoryExists(ptdetail, (error, results) => {
+    //             if (error) {
+    //                 return res.status(200).json({
+    //                     success: 1,
+    //                     message: error
+    //                 })
+    //             }
+    //             const ExistingroomCategory = results.flat().map(item => ({
+    //                 RC_CODE: item.fb_rc_code,
+    //                 fb_rc_slno: item.fb_rc_slno
+    //             }));
+
+    //             const RoomCategoryInsert = ptdetail.filter(item =>
+    //                 !ExistingroomCategory.some(existing => existing.RC_CODE === item.RC_CODE)).reduce((acc, item) => {
+    //                     // Add the item only if its RT_CODE is not already present in the accumulator
+    //                     if (!acc.some(existing => existing.RC_CODE === item.RC_CODE)) {
+    //                         return [...acc, item]; // Use spread operator to add the item
+    //                     }
+    //                     return acc;
+    //                 }, []);
+
+    //             const RoomCategoryUpdate = ptdetail.reduce((acc, item) => {
+    //                 const matchingroomcategory = ExistingroomCategory.find(existing => existing.RC_CODE === item.RC_CODE);
+    //                 if (matchingroomcategory) {
+    //                     return [...acc, { ...item, fb_rc_slno: matchingroomcategory.fb_rc_slno }];
+    //                 }
+    //                 return acc;
+    //             }, []);
+
+
+    //             if (RoomCategoryInsert.length > 0) {
+    //                 insertRoomCategoryDetail(RoomCategoryInsert, (error, results) => {
+    //                     if (error) {
+    //                         return res.status(200).json({
+    //                             success: 1,
+    //                             message: error
+    //                         })
+    //                     }
+    //                 })
+    //             }
+
+    //             if (RoomCategoryUpdate.length > 0) {
+    //                 UpdateRoomCategoryDetail(RoomCategoryUpdate, (error, results) => {
+    //                     if (error) {
+    //                         return res.status(200).json({
+    //                             success: 1,
+    //                             message: error
+    //                         })
+    //                     }
+    //                 })
+    //             };
+    //         })
+
+    //         return res.status(200).json({
+    //             success: 2,
+    //             message: "Success fully inserted and Created Data...?"
+    //         });
+    //     })
+    // },
+
+
     getNursingBed: (req, res) => {
         const data = req.body;
         getNursingBed(data, (err, results) => {
@@ -2170,6 +2206,45 @@ module.exports = {
             });
         })
     },
+    insertipfollowup: (req, res) => {
+        const { ipdata, Schedule_date, create_user } = req.body;
+        const combined = {
+            ...ipdata,
+            Schedule_date,
+            create_user
+        };
+        insertipfollowup(combined, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "inserted Sucessfully",
+
+            });
+        })
+    },
+    updateipfollowup: (req, res) => {
+        const data = req.body;
+        updateipfollowup(data, (error, results) => {
+            if (error) {
+                console.log(error);
+
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Updated Sucessfully",
+            });
+        })
+    },
+
     getprochecklistdetail: (req, res) => {
         const id = req.params.id;
         getprochecklistdetail(id, (error, results) => {
@@ -2215,6 +2290,31 @@ module.exports = {
             });
         });
     },
+    getallipfollowup: (req, res) => {
+        const data = req.body;
+        getallipfollowup(data, (err, results) => {
+            if (err) {
+                console.log(err);
+
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
     getbedremarkDetail: (req, res) => {
         const id = req.params.id;
         getbedremarkDetail(id, (err, results) => {
@@ -2981,6 +3081,20 @@ module.exports = {
     updatehkempdtl: (req, res) => {
         const data = req.body;
         updatehkempdtl(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    }, getdischargepatient: (req, res) => {
+        const data = req.body;
+        getdischargepatient(data, (err, results) => {
             if (err) {
                 return res.status(400).json({
                     success: 0,

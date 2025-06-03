@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { getTotalcomplaints, getAssistRectyEmpWise, getPendingOnholdEmpWise, getOnholdcomplaints, getComplaintcount, getTotalcomplaintsAllDpt, getOnholdcomplaintsAllDpt,
      getAllCompDeptwiseCount,getempAssignTicketCount,getempHoldTicketCountt,getempTodayRectifyTicketCount,getempTodayVerifiedTicketCount,getsuperviPendingVerifiTicketCount,
      getDeptAssignTicketCount,getDeptHoldTicketCount,getempAssistReceiveTicketCount,getDeptAssistReceiveTicketCount,getDeptTodayRectifyTicketCount,getDeptTodayVerifyTicketCount,
-     getDeptAllAssistRequestTicketCount} = require('../complaint_dashboard/cmDashboard.controller')
+     getDeptAllAssistRequestTicketCount,getVerifyTicketCountEmployeeDeptWise,getVerifyTicketCountDeptWise} = require('../complaint_dashboard/cmDashboard.controller')
 const { checkToken } = require("../../authentication/token_validation");
 
 
@@ -28,5 +28,8 @@ router.get("/deptTodayRectifyTicketCount/:id", checkToken, getDeptTodayRectifyTi
 router.get("/deptTodayVerifyTicketCount/:id", checkToken, getDeptTodayVerifyTicketCount);
 router.get("/deptAssistReceiveTicketCount/:id", checkToken, getDeptAssistReceiveTicketCount);
 router.get("/deptAllAssistRequestTicketCount/:id", checkToken, getDeptAllAssistRequestTicketCount);
+
+router.get("/getVerifyTicketCountEmployeeDeptWise/:id", checkToken, getVerifyTicketCountEmployeeDeptWise);
+router.get("/getVerifyTicketCountCompDeptWise/:id", checkToken, getVerifyTicketCountDeptWise);
 
 module.exports = router;

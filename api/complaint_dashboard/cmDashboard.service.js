@@ -554,6 +554,67 @@ compalint_date,complaint_dept_name,
             }
         );
     },
+            getVerifyTicketCountEmployeeDeptWise: (id, callBack) => {
+            pool.query(
+                     `SELECT
+                    co_deptsec_mast.sec_name,
+                    COUNT(DISTINCT cm_complaint_mast.complaint_slno) AS complaint_count
+                FROM
+                    cm_complaint_mast
+                LEFT JOIN cm_complaint_detail 
+                    ON cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
+                LEFT JOIN co_deptsec_mast 
+                    ON co_deptsec_mast.sec_id = cm_complaint_mast.complaint_dept_secslno
+                WHERE
+                    cm_complaint_detail.assigned_emp = ?
+                    AND cm_rectify_status = 'V'
+                    AND compalint_status = 3
+                    AND DATE(cm_complaint_mast.cm_verfy_time) = CURRENT_DATE
+                GROUP BY
+                    co_deptsec_mast.sec_id,
+                    co_deptsec_mast.sec_name`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    callBack(error)
+                }
+                return callBack(null, results)
+            }
+        );
+    },
+            getVerifyTicketCountDeptWise: (id, callBack) => {
+            pool.query(
+            `SELECT
+                co_deptsec_mast.sec_name,      
+                COUNT(DISTINCT cm_complaint_mast.complaint_slno) AS complaint_count
+            FROM
+                cm_complaint_mast
+            LEFT JOIN cm_complaint_detail 
+                ON cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
+            LEFT JOIN co_deptsec_mast 
+                ON co_deptsec_mast.sec_id = cm_complaint_mast.complaint_dept_secslno
+            WHERE
+                complaint_deptslno = (
+                    SELECT complaint_dept_slno 
+                    FROM cm_complaint_dept 
+                    WHERE department_slno = ?
+                )
+                AND cm_rectify_status = 'V'
+                AND compalint_status = 3
+                AND DATE(cm_complaint_mast.cm_verfy_time) = CURRENT_DATE
+            GROUP BY
+                co_deptsec_mast.sec_id,
+                co_deptsec_mast.sec_name`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    callBack(error)
+                }
+                return callBack(null, results)
+            }
+        );
+    },
+    
     
 
     

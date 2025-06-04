@@ -4,7 +4,7 @@ const { crfRegistration, crfRegimageGet, crfDataCollection, getDataCollectionIma
     ImageInsertHOD, ImageInsertDMS, ImageInsertMS, ImageInsertMO, ImageInsertSMO,
     ImageInsertGM, ImageInsertMD, ImageInsertED, crfHodImageGet, crfDMSImageGet,
     crfMSImageGet, crfMOImageGet, crfSMOImageGet, crfGMImageGet, crfMDImageGet,
-    crfEDImageGet, ImageInsertManaging, crfManageImageGet, ImageInsertMDKmch, crfKMCHMDImageGet
+    crfEDImageGet, ImageInsertManaging, crfManageImageGet, ImageInsertMDKmch, crfKMCHMDImageGet, crfDeliveryMarking, crfDMimageGet
 } = require('../crm_new_file_upload/crm_fileupload.controller')
 
 router.post("/InsertRegisterImage", checkToken, crfRegistration)
@@ -35,5 +35,9 @@ router.get("/crfEDImageGet/:id", checkToken, crfEDImageGet)
 // kmc
 router.get("/crfManageImageGet/:id", checkToken, crfManageImageGet)
 router.get("/crfKmchMdImageGet/:id", checkToken, crfKMCHMDImageGet)
+//delivery marking
+router.post("/InsertDMimage", checkToken, crfDeliveryMarking)
+router.get("/crfDMimageGet/:id", checkToken, crfDMimageGet)
+
 
 module.exports = router;

@@ -73,4 +73,16 @@ module.exports = {
             }
         )
     },
+    getActiveNotifications: (callback) => {
+    pool.query(
+      `select notification_slno,notification_heading, notification_remarks from  notification_menu where notification_status = 1`,
+      [],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
 }

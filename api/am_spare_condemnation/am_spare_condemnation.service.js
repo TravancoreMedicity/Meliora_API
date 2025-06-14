@@ -2,10 +2,46 @@ const { pool } = require('../../config/database')
 module.exports = {
     CondemnationList: (id, callBack) => {
         pool.query(
-            `Select
+            // `Select
+            //         am_service_details.condm_transfr_emp,
+            //         am_item_map_details.am_manufacture_no,
+            //          am_item_map_details.am_asset_old_no,                    
+            //         am_bill_amount,
+            //         am_condem_detail_slno, 
+            //         condem_mast_slno,                 
+            //         am_condem_reason,
+            //         item_status,
+            //         keep_inscarp_status,
+            //         keep_in_srap_store_reason,
+            //         scarp_store_emp,
+            //         condm_transf_remarks,
+            //         complaint_slno,
+            //         ROW_NUMBER() over (order by am_spare_item_map_slno) as slno,am_spare_item_map_master.am_spare_item_map_slno,
+            //         spare_creation_slno, am_item_name_creation.item_name,
+            //         category_name,spare_dept_slno, spare_deptsec_slno,
+            //         spare_room_slno, spare_subroom_slno, spare_rack_slno, spare_custodian_dept, 
+            //         spare_custodian_dept_sec, spare_asset_no, spare_create_status, spare_asset_no_only, 
+            //         spare_condamtn, spare_service,
+            //         co_employee_master.em_name as condm_trans_emp,
+            //         deleted_date
+            //         from am_spare_item_map_master
+            //         left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_spare_item_map_master.spare_creation_slno
+            //         left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno
+            //         left join am_custodian_department on am_custodian_department.am_custodian_slno=am_spare_item_map_master.spare_custodian_dept
+            //         left join am_asset_spare_details on am_asset_spare_details.am_spare_item_map_slno=am_spare_item_map_master.am_spare_item_map_slno
+            //         left join am_service_details on am_service_details.am_spare_item_slno=am_spare_item_map_master.am_spare_item_map_slno
+            //         left join co_employee_master on co_employee_master.em_id=am_service_details.condm_transfr_emp
+            //         left join am_item_map_details on am_item_map_details.am_spare_item_map_slno =am_spare_item_map_master.am_spare_item_map_slno
+            //         left join am_condemnation_details on am_condemnation_details.am_spare_item_slno=am_spare_item_map_master.am_spare_item_map_slno                  
+            //         where am_custodian_dept_slno=? and spare_condamtn=1  and submited_condemnation=0 and spare_create_status=1
+            //         group by am_spare_item_map_slno                
+            //         order by deleted_date desc`,
+            `		Select
                     am_service_details.condm_transfr_emp,
+                    co_deptsec_mast.sec_name AS ticket_reg_location,
                     am_item_map_details.am_manufacture_no,
-                     am_item_map_details.am_asset_old_no,                    
+                    am_item_map_details.am_asset_old_no,   
+                    cm_complaint_mast.complaint_dept_secslno,
                     am_bill_amount,
                     am_condem_detail_slno, 
                     condem_mast_slno,                 
@@ -15,7 +51,7 @@ module.exports = {
                     keep_in_srap_store_reason,
                     scarp_store_emp,
                     condm_transf_remarks,
-                    complaint_slno,
+                    am_service_details.complaint_slno,
                     ROW_NUMBER() over (order by am_spare_item_map_slno) as slno,am_spare_item_map_master.am_spare_item_map_slno,
                     spare_creation_slno, am_item_name_creation.item_name,
                     category_name,spare_dept_slno, spare_deptsec_slno,
@@ -32,7 +68,9 @@ module.exports = {
                     left join am_service_details on am_service_details.am_spare_item_slno=am_spare_item_map_master.am_spare_item_map_slno
                     left join co_employee_master on co_employee_master.em_id=am_service_details.condm_transfr_emp
                     left join am_item_map_details on am_item_map_details.am_spare_item_map_slno =am_spare_item_map_master.am_spare_item_map_slno
-                    left join am_condemnation_details on am_condemnation_details.am_spare_item_slno=am_spare_item_map_master.am_spare_item_map_slno                  
+                    left join am_condemnation_details on am_condemnation_details.am_spare_item_slno=am_spare_item_map_master.am_spare_item_map_slno   
+                    left join cm_complaint_mast on cm_complaint_mast.complaint_slno =am_service_details.complaint_slno
+                    left join co_deptsec_mast on co_deptsec_mast.sec_id =cm_complaint_mast.complaint_dept_secslno
                     where am_custodian_dept_slno=? and spare_condamtn=1  and submited_condemnation=0 and spare_create_status=1
                     group by am_spare_item_map_slno                
                     order by deleted_date desc`,
@@ -48,12 +86,45 @@ module.exports = {
 
     getAssetCondemnationList: (id, callBack) => {
         pool.query(
-            `select
+            // `select
+            //         category_name,
+            //         am_bill_amount,
+            //         am_item_map_details.am_manufacture_no,
+            //         am_item_map_details.am_asset_old_no, 
+            //         complaint_slno,
+            //         am_condem_detail_slno,
+            //         condem_mast_slno,                
+            //         am_condem_reason,
+            //         item_status,
+            //         keep_inscarp_status,
+            //         keep_in_srap_store_reason,
+            //         scarp_store_emp,
+            //         condm_transf_remarks,
+            //         ROW_NUMBER() over (order by am_item_map_slno) as slno,
+            //         em_name as condm_trans_user,
+            //         am_asset_item_map_master.am_item_map_slno, am_asset_item_map_master.item_creation_slno, item_dept_slno, item_deptsec_slno, item_room_slno, item_subroom_slno, item_rack_slno, 
+            //         item_custodian_dept, item_custodian_dept_sec, item_asset_no, item_asset_no_only, item_create_status,am_item_name_creation.item_name,
+			// 		asset_item_condmnation,
+            //         item_condm_date,
+            //         co_employee_master.em_name as condm_trans_emp
+            //         from am_asset_item_map_master
+            //         left join am_item_name_creation on am_item_name_creation.item_creation_slno=am_asset_item_map_master.item_creation_slno
+            //         left join am_category on am_category.category_slno=am_item_name_creation.item_category_slno                    
+            //         left join am_custodian_department on am_custodian_department.am_custodian_slno=am_asset_item_map_master.item_custodian_dept
+            //         left join am_service_details on am_service_details.am_asset_item_slno=am_asset_item_map_master.am_item_map_slno
+            //         left join co_employee_master on co_employee_master.em_id=am_service_details.condm_transfr_emp
+            //         left join am_item_map_details on am_item_map_details.am_Item_map_slno =am_asset_item_map_master.am_item_map_slno
+            //         left join am_condemnation_details on am_condemnation_details.am_asset_item_slno=am_asset_item_map_master.am_item_map_slno                    
+            //         where am_custodian_dept_slno=? and asset_item_condmnation=1 and submited_condemnation=0 and item_create_status=1          
+            //         group by am_item_map_slno
+            //         order by item_condm_date desc`,
+                   `select
                     category_name,
                     am_bill_amount,
                     am_item_map_details.am_manufacture_no,
                     am_item_map_details.am_asset_old_no, 
-                    complaint_slno,
+                    co_deptsec_mast.sec_name AS ticket_reg_location,
+                    am_service_details.complaint_slno,
                     am_condem_detail_slno,
                     condem_mast_slno,                
                     am_condem_reason,
@@ -76,8 +147,10 @@ module.exports = {
                     left join am_service_details on am_service_details.am_asset_item_slno=am_asset_item_map_master.am_item_map_slno
                     left join co_employee_master on co_employee_master.em_id=am_service_details.condm_transfr_emp
                     left join am_item_map_details on am_item_map_details.am_Item_map_slno =am_asset_item_map_master.am_item_map_slno
-                    left join am_condemnation_details on am_condemnation_details.am_asset_item_slno=am_asset_item_map_master.am_item_map_slno                    
-                    where am_custodian_dept_slno=? and asset_item_condmnation=1 and submited_condemnation=0 and item_create_status=1          
+                    left join am_condemnation_details on am_condemnation_details.am_asset_item_slno=am_asset_item_map_master.am_item_map_slno  
+                    left join cm_complaint_mast on cm_complaint_mast.complaint_slno = am_service_details.complaint_slno
+                    left join co_deptsec_mast on co_deptsec_mast.sec_id =cm_complaint_mast.complaint_dept_secslno
+                    where am_custodian_dept_slno=? and asset_item_condmnation=1 and submited_condemnation = 0 and item_create_status=1          
                     group by am_item_map_slno
                     order by item_condm_date desc`,
 
@@ -301,4 +374,37 @@ module.exports = {
             }
         );
     },
+
+
+        UpdateAssetCondemReport: (item) => {
+            return new Promise((resolve, reject) => {
+                const query = `
+                    UPDATE am_asset_item_map_master
+                    SET submited_condemnation = 1
+                    WHERE am_item_map_slno = ?
+                `;
+                pool.query(query, [item.am_item_map_slno], (error, results) => {
+                    if (error) return reject(error);
+                    resolve(results);
+                });
+            });
+        },
+
+        UpdateSpareCondemReport: (item) => {
+            return new Promise((resolve, reject) => {
+                const query = `
+                    UPDATE am_spare_item_map_master
+                    SET submited_condemnation = 1
+                    WHERE am_spare_item_map_slno = ?
+                `;
+                pool.query(query, [item.am_spare_item_map_slno], (error, results) => {
+                    if (error) return reject(error);
+                    resolve(results);
+                });
+            });
+        },
+
+
+
+
 }

@@ -23,6 +23,7 @@ app.use(
   cors({
     origin: [
 
+
         'http://192.168.10.88:9741',
         'http://192.168.10.88:9742',
         'https://192.168.10.88:9742',
@@ -68,41 +69,42 @@ const socketIOMiddlewre = (req, res, next) => {
 
 // ----- logger display For Info ----
 app.get("/info", (req, res) => {
-  fs.readFile("./errorlog/info.log", (error, txtString) => {
-    if (error) throw err;
-    res.write(
-      '<div id="content"><pre>' +
-      txtString.toString().replace(/\n/g, "<br />") +
-      "</pre>"
-    );
-    res.end();
-  });
+    fs.readFile("./errorlog/info.log", (error, txtString) => {
+        if (error) throw err;
+        res.write(
+            '<div id="content"><pre>' +
+            txtString.toString().replace(/\n/g, "<br />") +
+            "</pre>"
+        );
+        res.end();
+    });
 });
 // ----- logger display For err ----
 app.get("/error", (req, res) => {
-  fs.readFile("./errorlog/error.log", (error, txtString) => {
-    if (error) throw err;
-    res.write(
-      '<div id="content"><pre>' +
-      txtString.toString().replace(/\n/g, "<br />") +
-      "</pre>"
-    );
-    res.end();
-  });
+    fs.readFile("./errorlog/error.log", (error, txtString) => {
+        if (error) throw err;
+        res.write(
+            '<div id="content"><pre>' +
+            txtString.toString().replace(/\n/g, "<br />") +
+            "</pre>"
+        );
+        res.end();
+    });
 });
 
 // ----- logger display For ward ----
 app.get("/warn", (req, res) => {
-  fs.readFile("./errorlog/warn.log", (error, txtString) => {
-    if (error) throw err;
-    res.write(
-      '<div id="content"><pre>' +
-      txtString.toString().replace(/\n/g, "<br />") +
-      "</pre>"
-    );
-    res.end();
-  });
+    fs.readFile("./errorlog/warn.log", (error, txtString) => {
+        if (error) throw err;
+        res.write(
+            '<div id="content"><pre>' +
+            txtString.toString().replace(/\n/g, "<br />") +
+            "</pre>"
+        );
+        res.end();
+    });
 });
+
 
 
 
@@ -275,7 +277,7 @@ const backuptypemast = require("./api/it_backup_type_master/backup_type.router")
 const simOperators = require("./api/it_sim_operators/sim_operators.router");
 const notificationMenu = require("./api/notificationMenu/notification.router");
 const {
-  validateAccessToken,
+    validateAccessToken,
 } = require("./api/tokenValidation/tokenValidation");
 const AssetCondemnation = require("./api/am_condem_details/am_condem.router");
 // const backuptypemast = require('./api/it_backup_type_master/backup_type.router')
@@ -297,8 +299,8 @@ app.use((req, res, next) => {
         res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
         return res.status(200).json({});
     }
-  next();
-});
+    next();
+})
 
 // Outside Route Config
 app.use("/api/user", userRouter);
@@ -506,7 +508,6 @@ server.listen(
     `Server Up and Running ${process.env.APP_PORT}`,
     { meta1: "meta1" }
   )
-
 );
 
 

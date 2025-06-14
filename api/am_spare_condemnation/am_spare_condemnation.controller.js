@@ -1,5 +1,5 @@
 
-const { CondemnationList, ServiceList, pmDueOverList, AssetServiceList, getAssetCondemnationList } = require('../am_spare_condemnation/am_spare_condemnation.service')
+const { CondemnationList, ServiceList, pmDueOverList, AssetServiceList, getAssetCondemnationList, UpdateAssetCondemReport, UpdateSpareCondemReport } = require('../am_spare_condemnation/am_spare_condemnation.service')
 module.exports = {
 
 
@@ -110,4 +110,42 @@ module.exports = {
             });
         })
     },
+
+            submitCondemReport: async (req, res) => {
+            const body = req.body;
+            try {
+                const assetData = body
+                    .filter(item => item.am_item_map_slno)
+                    .map(item => ({ am_item_map_slno: item.am_item_map_slno }));
+
+                const spareData = body
+                    .filter(item => item.am_spare_item_map_slno)
+                    .map(item => ({ am_spare_item_map_slno: item.am_spare_item_map_slno }));
+
+                if (assetData?.length > 0) {
+                    for (let item of assetData) {
+                        await UpdateAssetCondemReport(item);
+                    }
+                }
+
+                if (spareData?.length > 0) {
+                    for (let item of spareData) {
+                        await UpdateSpareCondemReport(item);
+                    }
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    message: "Data updated successfully"
+                });
+
+            } catch (err) {
+                return res.status(500).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+        },
+
+
 }

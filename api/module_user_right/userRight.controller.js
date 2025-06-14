@@ -1,4 +1,4 @@
-const { create, update, checkInsertVal, checkUpdateVal, getUserModuleRightByID, getuserModuleRights, deleteUserGroup } = require('../module_user_right/userRight.service');
+const { create, update, checkInsertVal, checkUpdateVal, getUserModuleRightByID, getuserModuleRights, deleteUserGroup, getEmpComponentsRights } = require('../module_user_right/userRight.service');
 const logger = require('../../logger/logger')
 const { validateUserRights } = require('../../validation/validation_schema');
 
@@ -149,6 +149,28 @@ module.exports = {
                 message: "Record Deleted Successfully"
             });
         });
-    }
+    },
+
+        getEmpComponentsRights: (req, res) => {
+        const id = req.params.id;
+        getEmpComponentsRights(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
 
 }

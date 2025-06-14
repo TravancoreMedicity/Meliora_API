@@ -141,5 +141,32 @@ module.exports = {
                 return callBack(null, results)
             }
         )
-    }
+    },
+        getEmpComponentsRights: (id, callback) => {
+        pool.query(
+            `SELECT 
+                ugr.user_group_slno,
+                ugr.module_slno,
+                ugr.sub_module_slno,
+                ugr.menu_slno,
+                mgur.emp_slno
+            FROM
+                user_group_rights AS ugr
+            JOIN module_group_user_rights AS mgur 
+                ON mgur.user_group_slno = ugr.user_group_slno
+            WHERE 
+                ugr.module_slno = 22
+                AND ugr.sub_module_slno = 22
+                AND mgur.emp_slno = ?
+                AND ugr.menu_view=1`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
 }

@@ -136,7 +136,7 @@ module.exports = {
 
                 return res.status(200).json({
                     success: 1,
-                    message: "Data inserted and updated successfully"
+                    message: "Data updated successfully"
                 });
 
             } catch (err) {

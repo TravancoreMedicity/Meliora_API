@@ -190,6 +190,41 @@ module.exports = {
             }
         );
     },
+    GetDailyCensusReportView: (body, callBack) => {
+        const query = `
+        SELECT
+            census_slno, 
+            qi_daily_census.census_ns_slno,
+            qi_census_nursing_mast.census_ns_name, 
+            census_date, 
+            yesterday_census, 
+            total_admission, 
+            total_discharge, 
+            transfer_in, 
+            transfer_out, 
+            total_death, 
+            census_total,
+            ora_admission,
+            ora_discharge,
+            ora_death,
+            ora_census_total,
+            ora_dama,
+            ora_lama
+        FROM qi_daily_census 
+        LEFT JOIN qi_census_nursing_mast 
+            ON qi_census_nursing_mast.census_ns_slno = qi_daily_census.census_ns_slno
+        WHERE census_date BETWEEN ? AND ?
+    `;
+
+        const values = [body.census_datefrom, body.census_dateto];
+
+        pool.query(query, values, (error, results, fields) => {
+            if (error) {
+                return callBack(error);
+            }
+            return callBack(null, results);
+        });
+    }
 }
 
 

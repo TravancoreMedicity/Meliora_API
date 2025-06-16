@@ -8,6 +8,7 @@ const {
     CensusAlreadyInsert,
     ElliderDataUpdate,
     GetDailyCensusReportView
+
 } = require('./daily_census.service')
 module.exports = {
     DailyCensusInsert: (req, res) => {
@@ -161,7 +162,6 @@ module.exports = {
             })
         })
     },
-
     GetDailyCensusReportView: (req, res) => {
         const body = req.body;
         GetDailyCensusReportView(body, (err, results) => {
@@ -175,7 +175,6 @@ module.exports = {
                 return res.status(200).json({
                     success: 2,
                     message: "No Report Found"
-
                 })
             }
             return res.status(200).json({

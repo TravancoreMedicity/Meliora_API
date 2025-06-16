@@ -190,7 +190,7 @@ module.exports = {
             }
         );
     },
-
+    
     GetDailyCensusReportView: (body, callBack) => {
         const query = `
         SELECT

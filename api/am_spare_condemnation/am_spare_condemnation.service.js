@@ -46,6 +46,15 @@ module.exports = {
                     am_condem_detail_slno, 
                     condem_mast_slno,                 
                     am_condem_reason,
+                    cm_complaint_location,  
+                    cm_complaint_mast.rm_room_slno,
+					rm_room_name,
+					rm_newroom_creation.rm_roomtype_slno,
+					rm_room_floor_slno,
+					rm_insidebuilldblock_slno,
+					rm_insidebuildblock_name,
+					rm_floor_name,
+					rm_roomtype_name,
                     item_status,
                     keep_inscarp_status,
                     keep_in_srap_store_reason,
@@ -71,7 +80,11 @@ module.exports = {
                     left join am_condemnation_details on am_condemnation_details.am_spare_item_slno=am_spare_item_map_master.am_spare_item_map_slno   
                     left join cm_complaint_mast on cm_complaint_mast.complaint_slno =am_service_details.complaint_slno
                     left join co_deptsec_mast on co_deptsec_mast.sec_id =cm_complaint_mast.complaint_dept_secslno
-                    where am_custodian_dept_slno=? and spare_condamtn=1  and submited_condemnation=0 and spare_create_status=1
+                    left join rm_newroom_creation on rm_newroom_creation.rm_room_slno = cm_complaint_mast.rm_room_slno
+					LEFT JOIN rm_room_type_master ON rm_room_type_master.rm_roomtype_slno = rm_newroom_creation.rm_roomtype_slno
+					LEFT JOIN rm_floor_creation ON rm_floor_creation.rm_floor_slno = rm_newroom_creation.rm_room_floor_slno
+					LEFT JOIN rm_insidebuildblock_mast ON rm_insidebuildblock_mast.rm_insidebuildblock_slno = rm_newroom_creation.rm_insidebuilldblock_slno
+                    where am_custodian_dept_slno=? and spare_condamtn=1  and submited_condemnation=0 and spare_create_status=1	
                     group by am_spare_item_map_slno                
                     order by deleted_date desc`,
             [id],
@@ -128,6 +141,15 @@ module.exports = {
                     am_condem_detail_slno,
                     condem_mast_slno,                
                     am_condem_reason,
+                    cm_complaint_location,  
+                    cm_complaint_mast.rm_room_slno,
+					rm_room_name,
+					rm_newroom_creation.rm_roomtype_slno,
+					rm_room_floor_slno,
+					rm_insidebuilldblock_slno,
+					rm_insidebuildblock_name,
+					rm_floor_name,
+					rm_roomtype_name,
                     item_status,
                     keep_inscarp_status,
                     keep_in_srap_store_reason,
@@ -149,6 +171,10 @@ module.exports = {
                     left join am_item_map_details on am_item_map_details.am_Item_map_slno =am_asset_item_map_master.am_item_map_slno
                     left join am_condemnation_details on am_condemnation_details.am_asset_item_slno=am_asset_item_map_master.am_item_map_slno  
                     left join cm_complaint_mast on cm_complaint_mast.complaint_slno = am_service_details.complaint_slno
+                    left join rm_newroom_creation on rm_newroom_creation.rm_room_slno = cm_complaint_mast.rm_room_slno
+					LEFT JOIN rm_room_type_master ON rm_room_type_master.rm_roomtype_slno = rm_newroom_creation.rm_roomtype_slno
+					LEFT JOIN rm_floor_creation ON rm_floor_creation.rm_floor_slno = rm_newroom_creation.rm_room_floor_slno
+					LEFT JOIN rm_insidebuildblock_mast ON rm_insidebuildblock_mast.rm_insidebuildblock_slno = rm_newroom_creation.rm_insidebuilldblock_slno
                     left join co_deptsec_mast on co_deptsec_mast.sec_id =cm_complaint_mast.complaint_dept_secslno
                     where am_custodian_dept_slno=? and asset_item_condmnation=1 and submited_condemnation = 0 and item_create_status=1          
                     group by am_item_map_slno

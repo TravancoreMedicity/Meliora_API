@@ -7,8 +7,8 @@ const {
     GetDailyCensusReport,
     DailyCensusUpdate,
     GetCensusBargraphReport,
-    ElliderDataUpdate,
-    GetDailyCensusReportView
+    ElliderDataUpdate, GetDailyCensusReportView
+
 } = require('./daily_census.controller');
 router.post('/save', checkToken, DailyCensusInsert);
 router.post('/exist', checkToken, DailyCensusAlreadyExist);

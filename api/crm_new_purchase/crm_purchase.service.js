@@ -704,7 +704,6 @@ module.exports = {
     // },
 
     updatePoApprovals: (body) => {
-
         return Promise.all(body.map((val) => {
             return new Promise((resolve, reject) => {
                 pool.query(

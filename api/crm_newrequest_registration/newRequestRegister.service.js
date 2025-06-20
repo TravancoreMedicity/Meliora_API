@@ -1285,10 +1285,19 @@ module.exports = {
             gmo_status_name,
             md_status_name,
             ed_status_name,
-            managing_director_name
-
+            managing_director_name,
+            item_dp_IT,
+            item_dp_Bio,
+            item_dp_Ope,
+            item_dp_Hou,
+            item_dp_Main,
+            itemType_dp_IT,
+            itemType_dp_Bio,
+            itemType_dp_Ope,
+            itemType_dp_Hou,
+            itemType_dp_Main
              )
-             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.companyslno,
                 data.Incharge_approval,
@@ -1311,6 +1320,21 @@ module.exports = {
                 data.md_name,
                 data.ed_name,
                 data.managing_director_name,
+                data.deptIt,
+                data.deptbio,
+                data.deptOpe,
+                data.deptHouse,
+                data.deptMain,
+                data.deptItType,
+                data.deptbiotype,
+                data.deptOpeitm,
+                data.deptHouseitm,
+                data.deptMaintype,
+
+
+
+
+
 
             ],
             (error, results, feilds) => {
@@ -1326,8 +1350,10 @@ module.exports = {
         pool.query(
             `SELECT crm_common_slno, crm_common.company_slno,company_name, incharge_name, hod_name, dms_name, ms_name, mo_name, smo_name, gmo_name,
              md_name, ed_name, managing_director ,hod_status_name,incharge_status_name,dms_status_name,ms_status_name,smo_status_name,mo_status_name,
-            gmo_status_name,md_status_name,ed_status_name,managing_director_name FROM crm_common
-              LEFT JOIN crm_company_master ON crm_common.company_slno=crm_company_master.company_slno `,
+            gmo_status_name,md_status_name,ed_status_name,managing_director_name,item_dp_IT,
+            item_dp_Bio,item_dp_Ope,item_dp_Hou,item_dp_Main,itemType_dp_IT,itemType_dp_Bio,itemType_dp_Ope,itemType_dp_Hou,itemType_dp_Main
+             FROM crm_common
+             LEFT JOIN crm_company_master ON crm_common.company_slno=crm_company_master.company_slno `,
             [
             ],
             (error, results, feilds) => {
@@ -1362,7 +1388,18 @@ module.exports = {
             gmo_status_name=?,
             md_status_name=?,
             ed_status_name=?,
-            managing_director_name=?
+            managing_director_name=?,
+             item_dp_IT =?,
+            item_dp_Bio=?,
+            item_dp_Ope=?,
+            item_dp_Hou=?,
+            item_dp_Main=?,
+            itemType_dp_IT=?,
+            itemType_dp_Bio=?,
+            itemType_dp_Ope=?,
+            itemType_dp_Hou=?,
+            itemType_dp_Main=?
+
             `,
             [
                 data.companyslno,
@@ -1386,6 +1423,16 @@ module.exports = {
                 data.md_name,
                 data.ed_name,
                 data.managing_director_name,
+                data.deptIt,
+                data.deptbio,
+                data.deptOpe,
+                data.deptHouse,
+                data.deptMain,
+                data.deptItType,
+                data.deptbiotype,
+                data.deptOpeitm,
+                data.deptHouseitm,
+                data.deptMaintype,
 
             ],
             (error, results, feilds) => {

@@ -878,7 +878,6 @@ module.exports = {
                     if (fdmast_slno === 8 && fdmast_slno != undefined) {
                         insertDefaultPtImpression(impanswers, (error, results) => {
                             if (error) {
-                                console.log(error);
                                 return res.status(200).json({
                                     success: 1,
                                     message: error
@@ -2231,8 +2230,6 @@ module.exports = {
         const data = req.body;
         updateipfollowup(data, (error, results) => {
             if (error) {
-                console.log(error);
-
                 return res.status(200).json({
                     success: 0,
                     message: error
@@ -2294,8 +2291,6 @@ module.exports = {
         const data = req.body;
         getallipfollowup(data, (err, results) => {
             if (err) {
-                console.log(err);
-
                 return res.status(400).json({
                     success: 0,
                     message: err

@@ -1514,8 +1514,6 @@ module.exports = {
         // const id = req.params.id
         const baseDirectory = 'D:/DocMeliora/Meliora/CRF/DeliveryMarking/';
         const id = sanitize(req.params.id);
-        console.log(id);
-
         const folderPath = path.resolve(baseDirectory, id);
         // const folderPath = `D:/DocMeliora/Meliora/CRF/DeliveryMarking/${id}`;
         fs.readdir(folderPath, (err, files) => {

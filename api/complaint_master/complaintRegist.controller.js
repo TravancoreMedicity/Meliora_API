@@ -1,7 +1,7 @@
 const { complaintRegistInsert, complaintRegistUpdate,
     getcomplaintRegistByID, getcomplaintListbylogin, getcomplaintListbydept, insertAssetArray, assetinactive,
     getcomplaintAll, getapptokenbydept, updateserialnum, getAssetinComplaint, UpdateAssetinComplaint, getRoomsNameNdTypeList, getAssetsInRoom, getDeptSecWiseTicket,
-    SpareDetailsUndercomplaint, viewAllPendingTicket, deleteTicket,getVerificationPending
+    SpareDetailsUndercomplaint, viewAllPendingTicket, deleteTicket, getVerificationPending
 } = require('../complaint_master/complaintRegist.service');
 const { validateComplaintRegist } = require('../../validation/validation_schema');
 const logger = require('../../logger/logger');

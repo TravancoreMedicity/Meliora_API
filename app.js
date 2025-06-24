@@ -19,6 +19,7 @@ app.use(cookieParser());
 // app.use(lusca.csrf());
 
 app.use(
+<<<<<<< HEAD
   cors({
     origin: [
       "http://192.168.10.88:9741",
@@ -35,45 +36,64 @@ app.use(
     ],
     credentials: true,
   })
+=======
+    cors({
+        origin: [
+            'http://192.168.10.88:9741',
+            'http://192.168.10.88:9742',
+            'https://192.168.10.88:9742',
+            'https://travancoremedicity.in:9742',
+            'http://travancoremedicity.in:9741',
+            'http://192.168.10.88:3000',
+            'http://tm.medicity.co.in:8888',
+            'http://192.168.10.88:8888',
+            'http://192.168.22.9:3000',
+            'http://195.168.34.25:3001',
+            'http://195.168.34.25:3000',
+
+        ],
+        credentials: true,
+    })
+>>>>>>> 2f8d1eae3a472d975d0664dd59872158ca2076bb
 );
 
 
 // ----- logger display For Info ----
 app.get("/info", (req, res) => {
-  fs.readFile("./errorlog/info.log", (error, txtString) => {
-    if (error) throw err;
-    res.write(
-      '<div id="content"><pre>' +
-      txtString.toString().replace(/\n/g, "<br />") +
-      "</pre>"
-    );
-    res.end();
-  });
+    fs.readFile("./errorlog/info.log", (error, txtString) => {
+        if (error) throw err;
+        res.write(
+            '<div id="content"><pre>' +
+            txtString.toString().replace(/\n/g, "<br />") +
+            "</pre>"
+        );
+        res.end();
+    });
 });
 // ----- logger display For err ----
 app.get("/error", (req, res) => {
-  fs.readFile("./errorlog/error.log", (error, txtString) => {
-    if (error) throw err;
-    res.write(
-      '<div id="content"><pre>' +
-      txtString.toString().replace(/\n/g, "<br />") +
-      "</pre>"
-    );
-    res.end();
-  });
+    fs.readFile("./errorlog/error.log", (error, txtString) => {
+        if (error) throw err;
+        res.write(
+            '<div id="content"><pre>' +
+            txtString.toString().replace(/\n/g, "<br />") +
+            "</pre>"
+        );
+        res.end();
+    });
 });
 
 // ----- logger display For ward ----
 app.get("/warn", (req, res) => {
-  fs.readFile("./errorlog/warn.log", (error, txtString) => {
-    if (error) throw err;
-    res.write(
-      '<div id="content"><pre>' +
-      txtString.toString().replace(/\n/g, "<br />") +
-      "</pre>"
-    );
-    res.end();
-  });
+    fs.readFile("./errorlog/warn.log", (error, txtString) => {
+        if (error) throw err;
+        res.write(
+            '<div id="content"><pre>' +
+            txtString.toString().replace(/\n/g, "<br />") +
+            "</pre>"
+        );
+        res.end();
+    });
 });
 
 const server = http.createServer(app);
@@ -81,8 +101,8 @@ const io = socketUtils.WSIO(server);
 socketUtils.connection(io);
 
 const socketIOMiddlewre = (req, res, next) => {
-  req.io = io;
-  next();
+    req.io = io;
+    next();
 };
 
 
@@ -255,7 +275,7 @@ const backuptypemast = require("./api/it_backup_type_master/backup_type.router")
 const simOperators = require("./api/it_sim_operators/sim_operators.router");
 const notificationMenu = require("./api/notificationMenu/notification.router");
 const {
-  validateAccessToken,
+    validateAccessToken,
 } = require("./api/tokenValidation/tokenValidation");
 const AssetCondemnation = require("./api/am_condem_details/am_condem.router");
 // const backuptypemast = require('./api/it_backup_type_master/backup_type.router')
@@ -273,12 +293,12 @@ const amsAntibiotic = require("./api/ams_antibiotic/ams.router");
 app.use(express.json({ limit: "50mb" }));
 
 app.use((req, res, next) => {
-  if (req.method === "OPTIONS") {
-    res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
-    return res.status(200).json({});
-  }
+    if (req.method === "OPTIONS") {
+        res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
+        return res.status(200).json({});
+    }
 
-  next();
+    next();
 });
 
 // Outside Route Config
@@ -464,11 +484,11 @@ app.use("/api/approvalMapping", approvalMapping);
 app.use("/api/amsAntibiotic", amsAntibiotic);
 
 server.listen(
-  process.env.APP_PORT,
-  () => console.log(`Server Up and Running ${process.env.APP_PORT}`),
-  logger.productionLogger.log(
-    "info",
-    `Server Up and Running ${process.env.APP_PORT}`,
-    { meta1: "meta1" }
-  )
+    process.env.APP_PORT,
+    () => console.log(`Server Up and Running ${process.env.APP_PORT}`),
+    logger.productionLogger.log(
+        "info",
+        `Server Up and Running ${process.env.APP_PORT}`,
+        { meta1: "meta1" }
+    )
 );

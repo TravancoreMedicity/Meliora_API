@@ -99,6 +99,18 @@ const {
     getallipfollowup,
     updateipfollowup,
     getdischargepatient,
+    getCurrentCompany,
+    getptimpression,
+    insertimpression,
+    insertimpremark,
+    fetchimpremark,
+    getrelative,
+    getbirthdetail,
+    patientnotresponding,
+    getpatientnotresponding,
+    getstarcount,
+    getcategorycount,
+    getnursingstaiton,
     // getallscheduledate,
 } = require("./Feedback.controller");
 
@@ -241,15 +253,28 @@ router.get('/getroomassetdetail', getroomassetdetail)
 router.post('/inserthkitem', insertdischargeroomitem)
 router.post('/updatehkitem', updatedischargeroomitem)
 router.get('/getallhkitem', getallhkitem)
+router.get('/nurse', getnursingstaiton)
 
-router.get('/getallhkactiveitem', getallhkactiveitem)
+router.get('/getallhkactiveitem', getallhkactiveitem);
+router.get('/getstarcount', getstarcount);
+router.get('/getcategorycount', getcategorycount);
 
 router.post('/inserthkempdtl', inserthkempdtl)
 router.post('/updatehkempdtl', updatehkempdtl)
 router.get('/getallhkempdtl', getallhkempdtl)
 
 
-router.post('/getdischargepatient',getdischargepatient)
+router.post('/getdischargepatient', getdischargepatient)
+router.post('/ptnotresponding', patientnotresponding)
+router.post('/getptnotresponding', getpatientnotresponding)
+
+router.get('/getcurrentCompany', getCurrentCompany)
+router.post('/getptimpression', getptimpression)
+router.post('/insertimpression', insertimpression)
+router.post('/insertimpremark', insertimpremark)
+router.post('/fetchimpremark', fetchimpremark)
+router.post('/getrelative', getrelative)
+router.post('/getbirthdetail', getbirthdetail)
 
 //edlider meliora table
 // router.post('/insertbddetail', insertbddetail)

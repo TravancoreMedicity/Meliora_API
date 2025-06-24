@@ -159,6 +159,20 @@ const {
     updateipfollowup,
     insertDefaultPtImpression,
     getdischargepatient,
+    getCurrentCompany,
+    getptimpression,
+    insertimpression,
+    insertimppatientRemark,
+    fetchimpremark,
+    getrelative,
+    getbirthdetail,
+    patientnotresponding,
+    getpatientnotresponding,
+    getstarcount,
+    getcategorycount,
+    getnursingstaiton,
+    getTransferHistory,
+    getDischargepatient,
 } = require("./Feedback.service");
 
 module.exports = {
@@ -808,7 +822,8 @@ module.exports = {
     },
     insertFeedbackanswers: (req, res) => {
         const body = req.body;
-        const { fb_answers, fb_ip_num, fb_patient_num, fb_patient_name, fb_patient_mob, fdmast_slno, fb_default_quest, create_user } = body;
+        const { fb_answers, fb_ip_num, fb_patient_num, fb_patient_name, fb_patient_mob, fdmast_slno, fb_default_quest,
+            fb_default_reamark, create_user } = body;
 
         UpdateSerialAnswerMaster((error, results) => {
             if (error) {
@@ -855,7 +870,15 @@ module.exports = {
                 const impanswers = {
                     answer: fb_default_quest,
                     fb_transact_slno: fb_transact_slno_value,
+                    create_user: create_user
                 }
+
+                const impremark = {
+                    fb_transact_slno: fb_transact_slno_value,
+                    remark: fb_default_reamark,
+                    create_user: create_user
+                }
+
 
                 insertAllFeedBackTransactionMast(insertData, (error, results) => {
                     if (error) {
@@ -875,16 +898,28 @@ module.exports = {
                     })
 
                     // insert default question answer and details
-                    if (fdmast_slno === 8 && fdmast_slno != undefined) {
+                    if (fdmast_slno === 26 && fdmast_slno != undefined) {
                         insertDefaultPtImpression(impanswers, (error, results) => {
                             if (error) {
-                                console.log(error);
                                 return res.status(200).json({
                                     success: 1,
                                     message: error
                                 })
                             }
                         })
+                    }
+
+                    // insertdefault reamarks
+                    if (fdmast_slno === 26 && fdmast_slno != undefined) {
+                        insertimppatientRemark(impremark, (err, results) => {
+                            if (err) {
+                                return res.status(400).json({
+                                    success: 0,
+                                    message: err
+                                });
+                            }
+
+                        });
                     }
                     return res.status(200).json({
                         success: 2,
@@ -2207,10 +2242,11 @@ module.exports = {
         })
     },
     insertipfollowup: (req, res) => {
-        const { ipdata, Schedule_date, create_user } = req.body;
+        const { ipdata, Schedule_date, create_user, fb_pro_remark } = req.body;
         const combined = {
             ...ipdata,
             Schedule_date,
+            fb_pro_remark,
             create_user
         };
         insertipfollowup(combined, (error, results) => {
@@ -2538,9 +2574,22 @@ module.exports = {
                     message: "Successfully Inserted"
                 });
             });
-
         })
-
+    },
+    patientnotresponding: (req, res) => {
+        const data = req.body;
+        patientnotresponding(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Successfully Inserted"
+            });
+        });
     },
     updateassetitem: (req, res) => {
         const data = req.body;
@@ -2769,9 +2818,51 @@ module.exports = {
                 data: results
             });
         });
+    }, getnursingstaiton: (req, res) => {
+        getnursingstaiton((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 1) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found",
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
     },
     getallhkempdtl: (req, res) => {
         getallhkempdtl((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getCurrentCompany: (req, res) => {
+        getCurrentCompany((err, results) => {
             if (err) {
                 return res.status(400).json({
                     success: 0,
@@ -2812,7 +2903,48 @@ module.exports = {
             });
         });
     },
+    getstarcount: (req, res) => {
+        getstarcount((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
 
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getcategorycount: (req, res) => {
+        getcategorycount((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
     getprocheckbed: (req, res) => {
         getprocheckbed((err, results) => {
             if (err) {
@@ -3092,9 +3224,251 @@ module.exports = {
                 data: results
             });
         });
-    }, getdischargepatient: (req, res) => {
+    },
+    getptimpression: (req, res) => {
         const data = req.body;
-        getdischargepatient(data, (err, results) => {
+        getptimpression(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    insertimpression: (req, res) => {
+        const data = req.body;
+        insertDefaultPtImpression(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    insertimpremark: (req, res) => {
+        const data = req.body;
+        insertimppatientRemark(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Successfully inserted data"
+            });
+        });
+    },
+    fetchimpremark: (req, res) => {
+        const data = req.body;
+        fetchimpremark(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: 'Successfully fetched Data'
+            });
+        });
+    },
+    getrelative: (req, res) => {
+        const data = req.body;
+        const ipNumbers = data?.IP_NO || [];
+
+        if (ipNumbers.length === 0) {
+            return res.status(200).json({
+                success: 1,
+                message: 'No IpNumber Provided'
+            })
+        };
+
+        getrelative(ipNumbers, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            };
+
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            };
+
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: 'Successfully fetched Data'
+            });
+        });
+    },
+    getbirthdetail: (req, res) => {
+        const data = req.body;
+        getbirthdetail(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            };
+
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            };
+
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: 'Successfully fetched Data'
+            });
+        });
+    },
+
+    //discharge
+    getdischargepatient: (req, res) => {
+        const data = req.body;
+        const { NS_CODE, FROM_DATE, TO_DATE } = data;
+        let sql = `
+            SELECT 
+                fb_ip_no,
+                fb_ipd_date,
+                fb_pt_no,
+                fb_ptc_name,
+                fb_ptc_sex,
+                fb_ptd_dob,
+                fb_ptn_yearage,
+                fb_ptc_loadd1,
+                fb_ptc_loadd2,
+                fb_ptc_loadd3,
+                fb_ptc_loadd4,
+                fb_ipd_disc,
+                fb_ipc_status,
+                fb_dmd_date,
+                fb_ptc_mobile,
+                fb_doc_name,
+                fb_dep_desc,
+                fb_bed.fb_ns_code
+            FROM
+                fb_ipadmiss
+                LEFT JOIN fb_bed on  fb_ipadmiss.fb_bd_code = fb_bed.fb_bd_code
+            WHERE
+                fb_ipd_disc IS NOT NULL AND fb_ipc_status = 'R'
+        `;
+
+        let queryParams = [];
+
+        if (FROM_DATE) {
+            sql += " AND fb_ipd_disc >= ?";
+            queryParams = [...queryParams, FROM_DATE];
+        }
+        if (TO_DATE) {
+            sql += " AND fb_ipd_disc <= ?";
+            queryParams = [...queryParams, TO_DATE];
+        }
+        if (NS_CODE) {
+            sql += " AND fb_bed.fb_ns_code = ?";
+            queryParams = [...queryParams, NS_CODE];
+        } sql += `
+            GROUP BY
+                fb_ip_no,
+                fb_ipd_date,
+                fb_pt_no,
+                fb_ptc_name,
+                fb_ptc_sex,
+                fb_ptd_dob,
+                fb_ptn_yearage,
+                fb_ptc_loadd1,
+                fb_ptc_loadd2,
+                fb_ptc_loadd3,
+                fb_ptc_loadd4,
+                fb_ipd_disc,
+                fb_ipc_status,
+                fb_dmd_date,
+                fb_ptc_mobile,
+                fb_doc_name,
+                fb_dep_desc,
+                fb_bed.fb_ns_code
+                `;
+        getDischargepatient(sql, queryParams, (error, results) => {
+            if (error) {
+                return res.status(500).json({
+                    success: 0,
+                    message: error.message
+                });
+            }
+            if (!results || results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No data found"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+
+        // getdischargepatient(data, (err, results) => {
+        //     if (err) {
+        //         return res.status(400).json({
+        //             success: 0,
+        //             message: err
+        //         });
+        //     }
+        //     return res.status(200).json({
+        //         success: 2,
+        //         data: results
+        //     });
+        // });
+    },
+
+
+    getpatientnotresponding: (req, res) => {
+        const data = req.body;
+        getpatientnotresponding(data, (err, results) => {
             if (err) {
                 return res.status(400).json({
                     success: 0,
@@ -3107,6 +3481,7 @@ module.exports = {
             });
         });
     },
+
     getdischargeentrybed: (req, res) => {
         getdischargeentrybed((error, results) => {
             if (error) {
@@ -3216,4 +3591,5 @@ module.exports = {
 
 
 }
+
 

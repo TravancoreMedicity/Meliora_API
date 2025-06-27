@@ -1824,6 +1824,22 @@ where fb_ns_code=? and fb_floor_code=?
                 return callBack(null, results)
             })
     },
+    FindhkalreadyExist: (data, callBack) => {
+        pool.query(
+            `
+            select fb_hk_slno from 	fb_hk_check_bed where fb_hk_bed_slno = ? and fb_hk_status = 1
+            `,
+            [
+                data
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+
     getallnursestation: (callBack) => {
         pool.query(
             `
@@ -1864,8 +1880,6 @@ FROM fb_transaction_mast;
                 return callBack(null, results)
             })
     },
-
-
     updatenursestation: (data, callBack) => {
         pool.query(
             `
@@ -1885,6 +1899,32 @@ FROM fb_transaction_mast;
                 data.fb_ns_status,
                 data.edit_user,
                 data.fb_nurse_stn_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    updatehkcheckbed: (data, callBack) => {
+        const isInitial = data.fb_hk_bed_status === 1;
+        pool.query(
+            `
+            UPDATE  fb_hk_check_bed
+            SET
+            fb_hk_bed_status = ?,
+            fb_hk_bed_remark = ?,
+             ${isInitial ? 'fb_hk_initial_emp_assign' : 'fb_hk_finla_emp_assign'} = ?,
+            fb_hk_check_status=?
+            WHERE fb_hk_slno = ?
+            `,
+            [
+                data.fb_hk_bed_status,
+                data.fb_hk_bed_remark,
+                data.assignEmployeee,
+                data.fb_hk_check_status,
+                data.fb_hk_slno
             ],
             (error, results, fields) => {
                 if (error) {
@@ -3114,7 +3154,41 @@ where fb_rc_roomslno = ?
 
     getallassignedbed: (data, callBack) => {
         pool.query(
-            `select fb_hk_slno,fb_hk_bed_slno from fb_hk_check_bed where fb_hk_sv_assign = 168 and fb_hk_status = 1 `,
+            `SELECT 
+                fb_hk_check_bed.fb_hk_slno,
+                fb_hk_check_bed.fb_hk_bed_slno,
+                fb_hk_check_bed.fb_hk_check_status,
+                fb_hk_check_bed.fb_hk_bed_status,
+                fb_hk_check_bed.fb_hk_bed_remark,
+                fb_hk_check_bed.fb_hk_finla_emp_assign,
+                fb_hk_check_bed.fb_hk_initial_emp_assign,
+                fb_bed.fb_bed_slno,
+                fb_bed.fb_bd_code,
+                fb_bed.fb_bdc_no,
+                fb_bed.fb_ns_code,
+                fb_bed.fb_rt_code,
+                fb_bed.fb_bdc_occup,
+                fb_bed.fb_bdn_cccno,
+                fb_bed.fb_bdc_status,
+                fb_bed.fb_hkd_cleaningreq,
+                fb_bed.fb_rm_code,
+                fb_ns_name,
+                fb_rtc_desc,
+                fb_rtc_alias,
+                fb_bed.create_date
+            FROM
+                fb_hk_check_bed
+                    LEFT JOIN
+                fb_bed ON fb_hk_check_bed.fb_hk_bed_slno = fb_bed.fb_bed_slno
+                    LEFT JOIN
+                fb_nurse_station_master ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code
+                    LEFT JOIN
+                fb_room_type ON fb_bed.fb_rt_code = fb_room_type.fb_rt_code
+                    LEFT JOIN
+                fb_roomcreation_master ON fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
+            WHERE
+                fb_hk_sv_assign = ?
+                    AND fb_hk_status = 1`,
             [
                 data
             ]
@@ -4502,6 +4576,30 @@ select
             }
         )
     },
+    CheckBedAlreadyAssigned: (data, callBack) => {
+        pool.query(
+            `
+            SELECT 
+                fb_hk_slno
+            FROM
+                fb_hk_check_bed
+            WHERE
+                fb_hk_sv_assign = ?
+                    AND fb_hk_bed_slno = ?
+                    AND fb_hk_status = 0	
+            `,
+            [
+                data.fb_hk_sv_assign,
+                data.fb_hk_bed_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
     getdischargeentrybed: (callBack) => {
         pool.query(
             `
@@ -4634,6 +4732,27 @@ select
                 }
                 return callBack(null, { insertId: results.insertId });
             })
+    }, UpdateHkAssignedBed: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE  fb_hk_check_bed
+            SET
+                fb_hk_status = 1,
+                edit_user = ?
+            WHERE
+                fb_hk_slno = ?
+            `,
+            [
+                data.edit_user,
+                data.fb_hk_slno
+
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, { insertId: results.insertId });
+            })
     },
     updateipfollowup: (data, callBack) => {
         pool.query(
@@ -4660,9 +4779,8 @@ select
             })
     },
     CheckProCheckBedPresent: (data, callBack) => {
-        // `select fb_check_bed_slno from fb_pro_check_bed where fb_bed_slno = ?`,
         pool.query(
-            ` select fb_check_bed_slno from fb_pro_check_bed where fb_bed_slno = 12 and fb_final_check <> 1;`,
+            ` select fb_check_bed_slno from fb_pro_check_bed where fb_bed_slno = ? and fb_final_check IS NULL;`,
             [
                 data.fb_bed_slno,
             ]
@@ -4787,7 +4905,7 @@ where fb_pro_check_bed.fb_bed_slno = ?;`,
                 return callBack(null, results)
             })
     },
-    getDischargepatient: (sql, params, callback) => {  
+    getDischargepatient: (sql, params, callback) => {
         pool.query(sql, params, (error, results) => {
             if (error) {
                 return callback(error);
@@ -4795,4 +4913,61 @@ where fb_pro_check_bed.fb_bed_slno = ?;`,
             return callback(null, results);
         });
     },
+    insertHkdetails: (data, callBack) => {
+        const promises = data?.map((item) => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    ` INSERT INTO  fb_hk_bed_detail(
+                            fb_hk_slno,
+                            fb_hk_rm_cklist_slno,
+                            fb_hk_rm_item_condition
+                        ) 
+                        VALUES(?,?,?)
+            `,
+                    [
+                        item.fb_hk_slno,
+                        item.fb_hk_rm_cklist_slno,
+                        item.fb_hk_rm_item_condition
+                    ],
+                    (error, results, fields) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(results);
+                        }
+                    }
+                );
+            });
+        });
+        // Use Promise.all to wait for all insertions
+        Promise.all(promises)
+            .then((results) => {
+                callBack(null, results);
+            })
+            .catch((error) => {
+                callBack(error);
+            });
+
+    }, gethkcheckdtl: (data, callBack) => {
+        pool.query(
+            `
+            SELECT 
+                fb_hk_rm_item_condition, fb_hk_rm_cklist_slno
+            FROM
+                fb_hk_bed_detail
+            WHERE
+                fb_hk_slno = ?;	
+            `,
+            [
+                data.fb_hk_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+
 }

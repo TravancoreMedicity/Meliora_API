@@ -173,6 +173,12 @@ const {
     getnursingstaiton,
     getTransferHistory,
     getDischargepatient,
+    FindhkalreadyExist,
+    updatehkcheckbed,
+    CheckBedAlreadyAssigned,
+    UpdateHkAssignedBed,
+    insertHkdetails,
+    gethkcheckdtl,
 } = require("./Feedback.service");
 
 module.exports = {
@@ -1565,6 +1571,64 @@ module.exports = {
 
         })
     },
+    insertHkdetails: (req, res) => {
+        const body = req.body;
+        const { data, fb_bed_slno, fb_hk_bd_status, fb_hk_remark, fb_hk_emp_assign } = body;
+        const assignEmployeee = JSON.stringify(fb_hk_emp_assign);
+
+        FindhkalreadyExist(fb_bed_slno, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Error in fetchin data"
+                })
+            }
+
+            const Bed_slno = results?.[0]?.fb_hk_slno;
+
+            const updateData = {
+                fb_hk_slno: Bed_slno,
+                fb_hk_bed_status: fb_hk_bd_status,
+                fb_hk_bed_remark: fb_hk_remark,
+                assignEmployeee: assignEmployeee,
+                fb_hk_check_status: fb_hk_bd_status === 1 ? 1 : 2
+            };
+
+
+            const HkCheklistData = data?.map((val, index) => {
+                const insertData = {
+                    fb_hk_slno: Bed_slno,
+                    fb_hk_rm_cklist_slno: val?.fb_hk_rm_cklist_slno,
+                    fb_hk_rm_item_condition: val?.ispresent
+                }
+                return insertData
+            });
+
+            updatehkcheckbed(updateData, (error, results) => {
+                if (error) {
+                    return res.status(200).json({
+                        success: 1,
+                        message: error
+                    })
+                }
+            });
+
+            insertHkdetails(HkCheklistData, (error, results) => {
+                if (error) {
+                    return res.status(200).json({
+                        success: 1,
+                        message: error
+                    })
+                }
+            });
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Inserted Successfully'
+            })
+        })
+    },
+
     getallnursestation: (req, res) => {
         getallnursestation((error, results) => {
             if (error) {
@@ -2267,8 +2331,6 @@ module.exports = {
         const data = req.body;
         updateipfollowup(data, (error, results) => {
             if (error) {
-                console.log(error);
-
                 return res.status(200).json({
                     success: 0,
                     message: error
@@ -2330,8 +2392,6 @@ module.exports = {
         const data = req.body;
         getallipfollowup(data, (err, results) => {
             if (err) {
-                console.log(err);
-
                 return res.status(400).json({
                     success: 0,
                     message: err
@@ -2373,6 +2433,7 @@ module.exports = {
             });
         });
     },
+    // complaint feedback
     complaintregistraion: (req, res) => {
         const data = req.body;
         const { cm_assets, complaint_request_slno, compalint_date, cm_location, create_user } = data;
@@ -2447,6 +2508,7 @@ module.exports = {
 
         })
     },
+
     getdepassetonly: (req, res) => {
         const id = req.params.id;
         getdepassetonly(id, (err, results) => {
@@ -3150,13 +3212,49 @@ module.exports = {
 
     inserthkbedassign: (req, res) => {
         const data = req.body;
-        inserthkbedassign(data, (err, results) => {
+        const { fb_hk_sv_assign, fb_hk_bed_slno, fb_hk_status, create_user } = data;
+
+        const searchData = {
+            fb_hk_bed_slno: fb_hk_bed_slno,
+            fb_hk_sv_assign: fb_hk_sv_assign
+        };
+
+        CheckBedAlreadyAssigned(searchData, (err, results) => {
             if (err) {
                 return res.status(400).json({
                     success: 0,
                     message: err
                 });
             }
+
+            // if the Slno already exist change the status to 1 from 0
+            const HkBedSlno = results?.[0]?.fb_hk_slno;
+
+            const updateData = {
+                fb_hk_slno: HkBedSlno,
+                edit_user: create_user
+            }
+
+            if (HkBedSlno) {
+                UpdateHkAssignedBed(updateData, (err, results) => {
+                    if (err) {
+                        return res.status(400).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                })
+            } else {
+                inserthkbedassign(data, (err, results) => {
+                    if (err) {
+                        return res.status(400).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                });
+            }
+
             return res.status(200).json({
                 success: 2,
                 data: results
@@ -3514,6 +3612,8 @@ module.exports = {
             fb_bed_slno,
             fb_bd_code
         }
+
+
         CheckProCheckBedPresent(SearchData, (error, results) => {
             if (error) {
                 return res.status(200).status({
@@ -3573,20 +3673,120 @@ module.exports = {
                 });
 
             }
-
-
             return res.status(200).json({
                 success: 2,
                 message: "Initail Checklist Completed Successfully",
             })
+        })
+    },
+    gethkcheckdtl: (req, res) => {
+        const slno = req.body
+        gethkcheckdtl(slno, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+
+            });
+        })
+    },
+
+    houekeepingComplaintregistration: (req, res) => {
+        const data = req.body;
+        const {
+            cm_assets,
+            complaint_request_slno,
+            compalint_date,
+            cm_location,
+            create_user,
+            complaint_deptslno,
+            complaint_status,
+            assigned_employee
+        } = data;
+        const assetLength = cm_assets?.length;
+        fetchcurrentserialnos((error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "Error in fetching Data!"
+                })
+            };
+
+            let serialCurrentValue = results[0]?.serial_current;
+            let complaint_slno = serialCurrentValue;
+
+            if (!serialCurrentValue) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No data found"
+                })
+            };
+
+            const datas = cm_assets?.map((val, index) => {
+                const insertData = {
+                    complaint_slno: complaint_slno + index,
+                    complaint_deptslno: complaint_deptslno,
+                    complaint_desc: val?.fb_hk_rm_cklist_name,
+                    complaint_request_slno: complaint_request_slno,
+                    compalint_date: compalint_date,
+                    compalint_status: complaint_status,
+                    cm_location: cm_location,
+                    create_user: create_user,
+                    assigned_user: assigned_employee
+                }
+                return insertData
+            });
+
+
+
+            complaintregistraion(datas, (err, results) => {
+                if (err) {
+                    return res.status(400).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                UpdateSeiralNos(assetLength, (error, results) => {
+                    if (error) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: "Error in updating Value"
+                        })
+                    }
+                    UpdateComplaintDetailTable(datas, (err, results) => {
+                        if (err) {
+                            return res.status(400).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Successfully Inserted"
+                        });
+
+                    })
+
+                })
+
+            });
 
 
         })
-
-
-    },
-
-
+    }
 
 
 

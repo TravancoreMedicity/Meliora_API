@@ -111,6 +111,9 @@ const {
     getstarcount,
     getcategorycount,
     getnursingstaiton,
+    insertHkdetails,
+    gethkcheckdtl,
+    houekeepingComplaintregistration,
     // getallscheduledate,
 } = require("./Feedback.controller");
 
@@ -177,7 +180,7 @@ router.post('/getallmoduleitems', getallmoduleitems)
 
 router.get('/getfeedbackcount', getfeedbackcount)
 
-//nursingStation 
+router.post('/inserthkbeddetail', insertHkdetails)
 
 router.post('/nursestationinsert', nursestationinsert)
 router.post('/updatenursestation', updatenursestation)
@@ -189,7 +192,7 @@ router.post('/inpatientdetil', getCurrentPatient)
 
 router.get('/getallblockedbed', getallblockedbed) // check this later
 
-router.post('/insertbedremarks', insertbedremarks)
+router.post('/insertbedremarks', insertbedremarks) // maintainence
 router.get('/getllbedremarks', getllbedremarks)// check later this 
 
 
@@ -235,7 +238,7 @@ router.post('/inserthkbedassign', inserthkbedassign)
 router.post('/removeassign', removeassign)
 //get assined bed
 router.get('/getallassignedbed/:id', getallassignedbed)
-// router.get('/gethktakenbed')
+
 
 router.post('/insertroomchecklist', insertroomchecklist)
 router.post('/updateroomchecklist', updateroomchecklist)
@@ -275,6 +278,10 @@ router.post('/insertimpremark', insertimpremark)
 router.post('/fetchimpremark', fetchimpremark)
 router.post('/getrelative', getrelative)
 router.post('/getbirthdetail', getbirthdetail)
+
+
+router.post('/gethkcheckdtl', gethkcheckdtl)
+router.post('/hkcmpreg', houekeepingComplaintregistration)
 
 //edlider meliora table
 // router.post('/insertbddetail', insertbddetail)

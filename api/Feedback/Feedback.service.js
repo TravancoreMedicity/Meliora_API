@@ -920,7 +920,7 @@ WHERE serial_slno = 3
             });
         }))
     },
-    insertDefaultPtImpression: (data, callBack) => {
+    insertDefaultPtImpression: (data, callBack) => { 
         const { answer, fb_transact_slno, create_user } = data;
         // This code destruct nested answer object to corresponding  details
         const insertPromises = Object.entries(answer)
@@ -4969,5 +4969,52 @@ where fb_pro_check_bed.fb_bed_slno = ?;`,
             }
         )
     },
+    gethkbedDetails: (data, callBack) => {
+        pool.query(
+            `  
+            SELECT 
+                fb_hk_sv_assign,
+                fb_hk_bed_remark,
+                fb_hk_check_status,
+                em_name,
+                fb_hk_bed_status
+            FROM
+                fb_hk_check_bed
+            left join co_employee_master on fb_hk_check_bed.fb_hk_sv_assign = co_employee_master.em_id
+            WHERE
+                fb_hk_bed_slno = ?
+            `,
+            [
+                data.fb_hk_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+
+    gethkcomplaintdetails: (data, callBack) => {
+        pool.query(
+            `
+           SELECT 
+                complaint_desc,compalint_status
+            FROM
+                cm_complaint_mast
+            WHERE complaint_deptslno  = 1 AND cm_location = ?
+            `,
+            [
+                data.cm_location
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+
 
 }

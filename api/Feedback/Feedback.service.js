@@ -920,7 +920,7 @@ WHERE serial_slno = 3
             });
         }))
     },
-    insertDefaultPtImpression: (data, callBack) => {
+    insertDefaultPtImpression: (data, callBack) => { 
         const { answer, fb_transact_slno, create_user } = data;
         // This code destruct nested answer object to corresponding  details
         const insertPromises = Object.entries(answer)

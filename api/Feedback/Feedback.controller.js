@@ -834,6 +834,7 @@ module.exports = {
             fb_default_reamark, create_user } = body;
 
         UpdateSerialAnswerMaster((error, results) => {
+
             if (error) {
                 return res.status(200).json({
                     success: 1,
@@ -850,7 +851,7 @@ module.exports = {
 
                 // getting transaction slno for the each patients
                 let serialCurrentValue = results[0]?.serial_current;
-
+        
                 if (!serialCurrentValue) {
                     return res.status(200).json({
                         success: 1,
@@ -905,9 +906,11 @@ module.exports = {
                         }
                     })
 
+
                     // insert default question answer and details
                     if (fdmast_slno === 8 && fdmast_slno != undefined) {
                         insertDefaultPtImpression(impanswers, (error, results) => {
+
                             if (error) {
                                 return res.status(200).json({
                                     success: 1,
@@ -1608,7 +1611,6 @@ module.exports = {
 
             updatehkcheckbed(updateData, (error, results) => {
                 if (error) {
-                    console.log(error, "updatehkcheckbed");
                     return res.status(200).json({
                         success: 1,
                         message: error
@@ -1618,7 +1620,6 @@ module.exports = {
 
             insertHkdetails(HkCheklistData, (error, results) => {
                 if (error) {
-                    console.log(error, "insertHkdetails");
                     return res.status(200).json({
                         success: 1,
                         message: error

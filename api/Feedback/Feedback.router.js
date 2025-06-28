@@ -114,6 +114,8 @@ const {
     insertHkdetails,
     gethkcheckdtl,
     houekeepingComplaintregistration,
+    gethkcomplaintdetails,
+    gethkbedDetails,
     // getallscheduledate,
 } = require("./Feedback.controller");
 
@@ -282,6 +284,8 @@ router.post('/getbirthdetail', getbirthdetail)
 
 router.post('/gethkcheckdtl', gethkcheckdtl)
 router.post('/hkcmpreg', houekeepingComplaintregistration)
+router.post('/gethkcmpdetail', gethkcomplaintdetails)
+router.post('/gethkbeddetail', gethkbedDetails)
 
 //edlider meliora table
 // router.post('/insertbddetail', insertbddetail)

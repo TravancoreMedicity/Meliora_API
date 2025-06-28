@@ -179,6 +179,8 @@ const {
     UpdateHkAssignedBed,
     insertHkdetails,
     gethkcheckdtl,
+    gethkcomplaintdetails,
+    gethkbedDetails,
 } = require("./Feedback.service");
 
 module.exports = {
@@ -904,7 +906,7 @@ module.exports = {
                     })
 
                     // insert default question answer and details
-                    if (fdmast_slno === 26 && fdmast_slno != undefined) {
+                    if (fdmast_slno === 8 && fdmast_slno != undefined) {
                         insertDefaultPtImpression(impanswers, (error, results) => {
                             if (error) {
                                 return res.status(200).json({
@@ -916,7 +918,7 @@ module.exports = {
                     }
 
                     // insertdefault reamarks
-                    if (fdmast_slno === 26 && fdmast_slno != undefined) {
+                    if (fdmast_slno === 8 && fdmast_slno != undefined) {
                         insertimppatientRemark(impremark, (err, results) => {
                             if (err) {
                                 return res.status(400).json({
@@ -1574,6 +1576,7 @@ module.exports = {
     insertHkdetails: (req, res) => {
         const body = req.body;
         const { data, fb_bed_slno, fb_hk_bd_status, fb_hk_remark, fb_hk_emp_assign } = body;
+
         const assignEmployeee = JSON.stringify(fb_hk_emp_assign);
 
         FindhkalreadyExist(fb_bed_slno, (error, results) => {
@@ -1594,7 +1597,6 @@ module.exports = {
                 fb_hk_check_status: fb_hk_bd_status === 1 ? 1 : 2
             };
 
-
             const HkCheklistData = data?.map((val, index) => {
                 const insertData = {
                     fb_hk_slno: Bed_slno,
@@ -1606,6 +1608,7 @@ module.exports = {
 
             updatehkcheckbed(updateData, (error, results) => {
                 if (error) {
+                    console.log(error, "updatehkcheckbed");
                     return res.status(200).json({
                         success: 1,
                         message: error
@@ -1615,6 +1618,7 @@ module.exports = {
 
             insertHkdetails(HkCheklistData, (error, results) => {
                 if (error) {
+                    console.log(error, "insertHkdetails");
                     return res.status(200).json({
                         success: 1,
                         message: error
@@ -3702,6 +3706,29 @@ module.exports = {
             });
         })
     },
+    gethkbedDetails: (req, res) => {
+        const slno = req.body
+        gethkbedDetails(slno, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+
+            });
+        })
+    },
 
     houekeepingComplaintregistration: (req, res) => {
         const data = req.body;
@@ -3785,6 +3812,29 @@ module.exports = {
             });
 
 
+        })
+    },
+    gethkcomplaintdetails: (req, res) => {
+        const slno = req.body
+        gethkcomplaintdetails(slno, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+
+            });
         })
     }
 

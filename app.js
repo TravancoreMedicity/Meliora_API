@@ -33,6 +33,7 @@ app.use(
             'http://195.168.34.25:3001',          
             'http://195.168.34.25:3000',
             'http://192.168.22.8:3000'
+
         ],
         credentials: true,
     })
@@ -270,6 +271,8 @@ const companyMast = require("./api/crm_company_mast/company.router");
 const crmDashboard = require("./api/crm_dashboard/crmDasboard.router");
 const approvalMapping = require("./api/crm_approval_mapping/approval.router");
 const amsAntibiotic = require("./api/ams_antibiotic/ams.router");
+const validateAuthentication = require("./api/validate_authentication/employeeData.router");
+
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -457,12 +460,13 @@ app.use("/api/backuptypemast", backuptypemast);
 app.use("/api/simOperators", simOperators);
 app.use("/api/AssetCondemnation", AssetCondemnation);
 app.get("/api/validateToken", validateTokenFrontend);
-
 app.use("/api/deliveryMarking", crfDeliveryMarking);
 app.use("/api/companyMast", companyMast);
 app.use("/api/CRFDashboard", crmDashboard);
 app.use("/api/approvalMapping", approvalMapping);
 app.use("/api/amsAntibiotic", amsAntibiotic);
+app.use("/api/validateAuthentication", validateAuthentication);
+
 
 server.listen(
     process.env.APP_PORT,

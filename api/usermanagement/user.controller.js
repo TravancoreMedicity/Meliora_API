@@ -281,7 +281,7 @@ module.exports = {
               message,
             });
           } else {
-            const accessToken = generateAccessToken(userData);
+            const accessToken = generateAccessToken(empdtl_slno);
             const refreshToken = generateRefreshToken(empdtl_slno); //instead use empdtl_slno
             // insert the refresh token
             //user_slno to empdtl_slno

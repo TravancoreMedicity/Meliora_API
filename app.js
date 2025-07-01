@@ -457,7 +457,6 @@ app.use("/api/backuptypemast", backuptypemast);
 app.use("/api/simOperators", simOperators);
 app.use("/api/AssetCondemnation", AssetCondemnation);
 app.get("/api/validateToken", validateTokenFrontend);
-
 app.use("/api/deliveryMarking", crfDeliveryMarking);
 app.use("/api/companyMast", companyMast);
 app.use("/api/CRFDashboard", crmDashboard);

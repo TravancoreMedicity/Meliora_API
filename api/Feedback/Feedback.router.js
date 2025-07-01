@@ -99,6 +99,23 @@ const {
     getallipfollowup,
     updateipfollowup,
     getdischargepatient,
+    getCurrentCompany,
+    getptimpression,
+    insertimpression,
+    insertimpremark,
+    fetchimpremark,
+    getrelative,
+    getbirthdetail,
+    patientnotresponding,
+    getpatientnotresponding,
+    getstarcount,
+    getcategorycount,
+    getnursingstaiton,
+    insertHkdetails,
+    gethkcheckdtl,
+    houekeepingComplaintregistration,
+    gethkcomplaintdetails,
+    gethkbedDetails,
     // getallscheduledate,
 } = require("./Feedback.controller");
 
@@ -165,7 +182,7 @@ router.post('/getallmoduleitems', getallmoduleitems)
 
 router.get('/getfeedbackcount', getfeedbackcount)
 
-//nursingStation 
+router.post('/inserthkbeddetail', insertHkdetails)
 
 router.post('/nursestationinsert', nursestationinsert)
 router.post('/updatenursestation', updatenursestation)
@@ -177,7 +194,7 @@ router.post('/inpatientdetil', getCurrentPatient)
 
 router.get('/getallblockedbed', getallblockedbed) // check this later
 
-router.post('/insertbedremarks', insertbedremarks)
+router.post('/insertbedremarks', insertbedremarks) // maintainence
 router.get('/getllbedremarks', getllbedremarks)// check later this 
 
 
@@ -223,7 +240,7 @@ router.post('/inserthkbedassign', inserthkbedassign)
 router.post('/removeassign', removeassign)
 //get assined bed
 router.get('/getallassignedbed/:id', getallassignedbed)
-// router.get('/gethktakenbed')
+
 
 router.post('/insertroomchecklist', insertroomchecklist)
 router.post('/updateroomchecklist', updateroomchecklist)
@@ -241,15 +258,34 @@ router.get('/getroomassetdetail', getroomassetdetail)
 router.post('/inserthkitem', insertdischargeroomitem)
 router.post('/updatehkitem', updatedischargeroomitem)
 router.get('/getallhkitem', getallhkitem)
+router.get('/nurse', getnursingstaiton)
 
-router.get('/getallhkactiveitem', getallhkactiveitem)
+router.get('/getallhkactiveitem', getallhkactiveitem);
+router.get('/getstarcount', getstarcount);
+router.get('/getcategorycount', getcategorycount);
 
 router.post('/inserthkempdtl', inserthkempdtl)
 router.post('/updatehkempdtl', updatehkempdtl)
 router.get('/getallhkempdtl', getallhkempdtl)
 
 
-router.post('/getdischargepatient',getdischargepatient)
+router.post('/getdischargepatient', getdischargepatient)
+router.post('/ptnotresponding', patientnotresponding)
+router.post('/getptnotresponding', getpatientnotresponding)
+
+router.get('/getcurrentCompany', getCurrentCompany)
+router.post('/getptimpression', getptimpression)
+router.post('/insertimpression', insertimpression)
+router.post('/insertimpremark', insertimpremark)
+router.post('/fetchimpremark', fetchimpremark)
+router.post('/getrelative', getrelative)
+router.post('/getbirthdetail', getbirthdetail)
+
+
+router.post('/gethkcheckdtl', gethkcheckdtl)
+router.post('/hkcmpreg', houekeepingComplaintregistration)
+router.post('/gethkcmpdetail', gethkcomplaintdetails)
+router.post('/gethkbeddetail', gethkbedDetails)
 
 //edlider meliora table
 // router.post('/insertbddetail', insertbddetail)

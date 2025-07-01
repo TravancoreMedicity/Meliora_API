@@ -270,6 +270,7 @@ const companyMast = require("./api/crm_company_mast/company.router");
 const crmDashboard = require("./api/crm_dashboard/crmDasboard.router");
 const approvalMapping = require("./api/crm_approval_mapping/approval.router");
 const amsAntibiotic = require("./api/ams_antibiotic/ams.router");
+const validateAuthentication = require("./api/validate_authentication/employeeData.router");
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -462,6 +463,7 @@ app.use("/api/companyMast", companyMast);
 app.use("/api/CRFDashboard", crmDashboard);
 app.use("/api/approvalMapping", approvalMapping);
 app.use("/api/amsAntibiotic", amsAntibiotic);
+app.use("/api/validateAuthentication", validateAuthentication);
 
 server.listen(
   process.env.APP_PORT,

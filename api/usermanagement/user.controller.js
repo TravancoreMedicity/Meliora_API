@@ -260,6 +260,8 @@ module.exports = {
                         em_id
                     } = userData;
 
+                // console.log(userData,"userData");
+                
                     const validatingUserLogin = validateUserLoginCheck(
                         password_validity,
                         last_passwd_change_date,
@@ -274,7 +276,7 @@ module.exports = {
                             message,
                         });
                     } else {
-                        const accessToken = generateAccessToken(userData);
+                        const accessToken = generateAccessToken(empdtl_slno);
                         const refreshToken = generateRefreshToken(empdtl_slno); //instead use empdtl_slno
                         // insert the refresh token
                         //user_slno to empdtl_slno
@@ -290,10 +292,11 @@ module.exports = {
                                 const returnData = {
                                     empdtl_slno,
                                     login_method_allowed,
-                                    em_id
-                                };
+                                    em_id,
+                                   token: accessToken,    
+                                                            };
                                 res.cookie("accessToken", accessToken, {
-                                    httpOnly: true,
+                                    // httpOnly: true,
                                     secure: false,// Set to false for HTTP (localhost). Use true for HTTPS (production).
                                     maxAge: process.env.COOKIE_TIME,// Optional: sets cookie expiry time in milliseconds  15 min
                                     sameSite: "Lax", // Helps with CSRF protection; strict is better than lax for security reasons
@@ -317,4 +320,5 @@ module.exports = {
             }
         });
     },
+    
 };

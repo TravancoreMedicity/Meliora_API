@@ -1,5 +1,6 @@
 const router = require("express").Router();
-const { checkToken } = require("../../authentication/token_validation");
+const { verifyToken } = require("../tokenValidation/tokenValidation");
+
 
 const {
     insertfeedbackcategory,
@@ -127,176 +128,176 @@ const {
 
 
 //categories
-router.post('/insertcategory', checkToken, insertfeedbackcategory)
-router.get('/getallCategories', checkToken, getallcategories)
-router.post('/updatecategory', checkToken, updatecategory)
+router.post('/insertcategory', verifyToken, insertfeedbackcategory)
+router.get('/getallCategories', verifyToken, getallcategories)
+router.post('/updatecategory', verifyToken, updatecategory)
 
 //subcategories
-router.post('/insertsubcategory', checkToken, insertsubcategory)
-router.get('/getallsubCategories', checkToken, getallsubCategories)
-router.post('/updatesubcategory', checkToken, updatesubcategory)
+router.post('/insertsubcategory', verifyToken, insertsubcategory)
+router.get('/getallsubCategories', verifyToken, getallsubCategories)
+router.post('/updatesubcategory', verifyToken, updatesubcategory)
 //collectiontype
-router.post('/insertcollectiontype', checkToken, insertcollectiontype)
-router.get('/allfeedbackcollection', checkToken, allfeedbackcollection)
-router.post('/updatecollectiontype', checkToken, updatecollectiontype)
-router.post("/getfeedbacksubcategory", checkToken, getfeedbacksubcategory)
+router.post('/insertcollectiontype', verifyToken, insertcollectiontype)
+router.get('/allfeedbackcollection', verifyToken, allfeedbackcollection)
+router.post('/updatecollectiontype', verifyToken, updatecollectiontype)
+router.post("/getfeedbacksubcategory", verifyToken, getfeedbacksubcategory)
 //feedback master
-router.post('/insertfeedback', checkToken, insertFeedbackName)
-router.get('/getallfeedback', checkToken, getFeedbackName)
-router.post('/updatetfeedback', checkToken, UpdateFeedbackName)
+router.post('/insertfeedback', verifyToken, insertFeedbackName)
+router.get('/getallfeedback', verifyToken, getFeedbackName)
+router.post('/updatetfeedback', verifyToken, UpdateFeedbackName)
 // feedbackDetial master   
-router.post('/insertfeedbackDetail', checkToken, insertfeedbackDetail)
-router.get('/getallfeedbackDetail', checkToken, getallfeedbackDetail)
-router.post('/updatefeedbackDetail', checkToken, updatefeedbackDetail)
+router.post('/insertfeedbackDetail', verifyToken, insertfeedbackDetail)
+router.get('/getallfeedbackDetail', verifyToken, getallfeedbackDetail)
+router.post('/updatefeedbackDetail', verifyToken, updatefeedbackDetail)
 
-router.post('/fetchFeedbackdtl', checkToken, fetchFeedbackdtl)
+router.post('/fetchFeedbackdtl', verifyToken, fetchFeedbackdtl)
 router.post('/fetchfbdisplay', fetchfbdisplay)// no check token
 // feedback user transaction
 router.post('/feedbackanswers', insertFeedbackanswers) // no check token
-router.post('/getalluserfeedback', checkToken, getalluserfeedback)
+router.post('/getalluserfeedback', verifyToken, getalluserfeedback)
 //feedback all Masters
-router.post('/insertmodulemaster', checkToken, insertmodulemaster)
-router.post('/updatemodulemaster', checkToken, updatemodulemaster)
-router.get('/getallmodulemaster', checkToken, getallmodulemaster)
+router.post('/insertmodulemaster', verifyToken, insertmodulemaster)
+router.post('/updatemodulemaster', verifyToken, updatemodulemaster)
+router.get('/getallmodulemaster', verifyToken, getallmodulemaster)
 
-router.post('/insertmenumaster', checkToken, insertmenumaster)
-router.get('/getallmenumaster', checkToken, getallmenumaster)
-router.post('/updatemenumaster', checkToken, updatemenumaster)
-
-
-router.post('/insertgroupmaster', checkToken, insertgroupmaster)
-router.post('/updategroupmaster', checkToken, updategroupmaster)
-router.get('/getallgroupmaster', checkToken, getallgroupmaster)
-
-router.post('/getallmodulemenu', checkToken, getallmodulemenu)
-router.post('/insertuserright', checkToken, insertuserright)
-router.post('/updateuserright', checkToken, updateuserright)
-
-router.get("/deparment", checkToken, getDeptStatus)
-router.get("/deparmentsec/:id", checkToken, getDepartmentSec)
-router.get("/departmentemp/:id", checkToken, getDepartmentEmpid)
-
-router.post('/employeerightinsert', checkToken, employeerightinsert)
-router.get('/getallemployeeright', checkToken, getallemployeeright)
-router.post('/employeerightupdate', checkToken, employeerightupdate)
-
-router.post('/getallmenuitems', checkToken, getallmenuitems)
-router.post('/insertusermodulemaster', checkToken, insertusermodulemaster)
-router.post('/updateusermodulemaster', checkToken, updateusermodulemaster)
-router.get('/getallusermodulemaster', checkToken, getallusermodulemaster)
-router.post('/getallmoduleitems', checkToken, getallmoduleitems)
-
-router.get('/getfeedbackcount', checkToken, getfeedbackcount)
-
-router.post('/inserthkbeddetail', checkToken, insertHkdetails)
-
-router.post('/nursestationinsert', checkToken, nursestationinsert)
-router.post('/updatenursestation', checkToken, updatenursestation)
-router.get('/getallnursestation', checkToken, getallnursestation)
-router.post('/getpatientfeedback', checkToken, getpatientfeedback)
-
-router.post('/getbed', checkToken, getNursingBed)
-router.post('/inpatientdetil', checkToken, getCurrentPatient)
-
-router.get('/getallblockedbed', checkToken, getallblockedbed) // check this later
-router.get('/getchecklistbed', checkToken, getchecklistbed) // check this later
-
-router.post('/insertbedremarks', checkToken, insertbedremarks) // maintainence
-router.get('/getllbedremarks', checkToken, getllbedremarks)// check later this 
+router.post('/insertmenumaster', verifyToken, insertmenumaster)
+router.get('/getallmenumaster', verifyToken, getallmenumaster)
+router.post('/updatemenumaster', verifyToken, updatemenumaster)
 
 
-router.post('/getalldischargeform', checkToken, getalldischargeform)
-router.post('/insertipfollowup', checkToken, insertipfollowup)
-router.post("/getallipfollowup", checkToken, getallipfollowup)
-router.post("/updateipfollowup", checkToken, updateipfollowup)
+router.post('/insertgroupmaster', verifyToken, insertgroupmaster)
+router.post('/updategroupmaster', verifyToken, updategroupmaster)
+router.get('/getallgroupmaster', verifyToken, getallgroupmaster)
+
+router.post('/getallmodulemenu', verifyToken, getallmodulemenu)
+router.post('/insertuserright', verifyToken, insertuserright)
+router.post('/updateuserright', verifyToken, updateuserright)
+
+router.get("/deparment", verifyToken, getDeptStatus)
+router.get("/deparmentsec/:id", verifyToken, getDepartmentSec)
+router.get("/departmentemp/:id", verifyToken, getDepartmentEmpid)
+
+router.post('/employeerightinsert', verifyToken, employeerightinsert)
+router.get('/getallemployeeright', verifyToken, getallemployeeright)
+router.post('/employeerightupdate', verifyToken, employeerightupdate)
+
+router.post('/getallmenuitems', verifyToken, getallmenuitems)
+router.post('/insertusermodulemaster', verifyToken, insertusermodulemaster)
+router.post('/updateusermodulemaster', verifyToken, updateusermodulemaster)
+router.get('/getallusermodulemaster', verifyToken, getallusermodulemaster)
+router.post('/getallmoduleitems', verifyToken, getallmoduleitems)
+
+router.get('/getfeedbackcount', verifyToken, getfeedbackcount)
+
+router.post('/inserthkbeddetail', verifyToken, insertHkdetails)
+
+router.post('/nursestationinsert', verifyToken, nursestationinsert)
+router.post('/updatenursestation', verifyToken, updatenursestation)
+router.get('/getallnursestation', verifyToken, getallnursestation)
+router.post('/getpatientfeedback', verifyToken, getpatientfeedback)
+
+router.post('/getbed', verifyToken, getNursingBed)
+router.post('/inpatientdetil', verifyToken, getCurrentPatient)
+
+router.get('/getallblockedbed', verifyToken, getallblockedbed) // check this later
+router.get('/getchecklistbed', verifyToken, getchecklistbed) // check this later
+
+router.post('/insertbedremarks', verifyToken, insertbedremarks) // maintainence
+router.get('/getllbedremarks', verifyToken, getllbedremarks)// check later this 
+
+
+router.post('/getalldischargeform', verifyToken, getalldischargeform)
+router.post('/insertipfollowup', verifyToken, insertipfollowup)
+router.post("/getallipfollowup", verifyToken, getallipfollowup)
+router.post("/updateipfollowup", verifyToken, updateipfollowup)
 
 
 
-router.get('/getempdetail/:id', checkToken, getempdetail)
-router.get('/getbedremarkDetail/:id', checkToken, getbedremarkDetail)
-router.get('/getberremarkstatus', checkToken, getberremarkstatus)
-router.get('/getallhkbeds', checkToken, getallHousekeepingBeds)
+router.get('/getempdetail/:id', verifyToken, getempdetail)
+router.get('/getbedremarkDetail/:id', verifyToken, getbedremarkDetail)
+router.get('/getberremarkstatus', verifyToken, getberremarkstatus)
+router.get('/getallhkbeds', verifyToken, getallHousekeepingBeds)
 
-router.get('/getcomplaintdetail/:id', checkToken, getcomplaintdetail)
-router.get('/getallroomassetdata/:id', checkToken, getallroomassetdata)
+router.get('/getcomplaintdetail/:id', verifyToken, getcomplaintdetail)
+router.get('/getallroomassetdata/:id', verifyToken, getallroomassetdata)
 
 
-router.get('/getallroomdetail', checkToken, getallroomdetail)
-router.get('/getallnewroomdetail', checkToken, getallnewroomdetail)
-router.get('/getallbedmaster', checkToken, getallbedmaster)
-router.post('/insertroommaster', checkToken, insertroommaster)
-router.post('/updateroommaster', checkToken, updateroommaster)
+router.get('/getallroomdetail', verifyToken, getallroomdetail)
+router.get('/getallnewroomdetail', verifyToken, getallnewroomdetail)
+router.get('/getallbedmaster', verifyToken, getallbedmaster)
+router.post('/insertroommaster', verifyToken, insertroommaster)
+router.post('/updateroommaster', verifyToken, updateroommaster)
 
-router.get('/getallcomplaintdetail', checkToken, getAllComplaintDetail)
-router.get('/getallComplaintType/:id', checkToken, getallComplaintType)
-router.post('/complaintregistraion', checkToken, complaintregistraion)
+router.get('/getallcomplaintdetail', verifyToken, getAllComplaintDetail)
+router.get('/getallComplaintType/:id', verifyToken, getallComplaintType)
+router.post('/complaintregistraion', verifyToken, complaintregistraion)
 
-router.post('/rectifycom', checkToken, rectifycomplaint)
-router.post('/insertroomassetdetail', checkToken, insertroomassetdetail)
-router.post('/updateroomassetdetail', checkToken, updateroomassetdetail)
+router.post('/rectifycom', verifyToken, rectifycomplaint)
+router.post('/insertroomassetdetail', verifyToken, insertroomassetdetail)
+router.post('/updateroomassetdetail', verifyToken, updateroomassetdetail)
 
-router.post('/insertassetitem', checkToken, insertassetitem)
-router.post('/updateassetitem', checkToken, updateassetitem)
-router.get('/getassetitem', checkToken, getallassetItems)
+router.post('/insertassetitem', verifyToken, insertassetitem)
+router.post('/updateassetitem', verifyToken, updateassetitem)
+router.get('/getassetitem', verifyToken, getallassetItems)
 
-router.post('/insertprocheckdetl', checkToken, insertprocheckdetl)
+router.post('/insertprocheckdetl', verifyToken, insertprocheckdetl)
 
 
 
 //get insethkbedassing
-router.post('/inserthkbedassign', checkToken, inserthkbedassign)
-router.post('/removeassign', checkToken, removeassign)
+router.post('/inserthkbedassign', verifyToken, inserthkbedassign)
+router.post('/removeassign', verifyToken, removeassign)
 //get assined bed
-router.get('/getallassignedbed/:id', checkToken, getallassignedbed)
+router.get('/getallassignedbed/:id', verifyToken, getallassignedbed)
 
 
-router.post('/insertroomchecklist', checkToken, insertroomchecklist)
-router.post('/updateroomchecklist', checkToken, updateroomchecklist)
-router.get('/getroomchecklist', checkToken, getroomchecklist)
-router.get('/getprocheckbed', checkToken, getprocheckbed)
-router.get('/getprocheckcompletebed', checkToken, getprocheckcompletebed)
+router.post('/insertroomchecklist', verifyToken, insertroomchecklist)
+router.post('/updateroomchecklist', verifyToken, updateroomchecklist)
+router.get('/getroomchecklist', verifyToken, getroomchecklist)
+router.get('/getprocheckbed', verifyToken, getprocheckbed)
+router.get('/getprocheckcompletebed', verifyToken, getprocheckcompletebed)
 
-router.get('/getprochecklistdetail/:id', checkToken, getprochecklistdetail)
+router.get('/getprochecklistdetail/:id', verifyToken, getprochecklistdetail)
 
-router.get('/getdischargeentrybed', checkToken, getdischargeentrybed)
-router.get('/getdepassetonly/:id', checkToken, getdepassetonly)
-router.get('/getroomassetdetail', checkToken, getroomassetdetail)
-
-
-router.post('/inserthkitem', checkToken, insertdischargeroomitem)
-router.post('/updatehkitem', checkToken, updatedischargeroomitem)
-router.get('/getallhkitem', checkToken, getallhkitem)
-router.get('/nurse', checkToken, getnursingstaiton)
-
-router.get('/getallhkactiveitem', checkToken, getallhkactiveitem);
-router.get('/getstarcount', checkToken, getstarcount);
-router.get('/getcategorycount', checkToken, getcategorycount);
-
-router.post('/inserthkempdtl', checkToken, inserthkempdtl)
-router.post('/updatehkempdtl', checkToken, updatehkempdtl)
-router.get('/getallhkempdtl', checkToken, getallhkempdtl)
+router.get('/getdischargeentrybed', verifyToken, getdischargeentrybed)
+router.get('/getdepassetonly/:id', verifyToken, getdepassetonly)
+router.get('/getroomassetdetail', verifyToken, getroomassetdetail)
 
 
-router.post('/getdischargepatient', checkToken, getdischargepatient)
-router.post('/ptnotresponding', checkToken, patientnotresponding)
-router.post('/getptnotresponding', checkToken, getpatientnotresponding)
+router.post('/inserthkitem', verifyToken, insertdischargeroomitem)
+router.post('/updatehkitem', verifyToken, updatedischargeroomitem)
+router.get('/getallhkitem', verifyToken, getallhkitem)
+router.get('/nurse', verifyToken, getnursingstaiton)
+
+router.get('/getallhkactiveitem', verifyToken, getallhkactiveitem);
+router.get('/getstarcount', verifyToken, getstarcount);
+router.get('/getcategorycount', verifyToken, getcategorycount);
+
+router.post('/inserthkempdtl', verifyToken, inserthkempdtl)
+router.post('/updatehkempdtl', verifyToken, updatehkempdtl)
+router.get('/getallhkempdtl', verifyToken, getallhkempdtl)
+
+
+router.post('/getdischargepatient', verifyToken, getdischargepatient)
+router.post('/ptnotresponding', verifyToken, patientnotresponding)
+router.post('/getptnotresponding', verifyToken, getpatientnotresponding)
 
 router.get('/getcurrentCompany', getCurrentCompany) // no check token
-router.post('/getptimpression', checkToken, getptimpression)
-router.post('/insertimpression', checkToken, insertimpression)
-router.post('/insertimpremark', checkToken, insertimpremark)
-router.post('/fetchimpremark', checkToken, fetchimpremark)
-router.post('/getrelative', checkToken, getrelative)
-router.post('/getbirthdetail', checkToken, getbirthdetail)
+router.post('/getptimpression', verifyToken, getptimpression)
+router.post('/insertimpression', verifyToken, insertimpression)
+router.post('/insertimpremark', verifyToken, insertimpremark)
+router.post('/fetchimpremark', verifyToken, fetchimpremark)
+router.post('/getrelative', verifyToken, getrelative)
+router.post('/getbirthdetail', verifyToken, getbirthdetail)
 
 
-router.post('/gethkcheckdtl', checkToken, gethkcheckdtl)
-router.post('/hkcmpreg', checkToken, houekeepingComplaintregistration)
-router.post('/gethkcmpdetail', checkToken, gethkcomplaintdetails)
-router.post('/gethkbeddetail', checkToken, gethkbedDetails)
+router.post('/gethkcheckdtl', verifyToken, gethkcheckdtl)
+router.post('/hkcmpreg', verifyToken, houekeepingComplaintregistration)
+router.post('/gethkcmpdetail', verifyToken, gethkcomplaintdetails)
+router.post('/gethkbeddetail', verifyToken, gethkbedDetails)
 
-router.post('/commonfbreport', checkToken, getCommonFeedbackReport);
-router.post('/ipfbreport', checkToken, getIpFeedbackReport);
+router.post('/commonfbreport', verifyToken, getCommonFeedbackReport);
+router.post('/ipfbreport', verifyToken, getIpFeedbackReport);
 
 //edlider meliora table
 // router.post('/insertbddetail', insertbddetail)

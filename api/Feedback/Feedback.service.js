@@ -226,7 +226,7 @@ LEFT JOIN
 	fb_category_master
 ON
 	fb_category_master.fb_category_slno = fb_subcategory_master.fb_category_slno
-WHERE meliora.fb_subcategory_master.fb_category_slno= ?`,
+WHERE fb_subcategory_master.fb_category_slno= ?`,
             [
                 data.fb_category_slno
             ],
@@ -911,8 +911,6 @@ WHERE serial_slno = 3
                         create_user,
                     ],
                     (error, results, fields) => {
-                        // console.log(results, "result");
-
                         if (error) {
                             return callBack(error)
                         }
@@ -922,6 +920,47 @@ WHERE serial_slno = 3
             });
         }))
     },
+    insertDefaultPtImpression: (data, callBack) => {
+        const { answer, fb_transact_slno, create_user } = data;
+        // This code destruct nested answer object to corresponding  details
+        const insertPromises = Object.entries(answer)
+            .flatMap(([fb_category_slno, questions]) =>
+                Object.entries(questions).map(([fb_subcategory_slno, qdata]) => {
+                    const rating = qdata.rating || 0;
+                    const details = JSON.stringify(qdata?.details || []);
+                    return new Promise((resolve, reject) => {
+                        pool.query(
+                            `
+                            INSERT INTO fb_imp_transact_mast (
+                            fb_transact_slno,
+                            fb_quest_id,
+                            fb_quest_sub,
+                            fb_imp_ans,
+                            fb_ans_detail,
+                            create_user
+                            ) VALUES (?, ?, ?, ?, ? , ?)
+                            `,
+                            [
+                                fb_transact_slno,
+                                parseInt(fb_category_slno),
+                                fb_subcategory_slno,
+                                rating,
+                                details,
+                                create_user
+                            ],
+                            (err, results) => {
+                                if (err) return reject(err);
+                                resolve(results);
+                            }
+                        );
+                    });
+                })
+            );
+        Promise.all(insertPromises)
+            .then((results) => callBack(null, results))
+            .catch((err) => callBack(err));
+    },
+
     getalluserfeedback: (data, callBack) => {
         pool.query(
             `
@@ -937,7 +976,7 @@ WHERE serial_slno = 3
     fb_detl.fdmast_slno,
 	fb_mast.feedback_name
 FROM
-  meliora.fb_transaction_detl
+  fb_transaction_detl
 LEFT JOIN 
     fb_detl ON fb_transaction_detl.fddet_slno = fb_detl.fddet_slno
 LEFT JOIN 
@@ -1004,6 +1043,29 @@ WHERE
                 return callBack(null, results)
             })
     },
+
+    insertimppatientRemark: (data, callBack) => {
+        pool.query(
+            `
+            INSERT INTO  fb_imp_pt_remarks(
+            fb_transact_slno,
+            fb_imp_remark,
+            create_user
+            ) 
+            VALUES(?,?,?)
+            `,
+            [
+                data.fb_transact_slno,
+                data.remark,
+                data.create_user
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
     updatemodulemaster: (data, callBack) => {
         pool.query(
             `
@@ -1060,6 +1122,100 @@ WHERE
             [
                 data.menuname,
                 data.moduleid
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    fetchimpremark: (data, callBack) => {
+        pool.query(
+            `
+           SELECT 
+                fb_imp_remark,
+                fb_imp_pt_remarks.create_date,
+                em_name
+            FROM
+                fb_imp_pt_remarks
+                    LEFT JOIN
+                co_employee_master ON fb_imp_pt_remarks.create_user = co_employee_master.em_id
+            WHERE
+                fb_transact_slno = ?
+            `,
+            [
+                data.FB_TCT_SLNO
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getrelative: (ipNumbers, callBack) => {
+        pool.query(
+            `
+           SELECT 
+            fb_ip_no,                      
+            fb_ipd_date,                   
+            fb_pt_no,                        
+            fb_ptc_name,                                  
+            fb_ptc_sex,                     
+            fb_ptd_dob,                                                           
+            fb_ptc_loadd1,                   
+            fb_ptc_loadd2,                   
+            fb_ptc_loadd3,                   
+            fb_ptc_loadd4,
+            fb_ptc_mobile,
+            fb_ptn_yearage,
+            fb_ipc_curstatus,
+            fb_doc_name   
+        FROM
+            fb_ipadmiss
+        WHERE
+            fb_ip_no IN (?)
+            `,
+            [
+                ipNumbers
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getbirthdetail: (data, callBack) => {
+        pool.query(
+            `
+           SELECT 
+                fb_br_slno,
+                fb_brd_date,
+                fb_pt_no,
+                fb_ptc_name,
+                fb_ptc_loadd1,
+                fb_ptc_loadd2,
+                fb_brc_husband,
+                fb_brn_age,
+                fb_brn_total,
+                fb_brn_live,
+                fb_bd_code,
+                fb_ip_no,
+                fb_child_gender,
+                fb_birth_date,
+                fb_mother_ip_no,
+                fb_child_pt_no,
+                fb_child_ip_no,
+                fb_child_weight
+            FROM
+                fb_birth_reg_mast
+            WHERE
+                fb_mother_ip_no = ?
+            `,
+            [
+                data.IP_NO
             ]
             , (error, results, fields) => {
                 if (error) {
@@ -1334,7 +1490,7 @@ WHERE
     },
     getDepartmentEmpid: (id, callBack) => {
         pool.query(
-            `SELECT em_id, em_name FROM meliora.co_employee_master where em_dept_section=? 
+            `SELECT em_id, em_name FROM co_employee_master where em_dept_section=? 
             and em_status=1 and em_no!=1 and em_id!=1606 order by em_name ASC`,
             [
                 id
@@ -1668,6 +1824,22 @@ where fb_ns_code=? and fb_floor_code=?
                 return callBack(null, results)
             })
     },
+    FindhkalreadyExist: (data, callBack) => {
+        pool.query(
+            `
+            select fb_hk_slno from 	fb_hk_check_bed where fb_hk_bed_slno = ? and fb_hk_status = 1
+            `,
+            [
+                data
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+
     getallnursestation: (callBack) => {
         pool.query(
             `
@@ -1698,7 +1870,7 @@ left join rm_floor_creation  on fb_nurse_station_master.fb_floor_code = rm_floor
         pool.query(
             `
 SELECT COUNT(*) AS total_rows
-FROM meliora.fb_transaction_mast;
+FROM fb_transaction_mast;
             `,
             []
             , (error, results, fields) => {
@@ -1708,8 +1880,6 @@ FROM meliora.fb_transaction_mast;
                 return callBack(null, results)
             })
     },
-
-
     updatenursestation: (data, callBack) => {
         pool.query(
             `
@@ -1729,6 +1899,32 @@ FROM meliora.fb_transaction_mast;
                 data.fb_ns_status,
                 data.edit_user,
                 data.fb_nurse_stn_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    updatehkcheckbed: (data, callBack) => {
+        const isInitial = data.fb_hk_bed_status === 1;
+        pool.query(
+            `
+            UPDATE  fb_hk_check_bed
+            SET
+            fb_hk_bed_status = ?,
+            fb_hk_bed_remark = ?,
+             ${isInitial ? 'fb_hk_initial_emp_assign' : 'fb_hk_finla_emp_assign'} = ?,
+            fb_hk_check_status=?
+            WHERE fb_hk_slno = ?
+            `,
+            [
+                data.fb_hk_bed_status,
+                data.fb_hk_bed_remark,
+                data.assignEmployeee,
+                data.fb_hk_check_status,
+                data.fb_hk_slno
             ],
             (error, results, fields) => {
                 if (error) {
@@ -1760,850 +1956,891 @@ FROM meliora.fb_transaction_mast;
                 return callBack(null, results)
             })
     },
-    insertbddetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                    INSERT INTO fb_bed(
-                        fb_bd_code,
-                        fb_bdc_no,
-                        fb_ns_code,
-                        fb_rt_code,
-                        fb_bdc_occup,
-                        fb_bdn_cccno,
-                        fb_bdc_status,
-                        fb_hkd_cleaningreq,
-                        fb_rm_code,
-                        fb_bdc_mhcode,
-                        fb_bdc_vipbed
-                    )
-                    VALUES(?,?,?,?,?,?,?,?,?,?,?)       
-                    `,
-                    [
-                        item.BD_CODE,
-                        item.BDC_NO,
-                        item.NS_CODE,
-                        item.RT_CODE,
-                        item.BDC_OCCUP,
-                        item.OCCU,
-                        item.BDC_STATUS,
-                        item.HKD_CLEANINGREQ,
-                        item.RM_CODE,
-                        item.BDC_MHCODE,
-                        item.BDC_VIPBED
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    CheckBedAlreadyPresent: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     SELECT
-                        fb_bed_slno, 
-                        fb_bd_code,
-                        fb_bdc_no,
-                        fb_ns_code,
-                        fb_rt_code,
-                        fb_bdc_occup,
-                        fb_bdn_cccno,
-                        fb_bdc_status,
-                        fb_hkd_cleaningreq,
-                        fb_rm_code,
-                        fb_bdc_mhcode,
-                        fb_bdc_vipbed
-                    FROM 
-                        fb_bed 
-                    where 
-                    fb_bd_code = ?  and fb_bdc_no = ?  
-                    `,
-                    [
-                        item.BD_CODE,
-                        item.BDC_NO,
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    updatebeddetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     UPDATE fb_bed 
-                     SET
-                        fb_bd_code = ?,
-                        fb_bdc_no = ?,
-                        fb_ns_code = ?,
-                        fb_rt_code = ?,
-                        fb_bdc_occup = ?,
-                        fb_bdn_cccno = ?,
-                        fb_bdc_status = ?,
-                        fb_hkd_cleaningreq = ?,
-                        fb_rm_code = ?,
-                        fb_bdc_mhcode = ?,
-                        fb_bdc_vipbed = ?
-                    where 
-                        fb_bed_slno = ?  
-                    `,
-                    [
-                        item.BD_CODE,
-                        item.BDC_NO,
-                        item.NS_CODE,
-                        item.RT_CODE,
-                        item.BDC_OCCUP,
-                        item.OCCU,
-                        item.BDC_STATUS,
-                        item.HKD_CLEANINGREQ,
-                        item.RM_CODE,
-                        item.BDC_MHCODE,
-                        item.BDC_VIPBED,
-                        item.fb_bed_slno
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    CheckRoomTypeAlreadyPreseint: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     SELECT
-                        fb_rmtp_slno, 
-                        fb_rt_code,
-                        fb_rtc_desc,
-                        fb_rtc_alias,
-                        fb_rc_code,
-                        fb_rtc_status, 
-                        fb_icu,
-                        fb_rtc_mhcode     
-                    FROM 
-                        fb_room_type 
-                    where 
-                        fb_rt_code = ?  
-                    `,
-                    [
-                        item.RT_CODE,
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    insertrtdetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                    INSERT INTO fb_room_type(
-                        fb_rt_code,
-                        fb_rtc_desc,
-                        fb_rtc_alias,
-                        fb_rc_code,
-                        fb_rtc_status, 
-                        fb_icu,
-                        fb_rtc_mhcode
-                    )
-                    VALUES(?,?,?,?,?,?,?)       
-                    `,
-                    [
-                        item.RT_CODE,
-                        item.RTC_DESC,
-                        item.RCC_DESC,
-                        item.RC_CODE,
-                        item.RTC_STATUS,
-                        item.ICU,
-                        item.RTC_MHCODE
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    updatertdetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     UPDATE fb_room_type 
-                     SET
-                        fb_rt_code = ?,
-                        fb_rtc_desc = ?,
-                        fb_rtc_alias = ?,
-                        fb_rc_code = ?,
-                        fb_rtc_status = ?, 
-                        fb_icu = ?,
-                        fb_rtc_mhcode = ?
-                    where 
-                        fb_rmtp_slno = ?  
-                    `,
-                    [
-                        item.RT_CODE,
-                        item.RTC_DESC,
-                        item.RCC_DESC,
-                        item.RC_CODE,
-                        item.RTC_STATUS,
-                        item.ICU,
-                        item.RTC_MHCODE,
-                        item.fb_rmtp_slno
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    CheckpatientAlreadyPresent: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     SELECT
-                       fb_ipad_slno, fb_ip_no, fb_ipd_date, fb_pt_no, fb_ptc_name, fb_ptc_sex, fb_ptd_dob, fb_ptn_dayage, fb_ptn_monthage, fb_ptn_yearage, fb_ptc_loadd1, fb_ptc_loadd2, fb_ptc_loadd3, fb_ptc_loadd4, fb_ptc_lopin, fb_rc_code, fb_bd_code, fb_do_code, fb_rs_code, fb_ipd_disc, fb_ipc_status, fb_dmc_slno, fb_dmd_date, fb_ptc_mobile, fb_ipc_mhcode, fb_doc_name
-                    FROM 
-                        fb_ipadmiss 
-                    where 
-                    fb_ip_no = ?  and fb_pt_no = ?  
-                    `,
-                    [
-                        item.IP_NO,
-                        item.PT_NO,
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    insertPatientDetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                    INSERT INTO fb_ipadmiss (
-                        fb_ip_no,
-                        fb_ipd_date,
-                        fb_pt_no,
-                        fb_ptc_name,
-                        fb_ptc_sex,
-                        fb_ptd_dob,   
-                        fb_ptn_dayage,
-                        fb_ptn_monthage,
-                        fb_ptn_yearage,
-                        fb_ptc_loadd1,
-                        fb_ptc_loadd2, 
-                        fb_ptc_loadd3,
-                        fb_ptc_loadd4,
-                        fb_ptc_lopin,
-                        fb_rc_code,
-                        fb_bd_code,
-                        fb_do_code, 
-                        fb_rs_code, 
-                        fb_ipd_disc,
-                        fb_ipc_status,
-                        fb_dmc_slno,
-                        fb_dmd_date,
-                        fb_ptc_mobile, 
-                        fb_ipc_mhcode,
-                        fb_doc_name,
-                        fb_ipc_curstatus
-                    ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    `,
-                    [
-                        item.IP_NO,
-                        item.IPD_DATE,
-                        item.PT_NO,
-                        item.PTC_PTNAME,
-                        item.PTC_SEX,
-                        item.PTD_DOB,
-                        item.PTN_DAYAGE,
-                        item.PTN_MONTHAGE,
-                        item.PTN_YEARAGE,
-                        item.PTC_LOADD1,
-                        item.PTC_LOADD2,
-                        item.PTC_LOADD3,
-                        item.PTC_LOADD4,
-                        item.PTC_LOPIN,
-                        item.RC_CODE,
-                        item.BD_CODE,
-                        item.DO_CODE,
-                        item.RS_CODE,
-                        item.IPD_DISC,
-                        item.IPC_STATUS,
-                        item.DMC_SLNO,
-                        item.DMD_DATE,
-                        item.PTC_MOBILE,
-                        item.IPC_MHCODE,
-                        item.DOC_NAME,
-                        item.IPC_CURSTATUS
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error);
-                        } else {
-                            resolve(results);
-                        }
-                    }
-                );
-            });
-        });
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    updatePatientDetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                    UPDATE fb_ipadmiss
-                    SET
-                        fb_ip_no = ?, 
-                        fb_ipd_date = ?, 
-                        fb_pt_no = ?, 
-                        fb_ptc_name = ?, 
-                        fb_ptc_sex = ?, 
-                        fb_ptd_dob = ?, 
-                        fb_ptn_dayage = ?, 
-                        fb_ptn_monthage = ?, 
-                        fb_ptn_yearage = ?, 
-                        fb_ptc_loadd1 = ?, 
-                        fb_ptc_loadd2 = ?, 
-                        fb_ptc_loadd3 = ?, 
-                        fb_ptc_loadd4 = ?, 
-                        fb_ptc_lopin = ?, 
-                        fb_rc_code = ?, 
-                        fb_bd_code = ?, 
-                        fb_do_code = ?, 
-                        fb_rs_code = ?, 
-                        fb_ipd_disc = ?, 
-                        fb_ipc_status = ?, 
-                        fb_dmc_slno = ?, 
-                        fb_dmd_date = ?, 
-                        fb_ptc_mobile = ?, 
-                        fb_ipc_mhcode = ?, 
-                        fb_doc_name = ?,
-                        fb_ipc_curstatus = ?
-                    WHERE fb_ipad_slno = ?
-                    `,
-                    [
-                        item.IP_NO,
-                        item.IPD_DATE,
-                        item.PT_NO,
-                        item.PTC_PTNAME,
-                        item.PTC_SEX,
-                        item.PTD_DOB,
-                        item.PTN_DAYAGE,
-                        item.PTN_MONTHAGE,
-                        item.PTN_YEARAGE,
-                        item.PTC_LOADD1,
-                        item.PTC_LOADD2,
-                        item.PTC_LOADD3,
-                        item.PTC_LOADD4,
-                        item.PTC_LOPIN,
-                        item.RC_CODE,
-                        item.BD_CODE,
-                        item.DO_CODE,
-                        item.RS_CODE,
-                        item.IPD_DISC,
-                        item.IPC_STATUS,
-                        item.DMC_SLNO,
-                        item.DMD_DATE,
-                        item.PTC_MOBILE,
-                        item.IPC_MHCODE,
-                        item.DOC_NAME,
-                        item.IPC_CURSTATUS,
-                        item.fb_ipad_slno
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error);
-                        } else {
-                            resolve(results);
-                        }
-                    }
-                );
-            });
-        });
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
 
-    },
-    CheckRoomsinMasterPresent: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     SELECT
-                        fb_rm_slno,
-                        fb_rm_code,
-                        fb_rmc_desc,
-                        fb_rmc_alias,
-                        fb_rac_status,
-                        fb_rmc_mhcode,
-                        fb_ns_code      
-                    FROM 
-                        fb_room_master 
-                    where 
-                        fb_rm_code = ?  
-                    `,
-                    [
-                        item.RM_CODE,
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    insertRoomMasterdetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                    INSERT INTO fb_room_master(
-                        fb_rm_code,
-                        fb_rmc_desc,
-                        fb_rmc_alias,
-                        fb_rac_status,
-                        fb_rmc_mhcode,
-                        fb_ns_code
-                    )
-                    VALUES(?,?,?,?,?,?)       
-                    `,
-                    [
-                        item.RM_CODE,
-                        item.RMC_DESC,
-                        item.RMC_ALIAS,
-                        item.RMC_STATUS,
-                        item.RMC_MHCODE,
-                        item.NS_CODE
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    updateRoomMasterDetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     UPDATE fb_room_master 
-                     SET
-                        fb_rm_code = ?,
-                        fb_rmc_desc = ?,
-                        fb_rmc_alias = ?,
-                        fb_rac_status = ?,
-                        fb_rmc_mhcode = ?,
-                        fb_ns_code= ?
-                    where 
-                        fb_rm_slno = ?  
-                    `,
-                    [
-                        item.RM_CODE,
-                        item.RMC_DESC,
-                        item.RMC_ALIAS,
-                        item.RMC_STATUS,
-                        item.RMC_MHCODE,
-                        item.NS_CODE,
-                        item.fb_rm_slno
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    CheckadmnReasonsExits: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     SELECT
-                        fb_adrn_slno,
-                        fb_rs_code, 
-                        fb_rsc_desc,
-                        fb_rsc_alias,
-                        fb_rsc_status      
-                    FROM 
-                        fb_admn_reason 
-                    where 
-                        fb_rs_code = ?  
-                    `,
-                    [
-                        item.RS_CODE,
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    insertadminReasons: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                    INSERT INTO fb_admn_reason(
-                        fb_rs_code, 
-                        fb_rsc_desc,
-                        fb_rsc_alias,
-                        fb_rsc_status  
-                    )
-                    VALUES(?,?,?,?)       
-                    `,
-                    [
-                        item.RS_CODE,
-                        item.RSC_DESC,
-                        item.RSC_ALIAS,
-                        item.RSC_STATUS
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    updateadmnReasons: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     UPDATE fb_admn_reason 
-                     SET
-                        fb_rs_code = ?,
-                        fb_rsc_desc = ?,
-                        fb_rsc_alias = ?,
-                        fb_rsc_status = ?
-                    where 
-                        fb_adrn_slno = ?  
-                    `,
-                    [
-                        item.RS_CODE,
-                        item.RSC_DESC,
-                        item.RSC_ALIAS,
-                        item.RSC_STATUS,
-                        item.fb_adrn_slno
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    CheckRoomCategoryExists: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     SELECT
-                        fb_rc_slno,
-                        fb_rc_code,
-                        fb_rcc_desc,
-                        fb_rcc_alias,
-                        fb_rcc_status,
-                        fb_rcc_mhocde      
-                    FROM 
-                        fb_room_category 
-                    where 
-                        fb_rc_code = ?  
-                    `,
-                    [
-                        item.RC_CODE,
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    insertRoomCategoryDetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                    INSERT INTO fb_room_category(
-                        fb_rc_code,
-                        fb_rcc_desc,
-                        fb_rcc_alias,
-                        fb_rcc_status,
-                        fb_rcc_mhocde 
-                    )
-                    VALUES(?,?,?,?,?)       
-                    `,
-                    [
-                        item.RC_CODE,
-                        item.RCC_DESC,
-                        item.RCC_ALIAS,
-                        item.RCC_STATUS,
-                        item.RCC_MHCODE
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
-    UpdateRoomCategoryDetail: (data, callBack) => {
-        const promises = data.map((item) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `
-                     UPDATE fb_room_category 
-                     SET
-                        fb_rc_code = ?,
-                        fb_rcc_desc = ?,
-                        fb_rcc_alias = ?,
-                        fb_rcc_status = ?,
-                        fb_rcc_mhocde = ?
-                    where 
-                        fb_rc_slno = ?  
-                    `,
-                    [
-                        item.RC_CODE,
-                        item.RCC_DESC,
-                        item.RCC_ALIAS,
-                        item.RCC_STATUS,
-                        item.RCC_MHCODE,
-                        item.fb_rc_slno
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            reject(error); // Reject the promise if there's an error
-                        } else {
-                            resolve(results); // Resolve the promise if successful
-                        }
-                    }
-                );
-            });
-        });
-        // Use Promise.all to wait for all insertions
-        Promise.all(promises)
-            .then((results) => {
-                callBack(null, results);
-            })
-            .catch((error) => {
-                callBack(error);
-            });
-    },
+    //Not using  saved for later
+    // insertbddetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 INSERT INTO fb_bed(
+    //                     fb_bd_code,
+    //                     fb_bdc_no,
+    //                     fb_ns_code,
+    //                     fb_rt_code,
+    //                     fb_bdc_occup,
+    //                     fb_bdn_cccno,
+    //                     fb_bdc_status,
+    //                     fb_hkd_cleaningreq,
+    //                     fb_rm_code,
+    //                     fb_bdc_mhcode,
+    //                     fb_bdc_vipbed
+    //                 )
+    //                 VALUES(?,?,?,?,?,?,?,?,?,?,?)       
+    //                 `,
+    //                 [
+    //                     item.BD_CODE,
+    //                     item.BDC_NO,
+    //                     item.NS_CODE,
+    //                     item.RT_CODE,
+    //                     item.BDC_OCCUP,
+    //                     item.OCCU,
+    //                     item.BDC_STATUS,
+    //                     item.HKD_CLEANINGREQ,
+    //                     item.RM_CODE,
+    //                     item.BDC_MHCODE,
+    //                     item.BDC_VIPBED
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    //Not using  saved for later
+    // CheckBedAlreadyPresent: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  SELECT
+    //                     fb_bed_slno, 
+    //                     fb_bd_code,
+    //                     fb_bdc_no,
+    //                     fb_ns_code,
+    //                     fb_rt_code,
+    //                     fb_bdc_occup,
+    //                     fb_bdn_cccno,
+    //                     fb_bdc_status,
+    //                     fb_hkd_cleaningreq,
+    //                     fb_rm_code,
+    //                     fb_bdc_mhcode,
+    //                     fb_bdc_vipbed
+    //                 FROM 
+    //                     fb_bed 
+    //                 where 
+    //                 fb_bd_code = ?  and fb_bdc_no = ?  
+    //                 `,
+    //                 [
+    //                     item.BD_CODE,
+    //                     item.BDC_NO,
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    //Not using  saved for later
+    // updatebeddetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  UPDATE fb_bed 
+    //                  SET
+    //                     fb_bd_code = ?,
+    //                     fb_bdc_no = ?,
+    //                     fb_ns_code = ?,
+    //                     fb_rt_code = ?,
+    //                     fb_bdc_occup = ?,
+    //                     fb_bdn_cccno = ?,
+    //                     fb_bdc_status = ?,
+    //                     fb_hkd_cleaningreq = ?,
+    //                     fb_rm_code = ?,
+    //                     fb_bdc_mhcode = ?,
+    //                     fb_bdc_vipbed = ?
+    //                 where 
+    //                     fb_bed_slno = ?  
+    //                 `,
+    //                 [
+    //                     item.BD_CODE,
+    //                     item.BDC_NO,
+    //                     item.NS_CODE,
+    //                     item.RT_CODE,
+    //                     item.BDC_OCCUP,
+    //                     item.OCCU,
+    //                     item.BDC_STATUS,
+    //                     item.HKD_CLEANINGREQ,
+    //                     item.RM_CODE,
+    //                     item.BDC_MHCODE,
+    //                     item.BDC_VIPBED,
+    //                     item.fb_bed_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    //Not using  saved for later
+    // CheckRoomTypeAlreadyPreseint: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  SELECT
+    //                     fb_rmtp_slno, 
+    //                     fb_rt_code,
+    //                     fb_rtc_desc,
+    //                     fb_rtc_alias,
+    //                     fb_rc_code,
+    //                     fb_rtc_status, 
+    //                     fb_icu,
+    //                     fb_rtc_mhcode     
+    //                 FROM 
+    //                     fb_room_type 
+    //                 where 
+    //                     fb_rt_code = ?  
+    //                 `,
+    //                 [
+    //                     item.RT_CODE,
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    //Not using  saved for later
+    // insertrtdetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 INSERT INTO fb_room_type(
+    //                     fb_rt_code,
+    //                     fb_rtc_desc,
+    //                     fb_rtc_alias,
+    //                     fb_rc_code,
+    //                     fb_rtc_status, 
+    //                     fb_icu,
+    //                     fb_rtc_mhcode
+    //                 )
+    //                 VALUES(?,?,?,?,?,?,?)       
+    //                 `,
+    //                 [
+    //                     item.RT_CODE,
+    //                     item.RTC_DESC,
+    //                     item.RCC_DESC,
+    //                     item.RC_CODE,
+    //                     item.RTC_STATUS,
+    //                     item.ICU,
+    //                     item.RTC_MHCODE
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    //Not using  saved for later
+    // updatertdetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  UPDATE fb_room_type 
+    //                  SET
+    //                     fb_rt_code = ?,
+    //                     fb_rtc_desc = ?,
+    //                     fb_rtc_alias = ?,
+    //                     fb_rc_code = ?,
+    //                     fb_rtc_status = ?, 
+    //                     fb_icu = ?,
+    //                     fb_rtc_mhcode = ?
+    //                 where 
+    //                     fb_rmtp_slno = ?  
+    //                 `,
+    //                 [
+    //                     item.RT_CODE,
+    //                     item.RTC_DESC,
+    //                     item.RCC_DESC,
+    //                     item.RC_CODE,
+    //                     item.RTC_STATUS,
+    //                     item.ICU,
+    //                     item.RTC_MHCODE,
+    //                     item.fb_rmtp_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    // Not using  saved for later
+    // CheckpatientAlreadyPresent: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  SELECT
+    //                    fb_ipad_slno, fb_ip_no, fb_ipd_date, fb_pt_no, fb_ptc_name, fb_ptc_sex, fb_ptd_dob, fb_ptn_dayage, fb_ptn_monthage, fb_ptn_yearage, fb_ptc_loadd1, fb_ptc_loadd2, fb_ptc_loadd3, fb_ptc_loadd4, fb_ptc_lopin, fb_rc_code, fb_bd_code, fb_do_code, fb_rs_code, fb_ipd_disc, fb_ipc_status, fb_dmc_slno, fb_dmd_date, fb_ptc_mobile, fb_ipc_mhcode, fb_doc_name
+    //                 FROM 
+    //                     fb_ipadmiss 
+    //                 where 
+    //                 fb_ip_no = ?  and fb_pt_no = ?  
+    //                 `,
+    //                 [
+    //                     item.IP_NO,
+    //                     item.PT_NO,
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    // Not using  saved for later2917
+    // insertPatientDetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 INSERT INTO fb_ipadmiss (
+    //                     fb_ip_no,
+    //                     fb_ipd_date,
+    //                     fb_pt_no,
+    //                     fb_ptc_name,
+    //                     fb_ptc_sex,
+    //                     fb_ptd_dob,   
+    //                     fb_ptn_dayage,
+    //                     fb_ptn_monthage,
+    //                     fb_ptn_yearage,
+    //                     fb_ptc_loadd1,
+    //                     fb_ptc_loadd2, 
+    //                     fb_ptc_loadd3,
+    //                     fb_ptc_loadd4,
+    //                     fb_ptc_lopin,
+    //                     fb_rc_code,
+    //                     fb_bd_code,
+    //                     fb_do_code, 
+    //                     fb_rs_code, 
+    //                     fb_ipd_disc,
+    //                     fb_ipc_status,
+    //                     fb_dmc_slno,
+    //                     fb_dmd_date,
+    //                     fb_ptc_mobile, 
+    //                     fb_ipc_mhcode,
+    //                     fb_doc_name,
+    //                     fb_ipc_curstatus
+    //                 ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    //                 `,
+    //                 [
+    //                     item.IP_NO,
+    //                     item.IPD_DATE,
+    //                     item.PT_NO,
+    //                     item.PTC_PTNAME,
+    //                     item.PTC_SEX,
+    //                     item.PTD_DOB,
+    //                     item.PTN_DAYAGE,
+    //                     item.PTN_MONTHAGE,
+    //                     item.PTN_YEARAGE,
+    //                     item.PTC_LOADD1,
+    //                     item.PTC_LOADD2,
+    //                     item.PTC_LOADD3,
+    //                     item.PTC_LOADD4,
+    //                     item.PTC_LOPIN,
+    //                     item.RC_CODE,
+    //                     item.BD_CODE,
+    //                     item.DO_CODE,
+    //                     item.RS_CODE,
+    //                     item.IPD_DISC,
+    //                     item.IPC_STATUS,
+    //                     item.DMC_SLNO,
+    //                     item.DMD_DATE,
+    //                     item.PTC_MOBILE,
+    //                     item.IPC_MHCODE,
+    //                     item.DOC_NAME,
+    //                     item.IPC_CURSTATUS
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error);
+    //                     } else {
+    //                         resolve(results);
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+    // Not using  saved for later
+    // updatePatientDetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 UPDATE fb_ipadmiss
+    //                 SET
+    //                     fb_ip_no = ?, 
+    //                     fb_ipd_date = ?, 
+    //                     fb_pt_no = ?, 
+    //                     fb_ptc_name = ?, 
+    //                     fb_ptc_sex = ?, 
+    //                     fb_ptd_dob = ?, 
+    //                     fb_ptn_dayage = ?, 
+    //                     fb_ptn_monthage = ?, 
+    //                     fb_ptn_yearage = ?, 
+    //                     fb_ptc_loadd1 = ?, 
+    //                     fb_ptc_loadd2 = ?, 
+    //                     fb_ptc_loadd3 = ?, 
+    //                     fb_ptc_loadd4 = ?, 
+    //                     fb_ptc_lopin = ?, 
+    //                     fb_rc_code = ?, 
+    //                     fb_bd_code = ?, 
+    //                     fb_do_code = ?, 
+    //                     fb_rs_code = ?, 
+    //                     fb_ipd_disc = ?, 
+    //                     fb_ipc_status = ?, 
+    //                     fb_dmc_slno = ?, 
+    //                     fb_dmd_date = ?, 
+    //                     fb_ptc_mobile = ?, 
+    //                     fb_ipc_mhcode = ?, 
+    //                     fb_doc_name = ?,
+    //                     fb_ipc_curstatus = ?
+    //                 WHERE fb_ipad_slno = ?
+    //                 `,
+    //                 [
+    //                     item.IP_NO,
+    //                     item.IPD_DATE,
+    //                     item.PT_NO,
+    //                     item.PTC_PTNAME,
+    //                     item.PTC_SEX,
+    //                     item.PTD_DOB,
+    //                     item.PTN_DAYAGE,
+    //                     item.PTN_MONTHAGE,
+    //                     item.PTN_YEARAGE,
+    //                     item.PTC_LOADD1,
+    //                     item.PTC_LOADD2,
+    //                     item.PTC_LOADD3,
+    //                     item.PTC_LOADD4,
+    //                     item.PTC_LOPIN,
+    //                     item.RC_CODE,
+    //                     item.BD_CODE,
+    //                     item.DO_CODE,
+    //                     item.RS_CODE,
+    //                     item.IPD_DISC,
+    //                     item.IPC_STATUS,
+    //                     item.DMC_SLNO,
+    //                     item.DMD_DATE,
+    //                     item.PTC_MOBILE,
+    //                     item.IPC_MHCODE,
+    //                     item.DOC_NAME,
+    //                     item.IPC_CURSTATUS,
+    //                     item.fb_ipad_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error);
+    //                     } else {
+    //                         resolve(results);
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+
+    // },
+
+    //Not using  saved for later
+    // CheckRoomsinMasterPresent: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  SELECT
+    //                     fb_rm_slno,
+    //                     fb_rm_code,
+    //                     fb_rmc_desc,
+    //                     fb_rmc_alias,
+    //                     fb_rac_status,
+    //                     fb_rmc_mhcode,
+    //                     fb_ns_code      
+    //                 FROM 
+    //                     fb_room_master 
+    //                 where 
+    //                     fb_rm_code = ?  
+    //                 `,
+    //                 [
+    //                     item.RM_CODE,
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    // Not using  saved for later
+    // insertRoomMasterdetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 INSERT INTO fb_room_master(
+    //                     fb_rm_code,
+    //                     fb_rmc_desc,
+    //                     fb_rmc_alias,
+    //                     fb_rac_status,
+    //                     fb_rmc_mhcode,
+    //                     fb_ns_code
+    //                 )
+    //                 VALUES(?,?,?,?,?,?)       
+    //                 `,
+    //                 [
+    //                     item.RM_CODE,
+    //                     item.RMC_DESC,
+    //                     item.RMC_ALIAS,
+    //                     item.RMC_STATUS,
+    //                     item.RMC_MHCODE,
+    //                     item.NS_CODE
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    // Not using  saved for later
+    // updateRoomMasterDetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  UPDATE fb_room_master 
+    //                  SET
+    //                     fb_rm_code = ?,
+    //                     fb_rmc_desc = ?,
+    //                     fb_rmc_alias = ?,
+    //                     fb_rac_status = ?,
+    //                     fb_rmc_mhcode = ?,
+    //                     fb_ns_code= ?
+    //                 where 
+    //                     fb_rm_slno = ?  
+    //                 `,
+    //                 [
+    //                     item.RM_CODE,
+    //                     item.RMC_DESC,
+    //                     item.RMC_ALIAS,
+    //                     item.RMC_STATUS,
+    //                     item.RMC_MHCODE,
+    //                     item.NS_CODE,
+    //                     item.fb_rm_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    // Not using  saved for later
+    // CheckadmnReasonsExits: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  SELECT
+    //                     fb_adrn_slno,
+    //                     fb_rs_code, 
+    //                     fb_rsc_desc,
+    //                     fb_rsc_alias,
+    //                     fb_rsc_status      
+    //                 FROM 
+    //                     fb_admn_reason 
+    //                 where 
+    //                     fb_rs_code = ?  
+    //                 `,
+    //                 [
+    //                     item.RS_CODE,
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    // Not using  saved for later
+    // insertadminReasons: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 INSERT INTO fb_admn_reason(
+    //                     fb_rs_code, 
+    //                     fb_rsc_desc,
+    //                     fb_rsc_alias,
+    //                     fb_rsc_status  
+    //                 )
+    //                 VALUES(?,?,?,?)       
+    //                 `,
+    //                 [
+    //                     item.RS_CODE,
+    //                     item.RSC_DESC,
+    //                     item.RSC_ALIAS,
+    //                     item.RSC_STATUS
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+
+    // Not using  saved for later
+    // updateadmnReasons: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  UPDATE fb_admn_reason 
+    //                  SET
+    //                     fb_rs_code = ?,
+    //                     fb_rsc_desc = ?,
+    //                     fb_rsc_alias = ?,
+    //                     fb_rsc_status = ?
+    //                 where 
+    //                     fb_adrn_slno = ?  
+    //                 `,
+    //                 [
+    //                     item.RS_CODE,
+    //                     item.RSC_DESC,
+    //                     item.RSC_ALIAS,
+    //                     item.RSC_STATUS,
+    //                     item.fb_adrn_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+
+    // Not using  saved for later
+    // CheckRoomCategoryExists: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  SELECT
+    //                     fb_rc_slno,
+    //                     fb_rc_code,
+    //                     fb_rcc_desc,
+    //                     fb_rcc_alias,
+    //                     fb_rcc_status,
+    //                     fb_rcc_mhocde      
+    //                 FROM 
+    //                     fb_room_category 
+    //                 where 
+    //                     fb_rc_code = ?  
+    //                 `,
+    //                 [
+    //                     item.RC_CODE,
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+    // Not using  saved for later
+    // insertRoomCategoryDetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                 INSERT INTO fb_room_category(
+    //                     fb_rc_code,
+    //                     fb_rcc_desc,
+    //                     fb_rcc_alias,
+    //                     fb_rcc_status,
+    //                     fb_rcc_mhocde 
+    //                 )
+    //                 VALUES(?,?,?,?,?)       
+    //                 `,
+    //                 [
+    //                     item.RC_CODE,
+    //                     item.RCC_DESC,
+    //                     item.RCC_ALIAS,
+    //                     item.RCC_STATUS,
+    //                     item.RCC_MHCODE
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+
+    // Not using  saved for later
+    // UpdateRoomCategoryDetail: (data, callBack) => {
+    //     const promises = data.map((item) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `
+    //                  UPDATE fb_room_category 
+    //                  SET
+    //                     fb_rc_code = ?,
+    //                     fb_rcc_desc = ?,
+    //                     fb_rcc_alias = ?,
+    //                     fb_rcc_status = ?,
+    //                     fb_rcc_mhocde = ?
+    //                 where 
+    //                     fb_rc_slno = ?  
+    //                 `,
+    //                 [
+    //                     item.RC_CODE,
+    //                     item.RCC_DESC,
+    //                     item.RCC_ALIAS,
+    //                     item.RCC_STATUS,
+    //                     item.RCC_MHCODE,
+    //                     item.fb_rc_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         reject(error); // Reject the promise if there's an error
+    //                     } else {
+    //                         resolve(results); // Resolve the promise if successful
+    //                     }
+    //                 }
+    //             );
+    //         });
+    //     });
+    //     // Use Promise.all to wait for all insertions
+    //     Promise.all(promises)
+    //         .then((results) => {
+    //             callBack(null, results);
+    //         })
+    //         .catch((error) => {
+    //             callBack(error);
+    //         });
+    // },
+
+
+
     getNursingBed: (data, callBack) => {
         pool.query(
             `
@@ -2708,37 +2945,127 @@ ORDER BY
         pool.query(
             `
               SELECT 
-               fb_bed.fb_bed_slno, 
-               fb_bed.fb_bd_code,
-               fb_bed.fb_bdc_no,
-               fb_bed.fb_ns_code,
-               fb_bed.fb_rt_code,
-               fb_bed.fb_bdc_occup,
-               fb_bed.fb_bdn_cccno,
-               fb_bed.fb_bdc_status,
-               fb_bed.fb_hkd_cleaningreq,
-               fb_bed.fb_rm_code,
-               fb_bed.fb_bdc_mhcode,
-               fb_bed.fb_bdc_vipbed,
-               fb_ns_name,
-               fb_rtc_desc,
-               fb_rtc_alias,
-               fb_bed.create_date,
-               fb_bed_remarks.fb_bed_remark,
-               fb_bed_remarks.fb_bed_status,
-               fb_rm_room_slno
-               FROM meliora.fb_bed
-               LEFT JOIN fb_nurse_station_master 
-               ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code   
-               LEFT JOIN fb_room_type 
-               ON fb_bed.fb_rt_code = fb_room_type.fb_rt_code
-			   LEFT JOIN fb_roomcreation_master 
-               ON fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
-               LEFT JOIN fb_bed_remarks 
-               ON fb_bed.fb_bed_slno = fb_bed_remarks.fb_bed_slno 
-               AND fb_bed_remarks.fb_bed_status = 1 
-               WHERE fb_bed.fb_bdc_occup = "N"
+                fb_bed.fb_bed_slno,
+                rm_outlet_slno,
+                fb_bed.fb_bd_code,
+                fb_bed.fb_bdc_no,
+                fb_bed.fb_ns_code,
+                fb_bed.fb_rt_code,
+                fb_bed.fb_bdc_occup,
+                fb_bed.fb_bdn_cccno,
+                fb_bed.fb_bdc_status,
+                fb_bed.fb_hkd_cleaningreq,
+                fb_bed.fb_rm_code,
+                fb_bed.fb_bdc_mhcode,
+                fb_bed.fb_bdc_vipbed,
+                fb_ns_name,
+                fb_rtc_desc,
+                fb_rtc_alias,
+                fb_bed.create_date,
+                fb_bed_remarks.fb_bed_remark,
+                fb_bed_remarks.fb_bed_status,
+                fb_rm_room_slno,
+                fb_hk_check_bed.fb_hk_bed_slno,
+                fb_hk_check_bed.fb_hk_status
+            FROM
+                fb_bed
+                LEFT JOIN fb_nurse_station_master 
+                    ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code
+                LEFT JOIN fb_room_type 
+                    ON fb_bed.fb_rt_code = fb_room_type.fb_rt_code
+                LEFT JOIN fb_roomcreation_master 
+                    ON fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
+                LEFT JOIN rm_newroom_creation 
+                    ON rm_newroom_creation.rm_room_slno = fb_roomcreation_master.fb_rm_room_slno
+                LEFT JOIN fb_hk_check_bed 
+                    ON fb_hk_check_bed.fb_hk_bed_slno = fb_bed.fb_bed_slno
+                LEFT JOIN fb_bed_remarks 
+                    ON fb_bed.fb_bed_slno = fb_bed_remarks.fb_bed_slno
+                    AND fb_bed_remarks.fb_bed_status = 1
+            WHERE
+                fb_bed.fb_bdc_occup = 'N'
+                AND (fb_hk_check_bed.fb_hk_status IS NULL OR fb_hk_check_bed.fb_hk_status != 1)
             `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    // main checklist bed getting query
+    getchecklistbed: (callBack) => {
+        pool.query(
+            // `  SELECT 
+            //    fb_bed.fb_bed_slno, 
+            //    fb_bed.fb_bd_code,
+            //    fb_bed.fb_bdc_no,
+            //    fb_bed.fb_ns_code,
+            //    fb_bed.fb_rt_code,
+            //    fb_bed.fb_bdc_occup,
+            //    fb_bed.fb_bdn_cccno,
+            //    fb_bed.fb_bdc_status,
+            //    fb_bed.fb_hkd_cleaningreq,
+            //    fb_bed.fb_rm_code,
+            //    fb_bed.fb_bdc_mhcode,
+            //    fb_bed.fb_bdc_vipbed,
+            //    fb_ns_name,
+            //    fb_rtc_desc,
+            //    fb_rtc_alias,
+            //    fb_bed.create_date,
+            //    fb_bed_remarks.fb_bed_remark,
+            //    fb_bed_remarks.fb_bed_status,
+            //    fb_rm_room_slno
+            //    FROM fb_bed
+            //    LEFT JOIN fb_nurse_station_master 
+            //    ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code   
+            //    LEFT JOIN fb_room_type 
+            //    ON fb_bed.fb_rt_code = fb_room_type.fb_rt_code
+            //    LEFT JOIN fb_roomcreation_master 
+            //    ON fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
+            //    LEFT JOIN fb_bed_remarks 
+            //    ON fb_bed.fb_bed_slno = fb_bed_remarks.fb_bed_slno 
+            //    AND fb_bed_remarks.fb_bed_status = 1 
+            //    WHERE fb_bed.fb_bdc_occup = "N"
+            // `,
+
+            `SELECT 
+                fb_bed.fb_bed_slno,
+                rm_outlet_slno,
+                fb_bed.fb_bd_code,
+                fb_bed.fb_bdc_no,
+                fb_bed.fb_ns_code,
+                fb_bed.fb_rt_code,
+                fb_bed.fb_bdc_occup,
+                fb_bed.fb_bdn_cccno,
+                fb_bed.fb_bdc_status,
+                fb_bed.fb_hkd_cleaningreq,
+                fb_bed.fb_rm_code,
+                fb_bed.fb_bdc_mhcode,
+                fb_bed.fb_bdc_vipbed,
+                fb_ns_name,
+                fb_rtc_desc,
+                fb_rtc_alias,
+                fb_bed.create_date,
+                fb_bed_remarks.fb_bed_remark,
+                fb_bed_remarks.fb_bed_status,
+                fb_rm_room_slno
+            FROM
+                fb_bed
+                    LEFT JOIN
+                fb_nurse_station_master ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code
+                    LEFT JOIN
+                fb_room_type ON fb_bed.fb_rt_code = fb_room_type.fb_rt_code
+                    LEFT JOIN
+                fb_roomcreation_master ON fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
+                LEFT JOIN
+                rm_newroom_creation ON rm_newroom_creation.rm_room_slno = fb_roomcreation_master.fb_rm_room_slno
+                    LEFT JOIN
+                fb_bed_remarks ON fb_bed.fb_bed_slno = fb_bed_remarks.fb_bed_slno
+                AND fb_bed_remarks.fb_bed_status = 1
+            WHERE
+                fb_bed.fb_bdc_occup = 'N'`,
             []
             , (error, results, fields) => {
                 if (error) {
@@ -2749,24 +3076,25 @@ ORDER BY
     },
     getallroomassetdata: (data, callBack) => {
         pool.query(
-            `select 
-	fb_assets_map_slno,
-	 fb_rc_roomslno, 
-     fb_asset_map_master.fb_dep_id   ,
-     fb_ismultiple,
-     fb_asset_count,
-     fb_asset_map_status,
-     fb_asset_item_master.fb_asset_name,
-	rm_room_name,
-    complaint_dept_name,
-    fb_complaint_dep,
-    fb_asset_slno
-from 
-	fb_asset_map_master
-left join rm_newroom_creation on rm_newroom_creation.rm_room_slno = fb_asset_map_master.fb_rc_roomslno
-left join fb_asset_item_master on fb_asset_item_master.fb_asset_slno = fb_asset_map_master.fb_asset_id	
-left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno = fb_asset_map_master.fb_complaint_dep		
-where fb_rc_roomslno = ?
+            `   select 
+                    fb_assets_map_slno,
+                    fb_rc_roomslno, 
+                    fb_asset_map_master.fb_dep_id,
+                    fb_ismultiple,
+                    fb_asset_count,
+                    fb_asset_map_status,
+                    fb_asset_item_master.fb_asset_name,
+                    rm_room_name,
+                    complaint_dept_name,
+                    fb_complaint_dep,
+                    fb_asset_slno,
+                    fb_asset_type
+                from 
+                    fb_asset_map_master
+                left join rm_newroom_creation on rm_newroom_creation.rm_room_slno = fb_asset_map_master.fb_rc_roomslno
+                left join fb_asset_item_master on fb_asset_item_master.fb_asset_slno = fb_asset_map_master.fb_asset_id	
+                left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno = fb_asset_map_master.fb_complaint_dep		
+                where fb_rc_roomslno = ?
             `,
             [
                 data
@@ -2851,7 +3179,8 @@ where fb_rc_roomslno = ?
                 fdmast_slno,
                 fb_ip_num,
                 fb_patient_num,
-                fb_patient_name
+                fb_patient_name,
+                fb_transact_slno
             FROM 
                 fb_transaction_mast
             WHERE 
@@ -2870,12 +3199,13 @@ where fb_rc_roomslno = ?
     },
     getempdetail: (data, callBack) => {
         pool.query(
-            `select 
-                em_department,em_dept_section,em_name,desg_name
+            `
+            select 
+                em_department,em_dept_section,em_name,desg_name,complaint_dept_slno
             from 
                 co_employee_master
-            left join 
-                co_designation on co_employee_master.em_designation = co_designation.desg_slno
+            left join  co_designation on co_employee_master.em_designation = co_designation.desg_slno
+            left join  cm_complaint_dept on cm_complaint_dept.department_slno = co_employee_master.em_department
              where 
                 em_id = ?`,
             [
@@ -2888,9 +3218,72 @@ where fb_rc_roomslno = ?
                 return callBack(null, results)
             })
     },
+    getallipfollowup: (data, callBack) => {
+        pool.query(
+            `select
+                fb_ip_date_schedule.fb_date_schedule_slno, 
+                fb_ip_date_schedule.fb_ip_no,
+                fb_ip_date_schedule.fb_schedule_date,
+                fb_ip_date_schedule.fb_pro_remark,
+                fb_ip_date_schedule.fb_pt_no
+                fb_ptc_name
+            from 
+                fb_ip_date_schedule
+			left join fb_ipadmiss on fb_ipadmiss.fb_ip_no = fb_ip_date_schedule.fb_ip_no
+           where fb_ipadmiss.fb_ipd_disc  BETWEEN ? AND ?;
+                `,
+            [
+                data?.FROM_DATE,
+                data?.TO_DATE
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+
     getallassignedbed: (data, callBack) => {
         pool.query(
-            `select fb_hk_slno,fb_hk_bed_slno from fb_hk_check_bed where fb_hk_sv_assign = 168 and fb_hk_status = 1 `,
+            `    SELECT 
+                fb_hk_check_bed.fb_hk_slno,
+                fb_hk_check_bed.fb_hk_bed_slno,
+                fb_hk_check_bed.fb_hk_check_status,
+                fb_hk_check_bed.fb_hk_bed_status,
+                fb_hk_check_bed.fb_hk_bed_remark,
+                fb_hk_check_bed.fb_hk_finla_emp_assign,
+                fb_hk_check_bed.fb_hk_initial_emp_assign,
+                fb_bed.fb_bed_slno,
+                fb_bed.fb_bd_code,
+                fb_bed.fb_bdc_no,
+                fb_bed.fb_ns_code,
+                fb_bed.fb_rt_code,
+                fb_bed.fb_bdc_occup,
+                fb_bed.fb_bdn_cccno,
+                fb_bed.fb_bdc_status,
+                fb_bed.fb_hkd_cleaningreq,
+                fb_bed.fb_rm_code,
+                fb_ns_name,
+                fb_rtc_desc,
+                fb_rtc_alias,
+                fb_bed.create_date,
+                 rm_outlet_slno
+            FROM
+                fb_hk_check_bed
+                    LEFT JOIN
+                fb_bed ON fb_hk_check_bed.fb_hk_bed_slno = fb_bed.fb_bed_slno
+                    LEFT JOIN
+                fb_nurse_station_master ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code
+                    LEFT JOIN
+                fb_room_type ON fb_bed.fb_rt_code = fb_room_type.fb_rt_code
+                    LEFT JOIN
+                fb_roomcreation_master ON fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
+                 LEFT JOIN
+				rm_newroom_creation ON rm_newroom_creation.rm_room_slno = fb_roomcreation_master.fb_rm_room_slno
+            WHERE
+                fb_hk_sv_assign = ?
+                    AND fb_hk_status = 1;`,
             [
                 data
             ]
@@ -3217,10 +3610,13 @@ where fb_rc_roomslno = ?
                 fb_asset_name,
                 fb_dep_id,
                 fb_asset_status,
-                complaint_dept_name
+                complaint_dept_name,
+                complaint_type_name,
+                fb_asset_item_master.fb_asset_type
             from 
                 fb_asset_item_master
-			left join cm_complaint_dept on fb_asset_item_master.fb_dep_id = cm_complaint_dept.complaint_dept_slno
+                left join cm_complaint_dept on fb_asset_item_master.fb_dep_id = cm_complaint_dept.complaint_dept_slno
+                left join cm_complaint_type on cm_complaint_type.complaint_type_slno = fb_asset_item_master.fb_asset_type;  
             `,
             []
             , (error, results, fields) => {
@@ -3265,6 +3661,21 @@ where fb_rc_roomslno = ?
                 return callBack(null, results)
             })
     },
+    getnursingstaiton: (callBack) => {
+        pool.query(
+            `SELECT 
+                fb_ns_code, fb_ns_name
+            FROM
+                fb_nurse_station_master
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
     getallhkempdtl: (callBack) => {
         pool.query(
             `select 	
@@ -3277,6 +3688,89 @@ where fb_rc_roomslno = ?
                 fb_hk_empdtl_master
             `,
             []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getCurrentCompany: (callBack) => {
+        pool.query(`
+            SELECT 
+                company_slno
+            FROM
+                crm_common
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getCommonFeedbackReport: (data, callBack) => {
+        pool.query(`
+             SELECT 
+                fb_transaction_mast.fb_transact_slno,
+                fb_patient_name,
+                fb_patient_mob,
+                fd_mark,
+                fb_suggestion,
+                rating_name,
+                rating_value,
+                fd_qa_eng,
+                fb_ip_num,
+                fb_transaction_mast.create_date,
+                fb_transaction_mast.create_user,
+                em_name
+                FROM fb_transaction_mast  
+                LEFT JOIN fb_transaction_detl ON fb_transaction_detl.fb_transact_slno = fb_transaction_mast.fb_transact_slno
+                LEFT JOIN fb_mast_qakey ON fb_mast_qakey.fbqa_slno = fb_transaction_detl.fbqa_slno
+                LEFT JOIN fb_detl ON fb_detl.fddet_slno = fb_transaction_detl.fddet_slno
+                LEFT JOIN co_employee_master ON co_employee_master.em_id = fb_transaction_mast.create_user
+                WHERE fb_transaction_mast.fdmast_slno = 3
+                AND fb_transaction_mast.create_date between ? and ?;
+            `,
+            [
+                data.FROM_DATE,
+                data.TO_DATE
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getIpFeedbackReport: (data, callBack) => {
+        pool.query(`
+              SELECT 
+                fb_transaction_mast.fb_transact_slno,
+                fb_patient_name,
+                fb_patient_mob,
+                fd_mark,
+                fb_suggestion,
+                rating_name,
+                rating_value,
+                fd_qa_eng,
+                fb_ip_num,
+                fb_transaction_mast.create_date,
+                fb_transaction_mast.create_user,
+                em_name
+                FROM fb_transaction_mast  
+                LEFT JOIN fb_transaction_detl ON fb_transaction_detl.fb_transact_slno = fb_transaction_mast.fb_transact_slno
+                LEFT JOIN fb_mast_qakey ON fb_mast_qakey.fbqa_slno = fb_transaction_detl.fbqa_slno
+                LEFT JOIN fb_detl ON fb_detl.fddet_slno = fb_transaction_detl.fddet_slno
+                LEFT JOIN co_employee_master ON co_employee_master.em_id = fb_transaction_mast.create_user
+                WHERE fb_transaction_mast.fdmast_slno = 7
+                AND fb_transaction_mast.create_date between ? and ?;
+            `,
+            [
+                data.FROM_DATE,
+                data.TO_DATE
+            ]
             , (error, results, fields) => {
                 if (error) {
                     return callBack(error)
@@ -3305,7 +3799,6 @@ where fb_rc_roomslno = ?
                 return callBack(null, results)
             })
     },
-
     getallhkactiveitem: (callBack) => {
         pool.query(
             `select 	
@@ -3324,7 +3817,58 @@ where fb_rc_roomslno = ?
                 return callBack(null, results)
             })
     },
-
+    getstarcount: (callBack) => {
+        pool.query(
+            `SELECT 
+                fd_mark,
+                COUNT(*) AS rating_count
+            FROM 
+                fb_transaction_detl
+            LEFT JOIN 
+                fb_mast_qakey ON fb_transaction_detl.fbqa_slno = fb_mast_qakey.fbqa_slno
+            WHERE 
+                fb_mast_qakey.fb_rateing_slno IN (4, 5) 
+                AND fb_aq_status != 0
+            GROUP BY 
+                fd_mark
+            ORDER BY 
+                fd_mark DESC
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getcategorycount: (callBack) => {
+        pool.query(
+            ` 
+            SELECT 
+                fb_transaction_detl.fb_category_slno,
+                COUNT(*) AS question_count,
+                fb_category_name
+            FROM 
+                fb_transaction_detl
+            LEFT JOIN 
+                fb_category_master ON fb_transaction_detl.fb_category_slno = fb_category_master.fb_category_slno
+            LEFT JOIN 
+                fb_mast_qakey ON fb_transaction_detl.fbqa_slno = fb_mast_qakey.fbqa_slno
+            WHERE  fb_aq_status != 0
+            GROUP BY 
+                fb_category_slno
+            ORDER BY 
+                fb_category_slno DESC
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
     getprocheckbed: (callBack) => {
         pool.query(
             `select 	
@@ -3520,11 +4064,30 @@ select
                 return callBack(null, results)
             })
     },
+    getallComplaintType: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                    complaint_type_slno, complaint_type_name
+                FROM
+                    cm_complaint_type
+                WHERE
+                    complaint_dept_slno = ?
+                        AND complaint_type_status = 1;
+            `,
+            [data]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+
     complaintregistraion: (data, callBack) => {
         const promises = data?.map((item) => {
             return new Promise((resolve, reject) => {
                 pool.query(
-                    ` INSERT INTO  cm_complaint_mast(
+                    `INSERT INTO  cm_complaint_mast(
                     complaint_slno,
                     complaint_deptslno,
                     complaint_desc,
@@ -3532,9 +4095,13 @@ select
                     compalint_date,
                     compalint_status,
                     cm_location,
-                    create_user
+                    complaint_typeslno,
+                    cm_complaint_location,
+                    create_user,
+                    fb_ticket,
+                    complaint_dept_secslno
                 ) 
-                VALUES(?,?,?,?,?,?,?,?)
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?)
             `,
                     [
                         item.complaint_slno,
@@ -3544,7 +4111,11 @@ select
                         item.compalint_date,
                         item.compalint_status,
                         item.cm_location,
-                        item.create_user
+                        item.complaint_typeslno,
+                        item.cm_complaint_location,
+                        item.create_user,
+                        item.fb_ticket,
+                        item.complaint_dept_secslno
                     ],
                     (error, results, fields) => {
                         if (error) {
@@ -3564,7 +4135,6 @@ select
             .catch((error) => {
                 callBack(error);
             });
-
     },
     UpdateSeiralNos: (data, callBack) => {
         pool.query(
@@ -3646,7 +4216,8 @@ select
     // },
     getcomplaintdetail: (data, callBack) => {
         pool.query(
-            `select  complaint_slno,
+            `SELECT
+                cm_complaint_mast.complaint_slno,
                 complaint_deptslno,
                 complaint_desc,
                 complaint_request_slno,
@@ -3657,12 +4228,57 @@ select
                 fb_bdc_no,
                 complaint_dept_name,
                 cm_asset_dept,
-                cm_am_assetmap_slno
-            from cm_complaint_mast 
-                left join fb_bed on cm_complaint_mast.cm_location = fb_bed.fb_bed_slno
-                left join cm_complaint_dept on cm_complaint_mast.complaint_deptslno = cm_complaint_dept.complaint_dept_slno
-                left join cm_comasset_mapping on cm_complaint_mast.complaint_slno = cm_comasset_mapping.cm_complait_slno
-                where cm_location = ?`,
+                cm_am_assetmap_slno,
+                fb_bed.fb_bed_slno,
+                fb_final_checked,
+
+                
+                GROUP_CONCAT(DISTINCT assigned_em.em_name SEPARATOR ', ') AS assigned_employees,
+
+                
+                GROUP_CONCAT(
+                    DISTINCT CASE 
+                        WHEN cm_complaint_detail.assign_rect_status = 1 
+                        THEN assigned_em.em_name 
+                    END 
+                    SEPARATOR ', '
+                ) AS rectified_employees,
+
+                created_by.em_name AS Registered_user,
+                cm_complaint_mast.create_user
+
+            FROM cm_complaint_mast 
+                LEFT JOIN fb_bed ON cm_complaint_mast.cm_complaint_location = fb_bed.fb_bdc_no
+                LEFT JOIN cm_complaint_dept ON cm_complaint_mast.complaint_deptslno = cm_complaint_dept.complaint_dept_slno
+                LEFT JOIN cm_comasset_mapping ON cm_complaint_mast.complaint_slno = cm_comasset_mapping.cm_complait_slno
+                LEFT JOIN fb_bed_remarks ON fb_bed_remarks.fb_bed_slno = fb_bed.fb_bed_slno
+                LEFT JOIN cm_complaint_detail ON cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
+                LEFT JOIN co_employee_master AS assigned_em ON assigned_em.em_id = cm_complaint_detail.assigned_emp
+                LEFT JOIN co_employee_master AS created_by ON created_by.em_id = cm_complaint_mast.create_user
+
+            WHERE 
+                cm_complaint_location = ? 
+                AND fb_ticket = 1 
+                AND fb_final_checked IS NULL
+
+            GROUP BY  
+                cm_complaint_mast.complaint_slno,
+                complaint_deptslno,
+                complaint_desc,
+                complaint_request_slno,
+                compalint_date,
+                compalint_status,
+                cm_location,
+                fb_bd_code,
+                fb_bdc_no,
+                complaint_dept_name,
+                cm_asset_dept,
+                cm_am_assetmap_slno,
+                fb_bed.fb_bed_slno,
+                fb_final_checked,
+                created_by.em_name,
+                cm_complaint_mast.create_user
+    `,
             [
                 data
             ]
@@ -3678,12 +4294,15 @@ select
             `
             UPDATE cm_complaint_mast
             SET
-                compalint_status = ?
+                compalint_status = ?,
+                cm_rectify_time = ?,
+                cm_rectify_status = 'R'
             WHERE
                 complaint_slno = ?
             `,
             [
                 data.status,
+                data.compalint_date,
                 data.complaint_slno
             ],
             (error, results, fields) => {
@@ -3701,14 +4320,16 @@ select
                     fb_asset_name,
                     fb_dep_id,
                     fb_asset_status,
+                    fb_asset_type,
                     create_user
                 ) 
-                VALUES(?,?,?,?)
+                VALUES(?,?,?,?,?)
             `,
             [
                 data.fb_asset_name,
                 data.fb_dep_id,
                 data.fb_asset_status,
+                data.fb_asset_type,
                 data.create_user
             ],
             (error, results, fields) => {
@@ -3792,8 +4413,29 @@ select
             }
         )
     },
-
-
+    patientnotresponding: (data, callBack) => {
+        pool.query(
+            `
+            INSERT INTO  fb_pt_not_responding(
+                fb_pt_ipno, 
+                fb_pt_nr_remark, 
+                create_user
+                ) 
+                VALUES(?,?,?)
+            `,
+            [
+                data.fb_ip_no,
+                data.remarks,
+                data.create_user
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
     updateassetitem: (data, callBack) => {
         pool.query(
             `
@@ -3802,6 +4444,7 @@ select
                     fb_asset_name = ?,
                     fb_dep_id = ?,
                     fb_asset_status = ?,
+                    fb_asset_type = ?,
                     edit_user = ?
                 where 
                     fb_asset_slno = ?
@@ -3810,6 +4453,7 @@ select
                 data.fb_asset_name,
                 data.fb_dep_id,
                 data.fb_asset_status,
+                data.fb_asset_type,
                 data.edit_user,
                 data.fb_assets_slno
             ],
@@ -3831,14 +4475,18 @@ select
                             complaint_slno,
                             assigned_emp,
                             assigned_date,
-                            assigned_user
+                            assigned_user,
+                            assign_rect_status,
+                            assign_status
                         ) 
-                        VALUES(?,?,?,?)`,
+                        VALUES(?,?,?,?,?,?)`,
                         [
                             item.complaint_slno,
                             user,
                             item.compalint_date,
                             item.create_user,
+                            item.assign_rect_status,
+                            item.assign_status
                         ],
                         (error, results, fields) => {
                             if (error) {
@@ -4084,6 +4732,122 @@ select
             }
         )
     },
+    getptimpression: (data, callBack) => {
+        pool.query(
+            `
+            SELECT 
+                fb_pt_imp_quest.fb_quest_id,
+                fb_quest_sub,
+                fb_ans_detail,
+                fb_quest,
+                em_name,
+                fb_imp_transact_mast.create_date,
+                fb_imp_ans
+            FROM
+                fb_imp_transact_mast
+                    LEFT JOIN fb_pt_imp_quest ON fb_imp_transact_mast.fb_quest_id = fb_pt_imp_quest.fb_quest_id
+                    LEFT JOIN co_employee_master ON fb_imp_transact_mast.create_user = co_employee_master.em_id
+            WHERE
+                fb_transact_slno = ?
+            `,
+            [
+                data.FB_TCT_SLNO
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    getdischargepatient: (data, callBack) => {
+        pool.query(
+            `
+            SELECT 
+                fb_ip_no,
+                fb_ipd_date,
+                fb_pt_no,
+                fb_ptc_name,
+                fb_ptc_sex,
+                fb_ptd_dob,
+                fb_ptn_yearage,
+                fb_ptc_loadd1,
+                fb_ptc_loadd2,
+                fb_ptc_loadd3,
+                fb_ptc_loadd4,
+                fb_ipd_disc,
+                fb_ipc_status,
+                fb_dmd_date,
+                fb_ptc_mobile,
+                fb_doc_name,
+                fb_dep_desc
+            FROM
+                fb_ipadmiss
+            WHERE
+                fb_ipd_disc IS NOT NULL AND fb_ipc_status = 'R'
+                    AND fb_ipd_disc  BETWEEN ? AND ?
+            `,
+            [
+                data.FROM_DATE,
+                data.TO_DATE
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    getpatientnotresponding: (data, callBack) => {
+        pool.query(
+            `
+            SELECT 
+                fb_pt_nr_remark,
+                fb_pt_not_responding.create_date,
+                em_name
+            FROM
+                fb_pt_not_responding
+                LEFT JOIN co_employee_master ON fb_pt_not_responding.create_user = co_employee_master.em_id
+            WHERE
+                fb_pt_ipno= ?
+            `,
+            [
+                data.IP_NO
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    CheckBedAlreadyAssigned: (data, callBack) => {
+        pool.query(
+            `
+            SELECT 
+                fb_hk_slno
+            FROM
+                fb_hk_check_bed
+            WHERE
+                fb_hk_sv_assign = ?
+                    AND fb_hk_bed_slno = ?
+                    AND fb_hk_status = 0	
+            `,
+            [
+                data.fb_hk_sv_assign,
+                data.fb_hk_bed_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
     getdischargeentrybed: (callBack) => {
         pool.query(
             `
@@ -4158,6 +4922,38 @@ select
                 return callBack(null, { insertId: results.insertId });
             })
     },
+
+
+    insertipfollowup: (data, callBack) => {
+        const scheduleDate = data.Schedule_date;
+        try {
+            pool.query(
+                `INSERT INTO fb_ip_date_schedule (
+                fb_ip_no,
+                fb_pt_no,
+                fb_schedule_date,
+                fb_pro_remark,
+                create_user
+            ) VALUES (?, ?, ?, ?, ?)
+            `,
+                [
+                    data.fb_ip_no,
+                    data.fb_pt_no,
+                    scheduleDate,
+                    data.fb_pro_remark,
+                    data.create_user
+                ],
+                (error, results, fields) => {
+                    if (error) {
+                        return callBack(error);
+                    }
+                    return callBack(null, { insertId: results.insertId });
+                }
+            );
+        } catch (err) {
+            return callBack(err);
+        }
+    },
     updateprocheckbed: (data, callBack) => {
         pool.query(
             `
@@ -4184,11 +4980,55 @@ select
                 }
                 return callBack(null, { insertId: results.insertId });
             })
+    }, UpdateHkAssignedBed: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE  fb_hk_check_bed
+            SET
+                fb_hk_status = 1,
+                edit_user = ?
+            WHERE
+                fb_hk_slno = ?
+            `,
+            [
+                data.edit_user,
+                data.fb_hk_slno
+
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, { insertId: results.insertId });
+            })
+    },
+    updateipfollowup: (data, callBack) => {
+        pool.query(
+            `
+            UPDATE  fb_ip_date_schedule
+            SET
+                fb_schedule_date = ?,
+                fb_pro_remark=?,
+                edit_user=?
+            WHERE
+                fb_date_schedule_slno = ?
+            `,
+            [
+                data.Schedule_date,
+                data.fb_pro_remark,
+                data.edit_user,
+                data.slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, { insertId: results.insertId });
+            })
     },
     CheckProCheckBedPresent: (data, callBack) => {
-        // `select fb_check_bed_slno from fb_pro_check_bed where fb_bed_slno = ?`,
         pool.query(
-            ` select fb_check_bed_slno from fb_pro_check_bed where fb_bed_slno = 12 and fb_final_check <> 1;`,
+            ` select fb_check_bed_slno from fb_pro_check_bed where fb_bed_slno = ? and fb_final_check IS NULL;`,
             [
                 data.fb_bed_slno,
             ]
@@ -4240,7 +5080,6 @@ select
             });
     },
     UpdateProCheckListDetail: (data, callBack) => {
-        // console.log(data, "UpdateProCheckListDetail");
         const { detail, fb_check_bed_slno, create_user } = data;
         const promises = detail?.map((item) => {
             return new Promise((resolve, reject) => {
@@ -4314,4 +5153,150 @@ where fb_pro_check_bed.fb_bed_slno = ?;`,
                 return callBack(null, results)
             })
     },
+    getDischargepatient: (sql, params, callback) => {
+        pool.query(sql, params, (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
+    insertHkdetails: (data, callBack) => {
+        const promises = data?.map((item) => {
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    ` INSERT INTO  fb_hk_bed_detail(
+                            fb_hk_slno,
+                            fb_hk_rm_cklist_slno,
+                            fb_hk_rm_item_condition
+                        ) 
+                        VALUES(?,?,?)
+            `,
+                    [
+                        item.fb_hk_slno,
+                        item.fb_hk_rm_cklist_slno,
+                        item.fb_hk_rm_item_condition
+                    ],
+                    (error, results, fields) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(results);
+                        }
+                    }
+                );
+            });
+        });
+        // Use Promise.all to wait for all insertions
+        Promise.all(promises)
+            .then((results) => {
+                callBack(null, results);
+            })
+            .catch((error) => {
+                callBack(error);
+            });
+
+    }, gethkcheckdtl: (data, callBack) => {
+        pool.query(
+            `
+            SELECT 
+                fb_hk_rm_item_condition, fb_hk_rm_cklist_slno
+            FROM
+                fb_hk_bed_detail
+            WHERE
+                fb_hk_slno = ?;	
+            `,
+            [
+                data.fb_hk_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    gethkbedDetails: (data, callBack) => {
+        pool.query(
+            `  
+            SELECT 
+                fb_hk_sv_assign,
+                fb_hk_bed_remark,
+                fb_hk_check_status,
+                em_name,
+                fb_hk_bed_status
+            FROM
+                fb_hk_check_bed
+            left join co_employee_master on fb_hk_check_bed.fb_hk_sv_assign = co_employee_master.em_id
+            WHERE
+                fb_hk_bed_slno = ?
+            `,
+            [
+                data.fb_hk_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+
+    gethkcomplaintdetails: (data, callBack) => {
+        pool.query(
+            `
+          SELECT 
+            cm_complaint_mast.complaint_slno,
+            complaint_desc,
+            compalint_status,
+            
+            GROUP_CONCAT(DISTINCT assigned_em.em_name SEPARATOR ', ') AS assigned_employees,
+
+            GROUP_CONCAT(
+                DISTINCT CASE 
+                    WHEN cm_complaint_detail.assign_rect_status = 1 
+                    THEN assigned_em.em_name 
+                END 
+                SEPARATOR ', '
+            ) AS rectified_employees,
+
+            created_by.em_name AS Registered_user,
+            cm_complaint_mast.create_user
+
+        FROM cm_complaint_mast
+        LEFT JOIN cm_complaint_detail 
+            ON cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
+        LEFT JOIN co_employee_master AS assigned_em 
+            ON assigned_em.em_id = cm_complaint_detail.assigned_emp
+        LEFT JOIN co_employee_master AS created_by 
+            ON created_by.em_id = cm_complaint_mast.create_user
+
+        WHERE 
+            complaint_deptslno = ?
+            AND cm_complaint_location = ?
+            AND fb_ticket = ?
+
+        GROUP BY 
+            cm_complaint_mast.complaint_slno,
+            complaint_desc,
+            compalint_status,
+            created_by.em_name,
+            cm_complaint_mast.create_user;
+            `,
+            [
+                data.complaint_deptslno,
+                data.location,
+                data.fb_ticket
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+
+
 }

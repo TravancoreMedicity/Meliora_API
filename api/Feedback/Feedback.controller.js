@@ -1,3 +1,4 @@
+const { replyQuery } = require("../complaint_assign/complaintAssign.service");
 const {
     insertfeedbackcategory,
     getallcategories,
@@ -70,24 +71,24 @@ const {
     getallnursestation,
     updatenursestation,
     getpatientfeedback,
-    insertbddetail,
-    CheckBedAlreadyPresent,
-    updatebeddetail,
-    CheckRoomTypeAlreadyPreseint,
-    insertrtdetail,
-    updatertdetail,
-    CheckpatientAlreadyPresent,
-    insertPatientDetail,
-    updatePatientDetail,
-    CheckRoomsinMasterPresent,
-    insertRoomMasterdetail,
-    updateRoomMasterDetail,
-    updateadmnReasons,
-    insertadminReasons,
-    CheckadmnReasonsExits,
-    CheckRoomCategoryExists,
-    insertRoomCategoryDetail,
-    UpdateRoomCategoryDetail,
+    // CheckBedAlreadyPresent,
+    // insertbddetail,
+    // updatebeddetail,
+    // CheckRoomTypeAlreadyPreseint,
+    // insertrtdetail,
+    // updatertdetail,
+    // CheckpatientAlreadyPresent,
+    // insertPatientDetail,
+    // updatePatientDetail,
+    // CheckRoomsinMasterPresent,
+    // insertRoomMasterdetail,
+    // updateRoomMasterDetail,
+    // updateadmnReasons,
+    // insertadminReasons,
+    // CheckadmnReasonsExits,
+    // CheckRoomCategoryExists,
+    // insertRoomCategoryDetail,
+    // UpdateRoomCategoryDetail,
     getNursingBed,
     getCurrentPatient,
     getallblockedbed,
@@ -152,6 +153,38 @@ const {
     getallassignedbed,
     getalldischargeform,
     UpdateAssignedBed,
+    insertipfollowup,
+    getallipfollowup,
+    getallscheduledate,
+    updateipfollowup,
+    insertDefaultPtImpression,
+    getdischargepatient,
+    getCurrentCompany,
+    getptimpression,
+    insertimpression,
+    insertimppatientRemark,
+    fetchimpremark,
+    getrelative,
+    getbirthdetail,
+    patientnotresponding,
+    getpatientnotresponding,
+    getstarcount,
+    getcategorycount,
+    getnursingstaiton,
+    getTransferHistory,
+    getDischargepatient,
+    FindhkalreadyExist,
+    updatehkcheckbed,
+    CheckBedAlreadyAssigned,
+    UpdateHkAssignedBed,
+    insertHkdetails,
+    gethkcheckdtl,
+    gethkcomplaintdetails,
+    gethkbedDetails,
+    getchecklistbed,
+    getallComplaintType,
+    getCommonFeedbackReport,
+    getIpFeedbackReport,
 } = require("./Feedback.service");
 
 module.exports = {
@@ -801,9 +834,11 @@ module.exports = {
     },
     insertFeedbackanswers: (req, res) => {
         const body = req.body;
-        const { fb_answers, fb_ip_num, fb_patient_num, fb_patient_name, fb_patient_mob, fdmast_slno, create_user } = body;
+        const { fb_answers, fb_ip_num, fb_patient_num, fb_patient_name, fb_patient_mob, fdmast_slno, fb_default_quest,
+            fb_default_reamark, create_user } = body;
 
         UpdateSerialAnswerMaster((error, results) => {
+
             if (error) {
                 return res.status(200).json({
                     success: 1,
@@ -818,6 +853,7 @@ module.exports = {
                     })
                 }
 
+                // getting transaction slno for the each patients
                 let serialCurrentValue = results[0]?.serial_current;
 
                 if (!serialCurrentValue) {
@@ -843,6 +879,20 @@ module.exports = {
                     fb_transact_slno: fb_transact_slno_value,
                     create_user: create_user
                 }
+                // object contain defult question answer
+                const impanswers = {
+                    answer: fb_default_quest,
+                    fb_transact_slno: fb_transact_slno_value,
+                    create_user: create_user
+                }
+
+                const impremark = {
+                    fb_transact_slno: fb_transact_slno_value,
+                    remark: fb_default_reamark,
+                    create_user: create_user
+                }
+
+
                 insertAllFeedBackTransactionMast(insertData, (error, results) => {
                     if (error) {
                         return res.status(200).json({
@@ -859,6 +909,33 @@ module.exports = {
                             })
                         }
                     })
+
+
+                    // insert default question answer and details
+                    if (fdmast_slno === 8 && fdmast_slno != undefined) {
+                        insertDefaultPtImpression(impanswers, (error, results) => {
+
+                            if (error) {
+                                return res.status(200).json({
+                                    success: 1,
+                                    message: error
+                                })
+                            }
+                        })
+                    }
+
+                    // insertdefault reamarks
+                    if (fdmast_slno === 8 && fdmast_slno != undefined) {
+                        insertimppatientRemark(impremark, (err, results) => {
+                            if (err) {
+                                return res.status(400).json({
+                                    success: 0,
+                                    message: err
+                                });
+                            }
+
+                        });
+                    }
                     return res.status(200).json({
                         success: 2,
                         message: "Inserted Successfully",
@@ -1503,6 +1580,64 @@ module.exports = {
 
         })
     },
+    insertHkdetails: (req, res) => {
+        const body = req.body;
+        const { data, fb_bed_slno, fb_hk_bd_status, fb_hk_remark, fb_hk_emp_assign } = body;
+
+        const assignEmployeee = JSON.stringify(fb_hk_emp_assign);
+
+        FindhkalreadyExist(fb_bed_slno, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Error in fetchin data"
+                })
+            }
+
+            const Bed_slno = results?.[0]?.fb_hk_slno;
+
+            const updateData = {
+                fb_hk_slno: Bed_slno,
+                fb_hk_bed_status: fb_hk_bd_status,
+                fb_hk_bed_remark: fb_hk_remark,
+                assignEmployeee: assignEmployeee,
+                fb_hk_check_status: fb_hk_bd_status //=== 1 ? 1 : 2
+            };
+
+            const HkCheklistData = data?.map((val, index) => {
+                const insertData = {
+                    fb_hk_slno: Bed_slno,
+                    fb_hk_rm_cklist_slno: val?.fb_hk_rm_cklist_slno,
+                    fb_hk_rm_item_condition: val?.ispresent
+                }
+                return insertData
+            });
+
+            updatehkcheckbed(updateData, (error, results) => {
+                if (error) {
+                    return res.status(200).json({
+                        success: 1,
+                        message: error
+                    })
+                }
+            });
+
+            insertHkdetails(HkCheklistData, (error, results) => {
+                if (error) {
+                    return res.status(200).json({
+                        success: 1,
+                        message: error
+                    })
+                }
+            });
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Inserted Successfully'
+            })
+        })
+    },
+
     getallnursestation: (req, res) => {
         getallnursestation((error, results) => {
             if (error) {
@@ -1589,339 +1724,348 @@ module.exports = {
             })
         })
     },
-    insertbddetail: async (req, res) => {
-        const { bedinfo } = req.body;
-
-        try {
-            // Step 1: Check if beds already exist
-            const bedResults = await new Promise((resolve, reject) => {
-                CheckBedAlreadyPresent(bedinfo, (error, results) => {
-                    if (error) reject(error);
-                    resolve(results);
-                });
-            });
-
-            const existingBdcNos = bedResults.flat().map(item => ({
-                BDC_NO: item.fb_bdc_no,
-                fb_bed_slno: item.fb_bed_slno
-            }));
-
-            // Step 2: Filter beds to insert and beds to update
-            const bedsToInsert = bedinfo.filter(item =>
-                !existingBdcNos.some(existing => existing.BDC_NO === item.BDC_NO)
-            );
-
-            const bedsToUpdate = bedinfo.reduce((acc, item) => {
-                const matchingBed = existingBdcNos.find(existing => existing.BDC_NO === item.BDC_NO);
-                if (matchingBed) {
-                    return [...acc, { ...item, fb_bed_slno: matchingBed.fb_bed_slno }];
-                }
-                return acc;
-            }, []);
-
-            // Step 3: Insert beds if necessary
-            if (bedsToInsert.length > 0) {
-                await new Promise((resolve, reject) => {
-                    insertbddetail(bedsToInsert, (error, results) => {
-                        if (error) reject(error);
-                        resolve(results);
-                    });
-                });
-            }
-            // Step 4: Update beds if necessary
-            if (bedsToUpdate.length > 0) {
-                await new Promise((resolve, reject) => {
-                    updatebeddetail(bedsToUpdate, (error, results) => {
-                        if (error) reject(error);
-                        resolve(results);
-                    });
-                });
-            }
-
-            // Step 5: Check if room types already exist
-            const roomResults = await new Promise((resolve, reject) => {
-                CheckRoomTypeAlreadyPreseint(bedinfo, (error, results) => {
-                    if (error) reject(error);
-                    resolve(results);
-                });
-            });
-
-            const existingrtNos = roomResults.flat().map(item => ({
-                RT_CODE: item.fb_rt_code,
-                fb_rmtp_slno: item.fb_rmtp_slno
-            }));
-
-            // Step 6: Filter room types to insert and room types to update
-            const roomTypesToInsert = bedinfo.filter(item =>
-                !existingrtNos.some(existing => existing.RT_CODE === item.RT_CODE)).reduce((acc, item) => {
-                    // Add the item only if its RT_CODE is not already present in the accumulator
-                    if (!acc.some(existing => existing.RT_CODE === item.RT_CODE)) {
-                        return [...acc, item]; // Use spread operator to add the item
-                    }
-                    return acc;
-                }, []);
 
 
-            const roomTypesToUpdate = bedinfo.reduce((acc, item) => {
-                const matchingRoomType = existingrtNos.find(existing => existing.RT_CODE === item.RT_CODE);
-                if (matchingRoomType) {
-                    return [...acc, { ...item, fb_rmtp_slno: matchingRoomType.fb_rmtp_slno }];
-                }
-                return acc;
-            }, []);
 
-            // Step 7: Insert room types if necessary
-            if (roomTypesToInsert.length > 0) {
-                await new Promise((resolve, reject) => {
-                    insertrtdetail(roomTypesToInsert, (error, results) => {
-                        if (error) reject(error);
-                        resolve(results);
-                    });
-                });
-            }
+    // insertbddetail: async (req, res) => {
+    //     const { bedinfo } = req.body;
 
-            // Step 8: Update room types if necessary
-            if (roomTypesToUpdate.length > 0) {
-                await new Promise((resolve, reject) => {
-                    updatertdetail(roomTypesToUpdate, (error, results) => {
-                        if (error) reject(error);
-                        resolve(results);
-                    });
-                });
-            }
-            // Return success response if all operations are successful
-            return res.status(200).json({
-                success: 2,
-                message: 'Successfully inserted and updated Data!'
-            });
-        } catch (error) {
-            // Return error response if any operation fails
-            return res.status(200).json({
-                success: 0,
-                message: error.message || error
-            });
-        }
-    },
+    //     try {
+    //         // Step 1: Check if beds already exist
+    //         const bedResults = await new Promise((resolve, reject) => {
+    //             CheckBedAlreadyPresent(bedinfo, (error, results) => {
+    //                 if (error) reject(error);
+    //                 resolve(results);
+    //             });
+    //         });
 
-    // inserting patient detail RoomMaster detail Room Catergory Detail AdmsReasons and other 
-    insertptdetailmlora: async (req, res) => {
-        const { ptdetail } = req.body;
-        CheckpatientAlreadyPresent(ptdetail, (error, results) => {
-            if (error) {
-                return res.status(200).json({
-                    success: 1,
-                    message: error
-                })
-            }
+    //         const existingBdcNos = bedResults.flat().map(item => ({
+    //             BDC_NO: item.fb_bdc_no,
+    //             fb_bed_slno: item.fb_bed_slno
+    //         }));
 
-            const existingPatient = results.flat().map(pat => ({
-                IP_NO: pat.fb_ip_no,
-                PT_NO: pat.fb_pt_no,
-                fb_ipad_slno: pat.fb_ipad_slno
-            }));
+    //         // Step 2: Filter beds to insert and beds to update
+    //         const bedsToInsert = bedinfo.filter(item =>
+    //             !existingBdcNos.some(existing => existing.BDC_NO === item.BDC_NO)
+    //         );
 
-            const patientToInsert = ptdetail.filter(item =>
-                !existingPatient.some(exit => exit.IP_NO === item.IP_NO && exit.PT_NO === item.PT_NO)
-            );
+    //         const bedsToUpdate = bedinfo.reduce((acc, item) => {
+    //             const matchingBed = existingBdcNos.find(existing => existing.BDC_NO === item.BDC_NO);
+    //             if (matchingBed) {
+    //                 return [...acc, { ...item, fb_bed_slno: matchingBed.fb_bed_slno }];
+    //             }
+    //             return acc;
+    //         }, []);
 
-            const patientToUpdate =
-                ptdetail.reduce((acc, item) => {
-                    const matchingPatient =
-                        existingPatient.find(existing => existing.IP_NO === item.IP_NO && existing.PT_NO === item.PT_NO);
-                    if (matchingPatient) {
-                        return [...acc, { ...item, fb_ipad_slno: matchingPatient.fb_ipad_slno }];
-                    }
-                    return acc;
-                }, []);
+    //         // Step 3: Insert beds if necessary
+    //         if (bedsToInsert.length > 0) {
+    //             await new Promise((resolve, reject) => {
+    //                 insertbddetail(bedsToInsert, (error, results) => {
+    //                     if (error) reject(error);
+    //                     resolve(results);
+    //                 });
+    //             });
+    //         }
+    //         // Step 4: Update beds if necessary
+    //         if (bedsToUpdate.length > 0) {
+    //             await new Promise((resolve, reject) => {
+    //                 updatebeddetail(bedsToUpdate, (error, results) => {
+    //                     if (error) reject(error);
+    //                     resolve(results);
+    //                 });
+    //             });
+    //         }
 
-            if (patientToInsert.length > 0) {
-                insertPatientDetail(patientToInsert, (error, results) => {
-                    if (error) {
-                        return res.status(200).json({
-                            success: 1,
-                            message: error
-                        })
-                    }
-                })
-            }
+    //         // Step 5: Check if room types already exist
+    //         const roomResults = await new Promise((resolve, reject) => {
+    //             CheckRoomTypeAlreadyPreseint(bedinfo, (error, results) => {
+    //                 if (error) reject(error);
+    //                 resolve(results);
+    //             });
+    //         });
 
-            if (patientToUpdate.length > 0) {
-                updatePatientDetail(patientToUpdate, (error, results) => {
-                    if (error) {
-                        return res.status(200).json({
-                            success: 1,
-                            message: error
-                        })
-                    }
-                })
-            };
+    //         const existingrtNos = roomResults.flat().map(item => ({
+    //             RT_CODE: item.fb_rt_code,
+    //             fb_rmtp_slno: item.fb_rmtp_slno
+    //         }));
 
-            //room master details
-            CheckRoomsinMasterPresent(ptdetail, (error, results) => {
-                if (error) {
-                    return res.status(200).json({
-                        success: 1,
-                        message: error
-                    })
-                }
-                const existingRooms = results.flat().map(item => ({
-                    RM_CODE: item.fb_rm_code,
-                    fb_rm_slno: item.fb_rm_slno
-                }));
-
-                const roommasterToInsert = ptdetail.filter(item =>
-                    !existingRooms.some(existing => existing.RM_CODE === item.RM_CODE)).reduce((acc, item) => {
-                        // Add the item only if its RT_CODE is not already present in the accumulator
-                        if (!acc.some(existing => existing.RM_CODE === item.RM_CODE)) {
-                            return [...acc, item]; // Use spread operator to add the item
-                        }
-                        return acc;
-                    }, []);
-
-                const roommasterToUpdate = ptdetail.reduce((acc, item) => {
-                    const matchingRoomType = existingRooms.find(existing => existing.RM_CODE === item.RM_CODE);
-                    if (matchingRoomType) {
-                        return [...acc, { ...item, fb_rm_slno: matchingRoomType.fb_rm_slno }];
-                    }
-                    return acc;
-                }, []);
-
-                if (roommasterToInsert.length > 0) {
-                    insertRoomMasterdetail(roommasterToInsert, (error, results) => {
-                        if (error) {
-                            return res.status(200).json({
-                                success: 1,
-                                message: error
-                            })
-                        }
-                    })
-                }
-                if (roommasterToUpdate.length > 0) {
-                    updateRoomMasterDetail(roommasterToUpdate, (error, results) => {
-                        if (error) {
-                            return res.status(200).json({
-                                success: 1,
-                                message: error
-                            })
-                        }
-                    })
-                };
-            });
-
-            //admn reason master insertion and upadation
-            CheckadmnReasonsExits(ptdetail, (error, results) => {
-                if (error) {
-                    return res.status(200).json({
-                        success: 1,
-                        message: error
-                    })
-                }
-                const existingAdmnReason = results.flat().map(item => ({
-                    RS_CODE: item.fb_rs_code,
-                    fb_adrn_slno: item.fb_adrn_slno
-                }));
-
-                const admnReasonToInsert = ptdetail.filter(item =>
-                    !existingAdmnReason.some(existing => existing.RS_CODE === item.RS_CODE)).reduce((acc, item) => {
-                        // Add the item only if its RT_CODE is not already present in the accumulator
-                        if (!acc.some(existing => existing.RS_CODE === item.RS_CODE)) {
-                            return [...acc, item]; // Use spread operator to add the item
-                        }
-                        return acc;
-                    }, []);
-
-                const admnReasonToUpdate = ptdetail.reduce((acc, item) => {
-                    const matchingadmnreason = existingAdmnReason.find(existing => existing.RS_CODE === item.RS_CODE);
-                    if (matchingadmnreason) {
-                        return [...acc, { ...item, fb_adrn_slno: matchingadmnreason.fb_adrn_slno }];
-                    }
-                    return acc;
-                }, []);
+    //         // Step 6: Filter room types to insert and room types to update
+    //         const roomTypesToInsert = bedinfo.filter(item =>
+    //             !existingrtNos.some(existing => existing.RT_CODE === item.RT_CODE)).reduce((acc, item) => {
+    //                 // Add the item only if its RT_CODE is not already present in the accumulator
+    //                 if (!acc.some(existing => existing.RT_CODE === item.RT_CODE)) {
+    //                     return [...acc, item]; // Use spread operator to add the item
+    //                 }
+    //                 return acc;
+    //             }, []);
 
 
-                if (admnReasonToInsert.length > 0) {
-                    insertadminReasons(admnReasonToInsert, (error, results) => {
-                        if (error) {
-                            return res.status(200).json({
-                                success: 1,
-                                message: error
-                            })
-                        }
-                    })
-                }
+    //         const roomTypesToUpdate = bedinfo.reduce((acc, item) => {
+    //             const matchingRoomType = existingrtNos.find(existing => existing.RT_CODE === item.RT_CODE);
+    //             if (matchingRoomType) {
+    //                 return [...acc, { ...item, fb_rmtp_slno: matchingRoomType.fb_rmtp_slno }];
+    //             }
+    //             return acc;
+    //         }, []);
 
-                if (admnReasonToUpdate.length > 0) {
-                    updateadmnReasons(admnReasonToUpdate, (error, results) => {
-                        if (error) {
-                            return res.status(200).json({
-                                success: 1,
-                                message: error
-                            })
-                        }
-                    })
-                };
-            })
+    //         // Step 7: Insert room types if necessary
+    //         if (roomTypesToInsert.length > 0) {
+    //             await new Promise((resolve, reject) => {
+    //                 insertrtdetail(roomTypesToInsert, (error, results) => {
+    //                     if (error) reject(error);
+    //                     resolve(results);
+    //                 });
+    //             });
+    //         }
 
-            //Room Category Master insertion and updation
-            CheckRoomCategoryExists(ptdetail, (error, results) => {
-                if (error) {
-                    return res.status(200).json({
-                        success: 1,
-                        message: error
-                    })
-                }
-                const ExistingroomCategory = results.flat().map(item => ({
-                    RC_CODE: item.fb_rc_code,
-                    fb_rc_slno: item.fb_rc_slno
-                }));
-
-                const RoomCategoryInsert = ptdetail.filter(item =>
-                    !ExistingroomCategory.some(existing => existing.RC_CODE === item.RC_CODE)).reduce((acc, item) => {
-                        // Add the item only if its RT_CODE is not already present in the accumulator
-                        if (!acc.some(existing => existing.RC_CODE === item.RC_CODE)) {
-                            return [...acc, item]; // Use spread operator to add the item
-                        }
-                        return acc;
-                    }, []);
-
-                const RoomCategoryUpdate = ptdetail.reduce((acc, item) => {
-                    const matchingroomcategory = ExistingroomCategory.find(existing => existing.RC_CODE === item.RC_CODE);
-                    if (matchingroomcategory) {
-                        return [...acc, { ...item, fb_rc_slno: matchingroomcategory.fb_rc_slno }];
-                    }
-                    return acc;
-                }, []);
+    //         // Step 8: Update room types if necessary
+    //         if (roomTypesToUpdate.length > 0) {
+    //             await new Promise((resolve, reject) => {
+    //                 updatertdetail(roomTypesToUpdate, (error, results) => {
+    //                     if (error) reject(error);
+    //                     resolve(results);
+    //                 });
+    //             });
+    //         }
+    //         // Return success response if all operations are successful
+    //         return res.status(200).json({
+    //             success: 2,
+    //             message: 'Successfully inserted and updated Data!'
+    //         });
+    //     } catch (error) {
+    //         // Return error response if any operation fails
+    //         return res.status(200).json({
+    //             success: 0,
+    //             message: error.message || error
+    //         });
+    //     }
+    // },
 
 
-                if (RoomCategoryInsert.length > 0) {
-                    insertRoomCategoryDetail(RoomCategoryInsert, (error, results) => {
-                        if (error) {
-                            return res.status(200).json({
-                                success: 1,
-                                message: error
-                            })
-                        }
-                    })
-                }
 
-                if (RoomCategoryUpdate.length > 0) {
-                    UpdateRoomCategoryDetail(RoomCategoryUpdate, (error, results) => {
-                        if (error) {
-                            return res.status(200).json({
-                                success: 1,
-                                message: error
-                            })
-                        }
-                    })
-                };
-            })
 
-            return res.status(200).json({
-                success: 2,
-                message: "Success fully inserted and Created Data...?"
-            });
-        })
-    },
+    // not using saved for later
+    // inserting patient detail RoomMaster detail Room Catergory Detail AdmsReasons and other  1767
+    // insertptdetailmlora: async (req, res) => {
+    //     const { ptdetail } = req.body;
+    //     CheckpatientAlreadyPresent(ptdetail, (error, results) => {
+    //         if (error) {
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 message: error
+    //             })
+    //         }
+
+    //         const existingPatient = results.flat().map(pat => ({
+    //             IP_NO: pat.fb_ip_no,
+    //             PT_NO: pat.fb_pt_no,
+    //             fb_ipad_slno: pat.fb_ipad_slno
+    //         }));
+
+    //         const patientToInsert = ptdetail.filter(item =>
+    //             !existingPatient.some(exit => exit.IP_NO === item.IP_NO && exit.PT_NO === item.PT_NO)
+    //         );
+
+    //         const patientToUpdate =
+    //             ptdetail.reduce((acc, item) => {
+    //                 const matchingPatient =
+    //                     existingPatient.find(existing => existing.IP_NO === item.IP_NO && existing.PT_NO === item.PT_NO);
+    //                 if (matchingPatient) {
+    //                     return [...acc, { ...item, fb_ipad_slno: matchingPatient.fb_ipad_slno }];
+    //                 }
+    //                 return acc;
+    //             }, []);
+
+    //         if (patientToInsert.length > 0) {
+    //             insertPatientDetail(patientToInsert, (error, results) => {
+    //                 if (error) {
+    //                     return res.status(200).json({
+    //                         success: 1,
+    //                         message: error
+    //                     })
+    //                 }
+    //             })
+    //         }
+
+    //         if (patientToUpdate.length > 0) {
+    //             updatePatientDetail(patientToUpdate, (error, results) => {
+    //                 if (error) {
+    //                     return res.status(200).json({
+    //                         success: 1,
+    //                         message: error
+    //                     })
+    //                 }
+    //             })
+    //         };
+
+    //         //room master details
+    //         CheckRoomsinMasterPresent(ptdetail, (error, results) => {
+    //             if (error) {
+    //                 return res.status(200).json({
+    //                     success: 1,
+    //                     message: error
+    //                 })
+    //             }
+    //             const existingRooms = results.flat().map(item => ({
+    //                 RM_CODE: item.fb_rm_code,
+    //                 fb_rm_slno: item.fb_rm_slno
+    //             }));
+
+    //             const roommasterToInsert = ptdetail.filter(item =>
+    //                 !existingRooms.some(existing => existing.RM_CODE === item.RM_CODE)).reduce((acc, item) => {
+    //                     // Add the item only if its RT_CODE is not already present in the accumulator
+    //                     if (!acc.some(existing => existing.RM_CODE === item.RM_CODE)) {
+    //                         return [...acc, item]; // Use spread operator to add the item
+    //                     }
+    //                     return acc;
+    //                 }, []);
+
+    //             const roommasterToUpdate = ptdetail.reduce((acc, item) => {
+    //                 const matchingRoomType = existingRooms.find(existing => existing.RM_CODE === item.RM_CODE);
+    //                 if (matchingRoomType) {
+    //                     return [...acc, { ...item, fb_rm_slno: matchingRoomType.fb_rm_slno }];
+    //                 }
+    //                 return acc;
+    //             }, []);
+
+    //             if (roommasterToInsert.length > 0) {
+    //                 insertRoomMasterdetail(roommasterToInsert, (error, results) => {
+    //                     if (error) {
+    //                         return res.status(200).json({
+    //                             success: 1,
+    //                             message: error
+    //                         })
+    //                     }
+    //                 })
+    //             }
+    //             if (roommasterToUpdate.length > 0) {
+    //                 updateRoomMasterDetail(roommasterToUpdate, (error, results) => {
+    //                     if (error) {
+    //                         return res.status(200).json({
+    //                             success: 1,
+    //                             message: error
+    //                         })
+    //                     }
+    //                 })
+    //             };
+    //         });
+
+    //         //admn reason master insertion and upadation
+    //         CheckadmnReasonsExits(ptdetail, (error, results) => {
+    //             if (error) {
+    //                 return res.status(200).json({
+    //                     success: 1,
+    //                     message: error
+    //                 })
+    //             }
+    //             const existingAdmnReason = results.flat().map(item => ({
+    //                 RS_CODE: item.fb_rs_code,
+    //                 fb_adrn_slno: item.fb_adrn_slno
+    //             }));
+
+    //             const admnReasonToInsert = ptdetail.filter(item =>
+    //                 !existingAdmnReason.some(existing => existing.RS_CODE === item.RS_CODE)).reduce((acc, item) => {
+    //                     // Add the item only if its RT_CODE is not already present in the accumulator
+    //                     if (!acc.some(existing => existing.RS_CODE === item.RS_CODE)) {
+    //                         return [...acc, item]; // Use spread operator to add the item
+    //                     }
+    //                     return acc;
+    //                 }, []);
+
+    //             const admnReasonToUpdate = ptdetail.reduce((acc, item) => {
+    //                 const matchingadmnreason = existingAdmnReason.find(existing => existing.RS_CODE === item.RS_CODE);
+    //                 if (matchingadmnreason) {
+    //                     return [...acc, { ...item, fb_adrn_slno: matchingadmnreason.fb_adrn_slno }];
+    //                 }
+    //                 return acc;
+    //             }, []);
+
+
+    //             if (admnReasonToInsert.length > 0) {
+    //                 insertadminReasons(admnReasonToInsert, (error, results) => {
+    //                     if (error) {
+    //                         return res.status(200).json({
+    //                             success: 1,
+    //                             message: error
+    //                         })
+    //                     }
+    //                 })
+    //             }
+
+    //             if (admnReasonToUpdate.length > 0) {
+    //                 updateadmnReasons(admnReasonToUpdate, (error, results) => {
+    //                     if (error) {
+    //                         return res.status(200).json({
+    //                             success: 1,
+    //                             message: error
+    //                         })
+    //                     }
+    //                 })
+    //             };
+    //         })
+
+    //         //Room Category Master insertion and updation
+    //         CheckRoomCategoryExists(ptdetail, (error, results) => {
+    //             if (error) {
+    //                 return res.status(200).json({
+    //                     success: 1,
+    //                     message: error
+    //                 })
+    //             }
+    //             const ExistingroomCategory = results.flat().map(item => ({
+    //                 RC_CODE: item.fb_rc_code,
+    //                 fb_rc_slno: item.fb_rc_slno
+    //             }));
+
+    //             const RoomCategoryInsert = ptdetail.filter(item =>
+    //                 !ExistingroomCategory.some(existing => existing.RC_CODE === item.RC_CODE)).reduce((acc, item) => {
+    //                     // Add the item only if its RT_CODE is not already present in the accumulator
+    //                     if (!acc.some(existing => existing.RC_CODE === item.RC_CODE)) {
+    //                         return [...acc, item]; // Use spread operator to add the item
+    //                     }
+    //                     return acc;
+    //                 }, []);
+
+    //             const RoomCategoryUpdate = ptdetail.reduce((acc, item) => {
+    //                 const matchingroomcategory = ExistingroomCategory.find(existing => existing.RC_CODE === item.RC_CODE);
+    //                 if (matchingroomcategory) {
+    //                     return [...acc, { ...item, fb_rc_slno: matchingroomcategory.fb_rc_slno }];
+    //                 }
+    //                 return acc;
+    //             }, []);
+
+
+    //             if (RoomCategoryInsert.length > 0) {
+    //                 insertRoomCategoryDetail(RoomCategoryInsert, (error, results) => {
+    //                     if (error) {
+    //                         return res.status(200).json({
+    //                             success: 1,
+    //                             message: error
+    //                         })
+    //                     }
+    //                 })
+    //             }
+
+    //             if (RoomCategoryUpdate.length > 0) {
+    //                 UpdateRoomCategoryDetail(RoomCategoryUpdate, (error, results) => {
+    //                     if (error) {
+    //                         return res.status(200).json({
+    //                             success: 1,
+    //                             message: error
+    //                         })
+    //                     }
+    //                 })
+    //             };
+    //         })
+
+    //         return res.status(200).json({
+    //             success: 2,
+    //             message: "Success fully inserted and Created Data...?"
+    //         });
+    //     })
+    // },
+
+
     getNursingBed: (req, res) => {
         const data = req.body;
         getNursingBed(data, (err, results) => {
@@ -1988,6 +2132,29 @@ module.exports = {
             });
         })
     },
+    getchecklistbed: (req, res) => {
+        getchecklistbed((error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+
+            });
+        })
+    },
+
     insertbedremarks: (req, res) => {
         const Body = req.body;
         const { fb_bed_slno,
@@ -2170,6 +2337,44 @@ module.exports = {
             });
         })
     },
+    insertipfollowup: (req, res) => {
+        const { ipdata, Schedule_date, create_user, fb_pro_remark } = req.body;
+        const combined = {
+            ...ipdata,
+            Schedule_date,
+            fb_pro_remark,
+            create_user
+        };
+        insertipfollowup(combined, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "inserted Sucessfully",
+
+            });
+        })
+    },
+    updateipfollowup: (req, res) => {
+        const data = req.body;
+        updateipfollowup(data, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Updated Sucessfully",
+            });
+        })
+    },
+
     getprochecklistdetail: (req, res) => {
         const id = req.params.id;
         getprochecklistdetail(id, (error, results) => {
@@ -2215,6 +2420,29 @@ module.exports = {
             });
         });
     },
+    getallipfollowup: (req, res) => {
+        const data = req.body;
+        getallipfollowup(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
     getbedremarkDetail: (req, res) => {
         const id = req.params.id;
         getbedremarkDetail(id, (err, results) => {
@@ -2237,9 +2465,20 @@ module.exports = {
             });
         });
     },
+    // complaint feedback
     complaintregistraion: (req, res) => {
         const data = req.body;
-        const { cm_assets, complaint_request_slno, compalint_date, cm_location, create_user } = data;
+        const {
+            cm_assets,
+            complaint_request_slno,
+            compalint_date,
+            cm_location,
+            create_user,
+            fb_ticket,
+            cm_complaint_location,
+            complaint_dept_secslno
+        } = data;
+
         const assetLength = cm_assets?.length;
         fetchcurrentserialnos((error, results) => {
             if (error) {
@@ -2256,7 +2495,9 @@ module.exports = {
                     success: 1,
                     message: "No data found"
                 })
-            }
+            };
+
+
 
             const datas = cm_assets?.map((val, index) => {
                 const insertData = {
@@ -2266,14 +2507,16 @@ module.exports = {
                     complaint_request_slno: complaint_request_slno,
                     compalint_date: compalint_date,
                     compalint_status: val.complaint_status,
-                    cm_location: cm_location,
+                    cm_location: cm_location, // only this part left
                     create_user: create_user,
-                    assigned_user: val.assigned_employee
+                    fb_ticket: fb_ticket,
+                    assigned_user: val.assigned_employee,
+                    complaint_typeslno: val.fb_asset_type,
+                    cm_complaint_location: cm_complaint_location,
+                    complaint_dept_secslno: complaint_dept_secslno
                 }
                 return insertData
             });
-
-
 
             complaintregistraion(datas, (err, results) => {
                 if (err) {
@@ -2305,12 +2548,10 @@ module.exports = {
                     })
 
                 })
-
             });
-
-
         })
     },
+
     getdepassetonly: (req, res) => {
         const id = req.params.id;
         getdepassetonly(id, (err, results) => {
@@ -2353,7 +2594,6 @@ module.exports = {
                         message: err
                     });
                 }
-
                 return res.status(200).json({
                     success: 2,
                     message: "Successfully Inserted"
@@ -2438,9 +2678,22 @@ module.exports = {
                     message: "Successfully Inserted"
                 });
             });
-
         })
-
+    },
+    patientnotresponding: (req, res) => {
+        const data = req.body;
+        patientnotresponding(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Successfully Inserted"
+            });
+        });
     },
     updateassetitem: (req, res) => {
         const data = req.body;
@@ -2543,6 +2796,7 @@ module.exports = {
         });
     },
     getAllComplaintDetail: (req, res) => {
+        const data = req.body;
         getAllComplaintDetail((err, results) => {
             if (err) {
                 return res.status(400).json({
@@ -2563,6 +2817,31 @@ module.exports = {
             });
         });
     },
+    getallComplaintType: (req, res) => {
+        const id = req.params.id;
+        getallComplaintType(id, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found",
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
+
     getallbedmaster: (req, res) => {
         getallbedmaster((err, results) => {
             if (err) {
@@ -2669,9 +2948,95 @@ module.exports = {
                 data: results
             });
         });
+    }, getnursingstaiton: (req, res) => {
+        getnursingstaiton((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 1) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found",
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
     },
     getallhkempdtl: (req, res) => {
         getallhkempdtl((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getCurrentCompany: (req, res) => {
+        getCurrentCompany((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getCommonFeedbackReport: (req, res) => {
+        const data = req.body;
+        getCommonFeedbackReport(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getIpFeedbackReport: (req, res) => {
+        const data = req.body;
+        getIpFeedbackReport(data, (err, results) => {
             if (err) {
                 return res.status(400).json({
                     success: 0,
@@ -2712,7 +3077,48 @@ module.exports = {
             });
         });
     },
+    getstarcount: (req, res) => {
+        getstarcount((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
 
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getcategorycount: (req, res) => {
+        getcategorycount((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
     getprocheckbed: (req, res) => {
         getprocheckbed((err, results) => {
             if (err) {
@@ -2918,13 +3324,49 @@ module.exports = {
 
     inserthkbedassign: (req, res) => {
         const data = req.body;
-        inserthkbedassign(data, (err, results) => {
+        const { fb_hk_sv_assign, fb_hk_bed_slno, fb_hk_status, create_user } = data;
+
+        const searchData = {
+            fb_hk_bed_slno: fb_hk_bed_slno,
+            fb_hk_sv_assign: fb_hk_sv_assign
+        };
+
+        CheckBedAlreadyAssigned(searchData, (err, results) => {
             if (err) {
                 return res.status(400).json({
                     success: 0,
                     message: err
                 });
             }
+
+            // if the Slno already exist change the status to 1 from 0
+            const HkBedSlno = results?.[0]?.fb_hk_slno;
+
+            const updateData = {
+                fb_hk_slno: HkBedSlno,
+                edit_user: create_user
+            }
+
+            if (HkBedSlno) {
+                UpdateHkAssignedBed(updateData, (err, results) => {
+                    if (err) {
+                        return res.status(400).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                })
+            } else {
+                inserthkbedassign(data, (err, results) => {
+                    if (err) {
+                        return res.status(400).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                });
+            }
+
             return res.status(200).json({
                 success: 2,
                 data: results
@@ -2993,6 +3435,263 @@ module.exports = {
             });
         });
     },
+    getptimpression: (req, res) => {
+        const data = req.body;
+        getptimpression(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    insertimpression: (req, res) => {
+        const data = req.body;
+        insertDefaultPtImpression(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    insertimpremark: (req, res) => {
+        const data = req.body;
+        insertimppatientRemark(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Successfully inserted data"
+            });
+        });
+    },
+    fetchimpremark: (req, res) => {
+        const data = req.body;
+        fetchimpremark(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: 'Successfully fetched Data'
+            });
+        });
+    },
+    getrelative: (req, res) => {
+        const data = req.body;
+        const ipNumbers = data?.IP_NO || [];
+
+        if (ipNumbers.length === 0) {
+            return res.status(200).json({
+                success: 1,
+                message: 'No IpNumber Provided'
+            })
+        };
+
+        getrelative(ipNumbers, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            };
+
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            };
+
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: 'Successfully fetched Data'
+            });
+        });
+    },
+    getbirthdetail: (req, res) => {
+        const data = req.body;
+        getbirthdetail(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            };
+
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            };
+
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: 'Successfully fetched Data'
+            });
+        });
+    },
+
+    //discharge
+    getdischargepatient: (req, res) => {
+        const data = req.body;
+        const { NS_CODE, FROM_DATE, TO_DATE } = data;
+        let sql = `
+            SELECT 
+                fb_ip_no,
+                fb_ipd_date,
+                fb_pt_no,
+                fb_ptc_name,
+                fb_ptc_sex,
+                fb_ptd_dob,
+                fb_ptn_yearage,
+                fb_ptc_loadd1,
+                fb_ptc_loadd2,
+                fb_ptc_loadd3,
+                fb_ptc_loadd4,
+                fb_ipd_disc,
+                fb_ipc_status,
+                fb_dmd_date,
+                fb_ptc_mobile,
+                fb_doc_name,
+                fb_dep_desc,
+                fb_bed.fb_ns_code
+            FROM
+                fb_ipadmiss
+                LEFT JOIN fb_bed on  fb_ipadmiss.fb_bd_code = fb_bed.fb_bd_code
+            WHERE
+                fb_ipd_disc IS NOT NULL AND fb_ipc_status = 'R'
+        `;
+
+        let queryParams = [];
+
+        if (FROM_DATE) {
+            sql += " AND fb_ipd_disc >= ?";
+            queryParams = [...queryParams, FROM_DATE];
+        }
+        if (TO_DATE) {
+            sql += " AND fb_ipd_disc <= ?";
+            queryParams = [...queryParams, TO_DATE];
+        }
+        if (NS_CODE) {
+            sql += " AND fb_bed.fb_ns_code = ?";
+            queryParams = [...queryParams, NS_CODE];
+        } sql += `
+            GROUP BY
+                fb_ip_no,
+                fb_ipd_date,
+                fb_pt_no,
+                fb_ptc_name,
+                fb_ptc_sex,
+                fb_ptd_dob,
+                fb_ptn_yearage,
+                fb_ptc_loadd1,
+                fb_ptc_loadd2,
+                fb_ptc_loadd3,
+                fb_ptc_loadd4,
+                fb_ipd_disc,
+                fb_ipc_status,
+                fb_dmd_date,
+                fb_ptc_mobile,
+                fb_doc_name,
+                fb_dep_desc,
+                fb_bed.fb_ns_code
+                `;
+        getDischargepatient(sql, queryParams, (error, results) => {
+            if (error) {
+                return res.status(500).json({
+                    success: 0,
+                    message: error.message
+                });
+            }
+            if (!results || results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No data found"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+
+        // getdischargepatient(data, (err, results) => {
+        //     if (err) {
+        //         return res.status(400).json({
+        //             success: 0,
+        //             message: err
+        //         });
+        //     }
+        //     return res.status(200).json({
+        //         success: 2,
+        //         data: results
+        //     });
+        // });
+    },
+
+
+    getpatientnotresponding: (req, res) => {
+        const data = req.body;
+        getpatientnotresponding(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
     getdischargeentrybed: (req, res) => {
         getdischargeentrybed((error, results) => {
             if (error) {
@@ -3025,6 +3724,8 @@ module.exports = {
             fb_bed_slno,
             fb_bd_code
         }
+
+
         CheckProCheckBedPresent(SearchData, (error, results) => {
             if (error) {
                 return res.status(200).status({
@@ -3084,22 +3785,175 @@ module.exports = {
                 });
 
             }
-
-
             return res.status(200).json({
                 success: 2,
                 message: "Initail Checklist Completed Successfully",
             })
+        })
+    },
+    gethkcheckdtl: (req, res) => {
+        const slno = req.body
+        gethkcheckdtl(slno, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+
+            });
+        })
+    },
+    gethkbedDetails: (req, res) => {
+        const slno = req.body
+        gethkbedDetails(slno, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+
+            });
+        })
+    },
+
+    houekeepingComplaintregistration: (req, res) => {
+        const data = req.body;
+        const {
+            cm_assets,
+            complaint_request_slno,
+            compalint_date,
+            cm_location,
+            create_user,
+            complaint_deptslno,
+            complaint_status,
+            assigned_employee,
+            complaint_typeslno,
+            cm_complaint_location,
+            fb_ticket,
+            complaint_dept_secslno
+        } = data;
+        const assetLength = cm_assets?.length;
+        fetchcurrentserialnos((error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "Error in fetching Data!"
+                })
+            };
+
+            let serialCurrentValue = results[0]?.serial_current;
+            let complaint_slno = serialCurrentValue;
+
+            if (!serialCurrentValue) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No data found"
+                })
+            };
+
+            const datas = cm_assets?.map((val, index) => {
+                const insertData = {
+                    complaint_slno: complaint_slno + index,
+                    complaint_deptslno: complaint_deptslno,
+                    complaint_desc: val?.fb_hk_rm_cklist_name,
+                    complaint_request_slno: complaint_request_slno,
+                    compalint_date: compalint_date,
+                    compalint_status: complaint_status,
+                    cm_location: cm_location,
+                    create_user: create_user,
+                    assigned_user: assigned_employee,
+                    complaint_typeslno: complaint_typeslno,
+                    cm_complaint_location: cm_complaint_location,
+                    fb_ticket: fb_ticket,
+                    complaint_dept_secslno: complaint_dept_secslno
+                }
+                return insertData
+            });
+
+            complaintregistraion(datas, (err, results) => {
+                if (err) {
+                    return res.status(400).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                UpdateSeiralNos(assetLength, (error, results) => {
+                    if (error) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: "Error in updating Value"
+                        })
+                    }
+                    UpdateComplaintDetailTable(datas, (err, results) => {
+                        if (err) {
+                            return res.status(400).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+
+                        return res.status(200).json({
+                            success: 2,
+                            message: "Successfully Inserted"
+                        });
+
+                    })
+
+                })
+
+            });
 
 
         })
-
-
     },
+    gethkcomplaintdetails: (req, res) => {
+        const data = req.body
+        gethkcomplaintdetails(data, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
 
-
+            });
+        })
+    }
 
 
 
 }
+
 

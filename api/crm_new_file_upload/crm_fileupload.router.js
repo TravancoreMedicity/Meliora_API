@@ -3,7 +3,7 @@ const { checkToken } = require("../../authentication/token_validation");
 const { crfRegistration, crfRegimageGet, crfDataCollection, getDataCollectionImage,
     ImageInsertHOD, ImageInsertDMS, ImageInsertMS, ImageInsertMO, ImageInsertSMO,
     ImageInsertGM, ImageInsertMD, ImageInsertED, crfHodImageGet, crfDMSImageGet,
-    crfMSImageGet, crfMOImageGet, crfSMOImageGet, crfGMImageGet, crfMDImageGet,
+    crfMSImageGet, crfMOImageGet, crfSMOImageGet, crfGMImageGet, crfMDImageGet, crfNabhImageGet, crfNabhGuidImageGet,
     crfEDImageGet, ImageInsertManaging, crfManageImageGet, ImageInsertMDKmch, crfKMCHMDImageGet, crfDeliveryMarking, crfDMimageGet
 } = require('../crm_new_file_upload/crm_fileupload.controller')
 
@@ -38,6 +38,8 @@ router.get("/crfKmchMdImageGet/:id", checkToken, crfKMCHMDImageGet)
 //delivery marking
 router.post("/InsertDMimage", checkToken, crfDeliveryMarking)
 router.get("/crfDMimageGet/:id", checkToken, crfDMimageGet)
+router.get("/crfNabhImageGet", checkToken, crfNabhImageGet)
+router.get("/crfNabhGuidImageGet", checkToken, crfNabhGuidImageGet)
 
 
 module.exports = router;

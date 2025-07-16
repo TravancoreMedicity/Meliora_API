@@ -1534,5 +1534,40 @@ module.exports = {
         });
 
     },
+    crfNabhImageGet: (req, res) => {
+        const id = req.params.id
+        const folderPath = `D:/DocMeliora/Meliora/fileshows/HOSPITAL MANUAL`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: files
+            });
+        });
 
+    },
+    crfNabhGuidImageGet: (req, res) => {
+        const id = req.params.id
+        const folderPath = `D:/DocMeliora/Meliora/fileshows/STANDARD TREATMENT GUIDLINE`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: files
+            });
+        });
+
+    },
 }

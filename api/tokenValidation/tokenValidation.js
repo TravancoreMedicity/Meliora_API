@@ -1,7 +1,8 @@
 // @ts-nocheck
 const dotenv = require('dotenv').config()
-const jwt = require('jsonwebtoken')
-const logger = require('../../logger/logger')
+const jwt = require('jsonwebtoken');
+const logger = require('../../logger/logger');
+
 module.exports = {
     verifyToken: (req, res, next) => {
         // let token = req.get('authorization')
@@ -13,7 +14,7 @@ module.exports = {
             // token = token.slice(7);
             jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
                 if (err) {
-                    logger.error(err)
+                    // logger.error(err)
                     return res.status(401).json({
                         status: 401,
                         message: "Invalid Token"
@@ -24,7 +25,7 @@ module.exports = {
                 }
             });
         } else {
-            logger.error("No token")
+            // logger.error("No token")
             return res.status(401).json({
                 status: 401,
                 message: "Invalid Token"

@@ -1620,12 +1620,12 @@ left join  co_employee_master on fb_employee_user_rights.fb_empid =  co_employee
     FindEmpyGroup: (data, callBack) => {
         pool.query(
             `
-select 
-	fb_grp_slno,
-	fb_empid
-from
-	fb_employee_user_rights
-WHERE fb_empid = ? and fb_usrright_status= 1
+        select 
+            fb_grp_slno,
+            fb_empid
+        from
+            fb_employee_user_rights
+        WHERE fb_empid = ? and fb_usrright_status= 1
             `,
             [
                 data.fb_emp_id,
@@ -3646,12 +3646,19 @@ ORDER BY
     },
     getallhkitem: (callBack) => {
         pool.query(
-            `select 	
-	            fb_hk_rm_cklist_slno,
-                fb_hk_rm_cklist_name, 
-                fb_hk_rm_cklist_status
-            from 
+            `
+            SELECT 
+                fb_hk_rm_cklist_slno,
+                fb_hk_rm_cklist_name,
+                fb_hk_rm_cklist_status,
+                fb_dep_id,
+                complaint_dept_name,
+                complaint_type_name,
+                fb_hk_item_master.fb_asset_type
+            FROM
                 fb_hk_item_master
+                left join cm_complaint_dept on fb_hk_item_master.fb_dep_id = cm_complaint_dept.complaint_dept_slno
+                left join cm_complaint_type on cm_complaint_type.complaint_type_slno = fb_hk_item_master.fb_asset_type;
             `,
             []
             , (error, results, fields) => {
@@ -3801,13 +3808,23 @@ ORDER BY
     },
     getallhkactiveitem: (callBack) => {
         pool.query(
-            `select 	
-	            fb_hk_rm_cklist_slno,
-                fb_hk_rm_cklist_name, 
-                fb_hk_rm_cklist_status
-            from 
+            `
+            SELECT 
+                fb_hk_rm_cklist_slno,
+                fb_hk_rm_cklist_name,
+                fb_hk_rm_cklist_status,
+                fb_dep_id,
+                complaint_dept_name,
+                complaint_type_name,
+                fb_hk_item_master.fb_asset_type
+            FROM
                 fb_hk_item_master
-            where fb_hk_rm_cklist_status = 1
+                    LEFT JOIN
+                cm_complaint_dept ON fb_hk_item_master.fb_dep_id = cm_complaint_dept.complaint_dept_slno
+                    LEFT JOIN
+                cm_complaint_type ON cm_complaint_type.complaint_type_slno = fb_hk_item_master.fb_asset_type
+            WHERE
+                fb_hk_rm_cklist_status = 1
             `,
             []
             , (error, results, fields) => {
@@ -4368,13 +4385,17 @@ select
             `
             INSERT INTO  fb_hk_item_master(
                 fb_hk_rm_cklist_name, 
+                fb_dep_id,
+                fb_asset_type,
                 fb_hk_rm_cklist_status,
                 create_user
                 ) 
-                VALUES(?,?,?)
+                VALUES(?,?,?,?,?)
             `,
             [
                 data.fb_hk_item_name,
+                data.fb_dep_id,
+                data.dep_item_type_id,
                 data.fb_hk_item_status,
                 data.create_user
             ],
@@ -4684,13 +4705,17 @@ select
             UPDATE  fb_hk_item_master
                 SET
                 fb_hk_rm_cklist_name=?, 
-                fb_hk_rm_cklist_status=?,
+                fb_dep_id = ?,
+                fb_asset_type = ?,
+                fb_hk_rm_cklist_status = ?,
                 edit_user =?
                 WHERE
                     fb_hk_rm_cklist_slno = ?
             `,
             [
                 data.fb_hk_item_name,
+                data.fb_dep_id,
+                data.dep_item_type_id,
                 data.fb_hk_item_status,
                 data.edit_user,
                 data.fb_hk_item_slno

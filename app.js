@@ -6,10 +6,36 @@ const logger = require("./logger/logger");
 const http = require("http");
 const socketUtils = require("./socketio/socketUltil");
 const cookieParser = require("cookie-parser");
+
+const https = require("https");
+const fs = require("fs");
 // const lusca = require('lusca')
 
+const key = fs.readFileSync("./ssl/key.pem");
+const cert = fs.readFileSync("./ssl/cert.pem");
+
 const app = express();
-const fs = require("fs");
+
+const httpsOptions = {
+  key: key,
+  cert: cert,
+};
+
+// Create HTTPS server
+const httpsServer = https.createServer(httpsOptions, app);
+
+// Create HTTP server to redirect to HTTPS
+const httpApp = express();
+httpApp.use((req, res, next) => {
+  if (!req.secure) {
+    return res.redirect("https://" + req.headers.host + req.url);
+  }
+  next();
+});
+
+httpsServer.listen(7001, () => {
+  console.log("HTTPS Server running on port 443");
+});
 
 //sockect io configuration
 
@@ -18,24 +44,56 @@ app.use(express.json());
 app.use(cookieParser());
 // app.use(lusca.csrf());
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3002",
+  "http://192.168.10.88:9741",
+  "http://192.168.10.88:9742",
+  "https://192.168.10.88:9742",
+  "http://travancoremedicity.in:9741",
+  "https://travancoremedicity.in:9742",
+  "http://tm.medicity.co.in:8888",
+  "http://192.168.10.88:8888",
+  "http://192.168.22.9:3000",
+  "http://195.168.34.25:3001",
+  "http://195.168.34.25:3000",
+  "http://192.168.22.170:3000",
+  "http://192.168.22.5:3000",
+];
+
+// app.use(
+//   cors({
+//     origin: [
+//       "http://192.168.10.88:9741",
+//       "http://192.168.10.88:9742",
+//       "https://192.168.10.88:9742",
+//       "https://travancoremedicity.in:9742",
+//       "http://travancoremedicity.in:9741",
+//       "http://192.168.10.88:3000",
+//       " http://tm.medicity.co.in:8888",
+//       " http://192.168.10.88:8888",
+//       "http://localhost:3002",
+//       "http://192.168.22.9:3000",
+//       "http://195.168.34.25:3001",
+//       "http://195.168.34.25:3000",
+//       "http://192.168.22.170:3000",
+//       "http://192.168.22.5:3000",
+//     ],
+//     credentials: true,
+//   })
+// );
+
+// Dynamically allow based on Origin
 app.use(
   cors({
-    origin: [
-      "http://192.168.10.88:9741",
-      "http://192.168.10.88:9742",
-      "https://192.168.10.88:9742",
-      "https://travancoremedicity.in:9742",
-      "http://travancoremedicity.in:9741",
-      "http://192.168.10.88:3000",
-      " http://tm.medicity.co.in:8888",
-      " http://192.168.10.88:8888",
-      "http://localhost:3002",
-      "http://192.168.22.9:3000",
-      "http://195.168.34.25:3001",
-      "http://195.168.34.25:3000",
-      "http://192.168.22.170:3000",
-      "http://192.168.22.5:3000",
-    ],
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn("Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -275,6 +333,7 @@ const validateAuthentication = require("./api/validate_authentication/employeeDa
 app.use(express.json({ limit: "50mb" }));
 
 app.use((req, res, next) => {
+  // console.log(req);
   if (req.method === "OPTIONS") {
     res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
     return res.status(200).json({});

@@ -6,36 +6,10 @@ const logger = require("./logger/logger");
 const http = require("http");
 const socketUtils = require("./socketio/socketUltil");
 const cookieParser = require("cookie-parser");
-
-const https = require("https");
-const fs = require("fs");
 // const lusca = require('lusca')
 
-const key = fs.readFileSync("./ssl/key.pem");
-const cert = fs.readFileSync("./ssl/cert.pem");
-
 const app = express();
-
-const httpsOptions = {
-  key: key,
-  cert: cert,
-};
-
-// Create HTTPS server
-const httpsServer = https.createServer(httpsOptions, app);
-
-// Create HTTP server to redirect to HTTPS
-const httpApp = express();
-httpApp.use((req, res, next) => {
-  if (!req.secure) {
-    return res.redirect("https://" + req.headers.host + req.url);
-  }
-  next();
-});
-
-httpsServer.listen(7001, () => {
-  console.log("HTTPS Server running on port 443");
-});
+const fs = require("fs");
 
 //sockect io configuration
 

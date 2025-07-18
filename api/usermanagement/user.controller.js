@@ -267,6 +267,7 @@ module.exports = {
             em_id,
             emp_no,
           } = userData;
+          console.log(userData);
 
           const validatingUserLogin = validateUserLoginCheck(
             password_validity,

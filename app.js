@@ -36,7 +36,6 @@ app.use(
     ],
     credentials: true,
   })
-
 );
 
 

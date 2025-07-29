@@ -157,6 +157,7 @@ module.exports = {
           specimen = ?, 
           fluid_type = ?,
           sample_type = ?,
+          result_verified_date = ?,
           investigation = ?,
           organism_one = ?, 
           organism_two = ?,
@@ -189,6 +190,7 @@ module.exports = {
     data.Specimen,
     data.FluidType,
     data.SampleType,
+    data.ResultVerifyDate,
     data.Investigation,
     data.organismOne,
     data.organismTwo,
@@ -214,152 +216,6 @@ module.exports = {
 
     getReportAntibioticPatients: (data,callback) => {
     pool.query(
-    //    `WITH numbered_antibiotics AS (
-    //     SELECT 
-    //     ams_antibiotic_patient_details.ams_patient_detail_slno,
-    //     mrd_no,
-    //     patient_name, 
-    //     patient_age,
-    //     patient_gender, 
-    //     patient_location,
-    //     bed_code,
-    //     consultant_department,    
-    //     doc_name, 
-    //     clinical_assesment,
-    //     sample_id,
-    //     date_of_collection,
-    //     samp_collect_for_antibiotic,
-    //     date_of_issue_of_report,
-    //     abst_culture_report,
-    //     emprical_antibiotic,
-    //     emprical_antibio_date_of_start,
-    //     escal_descal_iv_oral_switich,
-    //     emprical_antibio_complaince_policy,
-    //     compliance_pathogen_directed_therapy,
-    //     lab_no,
-    //     specimen,
-    //     fluid_type,
-    //     sample_type,
-    //     investigation,
-    //     organism_one,
-    //     organism_two,
-    //     growth,
-    //     growth_remark_one,
-    //     growth_remark_two, 
-    //     growth_remark_three,
-    //     culture_details_remarks,
-    //     culture_details_added_date,
-    //     physician_ams_comments,
-    //     report_updated, 
-    //     patient_outcome, 
-    //     ams_patient_antibiotics.patient_ip_no,
-    //     ams_patient_antibiotics.bill_date,
-    //     CONCAT(
-    //         ams_antibiotic_master.itc_desc,
-    //         ' - ',
-    //         CASE 
-    //             WHEN ams_antibiotic_master.restricted = 1 THEN 'Restricted' 
-    //             ELSE 'Unrestricted' 
-    //         END
-    //     ) AS antibiotic_info,
-    //     ROW_NUMBER() OVER (
-    //         PARTITION BY ams_patient_antibiotics.patient_ip_no 
-    //         ORDER BY ams_patient_antibiotics.ams_patient_detail_slno
-    //     ) AS rn
-    // FROM ams_antibiotic_patient_details 
-    // LEFT JOIN ams_patient_antibiotics 
-    //     ON ams_patient_antibiotics.ams_patient_detail_slno = ams_antibiotic_patient_details.ams_patient_detail_slno
-    // LEFT JOIN ams_antibiotic_master 
-    //     ON ams_antibiotic_master.item_code = ams_patient_antibiotics.item_code
-    // WHERE 
-    //     patient_status = 1 
-    //     AND report_updated = 1
-    //     AND ams_patient_antibiotics.bill_date BETWEEN ? AND ?
-    //   )
-    //   SELECT 
-    // ams_patient_detail_slno,
-    // mrd_no,
-    // patient_name, 
-    // patient_age,
-    // patient_gender, 
-    // patient_location,
-    // bed_code,
-    // consultant_department,    
-    // doc_name, 
-    // clinical_assesment,
-    // sample_id,
-    // date_of_collection,
-    // samp_collect_for_antibiotic,
-    // date_of_issue_of_report,
-    // abst_culture_report,
-    // emprical_antibiotic,
-    // emprical_antibio_date_of_start,
-    // escal_descal_iv_oral_switich,
-    // emprical_antibio_complaince_policy,
-    // compliance_pathogen_directed_therapy,
-    // lab_no,
-    // specimen,
-    // fluid_type,
-    // sample_type,
-    // investigation,
-    // organism_one,
-    // organism_two,
-    // growth,
-    // growth_remark_one,
-    // growth_remark_two, 
-    // growth_remark_three,
-    // culture_details_remarks,
-    // culture_details_added_date,
-    // physician_ams_comments,
-    // report_updated, 
-    // patient_outcome, 
-    // patient_ip_no,
-    // bill_date,
-    // MAX(CASE WHEN rn = 1 THEN antibiotic_info END) AS Antibiotic_1,
-    // MAX(CASE WHEN rn = 2 THEN antibiotic_info END) AS Antibiotic_2,
-    // MAX(CASE WHEN rn = 3 THEN antibiotic_info END) AS Antibiotic_3,
-    // MAX(CASE WHEN rn = 4 THEN antibiotic_info END) AS Antibiotic_4,
-    // MAX(CASE WHEN rn = 5 THEN antibiotic_info END) AS Antibiotic_5
-    // FROM numbered_antibiotics
-    // GROUP BY 
-    // ams_patient_detail_slno,
-    // mrd_no,
-    // patient_name, 
-    // patient_age,
-    // patient_gender, 
-    // patient_location,
-    // bed_code,
-    // consultant_department,    
-    // doc_name, 
-    // clinical_assesment,
-    // sample_id,
-    // date_of_collection,
-    // samp_collect_for_antibiotic,
-    // date_of_issue_of_report,
-    // abst_culture_report,
-    // emprical_antibiotic,
-    // emprical_antibio_date_of_start,
-    // escal_descal_iv_oral_switich,
-    // emprical_antibio_complaince_policy,
-    // compliance_pathogen_directed_therapy,
-    // lab_no,
-    // specimen,
-    // fluid_type,
-    // sample_type,
-    // investigation,
-    // organism_one,
-    // organism_two,
-    // growth,
-    // growth_remark_one,
-    // growth_remark_two, 
-    // growth_remark_three,
-    // culture_details_remarks,
-    // culture_details_added_date,
-    // physician_ams_comments,
-    // report_updated, 
-    // patient_outcome, 
-    // patient_ip_no,
-    // bill_date`,
         `WITH distinct_antibiotics AS (
         SELECT
             ams_patient_antibiotics.patient_ip_no,
@@ -403,6 +259,7 @@ module.exports = {
             apd.growth_remark_one,
             apd.growth_remark_two, 
             apd.growth_remark_three,
+            apd.result_verified_date,
             apd.culture_details_remarks,
             apd.culture_details_added_date,
             apd.physician_ams_comments,
@@ -475,6 +332,7 @@ module.exports = {
         growth_remark_one,
         growth_remark_two, 
         growth_remark_three,
+        result_verified_date,
         culture_details_remarks,
         culture_details_added_date,
         physician_ams_comments,
@@ -530,6 +388,7 @@ module.exports = {
         growth_remark_one,
         growth_remark_two, 
         growth_remark_three,
+        result_verified_date,
         culture_details_remarks,
         culture_details_added_date,
         physician_ams_comments,
@@ -913,5 +772,4 @@ updatePatientAntibioticsPriority: (data, callback) => {
     .catch((err) => callback(err));
 }
 
-    
-};
+}

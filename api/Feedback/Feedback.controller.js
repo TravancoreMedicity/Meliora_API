@@ -527,8 +527,6 @@ module.exports = {
             }
 
         })
-
-
     },
     getFeedbackName: (req, res) => {
         getFeedbackName((error, results) => {
@@ -3849,7 +3847,6 @@ module.exports = {
             complaint_deptslno,
             complaint_status,
             assigned_employee,
-            complaint_typeslno,
             cm_complaint_location,
             fb_ticket,
             complaint_dept_secslno
@@ -3873,6 +3870,7 @@ module.exports = {
                 })
             };
 
+
             const datas = cm_assets?.map((val, index) => {
                 const insertData = {
                     complaint_slno: complaint_slno + index,
@@ -3884,7 +3882,7 @@ module.exports = {
                     cm_location: cm_location,
                     create_user: create_user,
                     assigned_user: assigned_employee,
-                    complaint_typeslno: complaint_typeslno,
+                    complaint_typeslno: val?.fb_asset_type,
                     cm_complaint_location: cm_complaint_location,
                     fb_ticket: fb_ticket,
                     complaint_dept_secslno: complaint_dept_secslno

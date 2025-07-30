@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 module.exports = {
   checkToken: (req, res, next) => {
     const token = req.cookies.accessToken;
-    console.log(token);
+    // console.log(token);
 
     if (token) {
       // Remove Bearer from string

@@ -599,4 +599,86 @@ where module_slno = ?`,
         );
 
     },
+    InsertStaticUrl: (data, callBack) => {
+        pool.query(
+            `INSERT INTO static_api_master
+            (
+                 static_api, crf_api,elider_api,
+                create_user,nas_folder,nas_folder_kmc,ws_url
+               ) 
+                VALUES(?,?,?,?,?,?)`,
+            [
+                data.company_url,
+                data.company_url_tmc,
+                data.Ellider_api,
+                data.create_user,
+                data.nas_folder,
+                data.nas_folder_kmc,
+                data.ws_url
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    GetStaticUrl: (callBack) => {
+        pool.query(
+            `SELECT * FROM static_api_master `,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+
+    },
+    UpdateStaticUrl: (data, callBack) => {
+        pool.query(
+
+            `update static_api_master
+            set static_api=?,
+            crf_api=?,
+            elider_api=?,
+            nas_folder=?,
+            nas_folder_kmc=?,
+            ws_url=?
+            where static_slno=?`,
+            [
+                data.company_url,
+                data.company_url_tmc,
+                data.Ellider_api,
+                data.nas_folder,
+                data.nas_folder_kmc,
+                data.ws_url,
+                data.Url_slno,
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    getconfig: (callBack) => {
+        pool.query(
+            `SELECT * FROM static_api_master `,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        )
+
+    },
 }

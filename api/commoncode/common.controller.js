@@ -4,7 +4,7 @@ const { getEmployeeID, getMenuBasedRights, getSubModuleRights, getModuleMasterBy
     getModuleGroup, getUserModuleRights, getempId, inpatientList, getBranch, getDesignation, getSalutation,
     getSerialno, getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
     getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor, getSerialnoEmpDetl
-    , getInchargehod, updateEmpMobileApp, getdeptSecInchhod, manualEmpList,
+    , getInchargehod, updateEmpMobileApp, getdeptSecInchhod, manualEmpList, InsertStaticUrl, GetStaticUrl, getconfig, UpdateStaticUrl,
     updatemobapprequired, getMobileAppStatusCredential, getCompSerialno, getCrfDept, getDeptType, getdeptHoddeptsec,
     getdeptInchargedeptsec
 } = require('../commoncode/common.service');
@@ -865,5 +865,107 @@ module.exports = {
             });
         });
     },
+    InsertStaticUrl: (req, res) => {
+        const body = req.body
+        InsertStaticUrl(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
 
+            if (results.length == 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+    },
+
+    GetStaticUrl: (req, res) => {
+
+        GetStaticUrl((err, results) => {
+            if (err) {
+                logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                logger.infoLogger("No Records Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    UpdateStaticUrl: (req, res) => {
+        const body = req.body
+        UpdateStaticUrl(body, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results.length == 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        })
+    },
+
+
+    getconfig: (req, res) => {
+        getconfig((err, results) => {
+            if (err) {
+                logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                logger.infoLogger("No Records Found")
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
 }

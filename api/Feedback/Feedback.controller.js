@@ -185,6 +185,7 @@ const {
     getallComplaintType,
     getCommonFeedbackReport,
     getIpFeedbackReport,
+    insertCallCenterDetail,
 } = require("./Feedback.service");
 
 module.exports = {
@@ -832,8 +833,15 @@ module.exports = {
     },
     insertFeedbackanswers: (req, res) => {
         const body = req.body;
-        const { fb_answers, fb_ip_num, fb_patient_num, fb_patient_name, fb_patient_mob, fdmast_slno, fb_default_quest,
-            fb_default_reamark, create_user } = body;
+        const { fb_answers,
+            fb_ip_num,
+            fb_patient_num,
+            fb_patient_name,
+            fb_patient_mob,
+            fdmast_slno,
+            fb_default_quest,
+            fb_default_reamark,
+            create_user } = body;
 
         UpdateSerialAnswerMaster((error, results) => {
 
@@ -869,6 +877,7 @@ module.exports = {
                     fb_patient_num: fb_patient_num,
                     fb_patient_name: fb_patient_name,
                     fb_patient_mob: fb_patient_mob,
+                    fb_call_staus: fdmast_slno === 8 ? 1 : 0,
                     create_user: create_user
                 }
 
@@ -889,6 +898,12 @@ module.exports = {
                     remark: fb_default_reamark,
                     create_user: create_user
                 }
+
+                // const IsCalled = {
+                //     fb_transact_slno: fb_transact_slno_value,
+                //     fb_ip_num: fb_ip_num,
+                //     fb_cc_submitted: 1
+                // }
 
 
                 insertAllFeedBackTransactionMast(insertData, (error, results) => {
@@ -934,6 +949,20 @@ module.exports = {
 
                         });
                     }
+
+                    //insert Callcenter Detail to check if it is submitted
+                    // if (fdmast_slno === 8 && fdmast_slno != undefined) {
+                    //     insertCallCenterDetail(IsCalled, (err, results) => {
+                    //         if (err) {
+                    //             return res.status(400).json({
+                    //                 success: 0,
+                    //                 message: err
+                    //             });
+                    //         }
+
+                    //     });
+                    // }
+
                     return res.status(200).json({
                         success: 2,
                         message: "Inserted Successfully",
@@ -3579,8 +3608,10 @@ module.exports = {
     getdischargepatient: (req, res) => {
         const data = req.body;
         const { NS_CODE, FROM_DATE, TO_DATE } = data;
-        let sql = `
-            SELECT 
+        let sql =
+            `
+          SELECT 
+            ROW_NUMBER() OVER () AS slno,
                 fb_ip_no,
                 fb_ipd_date,
                 fb_pt_no,
@@ -3598,14 +3629,16 @@ module.exports = {
                 fb_ptc_mobile,
                 fb_doc_name,
                 fb_dep_desc,
-                fb_bed.fb_ns_code
+                fb_bed.fb_ns_code,
+                fb_transaction_mast.fb_call_staus,
+                fb_transaction_mast.fb_transact_slno
             FROM
                 fb_ipadmiss
                 LEFT JOIN fb_bed on  fb_ipadmiss.fb_bd_code = fb_bed.fb_bd_code
+                LEFT JOIN fb_transaction_mast ON fb_transaction_mast.fb_ip_num = fb_ipadmiss.fb_ip_no and fb_transaction_mast.fdmast_slno = 8
             WHERE
-                fb_ipd_disc IS NOT NULL AND fb_ipc_status = 'R'
-        `;
-
+                fb_ipd_disc IS NOT NULL AND fb_ipc_status = 'R' 
+        `
         let queryParams = [];
 
         if (FROM_DATE) {

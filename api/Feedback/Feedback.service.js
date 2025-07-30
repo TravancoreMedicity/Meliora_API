@@ -862,9 +862,10 @@ WHERE serial_slno = 3
             fb_patient_num,
             fb_patient_name,
             fb_patient_mob,
+            fb_call_staus,
             create_user
             ) 
-            VALUES(?,?,?,?,?,?,?)
+            VALUES(?,?,?,?,?,?,?,?)
             `,
             [
                 data.fb_transact_slno,
@@ -873,6 +874,7 @@ WHERE serial_slno = 3
                 data.fb_patient_num,
                 data.fb_patient_name,
                 data.fb_patient_mob,
+                data.fb_call_staus,
                 data.create_user,
             ],
             (error, results, fields) => {
@@ -1058,6 +1060,28 @@ WHERE
                 data.fb_transact_slno,
                 data.remark,
                 data.create_user
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    insertCallCenterDetail: (data, callBack) => {
+        pool.query(
+            `
+            INSERT INTO  fb_call_center(
+            fb_transact_slno,
+            fb_pt_ip_no,
+            fb_cc_submitted
+            ) 
+            VALUES(?,?,?)
+            `,
+            [
+                data.fb_transact_slno,
+                data.fb_ip_num,
+                data.fb_cc_submitted
             ],
             (error, results, fields) => {
                 if (error) {
@@ -3185,7 +3209,7 @@ ORDER BY
                 fb_transaction_mast
             WHERE 
                 fdmast_slno = ?
-                AND create_date BETWEEN ? AND ?;`,
+                AND create_date BETWEEN ? AND ?`,
             [
                 data.feedbackId,
                 data.FROM_DATE,

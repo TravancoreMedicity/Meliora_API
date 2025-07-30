@@ -217,183 +217,194 @@ module.exports = {
     getReportAntibioticPatients: (data,callback) => {
     pool.query(
         `WITH distinct_antibiotics AS (
-        SELECT
-            ams_patient_antibiotics.patient_ip_no,
-            ams_patient_antibiotics.item_code,
-            MIN(ams_patient_antibiotics.bill_date) AS bill_date  -- use earliest bill_date to represent that item_code
-        FROM ams_patient_antibiotics
-        GROUP BY ams_patient_antibiotics.patient_ip_no, ams_patient_antibiotics.item_code
-    ),
+            SELECT
+                patient_ip_no,
+                item_code,
+                MIN(bill_date) AS bill_date
+            FROM ams_patient_antibiotics
+            WHERE bill_date IS NOT NULL AND item_code IS NOT NULL AND patient_ip_no IS NOT NULL
+            GROUP BY patient_ip_no, item_code
+        ),
 
-    merged_data AS (
+        merged_data AS (
+            SELECT 
+                apd.ams_patient_detail_slno,
+                ab.patient_ip_no,
+                apd.mrd_no,
+                apd.patient_name, 
+                apd.patient_age,
+                apd.patient_gender, 
+                apd.patient_location,
+                apd.bed_code,
+                apd.consultant_department,    
+                apd.doc_name, 
+                apd.clinical_assesment,
+                apd.sample_id,
+                apd.date_of_collection,
+                apd.samp_collect_for_antibiotic,
+                apd.date_of_issue_of_report,
+                apd.abst_culture_report,
+                apd.emprical_antibiotic,
+                apd.emprical_antibio_date_of_start,
+                apd.escal_descal_iv_oral_switich,
+                apd.emprical_antibio_complaince_policy,
+                apd.compliance_pathogen_directed_therapy,
+                apd.lab_no,
+                apd.specimen,
+                apd.fluid_type,
+                apd.sample_type,
+                apd.investigation,
+                apd.organism_one,
+                apd.organism_two,
+                apd.growth,
+                apd.growth_remark_one,
+                apd.growth_remark_two, 
+                apd.growth_remark_three,
+                apd.result_verified_date,
+                apd.culture_details_remarks,
+                apd.culture_details_added_date,
+                apd.physician_ams_comments,
+                apd.report_updated, 
+                apd.patient_outcome,
+                ab.bill_date,
+                aba.item_priority,
+                aba.item_code,
+                CONCAT(
+                    aam.itc_desc,
+                    ' - ',
+                    CASE 
+                        WHEN aam.restricted = 1 THEN 'Restricted' 
+                        ELSE 'Unrestricted' 
+                    END
+                ) AS antibiotic_info
+            FROM distinct_antibiotics ab
+            JOIN ams_patient_antibiotics aba 
+                ON aba.patient_ip_no = ab.patient_ip_no 
+                AND aba.item_code = ab.item_code
+                AND aba.bill_date = ab.bill_date
+            LEFT JOIN ams_antibiotic_master aam 
+                ON aam.item_code = aba.item_code
+            LEFT JOIN ams_antibiotic_patient_details apd 
+                ON apd.ams_patient_detail_slno = aba.ams_patient_detail_slno
+            WHERE 
+                apd.patient_status = 1 
+                AND apd.report_updated = 1
+                AND aba.bill_date BETWEEN ? AND ?
+                AND apd.ams_patient_detail_slno IS NOT NULL
+        ),
+
+        deduped_antibiotics AS (
+            SELECT *,
+                ROW_NUMBER() OVER (
+                    PARTITION BY patient_ip_no, item_code
+                    ORDER BY item_priority DESC, bill_date ASC, item_code
+                ) AS rn_per_code
+            FROM merged_data
+        ),
+
+        ranked_antibiotics AS (
+            SELECT *,
+                ROW_NUMBER() OVER (
+                    PARTITION BY patient_ip_no
+                    ORDER BY item_priority DESC, bill_date ASC, item_code
+                ) AS final_rn
+            FROM deduped_antibiotics
+            WHERE rn_per_code = 1
+        )
+
         SELECT 
-            apd.ams_patient_detail_slno,
-            ab.patient_ip_no,
-            apd.mrd_no,
-            apd.patient_name, 
-            apd.patient_age,
-            apd.patient_gender, 
-            apd.patient_location,
-            apd.bed_code,
-            apd.consultant_department,    
-            apd.doc_name, 
-            apd.clinical_assesment,
-            apd.sample_id,
-            apd.date_of_collection,
-            apd.samp_collect_for_antibiotic,
-            apd.date_of_issue_of_report,
-            apd.abst_culture_report,
-            apd.emprical_antibiotic,
-            apd.emprical_antibio_date_of_start,
-            apd.escal_descal_iv_oral_switich,
-            apd.emprical_antibio_complaince_policy,
-            apd.compliance_pathogen_directed_therapy,
-            apd.lab_no,
-            apd.specimen,
-            apd.fluid_type,
-            apd.sample_type,
-            apd.investigation,
-            apd.organism_one,
-            apd.organism_two,
-            apd.growth,
-            apd.growth_remark_one,
-            apd.growth_remark_two, 
-            apd.growth_remark_three,
-            apd.result_verified_date,
-            apd.culture_details_remarks,
-            apd.culture_details_added_date,
-            apd.physician_ams_comments,
-            apd.report_updated, 
-            apd.patient_outcome,
-            ab.bill_date,
-            aba.item_priority,
-            aba.item_code,
-            CONCAT(
-                aam.itc_desc,
-                ' - ',
-                CASE 
-                    WHEN aam.restricted = 1 THEN 'Restricted' 
-                    ELSE 'Unrestricted' 
-                END
-            ) AS antibiotic_info
-        FROM distinct_antibiotics ab
-        JOIN ams_patient_antibiotics aba 
-            ON aba.patient_ip_no = ab.patient_ip_no 
-            AND aba.item_code = ab.item_code
-            AND aba.bill_date = ab.bill_date  
-        LEFT JOIN ams_antibiotic_master aam 
-            ON aam.item_code = aba.item_code
-        LEFT JOIN ams_antibiotic_patient_details apd 
-            ON apd.ams_patient_detail_slno = aba.ams_patient_detail_slno
-        WHERE 
-            apd.patient_status = 1 
-            AND apd.report_updated = 1
-            AND aba.bill_date BETWEEN ? AND ?
-    ),
+            patient_ip_no,
+            mrd_no,
+            patient_name, 
+            patient_age,
+            patient_gender, 
+            patient_location,
+            bed_code,
+            consultant_department,    
+            doc_name, 
+            clinical_assesment,
+            sample_id,
+            date_of_collection,
+            samp_collect_for_antibiotic,
+            date_of_issue_of_report,
+            abst_culture_report,
+            emprical_antibiotic,
+            emprical_antibio_date_of_start,
+            escal_descal_iv_oral_switich,
+            emprical_antibio_complaince_policy,
+            compliance_pathogen_directed_therapy,
+            lab_no,
+            specimen,
+            fluid_type,
+            sample_type,
+            investigation,
+            organism_one,
+            organism_two,
+            growth,
+            growth_remark_one,
+            growth_remark_two, 
+            growth_remark_three,
+            result_verified_date,
+            culture_details_remarks,
+            culture_details_added_date,
+            physician_ams_comments,
+            report_updated, 
+            patient_outcome,
 
-    numbered_antibiotics AS (
-        SELECT *,
-            ROW_NUMBER() OVER (
-                PARTITION BY patient_ip_no 
-                ORDER BY item_priority DESC, ams_patient_detail_slno
-            ) AS rn
-        FROM merged_data
-    )
+            MAX(CASE WHEN final_rn = 1 THEN antibiotic_info END) AS Antibiotic_1,
+            MAX(CASE WHEN final_rn = 1 THEN bill_date END) AS Antibiotic_1_BillDate,
 
-    SELECT 
-        patient_ip_no,
-        mrd_no,
-        patient_name, 
-        patient_age,
-        patient_gender, 
-        patient_location,
-        bed_code,
-        consultant_department,    
-        doc_name, 
-        clinical_assesment,
-        sample_id,
-        date_of_collection,
-        samp_collect_for_antibiotic,
-        date_of_issue_of_report,
-        abst_culture_report,
-        emprical_antibiotic,
-        emprical_antibio_date_of_start,
-        escal_descal_iv_oral_switich,
-        emprical_antibio_complaince_policy,
-        compliance_pathogen_directed_therapy,
-        lab_no,
-        specimen,
-        fluid_type,
-        sample_type,
-        investigation,
-        organism_one,
-        organism_two,
-        growth,
-        growth_remark_one,
-        growth_remark_two, 
-        growth_remark_three,
-        result_verified_date,
-        culture_details_remarks,
-        culture_details_added_date,
-        physician_ams_comments,
-        report_updated, 
-        patient_outcome,
+            MAX(CASE WHEN final_rn = 2 THEN antibiotic_info END) AS Antibiotic_2,
+            MAX(CASE WHEN final_rn = 2 THEN bill_date END) AS Antibiotic_2_BillDate,
 
-    MAX(CASE WHEN rn = 1 THEN antibiotic_info END) AS Antibiotic_1,
-    MAX(CASE WHEN rn = 1 THEN bill_date END) AS Antibiotic_1_BillDate,
+            MAX(CASE WHEN final_rn = 3 THEN antibiotic_info END) AS Antibiotic_3,
+            MAX(CASE WHEN final_rn = 3 THEN bill_date END) AS Antibiotic_3_BillDate,
 
-    MAX(CASE WHEN rn = 2 THEN antibiotic_info END) AS Antibiotic_2,
-    MAX(CASE WHEN rn = 2 THEN bill_date END) AS Antibiotic_2_BillDate,
+            MAX(CASE WHEN final_rn = 4 THEN antibiotic_info END) AS Antibiotic_4,
+            MAX(CASE WHEN final_rn = 4 THEN bill_date END) AS Antibiotic_4_BillDate,
 
-    MAX(CASE WHEN rn = 3 THEN antibiotic_info END) AS Antibiotic_3,
-    MAX(CASE WHEN rn = 3 THEN bill_date END) AS Antibiotic_3_BillDate,
+            MAX(CASE WHEN final_rn = 5 THEN antibiotic_info END) AS Antibiotic_5,
+            MAX(CASE WHEN final_rn = 5 THEN bill_date END) AS Antibiotic_5_BillDate
 
-    MAX(CASE WHEN rn = 4 THEN antibiotic_info END) AS Antibiotic_4,
-    MAX(CASE WHEN rn = 4 THEN bill_date END) AS Antibiotic_4_BillDate,
-
-    MAX(CASE WHEN rn = 5 THEN antibiotic_info END) AS Antibiotic_5,
-    MAX(CASE WHEN rn = 5 THEN bill_date END) AS Antibiotic_5_BillDate
-
-
-    FROM numbered_antibiotics
-    GROUP BY 
-        patient_ip_no,
-        mrd_no,
-        patient_name, 
-        patient_age,
-        patient_gender, 
-        patient_location,
-        bed_code,
-        consultant_department,    
-        doc_name, 
-        clinical_assesment,
-        sample_id,
-        date_of_collection,
-        samp_collect_for_antibiotic,
-        date_of_issue_of_report,
-        abst_culture_report,
-        emprical_antibiotic,
-        emprical_antibio_date_of_start,
-        escal_descal_iv_oral_switich,
-        emprical_antibio_complaince_policy,
-        compliance_pathogen_directed_therapy,
-        lab_no,
-        specimen,
-        fluid_type,
-        sample_type,
-        investigation,
-        organism_one,
-        organism_two,
-        growth,
-        growth_remark_one,
-        growth_remark_two, 
-        growth_remark_three,
-        result_verified_date,
-        culture_details_remarks,
-        culture_details_added_date,
-        physician_ams_comments,
-        report_updated, 
-        patient_outcome;
+        FROM ranked_antibiotics
+        GROUP BY 
+            patient_ip_no,
+            mrd_no,
+            patient_name, 
+            patient_age,
+            patient_gender, 
+            patient_location,
+            bed_code,
+            consultant_department,    
+            doc_name, 
+            clinical_assesment,
+            sample_id,
+            date_of_collection,
+            samp_collect_for_antibiotic,
+            date_of_issue_of_report,
+            abst_culture_report,
+            emprical_antibiotic,
+            emprical_antibio_date_of_start,
+            escal_descal_iv_oral_switich,
+            emprical_antibio_complaince_policy,
+            compliance_pathogen_directed_therapy,
+            lab_no,
+            specimen,
+            fluid_type,
+            sample_type,
+            investigation,
+            organism_one,
+            organism_two,
+            growth,
+            growth_remark_one,
+            growth_remark_two, 
+            growth_remark_three,
+            result_verified_date,
+            culture_details_remarks,
+            culture_details_added_date,
+            physician_ams_comments,
+            report_updated, 
+            patient_outcome;
         `,
       // `WITH numbered_antibiotics AS (
       //     SELECT 

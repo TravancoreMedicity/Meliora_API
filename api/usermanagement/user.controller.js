@@ -234,6 +234,7 @@ module.exports = {
   },
   userBasedLoginVerification: async (req, res) => {
     const body = req.body;
+    console.log(body);
     // CHECK USER BASED VALIDATION FIRST CHECK THE PASSWORD CREDENTIAL THEN REST
     userBasedValidationCheck(body, (error, results) => {
       if (error) {

@@ -18,26 +18,58 @@ app.use(express.json());
 app.use(cookieParser());
 // app.use(lusca.csrf());
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3002",
+  "http://192.168.10.88:9741",
+  "http://192.168.10.88:9742",
+  "https://192.168.10.88:9742",
+  "http://travancoremedicity.in:9741",
+  "https://travancoremedicity.in:9742",
+  "http://tm.medicity.co.in:8888",
+  "http://192.168.10.88:8888",
+  "http://192.168.22.9:3000",
+  "http://195.168.34.25:3001",
+  "http://195.168.34.25:3000",
+  "http://192.168.22.170:3000",
+  "http://192.168.22.5:3000",
+];
+
+// app.use(
+//   cors({
+//     origin: [
+//       "http://192.168.10.88:9741",
+//       "http://192.168.10.88:9742",
+//       "https://192.168.10.88:9742",
+//       "https://travancoremedicity.in:9742",
+//       "http://travancoremedicity.in:9741",
+//       "http://192.168.10.88:3000",
+//       " http://tm.medicity.co.in:8888",
+//       " http://192.168.10.88:8888",
+//       "http://localhost:3002",
+//       "http://192.168.22.9:3000",
+//       "http://195.168.34.25:3001",
+//       "http://195.168.34.25:3000",
+//       "http://192.168.22.170:3000",
+//       "http://192.168.22.5:3000",
+//     ],
+//     credentials: true,
+//   })
+// );
+
+// Dynamically allow based on Origin
 app.use(
   cors({
-    origin: [
-      "http://192.168.10.88:9741",
-      "http://192.168.10.88:9742",
-      "https://192.168.10.88:9742",
-      "https://travancoremedicity.in:9742",
-      "http://travancoremedicity.in:9741",
-      "http://192.168.10.88:3000",
-      "http://tm.medicity.co.in:8888",
-      "http://192.168.10.88:8888",
-      "http://localhost:3002",
-      "http://192.168.22.9:3000",
-      "http://195.168.34.25:3001",
-      "http://195.168.34.25:3000",
-      "http://192.168.22.170:3000",
-      "http://192.168.22.5:3000",
-      "http://192.168.22.8:3000",
-      "http://localhost:3000"
-    ],
+
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn("Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+
     credentials: true,
   })
 );
@@ -48,8 +80,8 @@ app.get("/info", (req, res) => {
     if (error) throw err;
     res.write(
       '<div id="content"><pre>' +
-      txtString.toString().replace(/\n/g, "<br />") +
-      "</pre>"
+        txtString.toString().replace(/\n/g, "<br />") +
+        "</pre>"
     );
     res.end();
   });
@@ -60,8 +92,8 @@ app.get("/error", (req, res) => {
     if (error) throw err;
     res.write(
       '<div id="content"><pre>' +
-      txtString.toString().replace(/\n/g, "<br />") +
-      "</pre>"
+        txtString.toString().replace(/\n/g, "<br />") +
+        "</pre>"
     );
     res.end();
   });
@@ -73,8 +105,8 @@ app.get("/warn", (req, res) => {
     if (error) throw err;
     res.write(
       '<div id="content"><pre>' +
-      txtString.toString().replace(/\n/g, "<br />") +
-      "</pre>"
+        txtString.toString().replace(/\n/g, "<br />") +
+        "</pre>"
     );
     res.end();
   });
@@ -274,10 +306,10 @@ const approvalMapping = require("./api/crm_approval_mapping/approval.router");
 const amsAntibiotic = require("./api/ams_antibiotic/ams.router");
 const validateAuthentication = require("./api/validate_authentication/employeeData.router");
 
-
 app.use(express.json({ limit: "50mb" }));
 
 app.use((req, res, next) => {
+  // console.log(req);
   if (req.method === "OPTIONS") {
     res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
     return res.status(200).json({});
@@ -467,7 +499,6 @@ app.use("/api/CRFDashboard", crmDashboard);
 app.use("/api/approvalMapping", approvalMapping);
 app.use("/api/amsAntibiotic", amsAntibiotic);
 app.use("/api/validateAuthentication", validateAuthentication);
-
 
 server.listen(
   process.env.APP_PORT,

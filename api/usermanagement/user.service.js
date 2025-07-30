@@ -151,7 +151,8 @@ module.exports = {
       [id],
       (error, results, fields) => {
         if (error) {
-          logger.error(error);
+          // logger.error(error);
+          console.log(error);
           return callBack(error);
         }
         return callBack(null, results);

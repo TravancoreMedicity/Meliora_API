@@ -51,8 +51,7 @@ module.exports = {
             WHERE 
                 emp.em_department = ?
                 AND emp.em_status = 1 
-                AND emp.em_no != 1 
-                AND emp.em_id != 1606
+                AND emp.em_no != 1                
             ORDER BY 
                 closed_count DESC`,
             [
@@ -869,8 +868,7 @@ module.exports = {
                 ON emp.em_id = closed_complaints.employee_id
                 WHERE 
                 emp.em_status = 1 
-                AND emp.em_no != 1 
-                AND emp.em_id != 1606
+                AND emp.em_no != 1               
                 AND (complaint_data.complaint_count > 0 OR closed_complaints.closed_count > 0)
                 AND emp.em_department = CompltDept.department_slno
                 ORDER BY 

@@ -274,7 +274,8 @@ WHERE fb_subcategory_master.fb_category_slno= ?`,
             fd_slno,
             feedback_name,
             fdmast_slno,
-            feedback_status 
+            feedback_status ,
+            fb_qr_status
             FROM 
             fb_mast
             where

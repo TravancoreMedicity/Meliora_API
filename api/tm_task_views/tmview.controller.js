@@ -2,7 +2,9 @@ const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnP
     EmployeeInCompleted, EmployeeOverDue, DepartmentOnProgress, DepartmentCompleted, DepartmentInCompleted, DepartmentOverDue, EmployeeName, EmployeeOnPending,
     ProjectOnProgress, ProjectCompleted, ProjectOverDue, GoalsOnProgress, GoalsCompleted, DepartmentOnHold, DepartmentPending, ViewAllEmployeeTask,
     GoalsOverDue, ProjectInCompleted, GoalsInCompleted, EmpProjectTask, EmpTaskCount, AllEmployeeProject, AllTaskUnderProject,
-    TTCTcountUnderProject, EmployeeTTCTcount, AllEmployeeTask, EmpTaskCountWithoutProject, SubTaskUnderTask, getAllProjects, AllTaskEmp, AllComplaintsEmp
+    TTCTcountUnderProject, EmployeeTTCTcount, AllEmployeeTask, EmpTaskCountWithoutProject, SubTaskUnderTask, getAllProjects, AllTaskEmp, AllComplaintsEmp,
+    deptOverDue,
+    deptCompleted
 } = require('../tm_task_views/tmview.service')
 module.exports = {
 
@@ -855,5 +857,49 @@ module.exports = {
             })
         })
     },
+      deptOverDue: (req, res) => {
 
+        const id = req.params.id;
+        deptOverDue(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+        deptCompleted: (req, res) => {
+        const id = req.params.id;
+        deptCompleted(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
 }

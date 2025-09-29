@@ -272,7 +272,7 @@ module.exports = {
             tm_query_reply_date,
             tm_mast_duedate_count,  
             tm_new_task_mast.tm_project_slno,
-            GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
+             JSON_ARRAYAGG(tm_new_task_mast_detl.tm_assigne_emp) as tm_assigne_emp,
             GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
@@ -318,7 +318,7 @@ module.exports = {
             tm_completed_remarks,
             tm_mast_duedate_count,
             tm_new_task_mast.tm_project_slno,
-            GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
+            JSON_ARRAYAGG(tm_new_task_mast_detl.tm_assigne_emp) as tm_assigne_emp,
             GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
@@ -442,7 +442,7 @@ module.exports = {
             tm_complete_date,
             tm_new_task_mast.tm_project_slno,
             main_task_slno,
-            GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
+            JSON_ARRAYAGG(tm_new_task_mast_detl.tm_assigne_emp) as tm_assigne_emp,
             GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
             FROM tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept

@@ -1516,7 +1516,7 @@ WHERE
     getDepartmentEmpid: (id, callBack) => {
         pool.query(
             `SELECT em_id, em_name FROM co_employee_master where em_dept_section=? 
-            and em_status=1 and em_no!=1 and em_id!=1606 order by em_name ASC`,
+            and em_status=1 and em_no!=1 order by em_name ASC`,
             [
                 id
             ],

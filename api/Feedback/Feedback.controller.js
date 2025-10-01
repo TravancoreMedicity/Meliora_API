@@ -186,6 +186,7 @@ const {
     getCommonFeedbackReport,
     getIpFeedbackReport,
     insertCallCenterDetail,
+    getAllPREMDetail,
 } = require("./Feedback.service");
 
 module.exports = {
@@ -552,6 +553,30 @@ module.exports = {
             }
         })
     },
+    getAllPREMDetail: (req, res) => {
+        getAllPREMDetail((error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Error in fetching data!"
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 0,
+                    message: 'No data Found'
+                })
+            }
+            if (results.length > 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "Successfully Fetched Data",
+                    data: results
+                })
+            }
+        })
+    },
+
     UpdateFeedbackName: (req, res) => {
         const body = req.body;
         UpdateFeedbackName(body, (error, results) => {
@@ -1056,8 +1081,9 @@ module.exports = {
             }
             if (results.length === 0) {
                 return res.status(200).json({
-                    success: 0,
-                    message: 'No data Found'
+                    success: 2,
+                    message: 'No data Found',
+                    data: []
                 })
             }
             if (results.length > 0) {
@@ -2901,7 +2927,8 @@ module.exports = {
             if (results.length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Record Found"
+                    message: "No Record Found",
+                    data: []
                 });
             }
 
@@ -2911,6 +2938,7 @@ module.exports = {
             });
         });
     },
+
     getallassignedbed: (req, res) => {
         const id = req.params.id;
         getallassignedbed(id, (err, results) => {

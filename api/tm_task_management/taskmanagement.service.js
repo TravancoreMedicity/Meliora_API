@@ -288,6 +288,43 @@ module.exports = {
 
     MasterTaskviewBySecid: (id, callback) => {
         pool.query(
+            // `SELECT 
+            // tm_new_task_mast.tm_task_slno,
+            // tm_task_name,
+            // tm_task_dept,
+            // tm_task_dept_sec,
+            // co_department_mast.dept_name,
+            // co_deptsec_mast.sec_name,
+			// tm_task_due_date, 
+            // tm_assigne_emp,
+            // co_employee_master.em_name,
+            // main_task_slno,
+            // tm_task_file,
+			// tm_task_description,
+            // tm_new_task_mast.tm_project_slno,
+            // tm_project_mast.tm_project_duedate,
+            // tm_project_name,
+            // tm_pending_remark,
+            // tm_onhold_remarks,
+            // tm_completed_remarks,
+            // tm_new_task_mast.create_date,
+            // tm_task_status,
+            // tm_complete_date,
+            // tm_mast_duedate_count,
+            // JSON_ARRAYAGG(tm_new_task_mast_detl.tm_assigne_emp) as tm_assigne_emp,
+            // GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
+            // FROM tm_new_task_mast              
+            // left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec 
+            // left join co_department_mast on co_department_mast.dept_id=co_deptsec_mast.dept_id
+            // left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
+            // left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
+            // left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
+            // WHERE (
+            // (tm_new_task_mast.tm_task_dept=?)
+            //  And (tm_new_task_mast.tm_task_status!=1)
+            //  And( tm_detail_status=1) )
+            // group by tm_new_task_mast.tm_task_slno
+			// ORDER BY tm_task_slno DESC`,
             `SELECT 
             tm_new_task_mast.tm_task_slno,
             tm_task_name,
@@ -296,8 +333,6 @@ module.exports = {
             co_department_mast.dept_name,
             co_deptsec_mast.sec_name,
 			tm_task_due_date, 
-            tm_assigne_emp,
-            co_employee_master.em_name,
             main_task_slno,
             tm_task_file,
 			tm_task_description,
@@ -311,18 +346,17 @@ module.exports = {
             tm_task_status,
             tm_complete_date,
             tm_mast_duedate_count,
-            GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ', ')as tm_assigne_emp,
+            JSON_ARRAYAGG(tm_new_task_mast_detl.tm_assigne_emp) as tm_assigne_emp,
             GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
             FROM tm_new_task_mast              
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec 
             left join co_department_mast on co_department_mast.dept_id=co_deptsec_mast.dept_id
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
-            left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
+            left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno  AND tm_new_task_mast_detl.tm_detail_status = 1
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
-            WHERE (
-            (tm_new_task_mast.tm_task_dept_sec=?)
-             And (tm_new_task_mast.tm_task_status!=1)
-             And( tm_detail_status=1) )
+            WHERE 
+            tm_new_task_mast.tm_task_dept=?
+            And tm_new_task_mast.tm_task_status!=1
             group by tm_new_task_mast.tm_task_slno
 			ORDER BY tm_task_slno DESC`,
             [id],
@@ -1167,7 +1201,7 @@ module.exports = {
             FROM tm_goal_mast  
             left join tm_project_mast on tm_project_mast.tm_goal_slno=tm_goal_mast.tm_goals_slno
             left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
-            where tm_task_dept_sec=? group by tm_goals_slno`,
+            where tm_task_dept=? group by tm_goals_slno`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -1195,7 +1229,7 @@ module.exports = {
             FROM tm_project_mast  
             left join tm_goal_mast on tm_goal_mast.tm_goals_slno=tm_project_mast.tm_goal_slno
             left join tm_new_task_mast on tm_new_task_mast.tm_project_slno=tm_project_mast.tm_project_slno
-            where tm_task_dept_sec=? group by tm_project_slno`,
+            where tm_task_dept=? group by tm_project_slno`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -1228,24 +1262,43 @@ module.exports = {
             tm_new_task_mast.tm_project_slno,
             main_task_slno,
             tm_mast_duedate_count,
-            GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
+            JSON_ARRAYAGG(tm_new_task_mast_detl.tm_assigne_emp) as tm_assigne_emp,
             GROUP_CONCAT(co_employee_master.em_name SEPARATOR ',')as em_name 
             FROM tm_new_task_mast            
             left join co_department_mast on co_department_mast.dept_id=tm_new_task_mast.tm_task_dept
             left join co_deptsec_mast on co_deptsec_mast.sec_id=tm_new_task_mast.tm_task_dept_sec
-            left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno=tm_new_task_mast.tm_task_slno
+            left join tm_new_task_mast_detl ON tm_new_task_mast_detl.tm_task_slno = tm_new_task_mast.tm_task_slno
+			AND tm_new_task_mast_detl.tm_detail_status = 1
             left join co_employee_master on co_employee_master.em_id=tm_new_task_mast_detl.tm_assigne_emp
             left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
             WHERE
-            tm_new_task_mast.main_task_slno=?
-             and  tm_task_dept_sec=?
-             AND tm_detail_status=1
+            tm_new_task_mast.main_task_slno=?                
             group by tm_new_task_mast.tm_task_slno`,
             [
-                data.main_task_slno,
-                data.tm_task_dept_sec
+                data.main_task_slno       
             ],
             (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+        getAllEmpUnderdept: (id, callback) => {
+        pool.query(
+            `SELECT 
+            em_id,
+            em_name,
+            sec_id,
+            sec_name
+            FROM 
+            co_employee_master 
+            left join co_deptsec_mast on co_deptsec_mast.sec_id =co_employee_master.em_dept_section
+            where em_department=?
+            and em_status=1  order by em_name ASC`,
+            [id],
+            (error, results, fields) => {
                 if (error) {
                     return callback(error);
                 }

@@ -401,5 +401,30 @@ module.exports = {
             }
         );
     },
+    getHoldedTickets: (sql, params, callback) => {
+        pool.query(sql, params, (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
 
+        getPendingTicketsReport: (sql, params, callback) => {
+        pool.query(sql, params, (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
+
+            getPendingTicketsCountReport: (sql, params, callback) => {
+        pool.query(sql, params, (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
 }

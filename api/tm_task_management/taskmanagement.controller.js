@@ -3,7 +3,8 @@ const { CreateTaskInsert, CreateTaskDetailInsert, CreateTaskView, CreateSubTaskI
     ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptUpdate, ProgressInsert, ProgressView, ProgressUpdate,
     ProjectDeptView, GoalDeptSearch, ProjectDeptSearch, SubProgressView, taskStatusUpdate, SearchProjectAndEmployee, GetTaskSlno,
     UpdateStatus, InsertDueDate, getCurrentDueDate, getAllDueDates, AllTaskListProjectz, getDeptGoals, getDeptProjects, subtaskUnderdepSec,
-    getAllGoals } = require('../tm_task_management/taskmanagement.service')
+    getAllGoals, 
+    getAllEmpUnderdept} = require('../tm_task_management/taskmanagement.service')
 
 const logger = require('../../logger/logger');
 module.exports = {
@@ -1181,6 +1182,26 @@ module.exports = {
             })
         })
     },
-
+    getAllEmpUnderdept: (req, res) => {
+        const id = req.params.id;
+        getAllEmpUnderdept(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
 }
 

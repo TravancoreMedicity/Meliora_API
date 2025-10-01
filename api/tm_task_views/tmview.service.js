@@ -1026,7 +1026,7 @@ module.exports = {
                            left join co_deptsec_mast DS on DS.sec_id=T.tm_task_dept_sec
                            where tm_detail_status=1 and T.tm_task_status=1
                               GROUP BY emslno ) AA
-                           where    AA.emslno in (select em_id from co_employee_master where em_dept_section=? and em_status=1)
+                           where    AA.emslno in (select em_id from co_employee_master where em_department=? and em_status=1)
                            group by emslno`,
             [id],
             (error, results, fields) => {
@@ -1362,6 +1362,100 @@ module.exports = {
             tm_project_name ASC`
             , [],
             (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+
+        deptOverDue: (id, callback) => {
+        pool.query(
+            `SELECT 
+            tm_new_task_mast.tm_task_slno,
+            tm_task_name,
+            tm_task_dept,
+            co_department_mast.dept_name,
+            tm_task_dept_sec,
+            co_deptsec_mast.sec_name,
+            tm_task_due_date,
+            tm_assigne_emp,
+            main_task_slno,
+            tm_pending_remark,
+            tm_onhold_remarks,
+            tm_completed_remarks,
+            tm_task_status,
+            tm_task_file,
+            tm_project_mast.tm_project_duedate,
+            tm_new_task_mast.tm_project_slno,
+            tm_project_name,
+            tm_mast_duedate_count,
+            tm_new_task_mast.create_date,
+            tm_task_description,
+            GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name 
+            FROM tm_new_task_mast            
+            left join co_department_mast on co_department_mast.dept_id = tm_new_task_mast.tm_task_dept
+            left join co_deptsec_mast on co_deptsec_mast.sec_id = tm_new_task_mast.tm_task_dept_sec
+            left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno = tm_new_task_mast.tm_task_slno
+            left join co_employee_master on co_employee_master.em_id = tm_new_task_mast_detl.tm_assigne_emp
+            left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
+            WHERE tm_new_task_mast.tm_task_dept =? AND tm_task_due_date < current_date()
+            AND ((tm_new_task_mast.tm_task_status !=1) || (tm_new_task_mast.tm_task_status=0)|| (tm_new_task_mast.tm_task_status=2)
+             || (tm_new_task_mast.tm_task_status iS NULL ))
+            AND (tm_detail_status=1)
+            group by tm_new_task_mast.tm_task_slno
+            order By tm_task_due_date desc`,
+            [id],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+
+        );
+    },
+     deptCompleted: (id, callback) => {
+        pool.query(
+            `SELECT 
+            tm_new_task_mast.tm_task_slno,
+            tm_task_name,
+            tm_task_dept,
+            co_department_mast.dept_name,
+            tm_task_dept_sec,
+            co_deptsec_mast.sec_name,
+            tm_task_due_date,
+            tm_assigne_emp,
+            main_task_slno,
+            tm_new_task_mast.create_date,
+            tm_new_task_mast.tm_project_slno,
+            tm_project_name,
+            tm_task_file,
+            tm_pending_remark,
+            tm_onhold_remarks,
+            tm_completed_remarks,
+            tm_task_description,
+            tm_task_status,
+            tm_complete_date,
+            tm_mast_duedate_count,
+            GROUP_CONCAT(tm_new_task_mast_detl.tm_assigne_emp SEPARATOR ',')as tm_assigne_emp,
+            GROUP_CONCAT(lower(co_employee_master.em_name) SEPARATOR ',')as em_name  
+            FROM tm_new_task_mast            
+            left join co_department_mast on co_department_mast.dept_id = tm_new_task_mast.tm_task_dept
+            left join co_deptsec_mast on co_deptsec_mast.sec_id = tm_new_task_mast.tm_task_dept_sec
+            left join tm_new_task_mast_detl on tm_new_task_mast_detl.tm_task_slno = tm_new_task_mast.tm_task_slno
+            left join co_employee_master on co_employee_master.em_id = tm_new_task_mast_detl.tm_assigne_emp
+            left join tm_project_mast on tm_project_mast.tm_project_slno=tm_new_task_mast.tm_project_slno 
+            WHERE tm_new_task_mast.tm_task_dept =?
+            AND tm_new_task_mast.tm_task_status = 1
+            AND (tm_detail_status=1)
+            group by tm_new_task_mast.tm_task_slno
+            order By tm_task_due_date desc`,
+            [id],
+            (error, results, fields) => {
                 if (error) {
                     return callback(error);
                 }

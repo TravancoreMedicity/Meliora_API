@@ -279,7 +279,7 @@ WHERE fb_subcategory_master.fb_category_slno= ?`,
             FROM 
             fb_mast
             where
-            feedback_status = 1
+            feedback_status = 1 and fb_qr_status = 0
             `,
             []
             , (error, results, fields) => {
@@ -289,6 +289,29 @@ WHERE fb_subcategory_master.fb_category_slno= ?`,
                 return callBack(null, results)
             })
     },
+    getAllPREMDetail: (callBack) => {
+        pool.query(
+            `
+            SELECT 
+            fd_slno,
+            feedback_name,
+            fdmast_slno,
+            feedback_status ,
+            fb_qr_status
+            FROM 
+            fb_mast
+            where
+            feedback_status = 1 and fb_qr_status = 1
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+
     UpdateFeedbackName: (data, callBack) => {
         pool.query(
             `
@@ -3628,6 +3651,7 @@ ORDER BY
                 return callBack(null, results)
             })
     },
+
     getallassetItems: (callBack) => {
         pool.query(
             `select 	
@@ -3641,7 +3665,7 @@ ORDER BY
             from 
                 fb_asset_item_master
                 left join cm_complaint_dept on fb_asset_item_master.fb_dep_id = cm_complaint_dept.complaint_dept_slno
-                left join cm_complaint_type on cm_complaint_type.complaint_type_slno = fb_asset_item_master.fb_asset_type;  
+                left join cm_complaint_type on cm_complaint_type.complaint_type_slno = fb_asset_item_master.fb_asset_type 
             `,
             []
             , (error, results, fields) => {

@@ -123,6 +123,7 @@ const {
     getallComplaintType,
     getCommonFeedbackReport,
     getIpFeedbackReport,
+    getAllPREMDetail,
     // getallscheduledate,
 } = require("./Feedback.controller");
 
@@ -298,6 +299,9 @@ router.post('/gethkbeddetail', verifyToken, gethkbedDetails)
 
 router.post('/commonfbreport', verifyToken, getCommonFeedbackReport);
 router.post('/ipfbreport', verifyToken, getIpFeedbackReport);
+
+
+router.get('/premdetail', verifyToken, getAllPREMDetail)
 
 //edlider meliora table
 // router.post('/insertbddetail', insertbddetail)

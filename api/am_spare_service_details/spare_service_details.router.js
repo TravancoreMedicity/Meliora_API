@@ -3,7 +3,7 @@ const { checkToken } = require("../../authentication/token_validation");
 const { getAssetDetails, getcomplaintDetails, getAssetcomplaintDetails, serviceDetailsInsert, getserviceDetails, serviceDetailsUpdate,
     getAllserviceDetails, AssetDetailsUpdate, SpareDetailsUpdate, spareServiceUpdate, servicedEmpDetailsInsert, getDeptServiceDetailsData, servicedEmpDetailsUpdate,
     AssetServiceHoldUpdate, SpareServiceHoldUpdate, getAssetListUnderCustodian, getAssetAlllDetails, getAssetUnderSelectdDeptAndSec, getPendingAsset, getPendingSpare,
-    CmSpareComplaintService,InsertSupplierContactDetails,UpdateSupplierContactDetails,viewSupplierContactDetails
+    CmSpareComplaintService
 } = require('./spare_service_details.controller');
 
 router.post("/getAssetDetails", checkToken, getAssetDetails);
@@ -38,11 +38,5 @@ router.post("/getPendingAsset", checkToken, getPendingAsset);
 router.post("/getPendingSpare", checkToken, getPendingSpare);
 
 router.post('/CmSpareComplaintService', checkToken, CmSpareComplaintService)
-
-
-
-router.post("/InsertSupplierContactDetails", checkToken, InsertSupplierContactDetails);
-router.patch('/UpdateSupplierContactDetails', checkToken, UpdateSupplierContactDetails)
-router.get("/viewSupplierContactDetails/:id", checkToken, viewSupplierContactDetails)
 
 module.exports = router

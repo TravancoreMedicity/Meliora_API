@@ -2,7 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require("fs")
 const logger = require('../../logger/logger')
-
+const archiver = require('archiver');
 const { ComplaintFileUpload } = require('./cm_file_upload.service')
 
 const complaintfilestorage = multer.diskStorage({
@@ -116,23 +116,44 @@ module.exports = {
             }
         });
     },
-    getComplaintFile: (req, res) => {
-        const id = req.params.id
+
+
+
+        getComplaintFile: (req, res) => {
+        const id = req.params.id;
         const folderPath = `D:/DocMeliora/Meliora/ComplaintManagement/${id}`;
         fs.readdir(folderPath, (err, files) => {
-
             if (err) {
+     
                 return res.status(200).json({
                     success: 0,
-                    message: err.message // Return the error message
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-
-                success: 1,
-
-                data: files // Send the list of files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
     },
 

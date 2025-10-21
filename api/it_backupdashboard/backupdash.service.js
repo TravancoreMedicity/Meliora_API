@@ -141,7 +141,8 @@ module.exports = {
                left join it_backup_time_details on it_backup_time_details.time_slno=it_backup_daily_details.time_slno
                where  dept2.dept_id=?
                AND it_backup_details_mast.backup_active_status=1
-               and it_backup_time_details.status=1`,
+               and it_backup_time_details.status=1
+               order by backup_daily_date desc`,
 
             [id],
             (error, results, fields) => {
@@ -341,6 +342,7 @@ module.exports = {
           where  dept2.dept_id=?
         AND it_backup_details_mast.backup_active_status=1
           AND it_backup_time_details.status=1
+        order by backup_monthly_date desc
         `,
             [id],
             (error, results, fields) => {
@@ -545,6 +547,7 @@ module.exports = {
                     where  dept2.dept_id=?        
                     AND it_backup_details_mast.backup_active_status=1
                     AND it_backup_time_details.status=1
+                    order by backup_yearly_date desc
                     `,
 
             [id],

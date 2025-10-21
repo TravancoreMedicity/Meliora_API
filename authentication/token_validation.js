@@ -4,8 +4,7 @@ const jwt = require("jsonwebtoken");
 module.exports = {
   checkToken: (req, res, next) => {
     const token = req.cookies.accessToken;
-    console.log(token);
-
+    const kmctoken = req.get("authorization");
     if (token) {
       // Remove Bearer from string
       //   token = token.slice(7);
@@ -21,8 +20,21 @@ module.exports = {
           next();
         }
       });
+    } else if (kmctoken) {
+      tokenkmc = kmctoken.slice(6);
+      jwt.verify(tokenkmc, process.env.SECRET_ID_KMCMEL, (err, decoded) => {
+        if (err) {
+          //   logger.error(err);
+          return res.status(401).json({
+            status: 401,
+            message: "Invalid Token 1",
+          });
+        } else {
+          req.decoded = decoded;
+          next();
+        }
+      });
     } else {
-      //   logger.error("No token");
       return res.status(401).json({
         status: 401,
         message: "Invalid Token 2",

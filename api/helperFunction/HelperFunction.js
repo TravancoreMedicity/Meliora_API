@@ -15,4 +15,23 @@ const generateRefreshToken = ({ userSlno }) =>
     expiresIn: "1d",
   });
 
-module.exports = { generateAccessToken, generateRefreshToken };
+const generateEliderID = ({ userSlno }) =>
+  jwt.sign({ id: userSlno }, process.env.SECRET_ID_MEL,
+  );
+
+
+const generateEliderToken = (userData) => {
+  // const plainUserData = JSON.parse(JSON.stringify(userData));
+  return jwt.sign({ id: userData }, process.env.SECRET_KEY_MEL, {
+    expiresIn: "60d",
+  });
+};
+
+const generateKmcToken = (userSlno) => {
+  // const plainUserData = JSON.parse(JSON.stringify(userData));
+  return jwt.sign({ id: userSlno }, process.env.SECRET_ID_KMCMEL, {
+    expiresIn: "60d",
+  });
+};
+
+module.exports = { generateAccessToken, generateRefreshToken, generateEliderToken, generateEliderID, generateKmcToken };

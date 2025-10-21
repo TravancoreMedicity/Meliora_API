@@ -78,8 +78,8 @@ app.get("/info", (req, res) => {
     if (error) throw err;
     res.write(
       '<div id="content"><pre>' +
-        txtString.toString().replace(/\n/g, "<br />") +
-        "</pre>"
+      txtString.toString().replace(/\n/g, "<br />") +
+      "</pre>"
     );
     res.end();
   });
@@ -90,8 +90,8 @@ app.get("/error", (req, res) => {
     if (error) throw err;
     res.write(
       '<div id="content"><pre>' +
-        txtString.toString().replace(/\n/g, "<br />") +
-        "</pre>"
+      txtString.toString().replace(/\n/g, "<br />") +
+      "</pre>"
     );
     res.end();
   });
@@ -103,8 +103,8 @@ app.get("/warn", (req, res) => {
     if (error) throw err;
     res.write(
       '<div id="content"><pre>' +
-        txtString.toString().replace(/\n/g, "<br />") +
-        "</pre>"
+      txtString.toString().replace(/\n/g, "<br />") +
+      "</pre>"
     );
     res.end();
   });
@@ -303,6 +303,9 @@ const crmDashboard = require("./api/crm_dashboard/crmDasboard.router");
 const approvalMapping = require("./api/crm_approval_mapping/approval.router");
 const amsAntibiotic = require("./api/ams_antibiotic/ams.router");
 const validateAuthentication = require("./api/validate_authentication/employeeData.router");
+const melioraDepMaster = require("./api/Meliora_department_master/meliora_dep_master.router");
+const ContractMaster = require("./api/contract_master/contract.router");
+
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -497,6 +500,10 @@ app.use("/api/CRFDashboard", crmDashboard);
 app.use("/api/approvalMapping", approvalMapping);
 app.use("/api/amsAntibiotic", amsAntibiotic);
 app.use("/api/validateAuthentication", validateAuthentication);
+app.use("/api/melioraDepMaster", melioraDepMaster);
+app.use("/api/ContractMaster", ContractMaster);
+
+
 
 server.listen(
   process.env.APP_PORT,

@@ -152,7 +152,6 @@ module.exports = {
       (error, results, fields) => {
         if (error) {
           // logger.error(error);
-          console.log(error);
           return callBack(error);
         }
         return callBack(null, results);
@@ -256,6 +255,124 @@ module.exports = {
       [data.refresh_token, data.empdtl_slno, data.empdtl_slno],
       (error, results, fields) => {
         if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      }
+    );
+  },
+
+  // userBasedInsertEliderToken: (data, callBack) => {
+  //   pool.query(
+  //     `INSERT INTO co_token( Elider_token,Elider_Id)  VALUES(?,?)`,
+  //     [data.Elider_token, data.Elider_Id],
+  //     (error, results, fields) => {
+  //       console.log(error);
+
+  //       if (error) {
+
+  //         return callBack(error);
+  //       }
+  //       return callBack(null, results);
+  //     }
+  //   );
+  // },
+  userBasedInsertEliderToken: (data, callBack) => {
+    pool.query(
+      `SELECT * FROM co_token WHERE token_slno = 1`,
+      [],
+      (err, results) => {
+        if (err) {
+          return callBack(err);
+        }
+
+        if (results.length > 0) {
+          // Record exists, perform update
+          pool.query(
+            `UPDATE co_token SET Elider_token = ?,Elider_Id =? WHERE token_slno = 1`,
+            [data.Elider_token, data.Elider_Id],
+            (updateErr, updateResults) => {
+              if (updateErr) {
+                return callBack(updateErr);
+              }
+              return callBack(null, updateResults);
+            }
+          );
+        } else {
+          // Record doesn't exist, perform insert
+          pool.query(
+            `INSERT INTO co_token (Elider_token, Elider_Id) VALUES (?, ?)`,
+            [data.Elider_token, data.Elider_Id],
+            (insertErr, insertResults) => {
+              if (insertErr) {
+                return callBack(insertErr);
+              }
+              return callBack(null, insertResults);
+            }
+          );
+        }
+      }
+    );
+  },
+  getelidertoken: (callBack) => {
+    pool.query(
+      "SELECT Elider_token FROM co_token ",
+      [],
+      (error, results, fields) => {
+        if (error) {
+          logger.error(error);
+          return callBack(error);
+        }
+        return callBack(null, results);
+      }
+    );
+  },
+
+  userBasedInsertKMCToken: (data, callBack) => {
+    pool.query(
+      `SELECT * FROM co_token WHERE token_slno = 2`,
+      [],
+      (err, results) => {
+        if (err) {
+          return callBack(err);
+        }
+
+        if (results.length > 0) {
+          // Record exists, perform update
+          pool.query(
+            `UPDATE co_token SET Kmc_token = ? WHERE token_slno = 2`,
+            [data.KMC_token],
+            (updateErr, updateResults) => {
+              if (updateErr) {
+                return callBack(updateErr);
+              }
+              return callBack(null, updateResults);
+            }
+          );
+        } else {
+          // Record doesn't exist, perform insert
+          pool.query(
+            `INSERT INTO co_token (Kmc_token) VALUES (?)`,
+            [data.KMC_token],
+            (insertErr, insertResults) => {
+              if (insertErr) {
+                return callBack(insertErr);
+              }
+              return callBack(null, insertResults);
+            }
+          );
+        }
+      }
+    );
+  },
+
+  getKmctoken: (callBack) => {
+    pool.query(
+      "SELECT Kmc_token FROM co_token where token_slno =2",
+      [],
+      (error, results, fields) => {
+        if (error) {
+          // logger.error(error);
           return callBack(error);
         }
         return callBack(null, results);

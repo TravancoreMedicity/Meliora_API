@@ -77,8 +77,6 @@ module.exports = {
               }
               const data = JSON.parse(JSON.stringify(result));
               if (data.length > 0) {
-                console.log(data);
-
                 let emppushTokens = data?.map((val) => val.app_token);
 
                 // let somePushTokens = ['ExponentPushToken[9JbCJvDTrQ1DggVszGG6zk]'];
@@ -234,9 +232,8 @@ module.exports = {
 
                     messages.push({
                       to: pushToken,
-                      title: `NEW TICKET :${
-                        body.complaint_slno
-                      } / Location: ${body?.locationName?.toLowerCase()} `,
+                      title: `NEW TICKET :${body.complaint_slno
+                        } / Location: ${body?.locationName?.toLowerCase()} `,
                       subtitle: `New Ticket Registerd`,
                       body: `${body.priority} | ${body.complaint_desc}`,
                       data: { withSome: body.complaint_desc },
@@ -282,7 +279,7 @@ module.exports = {
                       try {
                         const ticketChunk =
                           await expo.sendPushNotificationsAsync(chunk);
-                        console.log("Ticket Chunk:", ticketChunk);
+                        // console.log("Ticket Chunk:", ticketChunk);
                         tickets.push(...ticketChunk);
 
                         ticketChunk.forEach((ticket) => {

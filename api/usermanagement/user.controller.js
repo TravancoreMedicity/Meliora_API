@@ -17,6 +17,9 @@ const {
   validateUserCredExcistOrNot,
   userBasedValidationCheck,
   userBasedInsertRefreshToken,
+  userBasedInsertEliderToken,
+  userBasedInsertKMCToken,
+  getelidertoken, getKmctoken
 } = require("./user.service");
 
 const { addHours, format } = require("date-fns");
@@ -24,6 +27,9 @@ const logger = require("../../logger/logger");
 const {
   generateAccessToken,
   generateRefreshToken,
+  generateEliderToken,
+  generateEliderID,
+  generateKmcToken
 } = require("../helperFunction/HelperFunction");
 const { encrypt, decrypt } = require("../EncryptionHandler/EncryptionHandler");
 const { validateUserLoginCheck } = require("./user.function");
@@ -234,7 +240,6 @@ module.exports = {
   },
   userBasedLoginVerification: async (req, res) => {
     const body = req.body;
-    console.log(body);
     // CHECK USER BASED VALIDATION FIRST CHECK THE PASSWORD CREDENTIAL THEN REST
     userBasedValidationCheck(body, (error, results) => {
       if (error) {
@@ -267,7 +272,6 @@ module.exports = {
             em_id,
             emp_no,
           } = userData;
-          console.log(userData);
 
           const validatingUserLogin = validateUserLoginCheck(
             password_validity,
@@ -285,6 +289,11 @@ module.exports = {
           } else {
             const accessToken = generateAccessToken(empdtl_slno);
             const refreshToken = generateRefreshToken(empdtl_slno); //instead use empdtl_slno
+            const eliderID = generateEliderID(empdtl_slno)
+            const elidertoken = generateEliderToken(eliderID)
+            const kmctoken = generateKmcToken(empdtl_slno)
+            //insert elider token
+
             // insert the refresh token
             //user_slno to empdtl_slno
             userBasedInsertRefreshToken(
@@ -333,6 +342,28 @@ module.exports = {
                     // logOutTime: format(addHours(new Date(results.login), logout_time), 'yyyy-MM-dd HH:mm:ss'),
                     // desg_name: results.desg_name,
                   };
+
+                  userBasedInsertEliderToken({
+                    Elider_token: elidertoken, Elider_Id: eliderID
+                  }, (error, result) => {
+                    if (error) {
+                      return res.status(500).json({
+                        success: 0,
+                        message: "Token Not Inserted",
+                      });
+                    }
+                  });
+
+                  userBasedInsertKMCToken({
+                    KMC_token: kmctoken
+                  }, (error, result) => {
+                    if (error) {
+                      return res.status(500).json({
+                        success: 0,
+                        message: "Token Not Inserted",
+                      });
+                    }
+                  });
                   res.cookie("accessToken", accessToken, {
                     // httpOnly: true,
                     secure: false, // Set to false for HTTP (localhost). Use true for HTTPS (production).
@@ -348,6 +379,19 @@ module.exports = {
                 }
               }
             );
+
+            // userBasedInsertEliderToken(
+            //   { Elider_token: elidertoken, Elider_Id: eliderID },
+            //   (error, results) => {
+            //     if (error) {
+            //       // logger.error(error);
+            //       return res.status(500).json({
+            //         success: 0,
+            //         message: "Database connection error while insert Elider Token",
+            //       });
+            //     }
+            //   }
+            // );
           }
         } else {
           return res.status(200).json({
@@ -356,6 +400,53 @@ module.exports = {
           });
         }
       }
+    });
+  },
+
+
+  getelidertoken: (req, res) => {
+    getelidertoken((error, results) => {
+      if (error) {
+        return res.status(500).json({
+          success: 0,
+          message: "Database connection error",
+        });
+      }
+
+      if (results?.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "no data",
+        });
+      }
+
+      return res.status(200).json({
+        success: 1,
+        data: results,
+      });
+    });
+  },
+
+  getKmctoken: (req, res) => {
+    getKmctoken((error, results) => {
+      if (error) {
+        return res.status(500).json({
+          success: 0,
+          message: "Database connection error",
+        });
+      }
+
+      if (results?.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "no data",
+        });
+      }
+
+      return res.status(200).json({
+        success: 1,
+        data: results,
+      });
     });
   },
 };

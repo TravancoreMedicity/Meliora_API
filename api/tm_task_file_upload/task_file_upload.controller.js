@@ -144,12 +144,18 @@ module.exports = {
     //         });
     //     });
     // },
+
+
+
     getTaskFile: (req, res) => {
         const id = req.params.id;
-        const folderPath = path.join('D:/DocMeliora/Meliora/TaskManagement', id);
+
+
+        // const folderPath = path.join('D:/DocMeliora/Meliora/CRF/crf_registration', id);
+        const folderPath = `D:/DocMeliora/Meliora/TaskManagement/${id}`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -181,4 +187,6 @@ module.exports = {
             }
         });
     },
+
+
 }

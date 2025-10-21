@@ -287,15 +287,9 @@ const feedbackforms = require("./api/Feedback/Feedback.router");
 const backuptypemast = require("./api/it_backup_type_master/backup_type.router");
 const simOperators = require("./api/it_sim_operators/sim_operators.router");
 const notificationMenu = require("./api/notificationMenu/notification.router");
-const {
-  validateAccessToken,
-} = require("./api/tokenValidation/tokenValidation");
+const { validateAccessToken, } = require("./api/tokenValidation/tokenValidation");
 const AssetCondemnation = require("./api/am_condem_details/am_condem.router");
-// const backuptypemast = require('./api/it_backup_type_master/backup_type.router')
-// const simOperators = require('./api/it_sim_operators/sim_operators.router')
-
-// const condemApprovalLevel = require('./api/am_asset_condem_approval_level_mast/approval_level_mast.router')
-
+const condemApprovalLevel = require('./api/am_asset_condem_approval_level_mast/approval_level_mast.router')
 const { validateTokenFrontend } = require("./authentication/ValidationCheck");
 const crfDeliveryMarking = require("./api/crm_delivery_marking/delivery_marking_router");
 const companyMast = require("./api/crm_company_mast/company.router");
@@ -305,6 +299,7 @@ const amsAntibiotic = require("./api/ams_antibiotic/ams.router");
 const validateAuthentication = require("./api/validate_authentication/employeeData.router");
 const melioraDepMaster = require("./api/Meliora_department_master/meliora_dep_master.router");
 const ContractMaster = require("./api/contract_master/contract.router");
+const condemMasters = require('./api/am_condemnation_master/condem_master.router')
 
 
 app.use(express.json({ limit: "50mb" }));
@@ -483,7 +478,6 @@ app.use("/api/Amdashboard", Amdashboard);
 app.use("/api/Ticketdashboard", Ticketdashboard);
 app.use("/api/medvallet", med_vallet_master);
 app.use("/api/medvehilces", mv_vehicle_registration);
-app.use("/api/AssetCondemnation", AssetCondemnation);
 app.use("/api/backuptypemast", backuptypemast);
 app.use("/api/simOperators", simOperators);
 app.use("/api/notificationMenu", notificationMenu);
@@ -502,7 +496,8 @@ app.use("/api/amsAntibiotic", amsAntibiotic);
 app.use("/api/validateAuthentication", validateAuthentication);
 app.use("/api/melioraDepMaster", melioraDepMaster);
 app.use("/api/ContractMaster", ContractMaster);
-
+app.use('/api/condemApprovalLevel', condemApprovalLevel)
+app.use('/api/condemMasters', condemMasters)
 
 
 server.listen(

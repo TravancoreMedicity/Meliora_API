@@ -2,9 +2,8 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require("fs")
-const { AmcCmcImageUpdate, BillMstImageUpdate, LeaseMstImageUpdate, GaurenteeWarrentefileUpdate, CondemImageUpdate
-}
-    = require('../am_file_upload/am_fileupload.service');
+const { AmcCmcImageUpdate, BillMstImageUpdate, LeaseMstImageUpdate, GaurenteeWarrentefileUpdate, CondemImageUpdate}= require('../am_file_upload/am_fileupload.service');
+const archiver = require('archiver');
 const logger = require('../../logger/logger');
 
 const AmcCmcImagestorage = multer.diskStorage({
@@ -261,24 +260,70 @@ module.exports = {
         });
 
     },
+    // AmcCmcImageView: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/Asset/AMCCMC/${id}`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
+
+    // },
+
     AmcCmcImageView: (req, res) => {
-        const id = req.params.id
-        const folderPath = `D:/DocMeliora/Meliora/Asset/AMCCMC/${id}`;
-        fs.readdir(folderPath, (err, files) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
+    const id = req.params.id;
+    const folderPath = `D:/DocMeliora/Meliora/Asset/AMCCMC/${id}`;
+    const fs = require('fs');
+    const path = require('path');
+    const archiver = require('archiver');
+
+    fs.readdir(folderPath, (err, files) => {
+        if (err) {     
+            return res.status(200).json({
+                success: 0,
+                message: err.message,
+            });
+        }
+
+        if (!files || files.length === 0) {
             return res.status(200).json({
                 success: 1,
-                data: files
+                data: []
+            });
+        }
+
+        // Create ZIP archive and send response
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Content-Disposition', `attachment; filename="${id}.zip"`);
+        const archive = archiver('zip', { zlib: { level: 9 } });
+        archive.on('error', (archiveErr) => {         
+            return res.status(500).json({
+                success: 0,
+                message: archiveErr.message
             });
         });
 
-    },
+        archive.pipe(res);
+
+        // Keep original filenames (don’t rename)
+        files.forEach((filename) => {
+            const filePath = path.join(folderPath, filename);
+            archive.file(filePath, { name: filename });
+        });
+
+        archive.finalize();
+    });
+},
+
 
     BillMasterImage: (req, res) => {
 
@@ -329,28 +374,62 @@ module.exports = {
         });
 
     },
+
+    // BillMasterImageView: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/Asset/BillMaster/${id}`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
+    // },
+
+
     BillMasterImageView: (req, res) => {
-        const id = req.params.id
+        const id = req.params.id;
         const folderPath = `D:/DocMeliora/Meliora/Asset/BillMaster/${id}`;
         fs.readdir(folderPath, (err, files) => {
-            if (err) {
-                logger.logwindow(err)
+            if (err) {              
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-            });
+            else if (!files || files.length === 0) {           
+                return res.status(200).json({
+                    success: 1,
+                    data: [] 
+                });
+            }
+            else {              
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);         
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
-
     },
 
 
     GaurenteeWarrenteeFile: (req, res) => {
-
         GaurenteeWarrenteeFile(req, res, async (err) => {
             const body = req.body;
 
@@ -466,24 +545,61 @@ module.exports = {
         });
 
     },
-    LeaseMasterImageView: (req, res) => {
-        const id = req.params.id
-        const folderPath = `D:/DocMeliora/Meliora/Asset/LeaseMaster/${id}`;
-        fs.readdir(folderPath, (err, files) => {
-            if (err) {
-                logger.logwindow(err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                data: files
-            });
-        });
+    // LeaseMasterImageView: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/Asset/LeaseMaster/${id}`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
 
-    },
+    // },
+
+     LeaseMasterImageView: (req, res) => {
+            const id = req.params.id;
+            const folderPath = `D:/DocMeliora/Meliora/Asset/LeaseMaster/${id}`;
+            fs.readdir(folderPath, (err, files) => {
+                if (err) {                
+                    return res.status(200).json({
+                        success: 0,
+                        message: err.message,
+                    });
+                }
+                else if (!files || files.length === 0) {
+                    // No images found
+                    return res.status(200).json({
+                        success: 1,
+                        data: [] // or files if you prefer to return the empty array
+                    });
+                }
+                else {
+                    // Otherwise, create the ZIP archive and pipe it
+                    res.setHeader('Content-Type', 'application/zip');
+                    res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                    const archive = archiver('zip', { zlib: { level: 9 } });
+                    archive.on('error', (archiveErr) => {
+                        console.error('Archive error:', archiveErr);
+                        res.status(500).json({ success: 0, message: archiveErr.message });
+                    });
+                    archive.pipe(res);
+                    // Optionally, filter for image extensions only
+                    files.forEach((filename) => {
+                        const filePath = path.join(folderPath, filename);
+                        archive.file(filePath, { name: filename });
+                    });
+                    archive.finalize();
+                }
+            });
+        },
 
     uploadCondemFile: (req, res) => {
         uploadCondemFile(req, res, async (err) => {
@@ -535,31 +651,65 @@ module.exports = {
 
     },
 
+    
+ getCondemFile : (req, res) => {
+  const { id, detailId } = req.body;
 
-    getCondemFile: (req, res) => {
-        const { id, detailId } = req.body;
-        if (!id || !detailId) {
-            return res.status(400).json({
-                success: 0,
-                message: "Missing required fields: id and detailId",
-            });
-        }
-        const folderPath = `D:/DocMeliora/Meliora/AssetCondemDetails/${id}/${detailId}`;
-        fs.readdir(folderPath, (err, files) => {
-                     if (err) {
-                logger.logwindow(err);
-                return res.status(500).json({
-                    success: 0,
-                    message: "Error reading directory",
-                    error: err.message,
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                data: files,
-            });
-        });
-    },
+  if (!id || !detailId) {
+    return res.status(400).json({
+      success: 0,
+      message: 'Missing required fields: id and detailId',
+    });
+  }
 
+  const folderPath = `D:/DocMeliora/Meliora/AssetCondemDetails/${id}/${detailId}`;
+
+  fs.readdir(folderPath, (err, files) => {
+    if (err) {
+      logger.logwindow(err);
+      console.error('Error reading folder:', err);
+      return res.status(200).json({
+        success: 0,
+        message: err.message,
+      });
+    }
+
+    if (!files || files.length === 0) {
+      return res.status(200).json({
+        success: 1,
+        data: [],
+      });
+    }
+
+    // Stream ZIP response
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="Condemnation_${id}_${detailId}.zip"`
+    );
+
+    const archive = archiver('zip', { zlib: { level: 9 } });
+
+    archive.on('error', (archiveErr) => {
+      console.error('Archive error:', archiveErr);
+      res.status(500).json({
+        success: 0,
+        message: archiveErr.message,
+      });
+    });
+
+    archive.pipe(res);
+
+    files.forEach((filename) => {
+      const filePath = path.join(folderPath, filename);
+      archive.file(filePath, { name: filename });
+    });
+
+    archive.finalize();
+  });
+},
+
+
+    
 
 }

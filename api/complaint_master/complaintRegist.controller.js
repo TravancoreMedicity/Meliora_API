@@ -29,7 +29,7 @@ const expo = new Expo();
 
 module.exports = {
   complaintRegistInsert: (req, res) => {
-    // console.log(req.io)
+
     const body = req.body;
     //validate complaintdept Insert function
     const body_result = validateComplaintRegist.validate(body);
@@ -77,6 +77,7 @@ module.exports = {
               }
               const data = JSON.parse(JSON.stringify(result));
               if (data.length > 0) {
+
                 let emppushTokens = data?.map((val) => val.app_token);
 
                 // let somePushTokens = ['ExponentPushToken[9JbCJvDTrQ1DggVszGG6zk]'];

@@ -424,7 +424,7 @@ module.exports = {
   },
 
   AssistMultiple: (req, res) => {
-    const body = req.body;
+    const body = req.body; 
     var newList = body.map((val, index) => {
       return [
         val.complaint_slno,

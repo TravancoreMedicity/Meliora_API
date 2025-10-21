@@ -33,10 +33,10 @@ module.exports = {
             //         left join co_employee_master on co_employee_master.em_id=am_service_details.condm_transfr_emp
             //         left join am_item_map_details on am_item_map_details.am_spare_item_map_slno =am_spare_item_map_master.am_spare_item_map_slno
             //         left join am_condemnation_details on am_condemnation_details.am_spare_item_slno=am_spare_item_map_master.am_spare_item_map_slno                  
-            //         where am_custodian_dept_slno=? and spare_condamtn=1  and submited_condemnation=0 and spare_create_status=1
+            //         where am_custodian_dept_slno=? and spare_condamtn=1  and submited_condemnation = 0
             //         group by am_spare_item_map_slno                
             //         order by deleted_date desc`,
-            `		Select
+            `            		Select
                     am_service_details.condm_transfr_emp,
                     co_deptsec_mast.sec_name AS ticket_reg_location,
                     am_item_map_details.am_manufacture_no,
@@ -128,10 +128,10 @@ module.exports = {
             //         left join co_employee_master on co_employee_master.em_id=am_service_details.condm_transfr_emp
             //         left join am_item_map_details on am_item_map_details.am_Item_map_slno =am_asset_item_map_master.am_item_map_slno
             //         left join am_condemnation_details on am_condemnation_details.am_asset_item_slno=am_asset_item_map_master.am_item_map_slno                    
-            //         where am_custodian_dept_slno=? and asset_item_condmnation=1 and submited_condemnation=0 and item_create_status=1          
+            //         where am_custodian_dept_slno=? and asset_item_condmnation=1     and submited_condemnation=0           
             //         group by am_item_map_slno
             //         order by item_condm_date desc`,
-                   `select
+`select
                     category_name,
                     am_bill_amount,
                     am_item_map_details.am_manufacture_no,
@@ -179,7 +179,6 @@ module.exports = {
                     where am_custodian_dept_slno=? and asset_item_condmnation=1 and submited_condemnation = 0 and item_create_status=1          
                     group by am_item_map_slno
                     order by item_condm_date desc`,
-
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -193,8 +192,7 @@ module.exports = {
         pool.query(
 
             `SELECT 
-            am_spare_item_map_master.am_spare_item_map_slno,   
-            am_manufacture_no,             
+            am_spare_item_map_master.am_spare_item_map_slno,                
             hold_color,      
             am_bill_mastslno,
             am_bill_master.am_bill_no,
@@ -400,9 +398,7 @@ module.exports = {
             }
         );
     },
-
-
-        UpdateAssetCondemReport: (item) => {
+     UpdateAssetCondemReport: (item) => {
             return new Promise((resolve, reject) => {
                 const query = `
                     UPDATE am_asset_item_map_master
@@ -429,8 +425,4 @@ module.exports = {
                 });
             });
         },
-
-
-
-
 }

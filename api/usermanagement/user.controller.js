@@ -272,7 +272,6 @@ module.exports = {
             em_id,
             emp_no,
           } = userData;
-
           const validatingUserLogin = validateUserLoginCheck(
             password_validity,
             last_passwd_change_date,
@@ -327,20 +326,11 @@ module.exports = {
                       "yyyy-MM-dd HH:mm:ss"
                     ),
                     desg_name: userData.desg_name,
-                    // token: jsontoken,
-                    // user: results.emp_username,
-                    // emp_no: results.emp_no,
-                    // emp_id: results.em_id,
-                    // emp_name: results.em_name,
-                    // emp_sec: results.sec_name,
-                    // emp_secid: results.em_dept_section,
-                    // app_token: results.app_token,
-                    // emp_dept: results.em_department,
-                    // dept_name: results.dept_name,
-                    // logintime: results.login,
-                    // supervisor: results.supervisor,
-                    // logOutTime: format(addHours(new Date(results.login), logout_time), 'yyyy-MM-dd HH:mm:ss'),
-                    // desg_name: results.desg_name,
+                    section_incharge_name: userData.section_incharge_name,
+                    section_incharge_id: userData.section_incharge_id,
+                    section_hod_name: userData.section_hod_name,
+                    section_hod_id: userData.section_hod_id
+
                   };
 
                   userBasedInsertEliderToken({

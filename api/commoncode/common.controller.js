@@ -229,7 +229,7 @@ module.exports = {
         const id = req.params.id;
         inpatientList(id, (err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: err
@@ -325,7 +325,7 @@ module.exports = {
 
         getSerialno((err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: err
@@ -394,7 +394,7 @@ module.exports = {
         const id = req.params.id
         getDietpatient(id, (err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: err
@@ -577,7 +577,7 @@ module.exports = {
 
         getSerialnoEmpDetl((err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: err
@@ -744,7 +744,7 @@ module.exports = {
 
         getCompSerialno((err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: err
@@ -895,7 +895,7 @@ module.exports = {
 
         GetStaticUrl((err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: err
@@ -947,7 +947,7 @@ module.exports = {
     getconfig: (req, res) => {
         getconfig((err, results) => {
             if (err) {
-                logger.errorLogger(err)
+                // logger.errorLogger(err)
                 return res.status(200).json({
                     success: 0,
                     message: err

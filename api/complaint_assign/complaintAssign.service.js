@@ -1239,7 +1239,7 @@ module.exports = {
         );
     },
 
-    AssistReqEmployee: (data, callback) => {
+    AssistReqEmployee: (data, callback) => {      
         pool.query(
             `SELECT           
             cmcd.assigned_emp,

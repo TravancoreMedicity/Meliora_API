@@ -214,13 +214,11 @@ module.exports = {
                   message: err,
                 });
               }
-              //   console.log(result);
+           
               const data = JSON.parse(JSON.stringify(result));
               if (data.length > 0) {
-                // console.log(data);
-                let emppushTokens = data?.map((val) => val.app_token);
-                // let somePushTokens = ['ExponentPushToken[9JbCJvDTrQ1DggVszGG6zk]'];
-                // console.log(emppushTokens);
+             
+                let emppushTokens = data?.map((val) => val.app_token);      
                 if (Object.keys(emppushTokens).length > 0) {
                   let messages = [];
                   for (let pushToken of emppushTokens) {

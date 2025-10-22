@@ -126,30 +126,11 @@ module.exports = {
         });
     },
 
-
-    // getAssetServiceFile: (req, res) => {
-    //     const id = req.params.id
-    //     const folderPath = `D:/DocMeliora/Meliora/AssetService/${id}`;
-    //     fs.readdir(folderPath, (err, files) => {
-
-    //         if (err) {
-    //             return res.status(200).json({
-    //                 success: 0,
-    //                 message: err.message // Return the error message
-    //             });
-    //         }
-    //         return res.status(200).json({
-
-    //             success: 1,
-
-    //             data: files // Send the list of files
-    //         });
-    //     });
-    // },
-
 getAssetServiceFile: (req, res) => {
-
+  
      const id = req.params.id; 
+
+
      const folderPath = `D:/DocMeliora/Meliora/AssetService/${id}`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {           

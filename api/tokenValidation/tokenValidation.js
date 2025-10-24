@@ -34,7 +34,7 @@ module.exports = {
 
   validateAccessToken: (req, res) => {
     const token = req.cookies.accessToken;
-    // console.log(token, "token");
+ 
 
     if (!token) {
       return res

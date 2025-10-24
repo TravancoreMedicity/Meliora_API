@@ -105,8 +105,7 @@ module.exports = {
         const id = req.params.id;
         const folderPath = path.join('D:/DocMeliora/Meliora/AssetName/Category', id);
         fs.readdir(folderPath, (err, files) => {
-            if (err) {
-                // console.error(err);
+            if (err) {      
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -124,8 +123,7 @@ module.exports = {
                 res.setHeader('Content-Type', 'application/zip');
                 res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
                 const archive = archiver('zip', { zlib: { level: 9 } });
-                archive.on('error', (archiveErr) => {
-                    console.error('Archive error:', archiveErr);
+                archive.on('error', (archiveErr) => {            
                     res.status(500).json({ success: 0, message: archiveErr.message });
                 });
                 archive.pipe(res);

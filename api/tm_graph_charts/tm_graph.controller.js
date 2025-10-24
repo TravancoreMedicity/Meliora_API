@@ -211,8 +211,7 @@ module.exports = {
                     res.setHeader('Content-Type', 'application/zip');
                     res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
                     const archive = archiver('zip', { zlib: { level: 9 } });
-                    archive.on('error', (archiveErr) => {
-                        console.error('Archive error:', archiveErr);
+                    archive.on('error', (archiveErr) => {         
                         res.status(500).json({ success: 0, message: archiveErr.message });
                     });
                     archive.pipe(res);

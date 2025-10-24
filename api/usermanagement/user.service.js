@@ -247,21 +247,6 @@ module.exports = {
     );
   },
 
-  // userBasedInsertEliderToken: (data, callBack) => {
-  //   pool.query(
-  //     `INSERT INTO co_token( Elider_token,Elider_Id)  VALUES(?,?)`,
-  //     [data.Elider_token, data.Elider_Id],
-  //     (error, results, fields) => {
-  //       console.log(error);
-
-  //       if (error) {
-
-  //         return callBack(error);
-  //       }
-  //       return callBack(null, results);
-  //     }
-  //   );
-  // },
   userBasedInsertEliderToken: (data, callBack) => {
     pool.query(
       `SELECT * FROM co_token WHERE token_slno = 1`,

@@ -226,30 +226,12 @@ module.exports = {
     },
 
 
-
-    // getMonthlyBillImages: (req, res) => {
-    //     const id = req.params.id
-    //     const folderPath = `D:/DocMeliora/Meliora/Bills/MonthlyBill/${id}`;
-    //     fs.readdir(folderPath, (err, files) => {
-    //         if (err) {
-    //             return res.status(200).json({
-    //                 success: 0,
-    //                 message: err.message // Return the error message
-    //             });
-    //         }
-    //         return res.status(200).json({
-    //             success: 1,
-    //             data: files // Send the list of files
-    //         });
-    //     });
-    // },
-
     getMonthlyBillImages: (req, res) => {
         const id = req.params.id;
         const folderPath = `D:/DocMeliora/Meliora/Bills/MonthlyBill/${id}`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+   
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -268,7 +250,7 @@ module.exports = {
                 res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
                 const archive = archiver('zip', { zlib: { level: 9 } });
                 archive.on('error', (archiveErr) => {
-                    console.error('Archive error:', archiveErr);
+                 
                     res.status(500).json({ success: 0, message: archiveErr.message });
                 });
                 archive.pipe(res);
@@ -308,7 +290,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/Bills/QuarterlyBill/${id}`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+           
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -327,7 +309,7 @@ module.exports = {
                 res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
                 const archive = archiver('zip', { zlib: { level: 9 } });
                 archive.on('error', (archiveErr) => {
-                    console.error('Archive error:', archiveErr);
+              
                     res.status(500).json({ success: 0, message: archiveErr.message });
                 });
                 archive.pipe(res);
@@ -340,24 +322,6 @@ module.exports = {
             }
         });
     },
-
-
-    // getYearlyBillImages: (req, res) => {
-    //     const id = req.params.id
-    //     const folderPath = `D:/DocMeliora/Meliora/Bills/YearlyBill/${id}`;
-    //     fs.readdir(folderPath, (err, files) => {
-    //         if (err) {
-    //             return res.status(200).json({
-    //                 success: 0,
-    //                 message: err.message // Return the error message
-    //             });
-    //         }
-    //         return res.status(200).json({
-    //             success: 1,
-    //             data: files // Send the list of files
-    //         });
-    //     });
-    // },
 
 
 
@@ -366,7 +330,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/Bills/YearlyBill/${id}`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+   
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -384,8 +348,7 @@ module.exports = {
                 res.setHeader('Content-Type', 'application/zip');
                 res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
                 const archive = archiver('zip', { zlib: { level: 9 } });
-                archive.on('error', (archiveErr) => {
-                    console.error('Archive error:', archiveErr);
+                archive.on('error', (archiveErr) => {     
                     res.status(500).json({ success: 0, message: archiveErr.message });
                 });
                 archive.pipe(res);
@@ -399,30 +362,13 @@ module.exports = {
         });
     },
 
-    // getOtherBillImages: (req, res) => {
-    //     const id = req.params.id
-    //     const folderPath = `D:/DocMeliora/Meliora/Bills/OtherBill/${id}`;
-    //     fs.readdir(folderPath, (err, files) => {
-
-    //         if (err) {
-    //             return res.status(200).json({
-    //                 success: 0,
-    //                 message: err.message // Return the error message
-    //             });
-    //         }
-    //         return res.status(200).json({
-    //             success: 1,
-    //             data: files // Send the list of files
-    //         });
-    //     });
-    // },
-
+    
     getOtherBillImages: (req, res) => {
         const id = req.params.id;
         const folderPath = `D:/DocMeliora/Meliora/Bills/OtherBill/${id}`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+             
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -440,8 +386,7 @@ module.exports = {
                 res.setHeader('Content-Type', 'application/zip');
                 res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
                 const archive = archiver('zip', { zlib: { level: 9 } });
-                archive.on('error', (archiveErr) => {
-                    console.error('Archive error:', archiveErr);
+                archive.on('error', (archiveErr) => {           
                     res.status(500).json({ success: 0, message: archiveErr.message });
                 });
                 archive.pipe(res);

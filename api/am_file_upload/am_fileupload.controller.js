@@ -415,7 +415,7 @@ module.exports = {
                 res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
                 const archive = archiver('zip', { zlib: { level: 9 } });
                 archive.on('error', (archiveErr) => {
-                    console.error('Archive error:', archiveErr);
+             
                     res.status(500).json({ success: 0, message: archiveErr.message });
                 });
                 archive.pipe(res);         
@@ -587,7 +587,7 @@ module.exports = {
                     res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
                     const archive = archiver('zip', { zlib: { level: 9 } });
                     archive.on('error', (archiveErr) => {
-                        console.error('Archive error:', archiveErr);
+                 
                         res.status(500).json({ success: 0, message: archiveErr.message });
                     });
                     archive.pipe(res);
@@ -667,7 +667,7 @@ module.exports = {
   fs.readdir(folderPath, (err, files) => {
     if (err) {
       logger.logwindow(err);
-      console.error('Error reading folder:', err);
+
       return res.status(200).json({
         success: 0,
         message: err.message,
@@ -687,11 +687,8 @@ module.exports = {
       'Content-Disposition',
       `attachment; filename="Condemnation_${id}_${detailId}.zip"`
     );
-
     const archive = archiver('zip', { zlib: { level: 9 } });
-
     archive.on('error', (archiveErr) => {
-      console.error('Archive error:', archiveErr);
       res.status(500).json({
         success: 0,
         message: archiveErr.message,

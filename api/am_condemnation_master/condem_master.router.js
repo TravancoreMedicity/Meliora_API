@@ -2,7 +2,8 @@ const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { CategoryInsert, CategoryView, CategoryUpdate,ScrapYardInsert,ScrapYardView,ScrapYardUpdate,QualityInsert,QualityView,QualityUpdate,QuantityUnitInsert,QuantityUnitView,
     QuantityUnitUpdate,SupplierRateInsert,SupplierRateView,SupplierRateUpdate,getActiveCategory,getActiveQuality,getActiveQuantity,getSelectedSupplierRates,getActiveScarpLocation,
-    scraplevelInsert,getScraplevels,getScraplevelUpdate,getScrapActivelevels,getEmployeeScrapLevel,getScrapActiveToplevel,getscrapItemRateDetail} = require('./condem_master.controller');
+    scraplevelInsert,getScraplevels,getScraplevelUpdate,getScrapActivelevels,getEmployeeScrapLevel,getScrapActiveToplevel,getscrapItemRateDetail,
+RemoveItemFromCategorized,RemoveAddedItemFromCategorized} = require('./condem_master.controller');
 
 router.post('/CategoryInsert', checkToken, CategoryInsert)
 router.get('/categoryView', checkToken, CategoryView)
@@ -30,11 +31,14 @@ router.post('/scraplevelInsert', checkToken, scraplevelInsert)
 router.get('/getScraplevels', checkToken, getScraplevels)
 router.patch('/scraplevelUpdate', checkToken, getScraplevelUpdate)
 router.get('/getScrapActivelevels', checkToken, getScrapActivelevels)
-
 router.get("/getEmployeeScrapLevel/:id", checkToken, getEmployeeScrapLevel)
 router.get('/getScrapActiveToplevel', checkToken, getScrapActiveToplevel)
-
 router.post("/getscrapItemRateDetail", checkToken, getscrapItemRateDetail);
+
+router.patch('/RemoveItemFromCategorized', checkToken, RemoveItemFromCategorized)
+router.patch('/RemoveAddedItemFromCategorized', checkToken, RemoveAddedItemFromCategorized)
+
+
 
 
 module.exports = router

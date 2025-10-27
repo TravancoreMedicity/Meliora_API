@@ -5,7 +5,9 @@ const { CategoryInsert, CategoryView, CategoryUpdate ,ScrapYardInsert,ScrapYardV
     getScraplevels,getScraplevelUpdate,getScrapActivelevels,
     getEmployeeScrapLevel,
     getScrapActiveToplevel,
-    getscrapItemRateDetail
+    getscrapItemRateDetail,
+    RemoveAddedItemFromCategorized,
+    RemoveItemFromCategorized
     
 } = require('./condem_master.service')
 module.exports = {
@@ -582,5 +584,52 @@ getScrapActiveToplevel: (req, res) => {
             })
         })
     },
+
+        RemoveItemFromCategorized: (req, res) => {
+            const body = req.body;              
+            RemoveItemFromCategorized(body, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    })
+                }
+                if (results === 0) {
+                    return res.status(200).json({
+                        success: 1,
+                        message: "No record found"
+    
+                    })
+                }
+                return res.status(200).json({
+                    success: 2,
+                    message: "Remove Item From Category"
+                })
+            })
+        },
+        
+        RemoveAddedItemFromCategorized: (req, res) => {
+            const body = req.body;    
+            RemoveAddedItemFromCategorized(body, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    })
+                }
+                if (results === 0) {
+                    return res.status(200).json({
+                        success: 1,
+                        message: "No record found"
+    
+                    })
+                }
+                return res.status(200).json({
+                    success: 2,
+                    message: "Remove Item From Category"
+                })
+            })
+        },
+        
 
 }

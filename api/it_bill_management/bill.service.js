@@ -184,7 +184,8 @@ module.exports = {
             supplier_details,
             it_supplier_name,
             payed_status,            
-            bill_description
+            bill_description,
+            bill_active_status
             FROM it_other_bills
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_other_bills.bill_category
             left join it_bill_supplier_details_mast on it_bill_supplier_details_mast.it_supplier_slno=it_other_bills.supplier_details`
@@ -211,7 +212,8 @@ module.exports = {
             bill_description=?,
             am_item_map_slno=?,
             supplier_details=?,
-            edit_user=?
+            edit_user=?,
+            bill_active_status=?
  			WHERE 
              other_bill_slno=?`,
             [
@@ -227,6 +229,7 @@ module.exports = {
                 data.am_item_map_slno,
                 data.supplier_details,
                 data.edit_user,
+                data.bill_active_status,
                 data.other_bill_slno
             ],
             (error, results, feilds) => {
@@ -510,7 +513,8 @@ module.exports = {
             FROM it_other_bills
             left join it_bill_category_mast on it_bill_category_mast.it_bill_category_slno=it_other_bills.bill_category
             left join it_bill_type_mast on it_bill_type_mast.it_bill_type_slno=it_bill_category_mast.it_bill_type_slno
-            where (payed_status is null || payed_status=0)and (it_bill_type_mast.it_bill_type_slno=3)`
+            where (payed_status is null || payed_status=0)and (it_bill_type_mast.it_bill_type_slno=3)
+            and bill_active_status=1`
             , [],
             (error, results, feilds) => {
                 if (error) {

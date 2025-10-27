@@ -692,6 +692,59 @@ module.exports = {
         );
     },
 
+
+    RemoveItemFromCategorized: (data, callback) => {
+    pool.query(
+        `UPDATE am_condemnation_details SET                   
+            scrap_category = ?, 
+            scrap_quality = ?, 
+            scrap_yard = ?, 
+            scarp_categorize = ?
+        WHERE 
+            am_condem_detail_slno = ?`,
+        [
+            data.scrap_category,
+            data.scrap_quality,
+            data.scrap_yard,
+            data.scarp_categorize,
+            data.am_condem_detail_slno
+        ],
+        (error, results, fields) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        }
+    );
+},
+
+
+      RemoveAddedItemFromCategorized: (data, callback) => {
+             pool.query(
+            `UPDATE am_condemnation_added_items SET                   
+            scrap_category=?,
+            scrap_quality=?,
+            scrap_yard=?,
+            scarp_categorize=?
+            WHERE 
+            item_slno=?`,
+            [
+                data.scrap_category,
+                data.scrap_quality,
+                data.scrap_yard,
+                data.scarp_categorize,
+                data.item_slno
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
 }
 
 

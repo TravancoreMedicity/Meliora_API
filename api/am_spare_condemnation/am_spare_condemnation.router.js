@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
-const { CondemnationList, ServiceList, pmDueOverList, AssetServiceList, getAssetCondemnationList,submitCondemReport } = require('../am_spare_condemnation/am_spare_condemnation.controller')
+const { CondemnationList, ServiceList, pmDueOverList, AssetServiceList, getAssetCondemnationList ,submitCondemReport} = require('../am_spare_condemnation/am_spare_condemnation.controller')
 
 
 router.get("/ServiceList/:id", checkToken, ServiceList)
@@ -11,6 +11,5 @@ router.get("/getAssetCondemnationList/:id", checkToken, getAssetCondemnationList
 
 
 router.patch("/submitCondemReport", checkToken, submitCondemReport)
-
 
 module.exports = router

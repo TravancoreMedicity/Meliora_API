@@ -6,7 +6,7 @@ const { getEmployeeID, getMenuBasedRights, getModuleGroupByID, getSubModuleRight
     getproceedcount, getNewOrderCount, getDietpatient, getNurstation, getDietMenu, getLoginProfile,
     getDashboardRights, getEmployeedeptSec, getfloor, getnurstationbyfloor,
     updatemobapprequired, getMobileAppStatusCredential, getdeptSecInchhod, manualEmpList,
-    getCompSerialno, getCrfDept, getDeptType, getdeptHoddeptsec, getdeptInchargedeptsec
+    getCompSerialno, getCrfDept, getDeptType, getdeptHoddeptsec, getdeptInchargedeptsec, InsertStaticUrl, GetStaticUrl, getconfig, UpdateStaticUrl
 } = require('../commoncode/common.controller');
 
 router.get("/getempid/:id", checkToken, getEmployeeID)
@@ -51,5 +51,13 @@ router.get("/deptType/:id", checkToken, getDeptType)
 router.get("/getdeptHoddeptsec/:id", checkToken, getdeptHoddeptsec)
 
 router.get("/getdeptInchargedeptsec/:id", checkToken, getdeptInchargedeptsec)
+
+
+//static url api
+router.post("/StaticUrl", checkToken, InsertStaticUrl)
+router.get('/view', checkToken, GetStaticUrl)
+router.post("/updateurl", checkToken, UpdateStaticUrl)
+router.get("/config", getconfig);
+
 
 module.exports = router;

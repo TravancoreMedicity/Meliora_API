@@ -1,5 +1,5 @@
-const { checkInsertVal, AuthoriztnInsertData, AuthorizationGets, AuthUpdateData,
-    getDeptSeconId, getDeptSeconIncharge, getDeptSeconHod, getDeptSeconHodbyDep } = require("../co_inchhod_authriztn/inchod_authoriztn.service")
+const { checkInsertVal, AuthoriztnInsertData, AuthorizationGets, AuthUpdateData, AuthorizationMelGets, AuthUpdateMelData,
+    getDeptSeconId, getDeptSeconIncharge, getDeptSeconHod, getDeptSeconHodbyDep, AuthoriztnInsertMelData, checkInsertValMel } = require("../co_inchhod_authriztn/inchod_authoriztn.service")
 const logger = require('../../logger/logger')
 
 module.exports = {
@@ -174,4 +174,78 @@ module.exports = {
             });
         });
     },
+
+
+
+    AuthoriztnInsertMelData: (req, res) => {
+        const body = req.body;
+        checkInsertValMel(body, (err, results) => {
+            const value = JSON.parse(JSON.stringify(results));
+            if (Object.keys(value).length === 0) {
+                AuthoriztnInsertMelData(body, (err, result) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Authorization Assign successfully"
+                    })
+                })
+            }
+            else {
+                logger.infologwindow("Diet Name Already Exist")
+                return res.status(200).json({
+                    success: 7,
+                    message: "Authorization Assigned selected deptsection"
+                })
+            }
+        })
+    },
+    AuthorizationMelGets: (req, res) => {
+        AuthorizationMelGets((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "No results found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    AuthUpdateMelData: (req, res) => {
+        const body = req.body;
+        AuthUpdateMelData(body, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("Record Not Found")
+                return res.status(400).json({
+                    success: 1,
+                    message: "Record Not Found"
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Authorization Assigned Deleted "
+            })
+        })
+    },
+
 }

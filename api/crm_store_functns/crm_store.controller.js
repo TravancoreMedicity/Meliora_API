@@ -222,15 +222,7 @@ module.exports = {
         UpdateStoreReceive(body).then(results => {
             const { store_receive_user, store_receive_date } = body[0]
             if (results) {
-                // const newArray = body?.map((val) => {
-                //     return {
-                //         store_receive: val.store_recieve === null ? 0 : val.store_recieve === 0 ? 0 : val.store_recieve,
-                //         store_receive_user: val.store_recieve === 1 ? val.store_receive_user : null,
-                //         store_receive_date: val.store_recieve === 1 ? val.store_receive_date : null,
-                //         crm_purchase_slno: val.crm_purchase_slno
-                //     }
-                // })
-                // console.log(newArray, "newArray");
+ 
                 const groupedData = {};
 
                 body.forEach(item => {

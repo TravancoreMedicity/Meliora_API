@@ -184,5 +184,91 @@ module.exports = {
         )
 
     },
+    AuthoriztnInsertMelData: (data, callBack) => {
+        pool.query(
+            `INSERT INTO meliora_authorization
+            (
+                mel_dept_section,
+                mel_auth_post,
+                mel_dept_section_post,
+                emp_id,
+                mel_auth_status,
+                create_user
+               ) 
+                VALUES(?,?,?,?,?,?)`,
+            [
+                data.dept_section,
+                data.auth_post,
+                data.dept_section_post,
+                data.emp_id,
+                1,
+                data.create_user
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    checkInsertValMel: (data, callBack) => {
+        pool.query(
+            `SELECT 
+            mel_dept_section
+            FROM meliora_authorization
+            WHERE mel_dept_section=? and mel_auth_post=? and mel_auth_status=1`,
+            [
+                data.dept_section,
+                data.auth_post
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    AuthorizationMelGets: (callback) => {
+        pool.query(
+            `SELECT mel_authorization_slno,
+            mel_dept_section,mel_auth_post,mel_dept_section_post,emp_id,
+            AD.sec_name as auth_deptsec,
+            co_employee_master.em_name as employee,
+               ED.sec_name as emp_deptsec,
+              if(mel_auth_post = 1 ,'Incharge','HOD') postauth
+            FROM meliora_authorization
+                        left join co_employee_master on co_employee_master.em_id=meliora_authorization.emp_id
+            left join co_deptsec_mast AD on AD.sec_id=meliora_authorization.mel_dept_section
+            left join co_deptsec_mast ED on ED.sec_id=meliora_authorization.mel_dept_section_post
+            where mel_auth_status=1`,
+            [],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 
+    AuthUpdateMelData: (data, callback) => {
+        pool.query(
+            `UPDATE meliora_authorization 
+            SET mel_auth_status=0,
+            delete_user=?            
+            WHERE mel_authorization_slno=? `,
+            [
+                data.delete_user,
+                data.authorization_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 }

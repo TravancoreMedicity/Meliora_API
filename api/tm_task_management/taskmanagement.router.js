@@ -4,7 +4,7 @@ const { CreateTaskInsert, CreateTaskDetailInsert, CreateTaskView, CreateSubTaskI
     MasterEmpByid, UpdateMasterTask, UpdateSubTask, SubtaskviewByidForEdit, MasterTaskviewByidForEdit, employeeInactive, DeptSearch, ProgressInsert,
     ProjectInsert, ProjectView, ProjectUpdate, GoalDeptInsert, GoalDeptUpdate, ProjectDeptView, ProjectDeptSearch, ProgressView, getAllDueDates,
     GoalDeptSearch, ProgressUpdate, SubProgressView, SearchProjectAndEmployee, AllTaskListProjectz, getAllGoals, getDeptGoals, getDeptProjects, subtaskUnderdepSec,
-    getAllEmpUnderdept
+    getAllEmpUnderdept,getAllCompletedTask
 
 } = require('../tm_task_management/taskmanagement.controller');
 
@@ -28,7 +28,6 @@ router.post('/insertSubtaskDetail', checkToken, CreateTaskSubTaskDetailInsert)
 router.post("/employeeInactive", checkToken, employeeInactive);
 
 router.get('/viewDeptProject/:id', checkToken, ProjectDeptView)
-
 router.post('/insertDeptGoal', checkToken, GoalDeptInsert)
 router.patch('/updateDeptGoal', checkToken, GoalDeptUpdate)
 router.get('/getAllGoals', checkToken, getAllGoals);
@@ -49,9 +48,10 @@ router.get('/getAllDueDates/:id', checkToken, getAllDueDates)
 router.post('/allTaskListProjectz', checkToken, AllTaskListProjectz)
 
 router.get('/subtaskviewByid/:id', checkToken, SubTaskviewByid)
-
 router.post('/subtaskUnderdepSec', checkToken, subtaskUnderdepSec)
-
 router.get('/getAllEmpUnderdept/:id', checkToken, getAllEmpUnderdept)
+
+router.post("/getAllCompletedTasks", checkToken, getAllCompletedTask)
+
 
 module.exports = router

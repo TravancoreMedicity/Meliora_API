@@ -12,7 +12,7 @@ module.exports = {
                  crm_request_master
               LEFT JOIN crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
              WHERE
-              (incharge_approve=1 || incharge_approve is null) AND user_acknldge is null AND crf_close is null 
+               user_acknldge is null AND crf_close is null and  (req_status!='R' and req_status!='P' OR req_status is null) AND internally_arranged_status =0
             GROUP BY crm_request_master.req_slno
             ORDER BY crm_request_master.req_slno DESC `,
             [],

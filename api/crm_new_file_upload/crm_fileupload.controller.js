@@ -9,6 +9,7 @@ const { CrfImageStatusUpdate, CrfDataColectionImageStatusUpdate, ImageInsertHODS
     = require('../crm_new_file_upload/crm_fileupload.service');
 const logger = require('../../logger/logger');
 const sanitize = require('sanitize-filename');
+const archiver = require('archiver');
 
 const crfRegisterstorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -680,25 +681,63 @@ module.exports = {
 
 
     // for getting the file
+    // crfRegimageGet: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+
+    //         });
+    //     });
+
+    // },
     crfRegimageGet: (req, res) => {
-        const id = req.params.id
-        const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}`;
+        const id = req.params.id;
+        const folderPath = path.join('D:/DocMeliora/Meliora/CRF/crf_registration', id);
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                logger.logwindow(err)
+                console.error(err);
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
-
     },
+
 
 
     crfDataCollection: (req, res) => {
@@ -750,41 +789,120 @@ module.exports = {
         });
 
     },
+    // crfManageImageGet: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/KMCMeliora/CRF/crf_registration/${id}/ManageUpload`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
+
+    // },
+
     crfManageImageGet: (req, res) => {
-        const id = req.params.id
+        const id = req.params.id;
         const folderPath = `D:/DocMeliora/KMCMeliora/CRF/crf_registration/${id}/ManageUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                logger.logwindow(err)
+                console.error(err);
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
-
     },
+
+    // getDataCollectionImage: (req, res) => {
+    //     const reqslno = req.body.req_slno
+    //     const datacollslno = req.body.crf_data_collect_slno
+    //     const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${reqslno}/datacollection/${datacollslno}`;
+    //     fs.readdir(folderPath, (err, files) => {
+
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
+    // },
+
+
     getDataCollectionImage: (req, res) => {
         const reqslno = req.body.req_slno
         const datacollslno = req.body.crf_data_collect_slno
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${reqslno}/datacollection/${datacollslno}`;
         fs.readdir(folderPath, (err, files) => {
-
             if (err) {
-                logger.logwindow(err)
+                console.error(err);
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${datacollslno}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
     },
 
@@ -1294,157 +1412,466 @@ module.exports = {
 
     },
     // for getting HOD Upload file the file
+    // crfHodImageGet: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/HodUpload`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
+
+    // },
+
     crfHodImageGet: (req, res) => {
-        const id = req.params.id
+        const id = req.params.id;
+        // const folderPath = path.join('D:/DocMeliora/Meliora/CRF/crf_registration', id);
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/HodUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                logger.logwindow(err)
+                console.error(err);
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
-
     },
 
+    // crfDMSImageGet: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/DMSUpload`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
+
+    // },
+
     crfDMSImageGet: (req, res) => {
-        const id = req.params.id
+        const id = req.params.id;
+        // const folderPath = path.join('D:/DocMeliora/Meliora/CRF/crf_registration', id);
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/DMSUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                logger.logwindow(err)
+                console.error(err);
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
-
     },
 
+    // crfMSImageGet: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/MSUpload`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
+
+    // },
     crfMSImageGet: (req, res) => {
-        const id = req.params.id
+        const id = req.params.id;
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/MSUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                logger.logwindow(err)
+                console.error(err);
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
-
     },
 
+    // crfMOImageGet: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/MOUpload`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
+
+    // },
+
     crfMOImageGet: (req, res) => {
-        const id = req.params.id
+        const id = req.params.id;
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/MOUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                logger.logwindow(err)
+                console.error(err);
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
-
     },
 
+    // crfSMOImageGet: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/SMOUpload`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
+
+    // },
+
     crfSMOImageGet: (req, res) => {
-        const id = req.params.id
+        const id = req.params.id;
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/SMOUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                logger.logwindow(err)
+                console.error(err);
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
-
     },
 
+    // crfGMImageGet: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/GMUpload`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
+
+    // },
+
+
+
     crfGMImageGet: (req, res) => {
-        const id = req.params.id
+        const id = req.params.id;
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/GMUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                logger.logwindow(err)
+                console.error(err);
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
-
     },
 
+    // crfMDImageGet: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/MDUpload`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
+
+    // },
+
     crfMDImageGet: (req, res) => {
-        const id = req.params.id
+        const id = req.params.id;
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/MDUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                logger.logwindow(err)
+                console.error(err);
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
-
     },
 
+
+    // crfEDImageGet: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/EDUpload`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
+
+    // },
     crfEDImageGet: (req, res) => {
-        const id = req.params.id
+        const id = req.params.id;
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/EDUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                logger.logwindow(err)
+                console.error(err);
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
-
     },
+
+
 
     crfManageImageGet: (req, res) => {
         const id = req.params.id
@@ -1510,62 +1937,545 @@ module.exports = {
         });
 
     },
+    // crfDMimageGet: (req, res) => {
+    //     // const id = req.params.id
+    //     const baseDirectory = 'D:/DocMeliora/Meliora/CRF/DeliveryMarking/';
+    //     const id = sanitize(req.params.id);
+    //     const folderPath = path.resolve(baseDirectory, id);
+    //     // const folderPath = `D:/DocMeliora/Meliora/CRF/DeliveryMarking/${id}`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+
+    //         });
+    //     });
+
+    // },
+
     crfDMimageGet: (req, res) => {
-        // const id = req.params.id
+        // const id = req.params.id;
         const baseDirectory = 'D:/DocMeliora/Meliora/CRF/DeliveryMarking/';
         const id = sanitize(req.params.id);
         const folderPath = path.resolve(baseDirectory, id);
-        // const folderPath = `D:/DocMeliora/Meliora/CRF/DeliveryMarking/${id}`;
+        // const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/EDUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                logger.logwindow(err)
+                console.error(err);
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
-
     },
+    // crfNabhImageGet: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/fileshows/HOSPITAL MANUAL`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
+
+    // },
     crfNabhImageGet: (req, res) => {
-        const id = req.params.id
         const folderPath = `D:/DocMeliora/Meliora/fileshows/HOSPITAL MANUAL`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                logger.logwindow(err)
+                console.error(err);
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
-
     },
+
+    // crfNabhGuidImageGet: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/fileshows/STANDARD TREATMENT GUIDLINE`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             logger.logwindow(err)
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files
+    //         });
+    //     });
+
+    // },
+
+
     crfNabhGuidImageGet: (req, res) => {
-        const id = req.params.id
         const folderPath = `D:/DocMeliora/Meliora/fileshows/STANDARD TREATMENT GUIDLINE`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                logger.logwindow(err)
+                console.error(err);
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
+    },
 
+
+    GetEmployeeGuide: (req, res) => {
+        const folderPath = `D:/DocMeliora/Meliora/fileshows/Employee Guide`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                console.error(err);
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message,
+                });
+            }
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
+        });
+    },
+
+    GetSoundAlike: (req, res) => {
+        const folderPath = `D:/DocMeliora/Meliora/fileshows/Sound Alike Drugs`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                console.error(err);
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message,
+                });
+            }
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
+        });
+    },
+    GetSradhaPolicy: (req, res) => {
+        const folderPath = `D:/DocMeliora/Meliora/fileshows/Saradha Policy`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                console.error(err);
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message,
+                });
+            }
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
+        });
+    },
+
+    GetMSDS: (req, res) => {
+        const folderPath = `D:/DocMeliora/Meliora/fileshows/MSDS`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                console.error(err);
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message,
+                });
+            }
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
+        });
+    },
+
+
+    GetMEDF: (req, res) => {
+        const folderPath = `D:/DocMeliora/Meliora/fileshows/MEDF`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                console.error(err);
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message,
+                });
+            }
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
+        });
+    },
+    GetAbbreviation: (req, res) => {
+        const folderPath = `D:/DocMeliora/Meliora/fileshows/Abbrevation`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                console.error(err);
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message,
+                });
+            }
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
+        });
+    },
+
+    GetFridge: (req, res) => {
+        const folderPath = `D:/DocMeliora/Meliora/fileshows/Fridge Medicines`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                console.error(err);
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message,
+                });
+            }
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
+        });
+    },
+    GetHighRisk: (req, res) => {
+        const folderPath = `D:/DocMeliora/Meliora/fileshows/High Risk Drugs`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                console.error(err);
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message,
+                });
+            }
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
+        });
+    },
+    GetLookAlike: (req, res) => {
+        const folderPath = `D:/DocMeliora/Meliora/fileshows/Look Alike`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                console.error(err);
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message,
+                });
+            }
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
+        });
+    },
+    GetPsychotropic: (req, res) => {
+        const folderPath = `D:/DocMeliora/Meliora/fileshows/Psychotropic Drugs`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                console.error(err);
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message,
+                });
+            }
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
+        });
     },
 }

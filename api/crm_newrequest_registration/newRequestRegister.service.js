@@ -658,6 +658,7 @@ module.exports = {
 
     getAllPendingApprovalsAboveHOD: (sql, params, callback) => {
         pool.query(sql, params, (error, results) => {
+
             if (error) {
                 return callback(error);
             }
@@ -750,7 +751,7 @@ module.exports = {
                 LEFT JOIN co_employee_master GM on GM.em_id=crm_request_approval.gm_user
                 LEFT JOIN co_employee_master ED on ED.em_id=crm_request_approval.ed_user
                 LEFT JOIN co_employee_master MD on MD.em_id=crm_request_approval.md_user
-                  LEFT JOIN co_employee_master MAD on MAD.em_id=crm_request_approval.managing_director_user
+                LEFT JOIN co_employee_master MAD on MAD.em_id=crm_request_approval.managing_director_user
                 LEFT JOIN co_employee_master PA ON PA.em_id=crm_purchase_mast.create_user
                 LEFT JOIN co_employee_master QC ON QC.em_id=crm_purchase_mast.quatation_calling_user
                 LEFT JOIN co_employee_master QN On QN.em_id=crm_purchase_mast.quatation_negotiation_user
@@ -1770,5 +1771,17 @@ LEFT JOIN co_employee_master em_incharge
                 return callback(null, results);
             }
         );
+    },
+
+
+
+    getAllPendingApprovalsMainAboveHOD: (sql, params, callback) => {
+        pool.query(sql, params, (error, results) => {
+
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
     },
 }

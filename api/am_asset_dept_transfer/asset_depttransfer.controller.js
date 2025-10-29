@@ -1,9 +1,10 @@
 const { pool } = require('../../config/database');
 const logger = require('../../logger/logger')
-const { getAssetBasedOnLocation, transferDepartment, getTransferHistory, updateTransLog, getAssetLocationDetails, getArrayOfAssetLocationDetails,
-    // CustodianAssetTransfer,
-    InsertTransferMaster, InsertTransferDetails, UpdateAssetData, getcustodianTransferhistory, getTransferDetail, getAssetOnSection
-} = require('../am_asset_dept_transfer/asset_depttransfer.service');
+const { getAssetBasedOnLocation, transferDepartment, getTransferHistory, updateTransLog, getAssetLocationDetails, getArrayOfAssetLocationDetails, InsertTransferMaster, 
+    InsertTransferDetails, UpdateAssetData, getcustodianTransferhistory, getTransferDetail, getAssetOnSection,getAssetUnderCustodian,getSpareUnderCustodian,
+    TransferAssetUnderCustodian, insertCustodianTransferItems,
+    insertCustodianTransferLog,
+    TransferSpareUnderCustodian} = require('../am_asset_dept_transfer/asset_depttransfer.service');
 
 module.exports = {
 
@@ -724,6 +725,394 @@ module.exports = {
             });
         })
     },
+getAssetUnderCustodian: (req, res) => {
+     const {
+        category,
+        subcategory,
+        group,
+        subgroup,
+        model,
+        submodel,
+        manufacture,
+        modelNumber,
+        itemName,
+        itemNumber,
+        custoDian  
+    } = req.body;
+
+    let sql = `
+         SELECT
+            item_name,
+            am_item_map_slno,
+            am_item_name_creation.item_creation_slno,
+            item_deptsec_slno,
+            am_custodian_department.am_custodian_name,
+            am_item_name_creation.item_name,
+            item_asset_no as item_prefix,
+            item_asset_no_only as item_suffix,
+            category_name
+        FROM am_asset_item_map_master
+        LEFT JOIN am_item_name_creation
+            ON am_item_name_creation.item_creation_slno = am_asset_item_map_master.item_creation_slno
+        LEFT JOIN am_category
+            ON am_category.category_slno = am_item_name_creation.item_category_slno
+        LEFT JOIN am_custodian_department
+            ON am_custodian_department.am_custodian_slno = am_asset_item_map_master.item_custodian_dept
+        WHERE am_asset_item_map_master.item_create_status = 1
+    `;
+
+    const queryParams = [];
+
+    if (category) {
+        sql += " AND item_category_slno = ?";
+        queryParams.push(category);
+    }
+    if (subcategory) {
+        sql += " AND item_subcategory_slno = ?";
+        queryParams.push(subcategory);
+    }
+    if (group) {
+        sql += " AND item_group_slno = ?";
+        queryParams.push(group);
+    }
+    if (subgroup) {
+        sql += " AND item_subgroup_slno = ?";
+        queryParams.push(subgroup);
+    }
+    if (model) {
+        sql += " AND item_model_slno = ?";
+        queryParams.push(model);
+    }
+    if (submodel) {
+        sql += " AND item_submodel_slno = ?";
+        queryParams.push(submodel);
+    }
+    if (manufacture) {
+        sql += " AND item_manufactures_slno = ?";
+        queryParams.push(manufacture);
+    }
+    if (modelNumber) {
+        sql += " AND item_model_num = ?";
+        queryParams.push(modelNumber);
+    }
+    if (custoDian) {
+        sql += " AND item_custodian_dept = ?";
+        queryParams.push(custoDian);
+    }
+    if (itemName) {
+    sql += " AND item_name LIKE ?";
+    queryParams.push(`%${itemName}%`);
+    }
+    if (itemNumber) {
+        sql += " AND item_asset_no_only = ?";
+        queryParams.push(itemNumber);
+    }
+    
+    sql += " ORDER BY item_asset_no_only ASC";
+
+    getAssetUnderCustodian(sql, queryParams, (error, results) => {
+        if (error) {
+            return res.status(500).json({
+                success: 0,
+                message: error.message
+            });
+        }
+        if (!results || results.length === 0) {
+            return res.status(200).json({
+                success: 2,
+                message: "No data found"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        });
+    });
+},
+getSpareUnderCustodian: (req, res) => {
+     const {
+        category,
+        subcategory,
+        group,
+        subgroup,
+        model,
+        submodel,
+        manufacture,
+        modelNumber,
+        itemName,
+        itemNumber,
+        custoDian    
+          
+    } = req.body;
 
 
+
+    let sql = `
+          SELECT
+            item_name,
+            am_spare_item_map_slno,
+            am_item_name_creation.item_creation_slno,
+            spare_deptsec_slno,
+            am_custodian_department.am_custodian_name,
+            am_item_name_creation.item_name,
+            spare_asset_no as item_prefix,
+            spare_asset_no_only as item_suffix,
+            category_name
+        FROM am_spare_item_map_master
+        LEFT JOIN am_item_name_creation
+            ON am_item_name_creation.item_creation_slno = am_spare_item_map_master.spare_creation_slno
+        LEFT JOIN am_category
+            ON am_category.category_slno = am_item_name_creation.item_category_slno
+        LEFT JOIN am_custodian_department
+            ON am_custodian_department.am_custodian_slno = am_spare_item_map_master.spare_custodian_dept
+        WHERE am_spare_item_map_master.spare_create_status = 1
+    `;
+
+    const queryParams = [];
+
+    if (category) {
+        sql += " AND item_category_slno = ?";
+        queryParams.push(category);
+    }
+    if (subcategory) {
+        sql += " AND item_subcategory_slno = ?";
+        queryParams.push(subcategory);
+    }
+    if (group) {
+        sql += " AND item_group_slno = ?";
+        queryParams.push(group);
+    }
+    if (subgroup) {
+        sql += " AND item_subgroup_slno = ?";
+        queryParams.push(subgroup);
+    }
+    if (model) {
+        sql += " AND item_model_slno = ?";
+        queryParams.push(model);
+    }
+    if (submodel) {
+        sql += " AND item_submodel_slno = ?";
+        queryParams.push(submodel);
+    }
+    if (manufacture) {
+        sql += " AND item_manufactures_slno = ?";
+        queryParams.push(manufacture);
+    }
+    if (modelNumber) {
+        sql += " AND item_model_num = ?";
+        queryParams.push(modelNumber);
+    }
+    if (custoDian) {
+        sql += " AND spare_custodian_dept = ?";
+        queryParams.push(custoDian);
+    }  
+    if (itemName) {
+    sql += " AND item_name LIKE ?";
+    queryParams.push(`%${itemName}%`);
+    }
+    if (itemNumber) {
+        sql += " AND spare_asset_no_only = ?";
+        queryParams.push(itemNumber);
+    }
+    
+
+    sql += " ORDER BY spare_asset_no_only ASC";
+
+
+    getSpareUnderCustodian(sql, queryParams, (error, results) => {
+        if (error) {
+            return res.status(500).json({
+                success: 0,
+                message: error.message
+            });
+        }
+        if (!results || results.length === 0) {
+            return res.status(200).json({
+                success: 2,
+                message: "No data found"
+            });
+        }
+        return res.status(200).json({
+            success: 1,
+            data: results
+        });
+    });
+},
+
+    TransferAssetUnderCustodian: (req, res) => {
+    const body = req.body;
+    const {
+        selectedRows,
+        custoDian,
+        transferCustodian,
+        am_custodian_dept_slno,
+        am_custodian_deptsec_slno,
+        assetOrSpare
+    } = body;
+    const userId = body.id;
+
+    // Step 1: Update all selected items first
+    Promise.all(
+        selectedRows.map((item) => {
+            return new Promise((resolve, reject) => {
+                TransferAssetUnderCustodian(
+                    {
+                        am_item_map_slno: item.am_item_map_slno,
+                        item_custodian_dept: transferCustodian,
+                        item_deptsec_slno: am_custodian_deptsec_slno,
+                        item_custodian_dept_sec: am_custodian_deptsec_slno,
+                        item_dept_slno: am_custodian_dept_slno,
+                        edit_user: userId
+                    },
+                    (err) => {
+                        if (err) return reject(err);
+                        resolve();
+                    }
+                );
+            });
+        })
+    )
+        .then(() => {
+            // Step 2: Insert into custodian transfer log
+            insertCustodianTransferLog(
+                {
+                    transfer_from_custodian: custoDian,
+                    transfer_to_custodian: transferCustodian,
+                    create_user: userId
+                },
+                (err, logResult) => {
+                    if (err) {
+                        return res.status(200).json({ success: 0, message: err });
+                    }
+
+                    const am_custo_transfer_slno = logResult.insertId;
+
+                    // Step 3: Insert transferred items
+                    Promise.all(
+                        selectedRows.map((item) => {
+                            return new Promise((resolve, reject) => {
+                                insertCustodianTransferItems(
+                                    {
+                                        am_custo_transfer_slno,
+                                        asset_or_spare: assetOrSpare,
+                                        item_asset_spare_slno: item.am_item_map_slno,
+                                        item_prefix: item.item_prefix,
+                                        item_suffix: item.item_suffix,
+                                        items_status: 1
+                                    },
+                                    (err) => {
+                                        if (err) return reject(err);
+                                        resolve();
+                                    }
+                                );
+                            });
+                        })
+                    )
+                        .then(() => {
+                            res.status(200).json({
+                                success: 1,
+                                message: "Transfer completed",
+                                am_custo_transfer_slno
+                            });
+                        })
+                        .catch((error) => {
+                            res.status(200).json({ success: 0, message: error });
+                        });
+                }
+            );
+        })
+        .catch((error) => {
+            res.status(200).json({ success: 0, message: error });
+        });
+},
+    TransferSpareUnderCustodian: (req, res) => {
+    const body = req.body;
+    const {
+        selectedRows,
+        custoDian,
+        transferCustodian,
+        am_custodian_dept_slno,
+        am_custodian_deptsec_slno,
+        assetOrSpare
+    } = body;
+    const userId = body.id;
+
+    // Step 1: Update all selected items first
+    Promise.all(
+        selectedRows.map((item) => {
+            return new Promise((resolve, reject) => {
+                TransferSpareUnderCustodian(
+                    {
+                        am_spare_item_map_slno: item.am_spare_item_map_slno,
+                        spare_custodian_dept: transferCustodian,
+                        spare_custodian_dept_sec: am_custodian_deptsec_slno,
+                        spare_dept_slno: am_custodian_dept_slno,
+                        spare_deptsec_slno: am_custodian_deptsec_slno,                       
+                        edit_user: userId
+                    },
+                    (err) => {
+                        if (err) return reject(err);
+                        resolve();
+                    }
+                );
+            });
+        })
+    )
+        .then(() => {
+            // Step 2: Insert into custodian transfer log
+            insertCustodianTransferLog(
+                {
+                    transfer_from_custodian: custoDian,
+                    transfer_to_custodian: transferCustodian,
+                    create_user: userId
+                },
+                (err, logResult) => {
+                    if (err) {
+                        return res.status(200).json({ success: 0, message: err });
+                    }
+
+                    const am_custo_transfer_slno = logResult.insertId;
+
+                    // Step 3: Insert transferred items
+                    Promise.all(
+                        selectedRows.map((item) => {
+                            return new Promise((resolve, reject) => {
+                                insertCustodianTransferItems(
+                                    {
+                                        am_custo_transfer_slno,
+                                        asset_or_spare: assetOrSpare,
+                                        item_asset_spare_slno: item.am_spare_item_map_slno,
+                                        item_prefix: item.item_prefix,
+                                        item_suffix: item.item_suffix,
+                                        items_status: 1
+                                    },
+                                    (err) => {
+                                        if (err) return reject(err);
+                                        resolve();
+                                    }
+                                );
+                            });
+                        })
+                    )
+                        .then(() => {
+                            res.status(200).json({
+                                success: 1,
+                                message: "Transfer completed",
+                                am_custo_transfer_slno
+                            });
+                        })
+                        .catch((error) => {
+                            res.status(200).json({ success: 0, message: error });
+                        });
+                }
+            );
+        })
+        .catch((error) => {
+            res.status(200).json({ success: 0, message: error });
+        });
+}
+
+
+
+   
 }

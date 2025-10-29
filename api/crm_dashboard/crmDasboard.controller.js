@@ -69,6 +69,13 @@ module.exports = {
             {
                 val: 9, name: 'managepending', sql: `AND (incharge_approve=1 OR hod_approve=1) AND managing_director_approve is null`
             },
+            {
+                val: 11, name: 'hodpending', sql: `AND hod_approve is null AND ((dms_req = 1 AND dms_approve is null) OR 
+                   ( dms_req = 0 AND dms_approve is  null)) AND
+				   ((ms_approve_req = 1 AND ms_approve is null) OR( ms_approve_req = 0 AND ms_approve is null)) AND
+				   manag_operation_approv is null AND senior_manage_approv is null AND gm_approve is null AND
+                   ed_approve is null AND md_approve is null and (req_status!='R' and req_status!='P' OR req_status is null) and hod_req = 1   `
+            },
         ]
 
         const filterSql = sqlArray.find(e => e.val === parseInt(id))?.sql || '';

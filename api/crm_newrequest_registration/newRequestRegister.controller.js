@@ -575,18 +575,18 @@ module.exports = {
                 val: 7, name: 'dmsreject', sql: `AND (dms_req = 1 OR ms_approve_req=1) AND req_status='R' AND crf_close is null AND user_acknldge is null`
             },
             {
-                val: 8, name: 'dmsclosed', sql: `AND (dms_req = 1 OR ms_approve_req = 1) AND close_date BETWEEN ? AND ? AND (crf_close = 1 OR crf_close = 2)`
+                val: 8, name: 'dmsclosed', sql: `AND (dms_req = 1 OR ms_approve_req = 1) AND close_date BETWEEN ? AND ? AND (crf_close = 1 OR crf_close = 2)or internally_arranged_status = 1`
 
             },
             // MS
             {
-                val: 9, name: 'mspending', sql: `AND ms_approve_req = 1 AND ms_approve is null AND 
+                val: 9, name: 'mspending', sql: `AND ms_approve_req = 1 AND ms_approve is null AND internally_arranged_status = 0 AND
                 manag_operation_approv is null AND senior_manage_approv is null AND  gm_approve is null AND ed_approve is null
                  AND md_approve is null AND crf_close is null AND user_acknldge is null and  (req_status!='R' and req_status!='P' OR req_status is null)`
             },
             // MO
             {
-                val: 10, name: 'mopending', sql: `AND manag_operation_approv is null AND
+                val: 10, name: 'mopending', sql: `AND manag_operation_approv is null AND internally_arranged_status = 0 AND
                  senior_manage_approv is null AND  gm_approve is null AND ed_approve is null AND md_approve is null
                   AND crf_close is null AND user_acknldge is null AND req_status!='P' AND req_status!='R'`
             },
@@ -612,7 +612,7 @@ module.exports = {
                 val: 16, name: 'reject', sql: ` AND req_status='R' AND crf_close is null AND user_acknldge is null`
             },
             {
-                val: 17, name: 'closed', sql: `AND close_date BETWEEN ? AND ? AND (crf_close = 1 OR crf_close = 2)`
+                val: 17, name: 'closed', sql: `AND close_date BETWEEN ? AND ? AND (crf_close = 1 OR crf_close = 2) or internally_arranged_status = 1`
             },
             {
                 val: 18, name: 'smopending', sql: `AND senior_manage_approv is null AND gm_approve is null AND

@@ -6,8 +6,8 @@ const {
     DailyCensusUpdate,
     GetCensusBargraphReport,
     CensusAlreadyInsert,
-    ElliderDataUpdate,
-    GetDailyCensusReportView
+    ElliderDataUpdate, GetDailyCensusReportView
+
 } = require('./daily_census.service')
 module.exports = {
     DailyCensusInsert: (req, res) => {
@@ -161,7 +161,6 @@ module.exports = {
             })
         })
     },
-
     GetDailyCensusReportView: (req, res) => {
         const body = req.body;
         GetDailyCensusReportView(body, (err, results) => {

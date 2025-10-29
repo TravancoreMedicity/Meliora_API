@@ -274,11 +274,12 @@ WHERE fb_subcategory_master.fb_category_slno= ?`,
             fd_slno,
             feedback_name,
             fdmast_slno,
-            feedback_status 
+            feedback_status ,
+            fb_qr_status
             FROM 
             fb_mast
             where
-            feedback_status = 1
+            feedback_status = 1 and fb_qr_status = 0
             `,
             []
             , (error, results, fields) => {
@@ -288,6 +289,29 @@ WHERE fb_subcategory_master.fb_category_slno= ?`,
                 return callBack(null, results)
             })
     },
+    getAllPREMDetail: (callBack) => {
+        pool.query(
+            `
+            SELECT 
+            fd_slno,
+            feedback_name,
+            fdmast_slno,
+            feedback_status ,
+            fb_qr_status
+            FROM 
+            fb_mast
+            where
+            feedback_status = 1 and fb_qr_status = 1
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+
     UpdateFeedbackName: (data, callBack) => {
         pool.query(
             `
@@ -862,9 +886,10 @@ WHERE serial_slno = 3
             fb_patient_num,
             fb_patient_name,
             fb_patient_mob,
+            fb_call_staus,
             create_user
             ) 
-            VALUES(?,?,?,?,?,?,?)
+            VALUES(?,?,?,?,?,?,?,?)
             `,
             [
                 data.fb_transact_slno,
@@ -873,6 +898,7 @@ WHERE serial_slno = 3
                 data.fb_patient_num,
                 data.fb_patient_name,
                 data.fb_patient_mob,
+                data.fb_call_staus,
                 data.create_user,
             ],
             (error, results, fields) => {
@@ -920,7 +946,7 @@ WHERE serial_slno = 3
             });
         }))
     },
-    insertDefaultPtImpression: (data, callBack) => { 
+    insertDefaultPtImpression: (data, callBack) => {
         const { answer, fb_transact_slno, create_user } = data;
         // This code destruct nested answer object to corresponding  details
         const insertPromises = Object.entries(answer)
@@ -1058,6 +1084,28 @@ WHERE
                 data.fb_transact_slno,
                 data.remark,
                 data.create_user
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    insertCallCenterDetail: (data, callBack) => {
+        pool.query(
+            `
+            INSERT INTO  fb_call_center(
+            fb_transact_slno,
+            fb_pt_ip_no,
+            fb_cc_submitted
+            ) 
+            VALUES(?,?,?)
+            `,
+            [
+                data.fb_transact_slno,
+                data.fb_ip_num,
+                data.fb_cc_submitted
             ],
             (error, results, fields) => {
                 if (error) {
@@ -1491,7 +1539,7 @@ WHERE
     getDepartmentEmpid: (id, callBack) => {
         pool.query(
             `SELECT em_id, em_name FROM co_employee_master where em_dept_section=? 
-            and em_status=1 and em_no!=1 and em_id!=1606 order by em_name ASC`,
+            and em_status=1 and em_no!=1 order by em_name ASC`,
             [
                 id
             ],
@@ -1620,12 +1668,12 @@ left join  co_employee_master on fb_employee_user_rights.fb_empid =  co_employee
     FindEmpyGroup: (data, callBack) => {
         pool.query(
             `
-select 
-	fb_grp_slno,
-	fb_empid
-from
-	fb_employee_user_rights
-WHERE fb_empid = ? and fb_usrright_status= 1
+        select 
+            fb_grp_slno,
+            fb_empid
+        from
+            fb_employee_user_rights
+        WHERE fb_empid = ? and fb_usrright_status= 1
             `,
             [
                 data.fb_emp_id,
@@ -2945,37 +2993,127 @@ ORDER BY
         pool.query(
             `
               SELECT 
-               fb_bed.fb_bed_slno, 
-               fb_bed.fb_bd_code,
-               fb_bed.fb_bdc_no,
-               fb_bed.fb_ns_code,
-               fb_bed.fb_rt_code,
-               fb_bed.fb_bdc_occup,
-               fb_bed.fb_bdn_cccno,
-               fb_bed.fb_bdc_status,
-               fb_bed.fb_hkd_cleaningreq,
-               fb_bed.fb_rm_code,
-               fb_bed.fb_bdc_mhcode,
-               fb_bed.fb_bdc_vipbed,
-               fb_ns_name,
-               fb_rtc_desc,
-               fb_rtc_alias,
-               fb_bed.create_date,
-               fb_bed_remarks.fb_bed_remark,
-               fb_bed_remarks.fb_bed_status,
-               fb_rm_room_slno
-               FROM fb_bed
-               LEFT JOIN fb_nurse_station_master 
-               ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code   
-               LEFT JOIN fb_room_type 
-               ON fb_bed.fb_rt_code = fb_room_type.fb_rt_code
-			   LEFT JOIN fb_roomcreation_master 
-               ON fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
-               LEFT JOIN fb_bed_remarks 
-               ON fb_bed.fb_bed_slno = fb_bed_remarks.fb_bed_slno 
-               AND fb_bed_remarks.fb_bed_status = 1 
-               WHERE fb_bed.fb_bdc_occup = "N"
+                fb_bed.fb_bed_slno,
+                rm_outlet_slno,
+                fb_bed.fb_bd_code,
+                fb_bed.fb_bdc_no,
+                fb_bed.fb_ns_code,
+                fb_bed.fb_rt_code,
+                fb_bed.fb_bdc_occup,
+                fb_bed.fb_bdn_cccno,
+                fb_bed.fb_bdc_status,
+                fb_bed.fb_hkd_cleaningreq,
+                fb_bed.fb_rm_code,
+                fb_bed.fb_bdc_mhcode,
+                fb_bed.fb_bdc_vipbed,
+                fb_ns_name,
+                fb_rtc_desc,
+                fb_rtc_alias,
+                fb_bed.create_date,
+                fb_bed_remarks.fb_bed_remark,
+                fb_bed_remarks.fb_bed_status,
+                fb_rm_room_slno,
+                fb_hk_check_bed.fb_hk_bed_slno,
+                fb_hk_check_bed.fb_hk_status
+            FROM
+                fb_bed
+                LEFT JOIN fb_nurse_station_master 
+                    ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code
+                LEFT JOIN fb_room_type 
+                    ON fb_bed.fb_rt_code = fb_room_type.fb_rt_code
+                LEFT JOIN fb_roomcreation_master 
+                    ON fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
+                LEFT JOIN rm_newroom_creation 
+                    ON rm_newroom_creation.rm_room_slno = fb_roomcreation_master.fb_rm_room_slno
+                LEFT JOIN fb_hk_check_bed 
+                    ON fb_hk_check_bed.fb_hk_bed_slno = fb_bed.fb_bed_slno
+                LEFT JOIN fb_bed_remarks 
+                    ON fb_bed.fb_bed_slno = fb_bed_remarks.fb_bed_slno
+                    AND fb_bed_remarks.fb_bed_status = 1
+            WHERE
+                fb_bed.fb_bdc_occup = 'N'
+                AND (fb_hk_check_bed.fb_hk_status IS NULL OR fb_hk_check_bed.fb_hk_status != 1)
             `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    // main checklist bed getting query
+    getchecklistbed: (callBack) => {
+        pool.query(
+            // `  SELECT 
+            //    fb_bed.fb_bed_slno, 
+            //    fb_bed.fb_bd_code,
+            //    fb_bed.fb_bdc_no,
+            //    fb_bed.fb_ns_code,
+            //    fb_bed.fb_rt_code,
+            //    fb_bed.fb_bdc_occup,
+            //    fb_bed.fb_bdn_cccno,
+            //    fb_bed.fb_bdc_status,
+            //    fb_bed.fb_hkd_cleaningreq,
+            //    fb_bed.fb_rm_code,
+            //    fb_bed.fb_bdc_mhcode,
+            //    fb_bed.fb_bdc_vipbed,
+            //    fb_ns_name,
+            //    fb_rtc_desc,
+            //    fb_rtc_alias,
+            //    fb_bed.create_date,
+            //    fb_bed_remarks.fb_bed_remark,
+            //    fb_bed_remarks.fb_bed_status,
+            //    fb_rm_room_slno
+            //    FROM fb_bed
+            //    LEFT JOIN fb_nurse_station_master 
+            //    ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code   
+            //    LEFT JOIN fb_room_type 
+            //    ON fb_bed.fb_rt_code = fb_room_type.fb_rt_code
+            //    LEFT JOIN fb_roomcreation_master 
+            //    ON fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
+            //    LEFT JOIN fb_bed_remarks 
+            //    ON fb_bed.fb_bed_slno = fb_bed_remarks.fb_bed_slno 
+            //    AND fb_bed_remarks.fb_bed_status = 1 
+            //    WHERE fb_bed.fb_bdc_occup = "N"
+            // `,
+
+            `SELECT 
+                fb_bed.fb_bed_slno,
+                rm_outlet_slno,
+                fb_bed.fb_bd_code,
+                fb_bed.fb_bdc_no,
+                fb_bed.fb_ns_code,
+                fb_bed.fb_rt_code,
+                fb_bed.fb_bdc_occup,
+                fb_bed.fb_bdn_cccno,
+                fb_bed.fb_bdc_status,
+                fb_bed.fb_hkd_cleaningreq,
+                fb_bed.fb_rm_code,
+                fb_bed.fb_bdc_mhcode,
+                fb_bed.fb_bdc_vipbed,
+                fb_ns_name,
+                fb_rtc_desc,
+                fb_rtc_alias,
+                fb_bed.create_date,
+                fb_bed_remarks.fb_bed_remark,
+                fb_bed_remarks.fb_bed_status,
+                fb_rm_room_slno
+            FROM
+                fb_bed
+                    LEFT JOIN
+                fb_nurse_station_master ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code
+                    LEFT JOIN
+                fb_room_type ON fb_bed.fb_rt_code = fb_room_type.fb_rt_code
+                    LEFT JOIN
+                fb_roomcreation_master ON fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
+                LEFT JOIN
+                rm_newroom_creation ON rm_newroom_creation.rm_room_slno = fb_roomcreation_master.fb_rm_room_slno
+                    LEFT JOIN
+                fb_bed_remarks ON fb_bed.fb_bed_slno = fb_bed_remarks.fb_bed_slno
+                AND fb_bed_remarks.fb_bed_status = 1
+            WHERE
+                fb_bed.fb_bdc_occup = 'N'`,
             []
             , (error, results, fields) => {
                 if (error) {
@@ -2986,24 +3124,25 @@ ORDER BY
     },
     getallroomassetdata: (data, callBack) => {
         pool.query(
-            `select 
-	fb_assets_map_slno,
-	 fb_rc_roomslno, 
-     fb_asset_map_master.fb_dep_id   ,
-     fb_ismultiple,
-     fb_asset_count,
-     fb_asset_map_status,
-     fb_asset_item_master.fb_asset_name,
-	rm_room_name,
-    complaint_dept_name,
-    fb_complaint_dep,
-    fb_asset_slno
-from 
-	fb_asset_map_master
-left join rm_newroom_creation on rm_newroom_creation.rm_room_slno = fb_asset_map_master.fb_rc_roomslno
-left join fb_asset_item_master on fb_asset_item_master.fb_asset_slno = fb_asset_map_master.fb_asset_id	
-left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno = fb_asset_map_master.fb_complaint_dep		
-where fb_rc_roomslno = ?
+            `   select 
+                    fb_assets_map_slno,
+                    fb_rc_roomslno, 
+                    fb_asset_map_master.fb_dep_id,
+                    fb_ismultiple,
+                    fb_asset_count,
+                    fb_asset_map_status,
+                    fb_asset_item_master.fb_asset_name,
+                    rm_room_name,
+                    complaint_dept_name,
+                    fb_complaint_dep,
+                    fb_asset_slno,
+                    fb_asset_type
+                from 
+                    fb_asset_map_master
+                left join rm_newroom_creation on rm_newroom_creation.rm_room_slno = fb_asset_map_master.fb_rc_roomslno
+                left join fb_asset_item_master on fb_asset_item_master.fb_asset_slno = fb_asset_map_master.fb_asset_id	
+                left join cm_complaint_dept on cm_complaint_dept.complaint_dept_slno = fb_asset_map_master.fb_complaint_dep		
+                where fb_rc_roomslno = ?
             `,
             [
                 data
@@ -3094,7 +3233,7 @@ where fb_rc_roomslno = ?
                 fb_transaction_mast
             WHERE 
                 fdmast_slno = ?
-                AND create_date BETWEEN ? AND ?;`,
+                AND create_date BETWEEN ? AND ?`,
             [
                 data.feedbackId,
                 data.FROM_DATE,
@@ -3108,12 +3247,13 @@ where fb_rc_roomslno = ?
     },
     getempdetail: (data, callBack) => {
         pool.query(
-            `select 
-                em_department,em_dept_section,em_name,desg_name
+            `
+            select 
+                em_department,em_dept_section,em_name,desg_name,complaint_dept_slno
             from 
                 co_employee_master
-            left join 
-                co_designation on co_employee_master.em_designation = co_designation.desg_slno
+            left join  co_designation on co_employee_master.em_designation = co_designation.desg_slno
+            left join  cm_complaint_dept on cm_complaint_dept.department_slno = co_employee_master.em_department
              where 
                 em_id = ?`,
             [
@@ -3154,7 +3294,7 @@ where fb_rc_roomslno = ?
 
     getallassignedbed: (data, callBack) => {
         pool.query(
-            `SELECT 
+            `    SELECT 
                 fb_hk_check_bed.fb_hk_slno,
                 fb_hk_check_bed.fb_hk_bed_slno,
                 fb_hk_check_bed.fb_hk_check_status,
@@ -3175,7 +3315,8 @@ where fb_rc_roomslno = ?
                 fb_ns_name,
                 fb_rtc_desc,
                 fb_rtc_alias,
-                fb_bed.create_date
+                fb_bed.create_date,
+                 rm_outlet_slno
             FROM
                 fb_hk_check_bed
                     LEFT JOIN
@@ -3186,9 +3327,11 @@ where fb_rc_roomslno = ?
                 fb_room_type ON fb_bed.fb_rt_code = fb_room_type.fb_rt_code
                     LEFT JOIN
                 fb_roomcreation_master ON fb_bed.fb_bd_code = fb_roomcreation_master.fb_rm_bd_code
+                 LEFT JOIN
+				rm_newroom_creation ON rm_newroom_creation.rm_room_slno = fb_roomcreation_master.fb_rm_room_slno
             WHERE
                 fb_hk_sv_assign = ?
-                    AND fb_hk_status = 1`,
+                    AND fb_hk_status = 1;`,
             [
                 data
             ]
@@ -3508,6 +3651,7 @@ where fb_rc_roomslno = ?
                 return callBack(null, results)
             })
     },
+
     getallassetItems: (callBack) => {
         pool.query(
             `select 	
@@ -3515,10 +3659,13 @@ where fb_rc_roomslno = ?
                 fb_asset_name,
                 fb_dep_id,
                 fb_asset_status,
-                complaint_dept_name
+                complaint_dept_name,
+                complaint_type_name,
+                fb_asset_item_master.fb_asset_type
             from 
                 fb_asset_item_master
-			left join cm_complaint_dept on fb_asset_item_master.fb_dep_id = cm_complaint_dept.complaint_dept_slno
+                left join cm_complaint_dept on fb_asset_item_master.fb_dep_id = cm_complaint_dept.complaint_dept_slno
+                left join cm_complaint_type on cm_complaint_type.complaint_type_slno = fb_asset_item_master.fb_asset_type 
             `,
             []
             , (error, results, fields) => {
@@ -3548,12 +3695,19 @@ where fb_rc_roomslno = ?
     },
     getallhkitem: (callBack) => {
         pool.query(
-            `select 	
-	            fb_hk_rm_cklist_slno,
-                fb_hk_rm_cklist_name, 
-                fb_hk_rm_cklist_status
-            from 
+            `
+            SELECT 
+                fb_hk_rm_cklist_slno,
+                fb_hk_rm_cklist_name,
+                fb_hk_rm_cklist_status,
+                fb_dep_id,
+                complaint_dept_name,
+                complaint_type_name,
+                fb_hk_item_master.fb_asset_type
+            FROM
                 fb_hk_item_master
+                left join cm_complaint_dept on fb_hk_item_master.fb_dep_id = cm_complaint_dept.complaint_dept_slno
+                left join cm_complaint_type on cm_complaint_type.complaint_type_slno = fb_hk_item_master.fb_asset_type;
             `,
             []
             , (error, results, fields) => {
@@ -3612,6 +3766,74 @@ where fb_rc_roomslno = ?
                 return callBack(null, results)
             })
     },
+    getCommonFeedbackReport: (data, callBack) => {
+        pool.query(`
+             SELECT 
+                fb_transaction_mast.fb_transact_slno,
+                fb_patient_name,
+                fb_patient_mob,
+                fd_mark,
+                fb_suggestion,
+                rating_name,
+                rating_value,
+                fd_qa_eng,
+                fb_ip_num,
+                fb_transaction_mast.create_date,
+                fb_transaction_mast.create_user,
+                em_name
+                FROM fb_transaction_mast  
+                LEFT JOIN fb_transaction_detl ON fb_transaction_detl.fb_transact_slno = fb_transaction_mast.fb_transact_slno
+                LEFT JOIN fb_mast_qakey ON fb_mast_qakey.fbqa_slno = fb_transaction_detl.fbqa_slno
+                LEFT JOIN fb_detl ON fb_detl.fddet_slno = fb_transaction_detl.fddet_slno
+                LEFT JOIN co_employee_master ON co_employee_master.em_id = fb_transaction_mast.create_user
+                WHERE fb_transaction_mast.fdmast_slno = 3
+                AND fb_transaction_mast.create_date between ? and ?;
+            `,
+            [
+                data.FROM_DATE,
+                data.TO_DATE
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getIpFeedbackReport: (data, callBack) => {
+        pool.query(`
+              SELECT 
+                fb_transaction_mast.fb_transact_slno,
+                fb_patient_name,
+                fb_patient_mob,
+                fd_mark,
+                fb_suggestion,
+                rating_name,
+                rating_value,
+                fd_qa_eng,
+                fb_ip_num,
+                fb_transaction_mast.create_date,
+                fb_transaction_mast.create_user,
+                em_name
+                FROM fb_transaction_mast  
+                LEFT JOIN fb_transaction_detl ON fb_transaction_detl.fb_transact_slno = fb_transaction_mast.fb_transact_slno
+                LEFT JOIN fb_mast_qakey ON fb_mast_qakey.fbqa_slno = fb_transaction_detl.fbqa_slno
+                LEFT JOIN fb_detl ON fb_detl.fddet_slno = fb_transaction_detl.fddet_slno
+                LEFT JOIN co_employee_master ON co_employee_master.em_id = fb_transaction_mast.create_user
+                WHERE fb_transaction_mast.fdmast_slno = 7
+                AND fb_transaction_mast.create_date between ? and ?;
+            `,
+            [
+                data.FROM_DATE,
+                data.TO_DATE
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
     CheckEmployeeAlreadyExist: (data, callBack) => {
         pool.query(
             `select 	
@@ -3633,16 +3855,25 @@ where fb_rc_roomslno = ?
                 return callBack(null, results)
             })
     },
-
     getallhkactiveitem: (callBack) => {
         pool.query(
-            `select 	
-	            fb_hk_rm_cklist_slno,
-                fb_hk_rm_cklist_name, 
-                fb_hk_rm_cklist_status
-            from 
+            `
+            SELECT 
+                fb_hk_rm_cklist_slno,
+                fb_hk_rm_cklist_name,
+                fb_hk_rm_cklist_status,
+                fb_dep_id,
+                complaint_dept_name,
+                complaint_type_name,
+                fb_hk_item_master.fb_asset_type
+            FROM
                 fb_hk_item_master
-            where fb_hk_rm_cklist_status = 1
+                    LEFT JOIN
+                cm_complaint_dept ON fb_hk_item_master.fb_dep_id = cm_complaint_dept.complaint_dept_slno
+                    LEFT JOIN
+                cm_complaint_type ON cm_complaint_type.complaint_type_slno = fb_hk_item_master.fb_asset_type
+            WHERE
+                fb_hk_rm_cklist_status = 1
             `,
             []
             , (error, results, fields) => {
@@ -3899,11 +4130,30 @@ select
                 return callBack(null, results)
             })
     },
+    getallComplaintType: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                    complaint_type_slno, complaint_type_name
+                FROM
+                    cm_complaint_type
+                WHERE
+                    complaint_dept_slno = ?
+                        AND complaint_type_status = 1;
+            `,
+            [data]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+
     complaintregistraion: (data, callBack) => {
         const promises = data?.map((item) => {
             return new Promise((resolve, reject) => {
                 pool.query(
-                    ` INSERT INTO  cm_complaint_mast(
+                    `INSERT INTO  cm_complaint_mast(
                     complaint_slno,
                     complaint_deptslno,
                     complaint_desc,
@@ -3911,9 +4161,13 @@ select
                     compalint_date,
                     compalint_status,
                     cm_location,
-                    create_user
+                    complaint_typeslno,
+                    cm_complaint_location,
+                    create_user,
+                    fb_ticket,
+                    complaint_dept_secslno
                 ) 
-                VALUES(?,?,?,?,?,?,?,?)
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?)
             `,
                     [
                         item.complaint_slno,
@@ -3923,7 +4177,11 @@ select
                         item.compalint_date,
                         item.compalint_status,
                         item.cm_location,
-                        item.create_user
+                        item.complaint_typeslno,
+                        item.cm_complaint_location,
+                        item.create_user,
+                        item.fb_ticket,
+                        item.complaint_dept_secslno
                     ],
                     (error, results, fields) => {
                         if (error) {
@@ -3943,7 +4201,6 @@ select
             .catch((error) => {
                 callBack(error);
             });
-
     },
     UpdateSeiralNos: (data, callBack) => {
         pool.query(
@@ -4025,7 +4282,8 @@ select
     // },
     getcomplaintdetail: (data, callBack) => {
         pool.query(
-            `select  complaint_slno,
+            `SELECT
+                cm_complaint_mast.complaint_slno,
                 complaint_deptslno,
                 complaint_desc,
                 complaint_request_slno,
@@ -4036,12 +4294,57 @@ select
                 fb_bdc_no,
                 complaint_dept_name,
                 cm_asset_dept,
-                cm_am_assetmap_slno
-            from cm_complaint_mast 
-                left join fb_bed on cm_complaint_mast.cm_location = fb_bed.fb_bed_slno
-                left join cm_complaint_dept on cm_complaint_mast.complaint_deptslno = cm_complaint_dept.complaint_dept_slno
-                left join cm_comasset_mapping on cm_complaint_mast.complaint_slno = cm_comasset_mapping.cm_complait_slno
-                where cm_location = ?`,
+                cm_am_assetmap_slno,
+                fb_bed.fb_bed_slno,
+                fb_final_checked,
+
+                
+                GROUP_CONCAT(DISTINCT assigned_em.em_name SEPARATOR ', ') AS assigned_employees,
+
+                
+                GROUP_CONCAT(
+                    DISTINCT CASE 
+                        WHEN cm_complaint_detail.assign_rect_status = 1 
+                        THEN assigned_em.em_name 
+                    END 
+                    SEPARATOR ', '
+                ) AS rectified_employees,
+
+                created_by.em_name AS Registered_user,
+                cm_complaint_mast.create_user
+
+            FROM cm_complaint_mast 
+                LEFT JOIN fb_bed ON cm_complaint_mast.cm_complaint_location = fb_bed.fb_bdc_no
+                LEFT JOIN cm_complaint_dept ON cm_complaint_mast.complaint_deptslno = cm_complaint_dept.complaint_dept_slno
+                LEFT JOIN cm_comasset_mapping ON cm_complaint_mast.complaint_slno = cm_comasset_mapping.cm_complait_slno
+                LEFT JOIN fb_bed_remarks ON fb_bed_remarks.fb_bed_slno = fb_bed.fb_bed_slno
+                LEFT JOIN cm_complaint_detail ON cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
+                LEFT JOIN co_employee_master AS assigned_em ON assigned_em.em_id = cm_complaint_detail.assigned_emp
+                LEFT JOIN co_employee_master AS created_by ON created_by.em_id = cm_complaint_mast.create_user
+
+            WHERE 
+                cm_complaint_location = ? 
+                AND fb_ticket = 1 
+                AND fb_final_checked IS NULL
+
+            GROUP BY  
+                cm_complaint_mast.complaint_slno,
+                complaint_deptslno,
+                complaint_desc,
+                complaint_request_slno,
+                compalint_date,
+                compalint_status,
+                cm_location,
+                fb_bd_code,
+                fb_bdc_no,
+                complaint_dept_name,
+                cm_asset_dept,
+                cm_am_assetmap_slno,
+                fb_bed.fb_bed_slno,
+                fb_final_checked,
+                created_by.em_name,
+                cm_complaint_mast.create_user
+    `,
             [
                 data
             ]
@@ -4057,12 +4360,15 @@ select
             `
             UPDATE cm_complaint_mast
             SET
-                compalint_status = ?
+                compalint_status = ?,
+                cm_rectify_time = ?,
+                cm_rectify_status = 'R'
             WHERE
                 complaint_slno = ?
             `,
             [
                 data.status,
+                data.compalint_date,
                 data.complaint_slno
             ],
             (error, results, fields) => {
@@ -4080,14 +4386,16 @@ select
                     fb_asset_name,
                     fb_dep_id,
                     fb_asset_status,
+                    fb_asset_type,
                     create_user
                 ) 
-                VALUES(?,?,?,?)
+                VALUES(?,?,?,?,?)
             `,
             [
                 data.fb_asset_name,
                 data.fb_dep_id,
                 data.fb_asset_status,
+                data.fb_asset_type,
                 data.create_user
             ],
             (error, results, fields) => {
@@ -4126,13 +4434,17 @@ select
             `
             INSERT INTO  fb_hk_item_master(
                 fb_hk_rm_cklist_name, 
+                fb_dep_id,
+                fb_asset_type,
                 fb_hk_rm_cklist_status,
                 create_user
                 ) 
-                VALUES(?,?,?)
+                VALUES(?,?,?,?,?)
             `,
             [
                 data.fb_hk_item_name,
+                data.fb_dep_id,
+                data.dep_item_type_id,
                 data.fb_hk_item_status,
                 data.create_user
             ],
@@ -4202,6 +4514,7 @@ select
                     fb_asset_name = ?,
                     fb_dep_id = ?,
                     fb_asset_status = ?,
+                    fb_asset_type = ?,
                     edit_user = ?
                 where 
                     fb_asset_slno = ?
@@ -4210,6 +4523,7 @@ select
                 data.fb_asset_name,
                 data.fb_dep_id,
                 data.fb_asset_status,
+                data.fb_asset_type,
                 data.edit_user,
                 data.fb_assets_slno
             ],
@@ -4231,14 +4545,18 @@ select
                             complaint_slno,
                             assigned_emp,
                             assigned_date,
-                            assigned_user
+                            assigned_user,
+                            assign_rect_status,
+                            assign_status
                         ) 
-                        VALUES(?,?,?,?)`,
+                        VALUES(?,?,?,?,?,?)`,
                         [
                             item.complaint_slno,
                             user,
                             item.compalint_date,
                             item.create_user,
+                            item.assign_rect_status,
+                            item.assign_status
                         ],
                         (error, results, fields) => {
                             if (error) {
@@ -4436,13 +4754,17 @@ select
             UPDATE  fb_hk_item_master
                 SET
                 fb_hk_rm_cklist_name=?, 
-                fb_hk_rm_cklist_status=?,
+                fb_dep_id = ?,
+                fb_asset_type = ?,
+                fb_hk_rm_cklist_status = ?,
                 edit_user =?
                 WHERE
                     fb_hk_rm_cklist_slno = ?
             `,
             [
                 data.fb_hk_item_name,
+                data.fb_dep_id,
+                data.dep_item_type_id,
                 data.fb_hk_item_status,
                 data.edit_user,
                 data.fb_hk_item_slno
@@ -4999,14 +5321,48 @@ where fb_pro_check_bed.fb_bed_slno = ?;`,
     gethkcomplaintdetails: (data, callBack) => {
         pool.query(
             `
-           SELECT 
-                complaint_desc,compalint_status
-            FROM
-                cm_complaint_mast
-            WHERE complaint_deptslno  = 1 AND cm_location = ?
+          SELECT 
+            cm_complaint_mast.complaint_slno,
+            complaint_desc,
+            compalint_status,
+            
+            GROUP_CONCAT(DISTINCT assigned_em.em_name SEPARATOR ', ') AS assigned_employees,
+
+            GROUP_CONCAT(
+                DISTINCT CASE 
+                    WHEN cm_complaint_detail.assign_rect_status = 1 
+                    THEN assigned_em.em_name 
+                END 
+                SEPARATOR ', '
+            ) AS rectified_employees,
+
+            created_by.em_name AS Registered_user,
+            cm_complaint_mast.create_user
+
+        FROM cm_complaint_mast
+        LEFT JOIN cm_complaint_detail 
+            ON cm_complaint_detail.complaint_slno = cm_complaint_mast.complaint_slno
+        LEFT JOIN co_employee_master AS assigned_em 
+            ON assigned_em.em_id = cm_complaint_detail.assigned_emp
+        LEFT JOIN co_employee_master AS created_by 
+            ON created_by.em_id = cm_complaint_mast.create_user
+
+        WHERE 
+            complaint_deptslno = ?
+            AND cm_complaint_location = ?
+            AND fb_ticket = ?
+
+        GROUP BY 
+            cm_complaint_mast.complaint_slno,
+            complaint_desc,
+            compalint_status,
+            created_by.em_name,
+            cm_complaint_mast.create_user;
             `,
             [
-                data.cm_location
+                data.complaint_deptslno,
+                data.location,
+                data.fb_ticket
             ]
             , (error, results, fields) => {
                 if (error) {

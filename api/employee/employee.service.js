@@ -122,25 +122,68 @@ module.exports = {
     },
     getEmployeeByUserName: (userName, callBack) => {
         pool.query(
-            `SELECT 
-            co_employee_master.em_name,
+        //     `SELECT 
+        //     co_employee_master.em_name,
+        //     emp_username,
+        //     emp_password,
+        //     desg_name,
+        //     app_token,
+        //     co_employee_master.em_department,
+        //     co_employee_master.em_id,
+        //     co_employee.emp_no,
+        //     co_employee_master.em_dept_section,
+        //     sec_name,dept_name,
+        //     current_timestamp() as login,
+        //     co_employee_master.supervisor
+        //  FROM co_employee
+        //     LEFT JOIN co_employee_master ON co_employee_master.em_no=co_employee.emp_no
+        //     LEFT JOIN co_department_mast ON co_department_mast.dept_id=co_employee_master.em_department
+        //     LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id=co_employee_master.em_dept_section
+        //      LEFT JOIN co_designation ON co_designation.desg_slno=co_employee_master.em_designation
+        //      WHERE emp_username = ? AND emp_status = '1'`,
+
+            `
+            SELECT 
+            emp.em_name,
             emp_username,
             emp_password,
             desg_name,
-            app_token,
-            co_employee_master.em_department,
-            co_employee_master.em_id,
+            emp.app_token,
+            emp.em_department,
+            emp.em_id,
             co_employee.emp_no,
-            co_employee_master.em_dept_section,
+            emp.em_dept_section,
             sec_name,dept_name,
             current_timestamp() as login,
-            co_employee_master.supervisor
-         FROM co_employee
-            LEFT JOIN co_employee_master ON co_employee_master.em_no=co_employee.emp_no
-            LEFT JOIN co_department_mast ON co_department_mast.dept_id=co_employee_master.em_department
-            LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id=co_employee_master.em_dept_section
-             LEFT JOIN co_designation ON co_designation.desg_slno=co_employee_master.em_designation
-             WHERE emp_username = ? AND emp_status = '1'`,
+            emp.supervisor ,
+            sec_incharge.em_name as section_incharge_name,
+			sec_incharge.em_id as section_incharge_id,
+            sec_hod.em_name as section_hod_name,
+             sec_hod.em_id as section_hod_id            
+            FROM co_employee
+            LEFT JOIN co_employee_master emp 
+                ON emp.em_no = co_employee.emp_no
+            LEFT JOIN co_department_mast dept 
+                ON dept.dept_id = emp.em_department
+            LEFT JOIN co_deptsec_mast sec 
+                ON sec.sec_id = emp.em_dept_section
+            LEFT JOIN co_designation desg 
+                ON desg.desg_slno = emp.em_designation
+            LEFT JOIN co_authorization dept_sec_incharge 
+                ON dept_sec_incharge.dept_section = emp.em_dept_section 
+                AND dept_sec_incharge.auth_status = 1 
+                AND dept_sec_incharge.auth_post = 1
+            LEFT JOIN co_authorization dept_sec_hod 
+                ON dept_sec_hod.dept_section = emp.em_dept_section 
+                AND dept_sec_hod.auth_status = 1 
+                AND dept_sec_hod.auth_post = 2
+            LEFT JOIN co_employee_master sec_incharge 
+                ON sec_incharge.em_id = dept_sec_incharge.emp_id
+            LEFT JOIN co_employee_master sec_hod 
+                ON sec_hod.em_id = dept_sec_hod.emp_id
+            WHERE emp_username = ?
+            AND emp_status = '1'`,
+
             [userName],
             (error, results, fields) => {
                 if (error) {

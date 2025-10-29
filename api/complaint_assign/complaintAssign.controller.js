@@ -403,7 +403,7 @@ module.exports = {
             return [val.complaint_slno, val.assigned_emp, val.assist_assign_date, val.assist_flag,
             val.assist_requested_emp, val.assign_rect_status, val.assigned_user]
         })
-
+      
         AssistMultiple(newList, (err, results) => {
             if (err) {
                 logger.logwindow(err)

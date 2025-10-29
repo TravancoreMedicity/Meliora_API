@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { RequstToAssignList, RequstToRectifyList, RequstToVerifyList, AssignToRectify, AssignToVerify,
     RectifyToVerify, ReqComCategorty, ReqAreaWise, ReqComPerAssigne, ReqTatPerComAssignee,
-    getCompCategory, getAllCopmDeptWise } = require('../cms_reports/cms_report.controller');
+    getCompCategory, getAllCopmDeptWise ,getHoldedTickets,getPendingTicketsReport,getPendingTicketsCountReport} = require('../cms_reports/cms_report.controller');
 
 
 router.post("/RequstToAssign", checkToken, RequstToAssignList);
@@ -17,4 +17,9 @@ router.post("/ReqComPerAssigne", checkToken, ReqComPerAssigne);
 router.post("/ReqTatPerComAssignee", checkToken, ReqTatPerComAssignee);
 router.get("/getCompCategory", checkToken, getCompCategory);
 router.post("/getAllCopmDeptWise", checkToken, getAllCopmDeptWise);
+
+router.post("/getHoldedTicketsReport", checkToken, getHoldedTickets)
+router.post("/getPendingTicketsReport", checkToken, getPendingTicketsReport)
+router.post("/getPendingTicketsCountReport", checkToken, getPendingTicketsCountReport)
+
 module.exports = router;

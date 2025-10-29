@@ -232,17 +232,13 @@ module.exports = {
             SET token = ? ,
             sessionid = ? 
             WHERE  empdtl_slno = ?`,
-            [
-                data.refresh_token,
-                data.empdtl_slno,
-                data.empdtl_slno
-            ],
+            [data.refresh_token, data.empdtl_slno, data.empdtl_slno],
             (error, results, fields) => {
                 if (error) {
-
-                    return callBack(error)
+                    return callBack(error);
                 }
-                return callBack(null, results)
-            })
+                return callBack(null, results);
+            }
+        );
     },
 }

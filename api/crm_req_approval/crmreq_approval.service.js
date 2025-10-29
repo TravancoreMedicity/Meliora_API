@@ -315,19 +315,53 @@ module.exports = {
         })
         )
     },
-    updateApprovedMOItemStatus: (body) => {
-        return Promise.all(body.map((val) => {
-            return new Promise((resolve, reject) => {
+    // updateApprovedMOItemStatus: (body) => {
+    //     return Promise.all(body.map((val) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `UPDATE
+    //                        crm_reqitems_approval_details
+    //                  SET
+    //                        item_mo_approve = ? ,
+    //                        item_mo_remarks = ?  ,
+    //                        item_mo_apprv_date = ?,
+    //                        item_mo_user = ?
+    //                  WHERE
+    //                        req_detl_slno = ? and req_slno = ?`,
+    //                 [
+    //                     val.itemStatus,
+    //                     val.remarks,
+    //                     val.statusDate,
+    //                     val.user,
+    //                     val.req_detl_slno,
+    //                     val.req_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     // console.log(error);
+
+    //                     if (error) {
+    //                         return reject(error)
+    //                     }
+    //                     return resolve(results)
+    //                 }
+    //             )
+    //         })
+    //     })
+    //     )
+    // },
+    updateApprovedMOItemStatus: async (body) => {
+        for (const val of body) {
+            await new Promise((resolve, reject) => {
                 pool.query(
                     `UPDATE
-                           crm_reqitems_approval_details
-                     SET
-                           item_mo_approve = ? ,
-                           item_mo_remarks = ?  ,
-                           item_mo_apprv_date = ?,
-                           item_mo_user = ?
-                     WHERE
-                           req_detl_slno = ? and req_slno = ?`,
+                    crm_reqitems_approval_details
+                SET
+                    item_mo_approve = ?,
+                    item_mo_remarks = ?,
+                    item_mo_apprv_date = ?,
+                    item_mo_user = ?
+                WHERE
+                    req_detl_slno = ? AND req_slno = ?`,
                     [
                         val.itemStatus,
                         val.remarks,
@@ -336,16 +370,16 @@ module.exports = {
                         val.req_detl_slno,
                         val.req_slno
                     ],
-                    (error, results, fields) => {
+                    (error, results) => {
                         if (error) {
-                            return reject(error)
+                            console.error("Deadlock or SQL error:", error);
+                            return reject(error);
                         }
-                        return resolve(results)
+                        resolve(results);
                     }
-                )
-            })
-        })
-        )
+                );
+            });
+        }
     },
 
     updateApprovedSMOItemStatus: (body) => {

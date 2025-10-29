@@ -158,11 +158,18 @@ module.exports = {
 
     ReqComCategorty: (data, callBack) => {
         pool.query(
-            // `select cm_complaint_mast.complaint_slno,compalint_date,cm_location,complaint_desc,
-            // cm_complaint_type.complaint_type_name,cm_priority_desc,em_name as createuser,
+            // `select 
+			// cm_complaint_mast.complaint_slno,
+            // compalint_date,
+            // cm_location,
+            // complaint_desc,
+            // cm_complaint_type.complaint_type_name,
+            // cm_priority_desc,
+            // em_name as createuser,
             // assigned_date,co_deptsec_mast.sec_name as location,cm_rectify_time,cm_verfy_time,
-            // cm_rectify_time,cm_verfy_time,
-            // TIMEDIFF(assigned_date, compalint_date) as tat
+            // cm_rectify_time,
+            // cm_verfy_time,
+            // assigned_date            
             // from cm_complaint_mast
             // left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
             // left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
@@ -171,23 +178,59 @@ module.exports = {
             // left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
             // where compalint_date between ? and ?  and complaint_typeslno=? group by complaint_slno`,
             `select 
-			cm_complaint_mast.complaint_slno,
+            cm_complaint_mast.complaint_slno,
             compalint_date,
             cm_location,
             complaint_desc,
             cm_complaint_type.complaint_type_name,
             cm_priority_desc,
             em_name as createuser,
-            assigned_date,co_deptsec_mast.sec_name as location,cm_rectify_time,cm_verfy_time,
+            assigned_date,
+            co_deptsec_mast.sec_name as location,
             cm_rectify_time,
             cm_verfy_time,
-            assigned_date            
+            rm_room_name,
+            rm_newroom_creation.rm_roomtype_slno,
+            rm_room_floor_slno,
+            rm_insidebuilldblock_slno,
+            rm_insidebuildblock_name,
+            rm_floor_name,
+            rm_roomtype_name,
+            cm_complaint_location,
+            CONCAT(
+                rm_room_name,
+                CASE WHEN rm_room_name IS NOT NULL AND 
+                        (rm_roomtype_name IS NOT NULL OR rm_insidebuildblock_name IS NOT NULL OR rm_floor_name IS NOT NULL)
+                    THEN ' (' ELSE '' END,
+                COALESCE(rm_roomtype_name, ''),
+                CASE WHEN rm_roomtype_name IS NOT NULL AND rm_insidebuildblock_name IS NOT NULL THEN ' - ' ELSE '' END,
+                COALESCE(rm_insidebuildblock_name, ''),
+                CASE WHEN (rm_insidebuildblock_name IS NOT NULL OR rm_roomtype_name IS NOT NULL) 
+                        AND rm_floor_name IS NOT NULL THEN ' - ' ELSE '' END,
+                COALESCE(rm_floor_name, ''),
+                CASE WHEN rm_room_name IS NOT NULL AND 
+                        (rm_roomtype_name IS NOT NULL OR rm_insidebuildblock_name IS NOT NULL OR rm_floor_name IS NOT NULL)
+                    THEN ')' ELSE '' END
+            ) AS room_location
             from cm_complaint_mast
-            left join cm_complaint_detail on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
-            left join co_deptsec_mast on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
-            left join cm_complaint_type on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
-            left join cm_priority_mast on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
-            left join co_employee_master on co_employee_master.em_id=cm_complaint_mast.create_user
+            left join cm_complaint_detail 
+                on cm_complaint_detail.complaint_slno=cm_complaint_mast.complaint_slno
+            left join co_deptsec_mast 
+                on co_deptsec_mast.sec_id=cm_complaint_mast.cm_location
+            left join cm_complaint_type 
+                on cm_complaint_type.complaint_type_slno=cm_complaint_mast.complaint_typeslno
+            left join cm_priority_mast 
+                on cm_priority_mast.cm_priority_slno=cm_complaint_mast.compalint_priority
+            left join co_employee_master 
+                on co_employee_master.em_id=cm_complaint_mast.create_user
+            left join rm_newroom_creation 
+                on rm_newroom_creation.rm_room_slno = cm_complaint_mast.rm_room_slno
+            left join rm_room_type_master 
+                on rm_room_type_master.rm_roomtype_slno =rm_newroom_creation.rm_roomtype_slno
+            left join rm_floor_creation 
+                on rm_floor_creation.rm_floor_slno =rm_newroom_creation.rm_room_floor_slno
+            left join rm_insidebuildblock_mast 
+                 on rm_insidebuildblock_mast.rm_insidebuildblock_slno =rm_newroom_creation.rm_insidebuilldblock_slno
             where compalint_date between ? and ?  and complaint_typeslno=? group by complaint_slno`,
             [
                 data.start_date,
@@ -358,5 +401,30 @@ module.exports = {
             }
         );
     },
+    getHoldedTickets: (sql, params, callback) => {
+        pool.query(sql, params, (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
 
+        getPendingTicketsReport: (sql, params, callback) => {
+        pool.query(sql, params, (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
+
+            getPendingTicketsCountReport: (sql, params, callback) => {
+        pool.query(sql, params, (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
 }

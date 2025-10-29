@@ -1,15 +1,9 @@
 
 const { CategoryInsert, CategoryView, CategoryUpdate ,ScrapYardInsert,ScrapYardView,ScrapYardUpdate,QualityInsert,QualityView,QualityUpdate,QuantityUnitInsert,QuantityUnitView,
-    QuantityUnitUpdate,SupplierRateInsert,SupplierRateView,SupplierRateUpdate,getActiveCategory,getActiveQuality,getActiveQuantity,
-    getSelectedSupplierRates,getActiveScarpLocation,scraplevelInsert,
-    getScraplevels,getScraplevelUpdate,getScrapActivelevels,
-    getEmployeeScrapLevel,
-    getScrapActiveToplevel,
-    getscrapItemRateDetail,
-    RemoveAddedItemFromCategorized,
-    RemoveItemFromCategorized
+    QuantityUnitUpdate,SupplierRateInsert,SupplierRateView,SupplierRateUpdate,getActiveCategory,getActiveQuality,getActiveQuantity, getSelectedSupplierRates,
+    getActiveScarpLocation,scraplevelInsert, getScraplevels,getScraplevelUpdate,getScrapActivelevels,getEmployeeScrapLevel,getScrapActiveToplevel, getscrapItemRateDetail,
+    RemoveAddedItemFromCategorized,  RemoveItemFromCategorized } = require('./condem_master.service')
     
-} = require('./condem_master.service')
 module.exports = {
  CategoryInsert: (req, res) => {
         const body = req.body;
@@ -585,7 +579,7 @@ getScrapActiveToplevel: (req, res) => {
         })
     },
 
-        RemoveItemFromCategorized: (req, res) => {
+        RemoveItemFromCategorized: (req, res) => {            
             const body = req.body;              
             RemoveItemFromCategorized(body, (err, results) => {
                 if (err) {
@@ -608,28 +602,28 @@ getScrapActiveToplevel: (req, res) => {
             })
         },
         
-        RemoveAddedItemFromCategorized: (req, res) => {
-            const body = req.body;    
-            RemoveAddedItemFromCategorized(body, (err, results) => {
-                if (err) {
-                    return res.status(200).json({
-                        success: 0,
-                        message: err
-                    })
-                }
-                if (results === 0) {
-                    return res.status(200).json({
-                        success: 1,
-                        message: "No record found"
-    
-                    })
-                }
+        RemoveAddedItemFromCategorized: (req, res) => {   
+        const body = req.body;
+        RemoveAddedItemFromCategorized(body, (err, results) => {
+            if (err) {
                 return res.status(200).json({
-                    success: 2,
-                    message: "Remove Item From Category"
+                    success: 0,
+                    message: err
                 })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Item Removed successfully"
             })
-        },
-        
+        })
+    },
+
 
 }

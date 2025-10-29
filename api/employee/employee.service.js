@@ -316,8 +316,8 @@ module.exports = {
         data.em_id,
       ],
       (error, results, feilds) => {
-        if (error) {
-          return callBack(error);
+        if (error) {    
+        return callBack(error);
         }
         return callBack(null, results);
       }

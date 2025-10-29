@@ -36,9 +36,7 @@ router.get('/getScrapActiveToplevel', checkToken, getScrapActiveToplevel)
 router.post("/getscrapItemRateDetail", checkToken, getscrapItemRateDetail);
 
 router.patch('/RemoveItemFromCategorized', checkToken, RemoveItemFromCategorized)
-router.patch('/RemoveAddedItemFromCategorized', checkToken, RemoveAddedItemFromCategorized)
-
-
+router.patch('/RemoveItemsAddedFromCategorized', checkToken, RemoveAddedItemFromCategorized)
 
 
 module.exports = router

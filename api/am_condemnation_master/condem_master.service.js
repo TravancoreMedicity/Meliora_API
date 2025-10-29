@@ -719,20 +719,23 @@ module.exports = {
 },
 
 
-      RemoveAddedItemFromCategorized: (data, callback) => {
+
+
+
+      RemoveAddedItemFromCategorized: (data, callback) => {       
              pool.query(
             `UPDATE am_condemnation_added_items SET                   
             scrap_category=?,
             scrap_quality=?,
             scrap_yard=?,
-            scarp_categorize=?
+            scrap_categorize=?
             WHERE 
             item_slno=?`,
             [
                 data.scrap_category,
                 data.scrap_quality,
                 data.scrap_yard,
-                data.scarp_categorize,
+                data.scrap_categorize,
                 data.item_slno
 
             ],
@@ -744,6 +747,9 @@ module.exports = {
             }
         )
     },
+
+
+    
 
 }
 

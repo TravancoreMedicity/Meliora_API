@@ -1,7 +1,10 @@
 const { pool } = require('../../config/database');
 const { getAssetDetails, getcomplaintDetails, getAssetcomplaintDetails, serviceDetailsInsert, getserviceDetails, serviceDetailsUpdate, getAllserviceDetails,
     AssetDetailsUpdate, SpareDetailsUpdate, spareServiceUpdate, servicedEmpDetailsInsert, getDeptServiceDetailsData, servicedEmpDetailsUpdate, AssetServiceHoldUpdate,
-    SpareServiceHoldUpdate, getAssetListUnderCustodian, getAssetAlllDetails, getAssetUnderSelectdDeptAndSec, getPendingAsset, getPendingSpare, CmSpareComplaintService
+    SpareServiceHoldUpdate, getAssetListUnderCustodian, getAssetAlllDetails, getAssetUnderSelectdDeptAndSec, getPendingAsset, getPendingSpare, CmSpareComplaintService,
+    InsertSupplierContactDetails,
+    UpdateSupplierContactDetails,
+    viewSupplierContactDetails
 } = require('./spare_service_details.service')
 module.exports = {
 
@@ -515,5 +518,67 @@ module.exports = {
             })
         })
     },
+
+     InsertSupplierContactDetails: (req, res) => {
+        const body = req.body;
+        InsertSupplierContactDetails(body, (err, result) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Supplier Contact Details Added Successfully",          
+            })
+        })
+    },
+    UpdateSupplierContactDetails: (req, res) => {
+        const body = req.body;
+
+        UpdateSupplierContactDetails(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Supplier Contact Details Updated Successfully"
+            })
+        })
+    },   
+
+        viewSupplierContactDetails: (req, res) => {
+            const id = req.params.id;
+            viewSupplierContactDetails(id, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                if (!results) {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "No Data"
+                    });
+                }
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            })
+        },
+    
 
 }

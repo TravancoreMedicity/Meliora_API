@@ -832,8 +832,7 @@ module.exports = {
 
         ViewCategorizedItems: (data, callback) => {       
            
-        pool.query(
-           
+        pool.query(           
             `Select 
             am_condem_detail_slno,
             scrap_category,
@@ -865,7 +864,7 @@ module.exports = {
             where  
             am_condemnation_details.scarp_categorize = 1
             and item_status = 1 
-             and scrap_submitted = 0
+            and scrap_submitted = 0
             and scrap_category = ?
             and scrap_quality = ?`,
             [

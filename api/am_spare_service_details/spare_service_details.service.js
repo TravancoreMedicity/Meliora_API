@@ -1091,4 +1091,97 @@ module.exports = {
             }
         );
     },
+
+     InsertSupplierContactDetails: (data, callback) => {
+    pool.query(
+      `INSERT INTO am_service_supplier_details
+            (          
+            service_details_slno,
+            supplier_slno,
+            contact_status,
+            contacted_emp,                    
+            contacted_date,
+             expected_service_vists,                    
+            supplier_response,
+            create_user
+            )
+            VALUES (?, ?, ?, ?, ?,?,?,?)`,
+      [
+        data.service_details_slno || null,
+        data.supplier_slno || null,
+        data.contact_status || null,
+        data.contacted_emp || null,
+        data.contacted_date || null,
+        data.expected_service_vists || null,
+        data.supplier_response || null,
+        data.create_user || null,
+      ],
+      (error, results, fields) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
+  UpdateSupplierContactDetails: (data, callback) => {
+    pool.query(
+      `UPDATE am_service_supplier_details SET 
+            service_details_slno=?,
+            supplier_slno=?   ,
+            contacted_emp=?,     
+            contacted_date=?,
+            expected_service_vists=?,
+            supplier_response=?,
+            edit_user=?
+            WHERE 
+            supplier_service_slno=?`,
+      [
+        data.service_details_slno,
+        data.supplier_slno,
+        data.contacted_emp,
+        data.contacted_date,
+        data.expected_service_vists,
+        data.supplier_response,
+        data.edit_user,
+        data.supplier_service_slno,
+      ],
+      (error, results, feilds) => {
+        if (error) {
+          return callback(error);
+        }
+        return callback(null, results);
+      }
+    );
+  },
+
+  viewSupplierContactDetails: (id, callBack) => {
+    pool.query(
+      `SELECT 
+            supplier_service_slno, 
+            em_name,
+            it_supplier_name,
+            service_details_slno,
+            supplier_slno, contact_status,
+            contacted_emp, contacted_date, 
+            expected_service_vists,
+            supplier_response                
+            FROM
+            am_service_supplier_details
+            left join it_bill_supplier_details_mast on it_bill_supplier_details_mast.it_supplier_slno = am_service_supplier_details.supplier_slno
+            left join co_employee_master on co_employee_master.em_id=am_service_supplier_details.contacted_emp
+            where
+            service_details_slno=?
+            and
+            contact_status=1`,
+
+      [id],
+      (error, results, fields) => {
+        if (error) {
+          callBack(error);
+        }
+        return callBack(null, results);
+      }
+    );
+  },
 }

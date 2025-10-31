@@ -176,7 +176,7 @@ module.exports = {
       if (results.length === 0) {
         deleteRefreshToken(id, (error, results) => {
           if (error) {
-            logger.error(error);
+            // logger.error(error);
             res.clearCookie("accessToken");
             return res.status(403).json({ message: "Invalid refresh token" });
           }

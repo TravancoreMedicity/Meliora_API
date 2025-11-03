@@ -17,6 +17,9 @@ const {
   validateUserCredExcistOrNot,
   userBasedValidationCheck,
   userBasedInsertRefreshToken,
+  userBasedInsertEliderToken,
+  userBasedInsertKMCToken,
+  getelidertoken, getKmctoken
 } = require("./user.service");
 
 const { addHours, format } = require("date-fns");
@@ -24,6 +27,9 @@ const logger = require("../../logger/logger");
 const {
   generateAccessToken,
   generateRefreshToken,
+  generateEliderToken,
+  generateEliderID,
+  generateKmcToken
 } = require("../helperFunction/HelperFunction");
 const { encrypt, decrypt } = require("../EncryptionHandler/EncryptionHandler");
 const { validateUserLoginCheck } = require("./user.function");
@@ -170,7 +176,7 @@ module.exports = {
       if (results.length === 0) {
         deleteRefreshToken(id, (error, results) => {
           if (error) {
-            logger.error(error);
+            // logger.error(error);
             res.clearCookie("accessToken");
             return res.status(403).json({ message: "Invalid refresh token" });
           }
@@ -234,7 +240,6 @@ module.exports = {
   },
   userBasedLoginVerification: async (req, res) => {
     const body = req.body;
-    console.log(body);
     // CHECK USER BASED VALIDATION FIRST CHECK THE PASSWORD CREDENTIAL THEN REST
     userBasedValidationCheck(body, (error, results) => {
       if (error) {
@@ -267,8 +272,6 @@ module.exports = {
             em_id,
             emp_no,
           } = userData;
-          console.log(userData);
-
           const validatingUserLogin = validateUserLoginCheck(
             password_validity,
             last_passwd_change_date,
@@ -285,6 +288,11 @@ module.exports = {
           } else {
             const accessToken = generateAccessToken(empdtl_slno);
             const refreshToken = generateRefreshToken(empdtl_slno); //instead use empdtl_slno
+            const eliderID = generateEliderID(empdtl_slno)
+            const elidertoken = generateEliderToken(eliderID)
+            const kmctoken = generateKmcToken(empdtl_slno)
+            //insert elider token
+
             // insert the refresh token
             //user_slno to empdtl_slno
             userBasedInsertRefreshToken(
@@ -318,21 +326,34 @@ module.exports = {
                       "yyyy-MM-dd HH:mm:ss"
                     ),
                     desg_name: userData.desg_name,
-                    // token: jsontoken,
-                    // user: results.emp_username,
-                    // emp_no: results.emp_no,
-                    // emp_id: results.em_id,
-                    // emp_name: results.em_name,
-                    // emp_sec: results.sec_name,
-                    // emp_secid: results.em_dept_section,
-                    // app_token: results.app_token,
-                    // emp_dept: results.em_department,
-                    // dept_name: results.dept_name,
-                    // logintime: results.login,
-                    // supervisor: results.supervisor,
-                    // logOutTime: format(addHours(new Date(results.login), logout_time), 'yyyy-MM-dd HH:mm:ss'),
-                    // desg_name: results.desg_name,
+                    section_incharge_name: userData.section_incharge_name,
+                    section_incharge_id: userData.section_incharge_id,
+                    section_hod_name: userData.section_hod_name,
+                    section_hod_id: userData.section_hod_id
+
                   };
+
+                  userBasedInsertEliderToken({
+                    Elider_token: elidertoken, Elider_Id: eliderID
+                  }, (error, result) => {
+                    if (error) {
+                      return res.status(500).json({
+                        success: 0,
+                        message: "Token Not Inserted",
+                      });
+                    }
+                  });
+
+                  userBasedInsertKMCToken({
+                    KMC_token: kmctoken
+                  }, (error, result) => {
+                    if (error) {
+                      return res.status(500).json({
+                        success: 0,
+                        message: "Token Not Inserted",
+                      });
+                    }
+                  });
                   res.cookie("accessToken", accessToken, {
                     // httpOnly: true,
                     secure: false, // Set to false for HTTP (localhost). Use true for HTTPS (production).
@@ -348,6 +369,19 @@ module.exports = {
                 }
               }
             );
+
+            // userBasedInsertEliderToken(
+            //   { Elider_token: elidertoken, Elider_Id: eliderID },
+            //   (error, results) => {
+            //     if (error) {
+            //       // logger.error(error);
+            //       return res.status(500).json({
+            //         success: 0,
+            //         message: "Database connection error while insert Elider Token",
+            //       });
+            //     }
+            //   }
+            // );
           }
         } else {
           return res.status(200).json({
@@ -359,4 +393,50 @@ module.exports = {
     });
   },
 
+
+  getelidertoken: (req, res) => {
+    getelidertoken((error, results) => {
+      if (error) {
+        return res.status(500).json({
+          success: 0,
+          message: "Database connection error",
+        });
+      }
+
+      if (results?.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "no data",
+        });
+      }
+
+      return res.status(200).json({
+        success: 1,
+        data: results,
+      });
+    });
+  },
+
+  getKmctoken: (req, res) => {
+    getKmctoken((error, results) => {
+      if (error) {
+        return res.status(500).json({
+          success: 0,
+          message: "Database connection error",
+        });
+      }
+
+      if (results?.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "no data",
+        });
+      }
+
+      return res.status(200).json({
+        success: 1,
+        data: results,
+      });
+    });
+  },
 };

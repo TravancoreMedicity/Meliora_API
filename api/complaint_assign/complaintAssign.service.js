@@ -127,7 +127,7 @@ module.exports = {
     getEmployee: (id, callBack) => {
         pool.query(
             ` SELECT em_id, em_name ,em_no FROM co_employee_master where em_department=?
-            and em_status=1 and em_no!=1 and em_id!=1606 order by em_name ASC `,
+            and em_status=1 and em_no!=1  order by em_name ASC `,
             [
                 id
             ],
@@ -330,7 +330,7 @@ module.exports = {
     getassistantEmployee: (data, callBack) => {
         pool.query(
             ` SELECT em_id, em_name FROM co_employee_master where em_department=? and em_id !=?
-            and em_status=1 and em_no!=1 and em_id!=1606`,
+            and em_status=1 and em_no!=1 `,
             [
                 data.em_department,
                 data.em_id
@@ -1239,7 +1239,7 @@ module.exports = {
         );
     },
 
-    AssistReqEmployee: (data, callback) => {
+    AssistReqEmployee: (data, callback) => {      
         pool.query(
             `SELECT           
             cmcd.assigned_emp,
@@ -1346,7 +1346,7 @@ module.exports = {
     getDeptEmployees: (data, callBack) => {
         pool.query(
             ` SELECT em_id, em_name FROM co_employee_master where em_department=?
-            and em_status=1 and em_no!=1 and em_id!=1606`,
+            and em_status=1 and em_no!=1 `,
             [
                 data.em_department,
                 data.em_id

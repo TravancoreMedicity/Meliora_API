@@ -2,9 +2,10 @@ const router = require('express').Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { crfRegistration, crfRegimageGet, crfDataCollection, getDataCollectionImage,
     ImageInsertHOD, ImageInsertDMS, ImageInsertMS, ImageInsertMO, ImageInsertSMO,
-    ImageInsertGM, ImageInsertMD, ImageInsertED, crfHodImageGet, crfDMSImageGet,
+    ImageInsertGM, ImageInsertMD, ImageInsertED, crfHodImageGet, crfDMSImageGet, GetEmployeeGuide,
     crfMSImageGet, crfMOImageGet, crfSMOImageGet, crfGMImageGet, crfMDImageGet, crfNabhImageGet, crfNabhGuidImageGet,
-    crfEDImageGet, ImageInsertManaging, crfManageImageGet, ImageInsertMDKmch, crfKMCHMDImageGet, crfDeliveryMarking, crfDMimageGet
+    crfEDImageGet, ImageInsertManaging, crfManageImageGet, ImageInsertMDKmch, crfKMCHMDImageGet, crfDeliveryMarking, crfDMimageGet, GetSoundAlike,
+    GetSradhaPolicy, GetMSDS, GetMEDF, GetAbbreviation, GetFridge, GetHighRisk, GetLookAlike, GetPsychotropic
 } = require('../crm_new_file_upload/crm_fileupload.controller')
 
 router.post("/InsertRegisterImage", checkToken, crfRegistration)
@@ -40,6 +41,16 @@ router.post("/InsertDMimage", checkToken, crfDeliveryMarking)
 router.get("/crfDMimageGet/:id", checkToken, crfDMimageGet)
 router.get("/crfNabhImageGet", checkToken, crfNabhImageGet)
 router.get("/crfNabhGuidImageGet", checkToken, crfNabhGuidImageGet)
+router.get("/EmployeeGuide", checkToken, GetEmployeeGuide)
+router.get("/SoundAlike", checkToken, GetSoundAlike)
+router.get("/SradhaPolicy", checkToken, GetSradhaPolicy)
+router.get("/MSDS", checkToken, GetMSDS)
+router.get("/MEDF", checkToken, GetMEDF)
+router.get("/Abbreviation", checkToken, GetAbbreviation)
+router.get("/Fridge", checkToken, GetFridge)
+router.get("/HighRisk", checkToken, GetHighRisk)
+router.get("/LookAlike", checkToken, GetLookAlike)
+router.get("/Psychotropic", checkToken, GetPsychotropic)
 
 
 module.exports = router;

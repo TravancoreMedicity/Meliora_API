@@ -181,6 +181,12 @@ const {
     gethkcheckdtl,
     gethkcomplaintdetails,
     gethkbedDetails,
+    getchecklistbed,
+    getallComplaintType,
+    getCommonFeedbackReport,
+    getIpFeedbackReport,
+    insertCallCenterDetail,
+    getAllPREMDetail,
 } = require("./Feedback.service");
 
 module.exports = {
@@ -523,8 +529,6 @@ module.exports = {
             }
 
         })
-
-
     },
     getFeedbackName: (req, res) => {
         getFeedbackName((error, results) => {
@@ -549,6 +553,30 @@ module.exports = {
             }
         })
     },
+    getAllPREMDetail: (req, res) => {
+        getAllPREMDetail((error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Error in fetching data!"
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 0,
+                    message: 'No data Found'
+                })
+            }
+            if (results.length > 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "Successfully Fetched Data",
+                    data: results
+                })
+            }
+        })
+    },
+
     UpdateFeedbackName: (req, res) => {
         const body = req.body;
         UpdateFeedbackName(body, (error, results) => {
@@ -830,8 +858,15 @@ module.exports = {
     },
     insertFeedbackanswers: (req, res) => {
         const body = req.body;
-        const { fb_answers, fb_ip_num, fb_patient_num, fb_patient_name, fb_patient_mob, fdmast_slno, fb_default_quest,
-            fb_default_reamark, create_user } = body;
+        const { fb_answers,
+            fb_ip_num,
+            fb_patient_num,
+            fb_patient_name,
+            fb_patient_mob,
+            fdmast_slno,
+            fb_default_quest,
+            fb_default_reamark,
+            create_user } = body;
 
         UpdateSerialAnswerMaster((error, results) => {
 
@@ -851,7 +886,7 @@ module.exports = {
 
                 // getting transaction slno for the each patients
                 let serialCurrentValue = results[0]?.serial_current;
-        
+
                 if (!serialCurrentValue) {
                     return res.status(200).json({
                         success: 1,
@@ -867,6 +902,7 @@ module.exports = {
                     fb_patient_num: fb_patient_num,
                     fb_patient_name: fb_patient_name,
                     fb_patient_mob: fb_patient_mob,
+                    fb_call_staus: fdmast_slno === 8 ? 1 : 0,
                     create_user: create_user
                 }
 
@@ -887,6 +923,12 @@ module.exports = {
                     remark: fb_default_reamark,
                     create_user: create_user
                 }
+
+                // const IsCalled = {
+                //     fb_transact_slno: fb_transact_slno_value,
+                //     fb_ip_num: fb_ip_num,
+                //     fb_cc_submitted: 1
+                // }
 
 
                 insertAllFeedBackTransactionMast(insertData, (error, results) => {
@@ -932,6 +974,20 @@ module.exports = {
 
                         });
                     }
+
+                    //insert Callcenter Detail to check if it is submitted
+                    // if (fdmast_slno === 8 && fdmast_slno != undefined) {
+                    //     insertCallCenterDetail(IsCalled, (err, results) => {
+                    //         if (err) {
+                    //             return res.status(400).json({
+                    //                 success: 0,
+                    //                 message: err
+                    //             });
+                    //         }
+
+                    //     });
+                    // }
+
                     return res.status(200).json({
                         success: 2,
                         message: "Inserted Successfully",
@@ -1025,8 +1081,9 @@ module.exports = {
             }
             if (results.length === 0) {
                 return res.status(200).json({
-                    success: 0,
-                    message: 'No data Found'
+                    success: 2,
+                    message: 'No data Found',
+                    data: []
                 })
             }
             if (results.length > 0) {
@@ -1597,7 +1654,7 @@ module.exports = {
                 fb_hk_bed_status: fb_hk_bd_status,
                 fb_hk_bed_remark: fb_hk_remark,
                 assignEmployeee: assignEmployeee,
-                fb_hk_check_status: fb_hk_bd_status === 1 ? 1 : 2
+                fb_hk_check_status: fb_hk_bd_status //=== 1 ? 1 : 2
             };
 
             const HkCheklistData = data?.map((val, index) => {
@@ -2128,6 +2185,29 @@ module.exports = {
             });
         })
     },
+    getchecklistbed: (req, res) => {
+        getchecklistbed((error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+
+            });
+        })
+    },
+
     insertbedremarks: (req, res) => {
         const Body = req.body;
         const { fb_bed_slno,
@@ -2441,7 +2521,17 @@ module.exports = {
     // complaint feedback
     complaintregistraion: (req, res) => {
         const data = req.body;
-        const { cm_assets, complaint_request_slno, compalint_date, cm_location, create_user } = data;
+        const {
+            cm_assets,
+            complaint_request_slno,
+            compalint_date,
+            cm_location,
+            create_user,
+            fb_ticket,
+            cm_complaint_location,
+            complaint_dept_secslno
+        } = data;
+
         const assetLength = cm_assets?.length;
         fetchcurrentserialnos((error, results) => {
             if (error) {
@@ -2458,7 +2548,9 @@ module.exports = {
                     success: 1,
                     message: "No data found"
                 })
-            }
+            };
+
+
 
             const datas = cm_assets?.map((val, index) => {
                 const insertData = {
@@ -2468,14 +2560,16 @@ module.exports = {
                     complaint_request_slno: complaint_request_slno,
                     compalint_date: compalint_date,
                     compalint_status: val.complaint_status,
-                    cm_location: cm_location,
+                    cm_location: cm_location, // only this part left
                     create_user: create_user,
-                    assigned_user: val.assigned_employee
+                    fb_ticket: fb_ticket,
+                    assigned_user: val.assigned_employee,
+                    complaint_typeslno: val.fb_asset_type,
+                    cm_complaint_location: cm_complaint_location,
+                    complaint_dept_secslno: complaint_dept_secslno
                 }
                 return insertData
             });
-
-
 
             complaintregistraion(datas, (err, results) => {
                 if (err) {
@@ -2507,10 +2601,7 @@ module.exports = {
                     })
 
                 })
-
             });
-
-
         })
     },
 
@@ -2556,7 +2647,6 @@ module.exports = {
                         message: err
                     });
                 }
-
                 return res.status(200).json({
                     success: 2,
                     message: "Successfully Inserted"
@@ -2759,6 +2849,7 @@ module.exports = {
         });
     },
     getAllComplaintDetail: (req, res) => {
+        const data = req.body;
         getAllComplaintDetail((err, results) => {
             if (err) {
                 return res.status(400).json({
@@ -2779,6 +2870,31 @@ module.exports = {
             });
         });
     },
+    getallComplaintType: (req, res) => {
+        const id = req.params.id;
+        getallComplaintType(id, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found",
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
+
     getallbedmaster: (req, res) => {
         getallbedmaster((err, results) => {
             if (err) {
@@ -2811,7 +2927,8 @@ module.exports = {
             if (results.length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Record Found"
+                    message: "No Record Found",
+                    data: []
                 });
             }
 
@@ -2821,6 +2938,7 @@ module.exports = {
             });
         });
     },
+
     getallassignedbed: (req, res) => {
         const id = req.params.id;
         getallassignedbed(id, (err, results) => {
@@ -2930,6 +3048,50 @@ module.exports = {
     },
     getCurrentCompany: (req, res) => {
         getCurrentCompany((err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getCommonFeedbackReport: (req, res) => {
+        const data = req.body;
+        getCommonFeedbackReport(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getIpFeedbackReport: (req, res) => {
+        const data = req.body;
+        getIpFeedbackReport(data, (err, results) => {
             if (err) {
                 return res.status(400).json({
                     success: 0,
@@ -3474,8 +3636,10 @@ module.exports = {
     getdischargepatient: (req, res) => {
         const data = req.body;
         const { NS_CODE, FROM_DATE, TO_DATE } = data;
-        let sql = `
-            SELECT 
+        let sql =
+            `
+          SELECT 
+            ROW_NUMBER() OVER () AS slno,
                 fb_ip_no,
                 fb_ipd_date,
                 fb_pt_no,
@@ -3493,14 +3657,16 @@ module.exports = {
                 fb_ptc_mobile,
                 fb_doc_name,
                 fb_dep_desc,
-                fb_bed.fb_ns_code
+                fb_bed.fb_ns_code,
+                fb_transaction_mast.fb_call_staus,
+                fb_transaction_mast.fb_transact_slno
             FROM
                 fb_ipadmiss
                 LEFT JOIN fb_bed on  fb_ipadmiss.fb_bd_code = fb_bed.fb_bd_code
+                LEFT JOIN fb_transaction_mast ON fb_transaction_mast.fb_ip_num = fb_ipadmiss.fb_ip_no and fb_transaction_mast.fdmast_slno = 8
             WHERE
-                fb_ipd_disc IS NOT NULL AND fb_ipc_status = 'R'
-        `;
-
+                fb_ipd_disc IS NOT NULL AND fb_ipc_status = 'R' 
+        `
         let queryParams = [];
 
         if (FROM_DATE) {
@@ -3741,7 +3907,10 @@ module.exports = {
             create_user,
             complaint_deptslno,
             complaint_status,
-            assigned_employee
+            assigned_employee,
+            cm_complaint_location,
+            fb_ticket,
+            complaint_dept_secslno
         } = data;
         const assetLength = cm_assets?.length;
         fetchcurrentserialnos((error, results) => {
@@ -3762,6 +3931,7 @@ module.exports = {
                 })
             };
 
+
             const datas = cm_assets?.map((val, index) => {
                 const insertData = {
                     complaint_slno: complaint_slno + index,
@@ -3772,12 +3942,14 @@ module.exports = {
                     compalint_status: complaint_status,
                     cm_location: cm_location,
                     create_user: create_user,
-                    assigned_user: assigned_employee
+                    assigned_user: assigned_employee,
+                    complaint_typeslno: val?.fb_asset_type,
+                    cm_complaint_location: cm_complaint_location,
+                    fb_ticket: fb_ticket,
+                    complaint_dept_secslno: complaint_dept_secslno
                 }
                 return insertData
             });
-
-
 
             complaintregistraion(datas, (err, results) => {
                 if (err) {
@@ -3816,8 +3988,8 @@ module.exports = {
         })
     },
     gethkcomplaintdetails: (req, res) => {
-        const slno = req.body
-        gethkcomplaintdetails(slno, (error, results) => {
+        const data = req.body
+        gethkcomplaintdetails(data, (error, results) => {
             if (error) {
                 return res.status(200).json({
                     success: 0,

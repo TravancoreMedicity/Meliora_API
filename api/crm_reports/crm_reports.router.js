@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { getCRFNoBased, getdataUserAcknldged, getdataUserNotAcknldged, getdataAllCRF, getPurchaseCRFData,
-    getPurchaseDetails, getPOdetailStores, getdataAllCRFWithPO, getCRFPurchaseAckPending
+    getPurchaseDetails, getPOdetailStores, getdataAllCRFWithPO, getCRFPurchaseAckPending, getCrfTat, getAllPurchasereport,
 } = require('../crm_reports/crm_report.controller');
 
 router.post('/getdataUserAcknldged', checkToken, getdataUserAcknldged);
@@ -17,6 +17,10 @@ router.post('/getdataAllCRFWithPO', checkToken, getdataAllCRFWithPO);
 
 router.get("/getPurchaseDetails/:id", checkToken, getPurchaseDetails);
 router.get("/getPOdetailStores/:id", checkToken, getPOdetailStores);
+router.post('/getCrfTat', checkToken, getCrfTat);
+router.post('/getAllPurchasereport', checkToken, getAllPurchasereport);
+
+
 
 
 module.exports = router;

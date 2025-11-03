@@ -19,15 +19,15 @@ app.use(cookieParser());
 // app.use(lusca.csrf());
 
 const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:3002",
   "http://192.168.10.88:9741",
   "http://192.168.10.88:9742",
   "https://192.168.10.88:9742",
-  "http://travancoremedicity.in:9741",
   "https://travancoremedicity.in:9742",
+  "http://travancoremedicity.in:9741",
+  "http://192.168.10.88:3000",
   "http://tm.medicity.co.in:8888",
   "http://192.168.10.88:8888",
+  "http://localhost:3002",
   "http://192.168.22.9:3000",
   "http://195.168.34.25:3001",
   "http://195.168.34.25:3000",
@@ -37,27 +37,7 @@ const allowedOrigins = [
 
 ];
 
-// app.use(
-//   cors({
-//     origin: [
-//       "http://192.168.10.88:9741",
-//       "http://192.168.10.88:9742",
-//       "https://192.168.10.88:9742",
-//       "https://travancoremedicity.in:9742",
-//       "http://travancoremedicity.in:9741",
-//       "http://192.168.10.88:3000",
-//       " http://tm.medicity.co.in:8888",
-//       " http://192.168.10.88:8888",
-//       "http://localhost:3002",
-//       "http://192.168.22.9:3000",
-//       "http://195.168.34.25:3001",
-//       "http://195.168.34.25:3000",
-//       "http://192.168.22.170:3000",
-//       "http://192.168.22.5:3000",
-//     ],
-//     credentials: true,
-//   })
-// );
+
 
 // Dynamically allow based on Origin
 app.use(
@@ -76,14 +56,15 @@ app.use(
   })
 );
 
+
 // ----- logger display For Info ----
 app.get("/info", (req, res) => {
   fs.readFile("./errorlog/info.log", (error, txtString) => {
     if (error) throw err;
     res.write(
       '<div id="content"><pre>' +
-        txtString.toString().replace(/\n/g, "<br />") +
-        "</pre>"
+      txtString.toString().replace(/\n/g, "<br />") +
+      "</pre>"
     );
     res.end();
   });
@@ -94,8 +75,8 @@ app.get("/error", (req, res) => {
     if (error) throw err;
     res.write(
       '<div id="content"><pre>' +
-        txtString.toString().replace(/\n/g, "<br />") +
-        "</pre>"
+      txtString.toString().replace(/\n/g, "<br />") +
+      "</pre>"
     );
     res.end();
   });
@@ -107,8 +88,8 @@ app.get("/warn", (req, res) => {
     if (error) throw err;
     res.write(
       '<div id="content"><pre>' +
-        txtString.toString().replace(/\n/g, "<br />") +
-        "</pre>"
+      txtString.toString().replace(/\n/g, "<br />") +
+      "</pre>"
     );
     res.end();
   });
@@ -122,6 +103,7 @@ const socketIOMiddlewre = (req, res, next) => {
   req.io = io;
   next();
 };
+
 
 const userRouter = require("./api/user/user.router");
 const employeeRouter = require("./api/employee/employee.router");
@@ -291,15 +273,9 @@ const feedbackforms = require("./api/Feedback/Feedback.router");
 const backuptypemast = require("./api/it_backup_type_master/backup_type.router");
 const simOperators = require("./api/it_sim_operators/sim_operators.router");
 const notificationMenu = require("./api/notificationMenu/notification.router");
-const {
-  validateAccessToken,
-} = require("./api/tokenValidation/tokenValidation");
+const { validateAccessToken, } = require("./api/tokenValidation/tokenValidation");
 const AssetCondemnation = require("./api/am_condem_details/am_condem.router");
-// const backuptypemast = require('./api/it_backup_type_master/backup_type.router')
-// const simOperators = require('./api/it_sim_operators/sim_operators.router')
-
-// const condemApprovalLevel = require('./api/am_asset_condem_approval_level_mast/approval_level_mast.router')
-
+const condemApprovalLevel = require('./api/am_asset_condem_approval_level_mast/approval_level_mast.router')
 const { validateTokenFrontend } = require("./authentication/ValidationCheck");
 const crfDeliveryMarking = require("./api/crm_delivery_marking/delivery_marking_router");
 const companyMast = require("./api/crm_company_mast/company.router");
@@ -307,6 +283,10 @@ const crmDashboard = require("./api/crm_dashboard/crmDasboard.router");
 const approvalMapping = require("./api/crm_approval_mapping/approval.router");
 const amsAntibiotic = require("./api/ams_antibiotic/ams.router");
 const validateAuthentication = require("./api/validate_authentication/employeeData.router");
+const melioraDepMaster = require("./api/Meliora_department_master/meliora_dep_master.router");
+const ContractMaster = require("./api/contract_master/contract.router");
+const condemMasters = require('./api/am_condemnation_master/condem_master.router')
+
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -484,7 +464,6 @@ app.use("/api/Amdashboard", Amdashboard);
 app.use("/api/Ticketdashboard", Ticketdashboard);
 app.use("/api/medvallet", med_vallet_master);
 app.use("/api/medvehilces", mv_vehicle_registration);
-app.use("/api/AssetCondemnation", AssetCondemnation);
 app.use("/api/backuptypemast", backuptypemast);
 app.use("/api/simOperators", simOperators);
 app.use("/api/notificationMenu", notificationMenu);
@@ -501,6 +480,11 @@ app.use("/api/CRFDashboard", crmDashboard);
 app.use("/api/approvalMapping", approvalMapping);
 app.use("/api/amsAntibiotic", amsAntibiotic);
 app.use("/api/validateAuthentication", validateAuthentication);
+app.use("/api/melioraDepMaster", melioraDepMaster);
+app.use("/api/ContractMaster", ContractMaster);
+app.use('/api/condemApprovalLevel', condemApprovalLevel)
+app.use('/api/condemMasters', condemMasters)
+
 
 server.listen(
   process.env.APP_PORT,

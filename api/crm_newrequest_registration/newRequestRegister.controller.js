@@ -5,7 +5,7 @@ const { requestRegistInsert, deleteCrfReq, requestRegistInsertDetl, requestAppro
     UpdateItemReceiveStatus, checkStoreReturnItem, insertReturnItemDetails, itemReturnDetailsForViewStore, getCommonMasterUpdate, getCommonMasterGetCat,
     viewItemReturnDetails, returnReplyDetails, getCrfDetailsForBiomedical, getCommonMaster, getCommonMasterGet, getStoreMasterInsert, getGetStoreMaster,
     getCommonMasterInsert, getCommonMasterSettingGet, getCommonMasterSettingUpdate, getDashBoardMaster, GetDashBoardMaster, getDashboardUpdate, GetDepartmentmappingGet,
-    getDashright, getCommonMasterGetByID, GetDataCollectionMasterUpdate, Getdatacollection, GetDataCollectionMaster, getdefaultRights, insertDepartmentMapping } = require('./newRequestRegister.service');
+    getDashright, getCommonMasterGetByID, GetDataCollectionMasterUpdate, Getdatacollection, GetDataCollectionMaster, getdefaultRights, insertDepartmentMapping, getAllPendingApprovalsMainAboveHOD } = require('./newRequestRegister.service');
 const logger = require('../../logger/logger');
 module.exports = {
 
@@ -575,18 +575,18 @@ module.exports = {
                 val: 7, name: 'dmsreject', sql: `AND (dms_req = 1 OR ms_approve_req=1) AND req_status='R' AND crf_close is null AND user_acknldge is null`
             },
             {
-                val: 8, name: 'dmsclosed', sql: `AND (dms_req = 1 OR ms_approve_req = 1) AND close_date BETWEEN ? AND ? AND (crf_close = 1 OR crf_close = 2)`
+                val: 8, name: 'dmsclosed', sql: `AND (dms_req = 1 OR ms_approve_req = 1) AND close_date BETWEEN ? AND ? AND (crf_close = 1 OR crf_close = 2)or internally_arranged_status = 1`
 
             },
             // MS
             {
-                val: 9, name: 'mspending', sql: `AND ms_approve_req = 1 AND ms_approve is null AND 
+                val: 9, name: 'mspending', sql: `AND ms_approve_req = 1 AND ms_approve is null AND internally_arranged_status = 0 AND
                 manag_operation_approv is null AND senior_manage_approv is null AND  gm_approve is null AND ed_approve is null
                  AND md_approve is null AND crf_close is null AND user_acknldge is null and  (req_status!='R' and req_status!='P' OR req_status is null)`
             },
             // MO
             {
-                val: 10, name: 'mopending', sql: `AND manag_operation_approv is null AND
+                val: 10, name: 'mopending', sql: `AND manag_operation_approv is null AND internally_arranged_status = 0 AND
                  senior_manage_approv is null AND  gm_approve is null AND ed_approve is null AND md_approve is null
                   AND crf_close is null AND user_acknldge is null AND req_status!='P' AND req_status!='R'`
             },
@@ -612,7 +612,7 @@ module.exports = {
                 val: 16, name: 'reject', sql: ` AND req_status='R' AND crf_close is null AND user_acknldge is null`
             },
             {
-                val: 17, name: 'closed', sql: `AND close_date BETWEEN ? AND ? AND (crf_close = 1 OR crf_close = 2)`
+                val: 17, name: 'closed', sql: `AND close_date BETWEEN ? AND ? AND (crf_close = 1 OR crf_close = 2) or internally_arranged_status = 1`
             },
             {
                 val: 18, name: 'smopending', sql: `AND senior_manage_approv is null AND gm_approve is null AND
@@ -656,7 +656,7 @@ module.exports = {
                     GROUP_CONCAT(item_type_name) as category,image_status,emergency_flag,emer_slno,crm_request_master.create_date,
                     total_approx_cost,user_deptsec,req_status,req_approv_slno,           
                     incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date,
-                    I.em_name as incharge_user,
+                    I.em_name as incharge_user,req_date,
                     hod_req, hod_approve, hod_remarks, hod_detial_analysis, hod_approve_date, H.em_name as hod_user,
                     dms_req, dms_approve, dms_remarks, dms_detail_analysis, dms_approve_date, D.em_name as dms_user,
                     ms_approve_req, ms_approve, ms_approve_remark, ms_detail_analysis, ms_approve_date, M.em_name as ms_approve_user,
@@ -1576,6 +1576,143 @@ module.exports = {
                 data: results
             })
         })
+    },
+    getAllPendingApprovalsMainAboveHOD: (req, res) => {
+        const { level, from, to } = req.body;
+        const sqlArray = [
+            // DMS
+            {
+                val: 1, name: 'dmspending', sql: `AND dms_req = 1 AND dms_approve is null AND ms_approve is null AND 
+                manag_operation_approv is null AND senior_manage_approv is null AND gm_approve is null AND ed_approve is null and  hod_approve = 1 
+                 AND md_approve is null AND crf_close is null AND user_acknldge is null   and  (req_status!='R' and req_status!='P' OR req_status is null)`
+
+            },
+
+            // MS
+            {
+                val: 9, name: 'mspending', sql: `AND ms_approve_req = 1 AND ms_approve is null AND 
+                manag_operation_approv is null AND senior_manage_approv is null AND  gm_approve is null AND ed_approve is null and dms_approve = 1
+                 AND md_approve is null AND crf_close is null AND user_acknldge is null and  (req_status!='R' and req_status!='P' OR req_status is null)`
+            },
+            // MO
+            {
+                val: 10, name: 'mopending', sql: `AND manag_operation_approv is null AND
+                 senior_manage_approv is null AND  gm_approve is null AND ed_approve is null AND md_approve is null and ms_approve = 1
+                  AND crf_close is null AND user_acknldge is null AND req_status!='P' AND req_status!='R'`
+            },
+
+            {
+                val: 18, name: 'smopending', sql: `AND senior_manage_approv is null AND gm_approve is null AND
+                 ed_approve is null AND md_approve is null AND crf_close is null AND user_acknldge is null and manag_operation_approv = 1
+                  AND req_status!='P' AND req_status!='R' AND internally_arranged_status =0 `
+            },
+            {
+                val: 19, name: 'gmpending', sql: `AND gm_approve is null AND
+                 ed_approve is null AND md_approve is null AND crf_close is null AND user_acknldge is null and manag_operation_approv = 1
+                  AND req_status!='P' AND req_status!='R'AND internally_arranged_status =0`
+            },
+            {
+                val: 20, name: 'mdpending', sql: `AND md_approve is null AND crf_close is null AND user_acknldge is null and gm_approve = 1
+                  AND req_status!='P' AND req_status!='R' AND internally_arranged_status =0`
+            },
+            {
+                val: 21, name: 'edpending', sql: `AND ed_approve is null AND crf_close is null AND user_acknldge is null and md_approve = 1
+                  AND req_status!='P' AND req_status!='R' AND internally_arranged_status =0`
+            },
+
+        ]
+        const filterSql = sqlArray.find(e => e.val === level)?.sql || '';
+        const sql = `
+                SELECT
+                    crm_request_master.req_slno,crm_request_master.actual_requirement,crm_request_master.needed,
+                    R.sec_name as req_deptsec,U.sec_name as user_deptsection,CR.em_name as create_user,
+                    crf_close,crf_close_remark,crf_closed_one,close_date,C.em_name as closed_user,
+                    crm_emergencytype_mast.emer_type_name,crm_emergencytype_mast.emer_type_escalation,
+                    crm_request_master.request_deptsec_slno,crm_request_master.location,emergeny_remarks,expected_date,
+                    GROUP_CONCAT(item_type_name) as category,image_status,emergency_flag,emer_slno,crm_request_master.create_date,
+                    total_approx_cost,user_deptsec,req_status,req_approv_slno,           
+                    incharge_req, incharge_approve, incharge_remarks, inch_detial_analysis, incharge_apprv_date,
+                    I.em_name as incharge_user,req_date,
+                    hod_req, hod_approve, hod_remarks, hod_detial_analysis, hod_approve_date, H.em_name as hod_user,
+                    dms_req, dms_approve, dms_remarks, dms_detail_analysis, dms_approve_date, D.em_name as dms_user,
+                    ms_approve_req, ms_approve, ms_approve_remark, ms_detail_analysis, ms_approve_date, M.em_name as ms_approve_user,
+                    manag_operation_req, manag_operation_approv, manag_operation_remarks, om_detial_analysis,
+                    om_approv_date, OM.em_name as manag_operation_user,senior_manage_remarks,senior_manage_req, senior_manage_approv,
+                    smo_detial_analysis, som_aprrov_date, SM.em_name as  senior_manage_user,gm_approve_req, gm_approve,
+                    gm_approve_remarks, gm_detial_analysis, gm_approv_date, GM.em_name as  gm_user,ed_approve_req, ed_approve,
+                    ed_approve_remarks, ed_detial_analysis, ed_approve_date, ED.em_name as  ed_user,md_approve_req,md_approve,
+                    md_approve_remarks,md_detial_analysis,md_approve_date,MD.em_name as md_user,
+                    managing_director_req, managing_director_approve, managing_director_remarks, managing_director_analysis,
+                    managing_director_approve_date,MAD.em_name as managing_director_username, managing_director_image,
+                    hod_image,dms_image,ms_image,mo_image,smo_image,gm_image,ed_image,md_image,
+                    TD.dept_id, TD.dept_name,TD.dept_type,internally_arranged_status,crf_view_remark,crf_view_status,VD.dept_name as viewDep,
+                   VE.em_name as viewName,company_name,crm_request_master.company_slno,
+
+                    ack_status, ack_remarks,PA.em_name as purchase_ackuser,crm_purchase_mast.create_date as ack_date,
+                    quatation_calling_status,quatation_calling_remarks,quatation_calling_date,QC.em_name as quatation_user,
+                    quatation_negotiation,quatation_negotiation_remarks,quatation_negotiation_date,QN.em_name as quatation_neguser,
+                    quatation_fixing,quatation_fixing_remarks,quatation_fixing_date,QF.em_name as quatation_fixuser,
+                    po_prepartion, po_complete,po_complete_date,PC.em_name as pocomplete_user,crm_purchase_po_details.po_to_supplier,po_to_supplier_date,
+                    crm_request_master.sub_store_recieve,approval_level,crm_purchase_po_details.store_recieve,
+                    user_acknldge,sub_store_name,sub_store_slno,po_number,
+                    crm_purchase_mast.store_receive_date,CRS.em_name as crs_user,STR.em_name as store_user,substore_ack_date       
+                FROM
+                    crm_request_master
+                    LEFT JOIN crm_request_approval on crm_request_approval.req_slno=crm_request_master.req_slno
+                    LEFT JOIN am_item_type ON JSON_CONTAINS(crm_request_master.category, cast(am_item_type.item_type_slno as json), '$')
+                    LEFT JOIN crm_emergencytype_mast on crm_emergencytype_mast.emergency_slno=crm_request_master.emer_slno
+                    LEFT JOIN co_deptsec_mast R on R.sec_id=crm_request_master.request_deptsec_slno
+                    LEFT JOIN co_deptsec_mast U on U.sec_id=crm_request_master.user_deptsec                 
+                    LEFT JOIN co_employee_master CR on CR.em_id=crm_request_master.create_user
+                    LEFT JOIN crm_purchase_mast on crm_purchase_mast.req_slno=crm_request_master.req_slno
+                    LEFT JOIN crm_purchase_po_details on crm_purchase_po_details.crm_purchase_slno = crm_purchase_mast.crm_purchase_slno
+                    LEFT JOIN crm_req_item_collect_details on crm_req_item_collect_details.req_slno=crm_request_master.req_slno
+                    LEFT JOIN co_employee_master I on I.em_id=crm_request_approval.incharge_user
+                    LEFT JOIN co_employee_master H on H.em_id=crm_request_approval.hod_user
+                    LEFT JOIN co_employee_master D on D.em_id=crm_request_approval.dms_user
+                    LEFT JOIN co_employee_master M on M.em_id=crm_request_approval.ms_approve_user
+                    LEFT JOIN co_employee_master C on C.em_id=crm_request_approval.crf_close_user
+                    LEFT JOIN co_employee_master OM on OM.em_id=crm_request_approval.manag_operation_user
+                    LEFT JOIN co_employee_master SM on SM.em_id=crm_request_approval.senior_manage_user
+                    LEFT JOIN co_employee_master GM on GM.em_id=crm_request_approval.gm_user
+                    LEFT JOIN co_employee_master ED on ED.em_id=crm_request_approval.ed_user
+                    LEFT JOIN co_employee_master MD on MD.em_id=crm_request_approval.md_user
+                    LEFT JOIN co_employee_master MAD on MAD.em_id=crm_request_approval.managing_director_user
+                    LEFT JOIN co_employee_master PA ON PA.em_id=crm_purchase_mast.create_user
+                    LEFT JOIN co_employee_master QC ON QC.em_id=crm_purchase_mast.quatation_calling_user
+                    LEFT JOIN co_employee_master QN On QN.em_id=crm_purchase_mast.quatation_negotiation_user
+                    LEFT JOIN co_employee_master QF ON QF.em_id=crm_purchase_mast.quatation_fixing_user
+                    LEFT JOIN co_employee_master PC ON PC.em_id=crm_purchase_mast.po_complete_user
+                    LEFT JOIN co_employee_master CRS ON CRS.em_id=crm_purchase_mast.store_receive_user
+                    LEFT JOIN co_employee_master STR ON STR.em_id=crm_req_item_collect_details.substore_user
+                    LEFT JOIN co_department_mast TD on TD.dept_id=R.dept_id
+                      LEFT JOIN co_department_mast VD ON VD.dept_id = crm_request_approval.crf_view_dep
+                    LEFT JOIN co_employee_master VE ON  VE.em_id = crm_request_approval.crf_view_Emid
+                    LEFT JOIN crm_store_master ON crm_store_master.crm_store_master_slno=crm_purchase_po_details.sub_store_slno
+                     LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno
+                WHERE
+                    (incharge_approve=1 OR hod_approve=1 or dms_req =1  or ms_approve_req =1) ${filterSql}
+                GROUP BY crm_request_master.req_slno,po_number
+                ORDER BY crm_request_master.req_slno DESC`
+        const queryParams = level === 8 || 17 ? [from, to] : [];
+        getAllPendingApprovalsMainAboveHOD(sql, queryParams, (err, results) => {
+            if (err) {
+                return res.status(500).json({
+                    success: 2,
+                    message: err.message
+                });
+            }
+            if (!results || results.length === 0) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "No results found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
     },
 }
 

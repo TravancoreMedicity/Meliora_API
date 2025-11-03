@@ -1,5 +1,9 @@
 const { validateCategoryCreate } = require('../../validation/validation_schema');
 const { CategoryInsert, CategoryView, CategoryUpdate } = require('../am_category/am_category.services')
+const path = require('path');
+const fs = require("fs")
+const archiver = require('archiver');
+
 module.exports = {
     CategoryInsert: (req, res) => {
         const body = req.body;
@@ -94,5 +98,42 @@ module.exports = {
                 message: "Category data Updated successfully"
             })
         })
+    },
+
+
+    RegimageGet: (req, res) => {
+        const id = req.params.id;
+        const folderPath = path.join('D:/DocMeliora/Meliora/AssetName/Category', id);
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {      
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message,
+                });
+            }
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {            
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
+        });
     },
 }

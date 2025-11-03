@@ -179,8 +179,8 @@ module.exports = {
       `INSERT INTO co_employee_master (em_id,em_no,em_salutation,em_name,em_gender,em_dob,em_doj,
                 em_mobile, em_email, em_branch ,em_department,em_dept_section,em_designation,em_status,
                 supervisor,
-                create_user)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+                create_user,meliora_depId,meliora_depSec)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
       [
         data.em_id,
         data.em_no,
@@ -198,6 +198,8 @@ module.exports = {
         data.em_status,
         data.supervisor,
         data.create_user,
+        data.department,
+        data.meldeptsec,
       ],
       (error, results, feilds) => {
         if (error) {
@@ -233,17 +235,34 @@ module.exports = {
   },
   employeeGetAll: (callBack) => {
     pool.query(
+      // `select co_employee.emp_no,em_name,emp_username,em_designation,em_dept_section,sec_name ,
+      //       em_no,co_employee_master.em_id,em_salutation,em_doj,em_dob,em_gender,em_branch,em_department,
+      //       em_dept_section, em_status ,em_mobile,em_email,module_group_user_rights.mod_grp_slno,
+      //       module_group_user_rights.user_group_slno,module_group_user_rights.mod_grp_user_slno,
+      //       supervisor,comp_type_map,
+      //       co_employee.empdtl_slno,
+      //       meliora_depId,meliora_depSec,
+      //       desg_name
+      //       from co_employee
+      //        left join co_employee_master on co_employee.em_id=co_employee_master.em_id
+      //        left join co_deptsec_mast on co_employee_master.em_dept_section=co_deptsec_mast.sec_id
+      //        left join module_group_user_rights on module_group_user_rights.emp_slno=co_employee_master.em_id
+      //        left join co_designation on co_designation.desg_slno=co_employee_master.em_designation
+      //        group by em_id`
       `select co_employee.emp_no,em_name,emp_username,em_designation,em_dept_section,sec_name ,
             em_no,co_employee_master.em_id,em_salutation,em_doj,em_dob,em_gender,em_branch,em_department,
             em_dept_section, em_status ,em_mobile,em_email,module_group_user_rights.mod_grp_slno,
             module_group_user_rights.user_group_slno,module_group_user_rights.mod_grp_user_slno,
             supervisor,comp_type_map,
-            co_employee.empdtl_slno
+            co_employee.empdtl_slno,
+              desg_name
             from co_employee
              left join co_employee_master on co_employee.em_id=co_employee_master.em_id
              left join co_deptsec_mast on co_employee_master.em_dept_section=co_deptsec_mast.sec_id
              left join module_group_user_rights on module_group_user_rights.emp_slno=co_employee_master.em_id
-             group by em_id`,
+             left join co_designation on co_designation.desg_slno=co_employee_master.em_designation
+             group by em_id `
+      ,
       [],
       (error, results, feilds) => {
         if (error) {
@@ -271,7 +290,9 @@ module.exports = {
              em_designation=?,
              em_status=?,
              supervisor=?,
-             edit_user=?   
+             edit_user=? ,
+             meliora_depId=?,
+             meliora_depSec=?  
             where em_id=?           
             `,
       [
@@ -290,11 +311,13 @@ module.exports = {
         data.em_status,
         data.supervisor,
         data.edit_user,
+        data.department,
+        data.meldeptsec,
         data.em_id,
       ],
       (error, results, feilds) => {
-        if (error) {
-          return callBack(error);
+        if (error) {    
+        return callBack(error);
         }
         return callBack(null, results);
       }
@@ -306,15 +329,13 @@ module.exports = {
             SET emp_username=?,
             emp_no=?,
              emp_email=?, 
-             emp_password=?,
              emp_status=?             
-            where em_id=?
+            where em_id=? and emp_status = 1
             `,
       [
         data.emp_username,
         data.emp_no,
         data.em_email,
-        data.emp_password,
         data.emp_status,
         data.em_id,
       ],

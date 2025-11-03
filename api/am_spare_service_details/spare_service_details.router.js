@@ -39,10 +39,9 @@ router.post("/getPendingSpare", checkToken, getPendingSpare);
 
 router.post('/CmSpareComplaintService', checkToken, CmSpareComplaintService)
 
-
-
 router.post("/InsertSupplierContactDetails", checkToken, InsertSupplierContactDetails);
 router.patch('/UpdateSupplierContactDetails', checkToken, UpdateSupplierContactDetails)
 router.get("/viewSupplierContactDetails/:id", checkToken, viewSupplierContactDetails)
+
 
 module.exports = router

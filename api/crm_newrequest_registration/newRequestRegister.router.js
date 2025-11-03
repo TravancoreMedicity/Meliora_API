@@ -43,6 +43,7 @@ const {
   getdefaultRights,
   insertDepartmentMapping,
   GetDepartmentmappingGet,
+  getAllPendingApprovalsMainAboveHOD
 } = require("./newRequestRegister.controller");
 
 router.post("/InsertRegMast", checkToken, requestRegistInsert);
@@ -108,5 +109,8 @@ router.post(
 router.get("/datacollectionRights/:id", checkToken, getdefaultRights);
 router.post("/DepartmentMapping", checkToken, insertDepartmentMapping);
 router.get("/DepartmentmappingGet", checkToken, GetDepartmentmappingGet);
+
+router.post("/getPendingListmain", checkToken, getAllPendingApprovalsMainAboveHOD);
+
 
 module.exports = router;

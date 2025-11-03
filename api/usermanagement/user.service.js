@@ -152,7 +152,6 @@ module.exports = {
       (error, results, fields) => {
         if (error) {
           // logger.error(error);
-          console.log(error);
           return callBack(error);
         }
         return callBack(null, results);
@@ -176,63 +175,48 @@ module.exports = {
     );
   },
   userBasedValidationCheck: (data, callBack) => {
-    // `SELECT
-    //         user_slno,
-    //         name,
-    //         login_type,
-    //         password_validity,
-    //         last_passwd_change_date,
-    //         password,
-    //         password_validity_expiry_date,
-    //         last_login_date,
-    //         sign_in_per_day_limit,
-    //         sign_in_per_day_count,
-    //         is_limited_user,
-    //         login_method_allowed
-    //     FROM  user
-    //     WHERE name = ?
-    //     AND user_status = 1`
     pool.query(
-      //   `SELECT
-      //             empdtl_slno,
-      //             password_validity,
-      //             last_passwd_change_date,
-      //             emp_password,
-      //             password_validity_expiry_date,
-      //             last_login_date,
-      //             em_id,
-      //             login_method_allowed,
-      //             emp_no
-      //         FROM  co_employee
-      //         WHERE emp_no = ?
-      //         AND emp_status = 1`,
       `SELECT 
-                co_employee_master.em_name,
-                emp_username,
-                emp_password,
-                desg_name,
-                app_token,
-                co_employee_master.em_department,
-                co_employee_master.em_id,
-                co_employee.emp_no,
-                co_employee_master.em_dept_section,
-                sec_name,dept_name,
-                current_timestamp() as login,
-                co_employee_master.supervisor,
-                co_employee.empdtl_slno,
-                co_employee.password_validity,
-                co_employee.last_passwd_change_date,
-                co_employee.emp_password,
-                co_employee.password_validity_expiry_date,
-                co_employee.last_login_date,
-                co_employee.login_method_allowed
-            FROM  co_employee 
-                LEFT JOIN co_employee_master ON co_employee_master.em_no=co_employee.emp_no
-                LEFT JOIN co_department_mast ON co_department_mast.dept_id=co_employee_master.em_department
-                LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id=co_employee_master.em_dept_section
-                LEFT JOIN co_designation ON co_designation.desg_slno=co_employee_master.em_designation
-            WHERE co_employee.emp_no = ?
-            AND co_employee.emp_status = 1`,
+            emp.em_name,
+            emp_username,
+            emp_password,
+            desg_name,
+            emp.app_token,
+            emp.em_department,
+            emp.em_id,
+            co_employee.emp_no,
+            co_employee.empdtl_slno,
+            emp.em_dept_section,
+            sec_name,dept_name,
+            current_timestamp() as login,
+            emp.supervisor ,
+            sec_incharge.em_name as section_incharge_name,
+			      sec_incharge.em_id as section_incharge_id,
+            sec_hod.em_name as section_hod_name,
+             sec_hod.em_id as section_hod_id            
+            FROM co_employee
+            LEFT JOIN co_employee_master emp 
+                ON emp.em_no = co_employee.emp_no
+            LEFT JOIN co_department_mast dept 
+                ON dept.dept_id = emp.em_department
+            LEFT JOIN co_deptsec_mast sec 
+                ON sec.sec_id = emp.em_dept_section
+            LEFT JOIN co_designation desg 
+                ON desg.desg_slno = emp.em_designation
+            LEFT JOIN co_authorization dept_sec_incharge 
+                ON dept_sec_incharge.dept_section = emp.em_dept_section 
+                AND dept_sec_incharge.auth_status = 1 
+                AND dept_sec_incharge.auth_post = 1
+            LEFT JOIN co_authorization dept_sec_hod 
+                ON dept_sec_hod.dept_section = emp.em_dept_section 
+                AND dept_sec_hod.auth_status = 1 
+                AND dept_sec_hod.auth_post = 2
+            LEFT JOIN co_employee_master sec_incharge 
+                ON sec_incharge.em_id = dept_sec_incharge.emp_id
+            LEFT JOIN co_employee_master sec_hod 
+                ON sec_hod.em_id = dept_sec_hod.emp_id
+            WHERE emp_username = ?
+            AND emp_status = '1'`,
       [data.userName],
       (error, results, fields) => {
         if (error) {
@@ -263,6 +247,106 @@ module.exports = {
     );
   },
 
+  userBasedInsertEliderToken: (data, callBack) => {
+    pool.query(
+      `SELECT * FROM co_token WHERE token_slno = 1`,
+      [],
+      (err, results) => {
+        if (err) {
+          return callBack(err);
+        }
 
-  
+        if (results.length > 0) {
+          // Record exists, perform update
+          pool.query(
+            `UPDATE co_token SET Elider_token = ?,Elider_Id =? WHERE token_slno = 1`,
+            [data.Elider_token, data.Elider_Id],
+            (updateErr, updateResults) => {
+              if (updateErr) {
+                return callBack(updateErr);
+              }
+              return callBack(null, updateResults);
+            }
+          );
+        } else {
+          // Record doesn't exist, perform insert
+          pool.query(
+            `INSERT INTO co_token (Elider_token, Elider_Id) VALUES (?, ?)`,
+            [data.Elider_token, data.Elider_Id],
+            (insertErr, insertResults) => {
+              if (insertErr) {
+                return callBack(insertErr);
+              }
+              return callBack(null, insertResults);
+            }
+          );
+        }
+      }
+    );
+  },
+  getelidertoken: (callBack) => {
+    pool.query(
+      "SELECT Elider_token FROM co_token ",
+      [],
+      (error, results, fields) => {
+        if (error) {
+          logger.error(error);
+          return callBack(error);
+        }
+        return callBack(null, results);
+      }
+    );
+  },
+
+  userBasedInsertKMCToken: (data, callBack) => {
+    pool.query(
+      `SELECT * FROM co_token WHERE token_slno = 2`,
+      [],
+      (err, results) => {
+        if (err) {
+          return callBack(err);
+        }
+
+        if (results.length > 0) {
+          // Record exists, perform update
+          pool.query(
+            `UPDATE co_token SET Kmc_token = ? WHERE token_slno = 2`,
+            [data.KMC_token],
+            (updateErr, updateResults) => {
+              if (updateErr) {
+                return callBack(updateErr);
+              }
+              return callBack(null, updateResults);
+            }
+          );
+        } else {
+          // Record doesn't exist, perform insert
+          pool.query(
+            `INSERT INTO co_token (Kmc_token) VALUES (?)`,
+            [data.KMC_token],
+            (insertErr, insertResults) => {
+              if (insertErr) {
+                return callBack(insertErr);
+              }
+              return callBack(null, insertResults);
+            }
+          );
+        }
+      }
+    );
+  },
+
+  getKmctoken: (callBack) => {
+    pool.query(
+      "SELECT Kmc_token FROM co_token where token_slno =2",
+      [],
+      (error, results, fields) => {
+        if (error) {
+          // logger.error(error);
+          return callBack(error);
+        }
+        return callBack(null, results);
+      }
+    );
+  },
 };

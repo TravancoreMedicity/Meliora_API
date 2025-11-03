@@ -198,10 +198,11 @@ module.exports = {
                     })
                 })
                 var a1 = newmeli.map((value, index) => {
-                    return [value.emp_slno, value.emp_email, value.emp_username, value.emp_password,
-                    value.emp_status, value.emp_id, value.emp_no, value.emp_created, value.emp_update
+                    return [value.emp_email, value.emp_username, value.emp_password,
+                    value.emp_status, value.emp_id, value.emp_no, value.emp_created, value.emp_updated
                     ]
                 })
+                     
                 if (a1.length !== 0) {
                     creategetemployeeuserPass(a1, (err, results) => {
                         if (err) {
@@ -582,7 +583,8 @@ module.exports = {
                     })
                 })
 
-                const result = emploginUpdate(newmeli)
+                 if (newmeli.length !== 0) {
+                     const result = emploginUpdate(newmeli)
                     .then((r) => {
 
                         return res.status(200).json({
@@ -595,6 +597,13 @@ module.exports = {
                             message: e.sqlMessage
                         });
                     })
+                 }else{
+                        return res.status(200).json({
+                        success: 2,
+                        message: "Noting to insert, already uptodate"
+                    });
+                 }
+               
             })
         });
     },

@@ -315,19 +315,53 @@ module.exports = {
         })
         )
     },
-    updateApprovedMOItemStatus: (body) => {
-        return Promise.all(body.map((val) => {
-            return new Promise((resolve, reject) => {
+    // updateApprovedMOItemStatus: (body) => {
+    //     return Promise.all(body.map((val) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `UPDATE
+    //                        crm_reqitems_approval_details
+    //                  SET
+    //                        item_mo_approve = ? ,
+    //                        item_mo_remarks = ?  ,
+    //                        item_mo_apprv_date = ?,
+    //                        item_mo_user = ?
+    //                  WHERE
+    //                        req_detl_slno = ? and req_slno = ?`,
+    //                 [
+    //                     val.itemStatus,
+    //                     val.remarks,
+    //                     val.statusDate,
+    //                     val.user,
+    //                     val.req_detl_slno,
+    //                     val.req_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     // console.log(error);
+
+    //                     if (error) {
+    //                         return reject(error)
+    //                     }
+    //                     return resolve(results)
+    //                 }
+    //             )
+    //         })
+    //     })
+    //     )
+    // },
+    updateApprovedMOItemStatus: async (body) => {
+        for (const val of body) {
+            await new Promise((resolve, reject) => {
                 pool.query(
                     `UPDATE
-                           crm_reqitems_approval_details
-                     SET
-                           item_mo_approve = ? ,
-                           item_mo_remarks = ?  ,
-                           item_mo_apprv_date = ?,
-                           item_mo_user = ?
-                     WHERE
-                           req_detl_slno = ? and req_slno = ?`,
+                    crm_reqitems_approval_details
+                SET
+                    item_mo_approve = ?,
+                    item_mo_remarks = ?,
+                    item_mo_apprv_date = ?,
+                    item_mo_user = ?
+                WHERE
+                    req_detl_slno = ? AND req_slno = ?`,
                     [
                         val.itemStatus,
                         val.remarks,
@@ -336,16 +370,16 @@ module.exports = {
                         val.req_detl_slno,
                         val.req_slno
                     ],
-                    (error, results, fields) => {
+                    (error, results) => {
                         if (error) {
-                            return reject(error)
+                            console.error("Deadlock or SQL error:", error);
+                            return reject(error);
                         }
-                        return resolve(results)
+                        resolve(results);
                     }
-                )
-            })
-        })
-        )
+                );
+            });
+        }
     },
 
     updateApprovedSMOItemStatus: (body) => {
@@ -1699,7 +1733,6 @@ module.exports = {
     },
 
     updateInternallyArranged: (data, callback) => {
-
         pool.query(
             `UPDATE
                   crm_request_mast_detail
@@ -1716,7 +1749,8 @@ module.exports = {
                  internal_remarks=?,
                  internal_user=?,
                  internal_date=?,
-                 po_item_status=0
+                 po_item_status=0,
+                 internal_arrange_dept=?
             WHERE
                 req_detl_slno =?`,
             [
@@ -1732,7 +1766,8 @@ module.exports = {
                 data.internal_remarks,
                 data.internal_user,
                 data.internal_date,
-                data.req_detl_slno
+                data.crfdept,
+                data.req_detl_slno,
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -1858,5 +1893,29 @@ module.exports = {
             }
         );
     },
+    getDataHod: (id, callBack) => {
+        pool.query(
+            `SELECT
+            dept_section,
+            auth_post,
+            dept_section_post,
+            emp_id
+            FROM 
+            co_authorization
+            WHERE
+            dept_section =?
+            and auth_status =1 and auth_post =2 `,
 
+            [
+                id
+            ],
+            (error, results, feilds) => {
+
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 }

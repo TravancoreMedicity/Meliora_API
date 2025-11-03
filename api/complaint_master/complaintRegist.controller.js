@@ -29,7 +29,6 @@ const expo = new Expo();
 
 module.exports = {
   complaintRegistInsert: (req, res) => {
-    // console.log(req.io)
     const body = req.body;
     //validate complaintdept Insert function
     const body_result = validateComplaintRegist.validate(body);
@@ -77,7 +76,6 @@ module.exports = {
               }
               const data = JSON.parse(JSON.stringify(result));
               if (data.length > 0) {
-                console.log(data);
 
                 let emppushTokens = data?.map((val) => val.app_token);
 
@@ -142,7 +140,7 @@ module.exports = {
                       try {
                         const ticketChunk =
                           await expo.sendPushNotificationsAsync(chunk);
-                        console.log("Ticket Chunk:", ticketChunk);
+                        // console.log("Ticket Chunk:", ticketChunk);
                         tickets.push(...ticketChunk);
 
                         ticketChunk.forEach((ticket) => {
@@ -171,13 +169,32 @@ module.exports = {
             });
 
             // let pushTicket = expo.sendPushNotificationsAsync()
+            // updateserialnum((err, results) => {
+            //   if (err) {
+            //     //logger.errorLogger(err)
+            //     return res.status(400).json({
+            //       success: 0,
+            //       message: res.err,
+            //     });
+            //   }
+            //   if (!results) {
+            //     return res.status(400).json({
+            //       success: 2,
+            //       message: "Record Not Found",
+            //     });
+            //   }
+            //   req.io.emit("message", `New Complaint Registed ! Please Check`);
+            //   return res.status(200).json({
+            //     success: 1,
+            //     insertId: slno,
+            //     message: "Complaint Registered Successfully",
+            //   });
+            // });
+
+
             updateserialnum((err, results) => {
               if (err) {
-                //logger.errorLogger(err)
-                return res.status(400).json({
-                  success: 0,
-                  message: res.err,
-                });
+                return res.status(400).json({ success: 0, message: err });
               }
               if (!results) {
                 return res.status(400).json({
@@ -185,13 +202,24 @@ module.exports = {
                   message: "Record Not Found",
                 });
               }
-              req.io.emit("message", `New Complaint Registed ! Please Check`);
+
+              // Step 5: Emit WebSocket event to all connected systems
+              req.io.emit("new_complaint_submitted", {
+                complaint_slno: body.complaint_slno,
+                department: body.complaint_deptslno,
+                createdAt: new Date(),
+              });
+              // Optional older broadcast (you can remove if not used)
+              req.io.emit("message", "New Complaint Registered! Please Check");
+              // Final Response
               return res.status(200).json({
                 success: 1,
-                insertId: slno,
+                insertId: body.complaint_slno,
                 message: "Complaint Registered Successfully",
               });
             });
+
+
           }
         });
       } else if (slno < results[0].serial_current) {
@@ -215,13 +243,11 @@ module.exports = {
                   message: err,
                 });
               }
-              //   console.log(result);
+
               const data = JSON.parse(JSON.stringify(result));
               if (data.length > 0) {
-                // console.log(data);
+
                 let emppushTokens = data?.map((val) => val.app_token);
-                // let somePushTokens = ['ExponentPushToken[9JbCJvDTrQ1DggVszGG6zk]'];
-                // console.log(emppushTokens);
                 if (Object.keys(emppushTokens).length > 0) {
                   let messages = [];
                   for (let pushToken of emppushTokens) {
@@ -234,9 +260,8 @@ module.exports = {
 
                     messages.push({
                       to: pushToken,
-                      title: `NEW TICKET :${
-                        body.complaint_slno
-                      } / Location: ${body?.locationName?.toLowerCase()} `,
+                      title: `NEW TICKET :${body.complaint_slno
+                        } / Location: ${body?.locationName?.toLowerCase()} `,
                       subtitle: `New Ticket Registerd`,
                       body: `${body.priority} | ${body.complaint_desc}`,
                       data: { withSome: body.complaint_desc },
@@ -282,7 +307,7 @@ module.exports = {
                       try {
                         const ticketChunk =
                           await expo.sendPushNotificationsAsync(chunk);
-                        console.log("Ticket Chunk:", ticketChunk);
+                        // console.log("Ticket Chunk:", ticketChunk);
                         tickets.push(...ticketChunk);
 
                         ticketChunk.forEach((ticket) => {
@@ -310,13 +335,32 @@ module.exports = {
               }
             });
             // let pushTicket = expo.sendPushNotificationsAsync()
+            // updateserialnum((err, results) => {
+            //   if (err) {
+            //     //logger.errorLogger(err)
+            //     return res.status(400).json({
+            //       success: 0,
+            //       message: res.err,
+            //     });
+            //   }
+            //   if (!results) {
+            //     return res.status(400).json({
+            //       success: 2,
+            //       message: "Record Not Found",
+            //     });
+            //   }
+            //   req.io.emit("message", `New Complaint Registed ! Please Check`);
+            //   return res.status(200).json({
+            //     success: 1,
+            //     insertId: body.complaint_slno,
+            //     message: "Complaint Registered Successfully",
+            //   });
+            // });
+
+            // Step 4: Update serial number
             updateserialnum((err, results) => {
               if (err) {
-                //logger.errorLogger(err)
-                return res.status(400).json({
-                  success: 0,
-                  message: res.err,
-                });
+                return res.status(400).json({ success: 0, message: err });
               }
               if (!results) {
                 return res.status(400).json({
@@ -324,18 +368,33 @@ module.exports = {
                   message: "Record Not Found",
                 });
               }
-              req.io.emit("message", `New Complaint Registed ! Please Check`);
+              // Step 5: Emit WebSocket event to all connected systems
+              req.io.emit("new_complaint_submitted", {
+                complaint_slno: body.complaint_slno,
+                department: body.complaint_deptslno,
+                createdAt: new Date(),
+              });
+
+              // Optional older broadcast (you can remove if not used)
+              req.io.emit("message", "New Complaint Registered! Please Check");
+
+              // Final Response
               return res.status(200).json({
                 success: 1,
                 insertId: body.complaint_slno,
                 message: "Complaint Registered Successfully",
               });
             });
+
+
           }
         });
       }
     });
   },
+
+
+
   complaintRegistUpdate: (req, res) => {
     const body = req.body;
     const body_result = validateComplaintRegist.validate(body);

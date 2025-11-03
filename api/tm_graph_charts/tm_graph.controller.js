@@ -165,25 +165,65 @@ module.exports = {
         })
     },
 
-    getEmployeeImage: (req, res) => {
-        const id = req.params.id
-        const folderPath = `D:/DocMeliora/Meliora/TaskEmployeeImage/${id}`;
-        fs.readdir(folderPath, (err, files) => {
+    // getEmployeeImage: (req, res) => {
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/TaskEmployeeImage/${id}`;
+    //     fs.readdir(folderPath, (err, files) => {
 
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message // Return the error message
-                });
-            }
-            return res.status(200).json({
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err.message // Return the error message
+    //             });
+    //         }
+    //         return res.status(200).json({
 
-                success: 1,
+    //             success: 1,
 
-                data: files // Send the list of files
+    //             data: files // Send the list of files
+    //         });
+    //     });
+    // },
+
+
+     getEmployeeImage: (req, res) => {
+            const id = req.params.id;
+                     
+            // const folderPath = path.join('D:/DocMeliora/Meliora/CRF/crf_registration', id);
+            const folderPath =  `D:/DocMeliora/Meliora/TaskEmployeeImage/${id}`;
+            fs.readdir(folderPath, (err, files) => {
+                if (err) {
+  
+                    return res.status(200).json({
+                        success: 0,
+                        message: err.message,
+                    });
+                }
+                else if (!files || files.length === 0) {
+                    // No images found
+                    return res.status(200).json({
+                        success: 1,
+                        data: [] // or files if you prefer to return the empty array
+                    });
+                }
+                else {
+                    // Otherwise, create the ZIP archive and pipe it
+                    res.setHeader('Content-Type', 'application/zip');
+                    res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                    const archive = archiver('zip', { zlib: { level: 9 } });
+                    archive.on('error', (archiveErr) => {         
+                        res.status(500).json({ success: 0, message: archiveErr.message });
+                    });
+                    archive.pipe(res);
+                    // Optionally, filter for image extensions only
+                    files.forEach((filename) => {
+                        const filePath = path.join(folderPath, filename);
+                        archive.file(filePath, { name: filename });
+                    });
+                    archive.finalize();
+                }
             });
-        });
-    },
+        },
 
     EmployeePendingcompl: (req, res) => {
         const id = req.params.id;

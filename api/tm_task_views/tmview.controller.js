@@ -4,7 +4,8 @@ const { ViewOverDueToday, ViewOverDueNextWeek, ViewOverDueNextMonth, EmployeeOnP
     GoalsOverDue, ProjectInCompleted, GoalsInCompleted, EmpProjectTask, EmpTaskCount, AllEmployeeProject, AllTaskUnderProject,
     TTCTcountUnderProject, EmployeeTTCTcount, AllEmployeeTask, EmpTaskCountWithoutProject, SubTaskUnderTask, getAllProjects, AllTaskEmp, AllComplaintsEmp,
     deptOverDue,
-    deptCompleted
+    deptCompleted,
+    EmpDelegatedTasks
 } = require('../tm_task_views/tmview.service')
 module.exports = {
 
@@ -902,4 +903,29 @@ module.exports = {
             });
         })
     },
+
+    EmpDelegatedTasks: (req, res) => {
+    const id = req.params.id;
+    EmpDelegatedTasks(id, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+    },
+    
+
 }

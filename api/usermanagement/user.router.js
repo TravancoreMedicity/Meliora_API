@@ -9,7 +9,7 @@ const {
     getAllUser,
     getRefershToken,
     logOutFunctionality,
-    userBasedLoginVerification
+    userBasedLoginVerification, getelidertoken, getKmctoken
 } = require('./user.controller');
 
 router.post('/insertUser', verifyToken, insertUser);
@@ -20,6 +20,8 @@ router.get('/getAllUser', verifyToken, getAllUser);
 router.get('/getRefershToken/:id', getRefershToken)
 router.get('/logout/:id', logOutFunctionality)
 router.post('/checkUserCres', userBasedLoginVerification)
+router.get('/get-elider-token', verifyToken, getelidertoken);
+router.get('/get-Kmc-token', verifyToken, getKmctoken);
 
 
 module.exports = router

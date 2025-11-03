@@ -70,7 +70,7 @@ module.exports = {
                                     for (let pushToken of emppushTokens) {
 
                                         if (!Expo.isExpoPushToken(pushToken)) {
-                                            // console.error(`Push token ${pushToken} is not a valid Expo push token`);
+                                         
                                             continue;
                                         }
 
@@ -101,7 +101,7 @@ module.exports = {
                                                 // documentation:
                                                 // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
                                             } catch (error) {
-                                                // console.error(error);
+                                           
                                             }
                                         }
                                     })()
@@ -178,7 +178,7 @@ module.exports = {
                                     for (let pushToken of emppushTokens) {
 
                                         if (!Expo.isExpoPushToken(pushToken)) {
-                                            // console.error(`Push token ${pushToken} is not a valid Expo push token`);
+                                       
                                             continue;
                                         }
 
@@ -209,7 +209,7 @@ module.exports = {
                                                 // documentation:
                                                 // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
                                             } catch (error) {
-                                                // console.error(error);
+                                        
                                             }
                                         }
                                     })()

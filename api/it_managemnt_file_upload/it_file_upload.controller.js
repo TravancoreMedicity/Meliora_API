@@ -3,7 +3,8 @@ const path = require('path');
 const fs = require("fs")
 const logger = require('../../logger/logger')
 const { BillImageUpdateMonthly, BillImageUpdateQuaterly, BillImageUpdateYearly, OtherBillImageUpdate,
-    TeleMonthlyBills } = require('../it_managemnt_file_upload/it_file_upload.service')
+    TeleMonthlyBills } = require('../it_managemnt_file_upload/it_file_upload.service');
+const archiver = require('archiver');
 
 // for monthly bill multiple file upload
 const monthlystorage = multer.diskStorage({
@@ -223,72 +224,182 @@ module.exports = {
             }
         });
     },
+
+
     getMonthlyBillImages: (req, res) => {
-        const id = req.params.id
+        const id = req.params.id;
         const folderPath = `D:/DocMeliora/Meliora/Bills/MonthlyBill/${id}`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
+   
                 return res.status(200).json({
                     success: 0,
-                    message: err.message // Return the error message
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files // Send the list of files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                 
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
     },
-    getQuaterlyBillImages: (req, res) => {
 
-        const id = req.params.id
+
+
+    // getQuaterlyBillImages: (req, res) => {
+
+    //     const id = req.params.id
+    //     const folderPath = `D:/DocMeliora/Meliora/Bills/QuarterlyBill/${id}`;
+    //     fs.readdir(folderPath, (err, files) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err.message // Return the error message
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: files // Send the list of files
+    //         });
+    //     });
+    // },
+
+
+    getQuaterlyBillImages: (req, res) => {
+        const id = req.params.id;
         const folderPath = `D:/DocMeliora/Meliora/Bills/QuarterlyBill/${id}`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
+           
                 return res.status(200).json({
                     success: 0,
-                    message: err.message // Return the error message
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files // Send the list of files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+              
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
     },
+
+
+
     getYearlyBillImages: (req, res) => {
-        const id = req.params.id
+        const id = req.params.id;
         const folderPath = `D:/DocMeliora/Meliora/Bills/YearlyBill/${id}`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
+   
                 return res.status(200).json({
                     success: 0,
-                    message: err.message // Return the error message
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files // Send the list of files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {     
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
     },
+
+    
     getOtherBillImages: (req, res) => {
-        const id = req.params.id
+        const id = req.params.id;
         const folderPath = `D:/DocMeliora/Meliora/Bills/OtherBill/${id}`;
         fs.readdir(folderPath, (err, files) => {
-
             if (err) {
+             
                 return res.status(200).json({
                     success: 0,
-                    message: err.message // Return the error message
+                    message: err.message,
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                data: files // Send the list of files
-            });
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="${id}_images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {           
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
         });
     },
+
 
     uploadFileQuaterly: (req, res) => {
         uploadquaterly(req, res, async (err) => {

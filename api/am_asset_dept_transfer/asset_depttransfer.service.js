@@ -6,7 +6,7 @@ module.exports = {
             item_name,am_item_map_slno,
             am_item_name_creation.item_creation_slno,
             item_deptsec_slno,     co_department_mast.dept_name,  
-         am_custodian_department.am_custodian_name,
+            am_custodian_department.am_custodian_name,
             am_item_name_creation.item_name,
             co_deptsec_mast.sec_name,
              item_asset_no,
@@ -459,5 +459,132 @@ module.exports = {
             }
         );
     },
+    getAssetUnderCustodian: (sql, params, callback) => {        
+        pool.query(sql, params, (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
+
+    getSpareUnderCustodian: (sql, params, callback) => {     
+                
+        pool.query(sql, params, (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
+TransferAssetUnderCustodian: (data, callback) => {
+      pool.query(
+        `UPDATE am_asset_item_map_master
+        SET            
+            item_custodian_dept = ?, 
+            item_deptsec_slno = ?,
+            item_custodian_dept_sec = ?,
+            item_dept_slno = ?,
+            edit_user = ?
+        WHERE am_item_map_slno = ?
+        `,
+        [
+            data.item_custodian_dept,  
+            data.item_deptsec_slno,     
+            data.item_custodian_dept_sec,
+            data.item_dept_slno,       
+            data.edit_user,            
+            data.am_item_map_slno     
+        ],
+        (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        }
+    );
+},
+TransferSpareUnderCustodian: (data, callback) => {
+     pool.query(
+        `UPDATE am_spare_item_map_master
+        SET            
+            spare_custodian_dept = ?, 
+            spare_custodian_dept_sec = ?,
+            spare_dept_slno = ?,      
+            spare_deptsec_slno = ?,
+            edit_user = ?
+        WHERE am_spare_item_map_slno = ?
+        `,
+        [
+            data.spare_custodian_dept,  
+            data.spare_custodian_dept_sec,
+            data.spare_dept_slno,   
+            data.spare_deptsec_slno,       
+            data.edit_user,            
+            data.am_spare_item_map_slno     
+        ],
+        (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        }
+    );
+},
+insertCustodianTransferLog: (data, callback) => {
+    pool.query(
+        `
+        INSERT INTO am_custodian_transfer_log
+        (
+            transfer_from_custodian,
+            transfer_to_custodian,
+            transfer_date,
+            create_user      
+        )
+        VALUES (?, ?, NOW(), ?)
+        `,
+        [
+            data.transfer_from_custodian,
+            data.transfer_to_custodian,
+            data.create_user
+        ],
+        (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        }
+    );
+},
+
+insertCustodianTransferItems: (data, callback) => {
+    pool.query(
+        `
+        INSERT INTO am_custodian_transferd_items
+        (
+            am_custo_transfer_slno,
+            asset_or_spare,
+            item_asset_spare_slno,
+            item_prefix,
+            item_suffix
+                
+        )
+        VALUES (?, ?, ?, ?, ?)
+        `,
+        [
+            data.am_custo_transfer_slno,
+            data.asset_or_spare,
+            data.item_asset_spare_slno,
+            data.item_prefix,
+            data.item_suffix           
+        ],
+        (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        }
+    );
+},
 
 }

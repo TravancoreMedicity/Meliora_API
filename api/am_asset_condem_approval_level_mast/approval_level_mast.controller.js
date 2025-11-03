@@ -1,7 +1,9 @@
 const { pool } = require('../../config/database');
 const logger = require('../../logger/logger')
 const { insertLevel, viewCondemnationLevel, updateLevel, getCondemnationApprovalRights, getCondemnationAllDetails,
-    getActiveCondemnationLevel
+    getActiveCondemnationLevel,
+    getCondemnActiveApprovalLevel,
+    updateLevelDetail
 } = require('./approval_level_mast.service');
 
 module.exports = {
@@ -22,7 +24,6 @@ module.exports = {
         })
     },
     viewCondemnationLevel: (req, res) => {
-
         viewCondemnationLevel((err, results) => {
             if (err) {
                 return res.status(200).json({
@@ -43,9 +44,9 @@ module.exports = {
 
         })
     },
-    updateLevel: (req, res) => {
-        const body = req.body;
-        updateLevel(body, (err, results) => {
+
+    getCondemnActiveApprovalLevel: (req, res) => {
+        getCondemnActiveApprovalLevel((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -55,59 +56,95 @@ module.exports = {
             if (results === 0) {
                 return res.status(200).json({
                     success: 1,
-                    message: "No record found"
-
+                    message: "No Records"
                 })
             }
             return res.status(200).json({
                 success: 2,
-                message: "Condemnation Approval Level Updated Successfully"
-            })
-        })
-    },
-    getCondemnationApprovalRights: (req, res) => {
-        const body = req.body;
-        getCondemnationApprovalRights(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (results.length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No record found"
-                })
-            }
-            return res.status(200).json({
-                success: 1,
                 data: results
             })
-        })
-    },
-    getCondemnationAllDetails: (req, res) => {
-        const body = req.body;
-        getCondemnationAllDetails(body, (err, results) => {
 
+        })
+    },
+    
+    updateLevel: (req, res) => {
+        const body = req.body;      
+      updateLevel(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
-                })
+                });
             }
-            if (results.length === 0) {
+    
+            if (results.affectedRows === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No record found in master table"
+                });
+            }
+    
+            // Proceed to update the second table
+            updateLevelDetail(body, (err2) => {
+                if (err2) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err2
+                    });
+                }
+    
                 return res.status(200).json({
                     success: 2,
-                    message: "No record found"
-                })
-            }
-            return res.status(200).json({
-                success: 1,
-                data: results
-            })
-        })
-    },
+                    message: "Condemnation Approval Level Updated Successfully"
+                });
+            });
+        });
+    },    
+
+    // getCondemnationApprovalRights: (req, res) => {
+    //     const body = req.body;
+    //     getCondemnationApprovalRights(body, (err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (results.length === 0) {
+    //             return res.status(200).json({
+    //                 success: 2,
+    //                 message: "No record found"
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: results
+    //         })
+    //     })
+    // },
+
+    // getCondemnationAllDetails: (req, res) => {
+    //     const body = req.body;
+    //     getCondemnationAllDetails(body, (err, results) => {
+
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             })
+    //         }
+    //         if (results.length === 0) {
+    //             return res.status(200).json({
+    //                 success: 2,
+    //                 message: "No record found"
+    //             })
+    //         }
+    //         return res.status(200).json({
+    //             success: 1,
+    //             data: results
+    //         })
+    //     })
+    // },
     getActiveCondemnationLevel: (req, res) => {
 
         getActiveCondemnationLevel((err, results) => {
@@ -130,5 +167,6 @@ module.exports = {
 
         })
     },
+    
 
 }

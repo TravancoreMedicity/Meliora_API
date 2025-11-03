@@ -127,9 +127,7 @@ module.exports = {
               })
           })
       },
-
-
-
+      
     getRestrictedAntibiotics: (req, res) => {
     getRestrictedAntibiotics((err, results) => {
       if (err) {
@@ -150,7 +148,6 @@ module.exports = {
       });
     });
   },
-
 
       getAllAntibioticCount: (req, res) => {
           const body = req.body

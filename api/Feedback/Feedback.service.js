@@ -5371,6 +5371,22 @@ where fb_pro_check_bed.fb_bed_slno = ?;`,
                 return callBack(null, results)
             })
     },
+    getNursingStationLastDate: (callBack) => {
+        pool.query(
+            `
+            SELECT MAX(update_date) AS last_update_date FROM fb_nurse_station_master;	
+            `,
+            [],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+
+
 
 
 }

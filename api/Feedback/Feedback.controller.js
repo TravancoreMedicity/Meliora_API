@@ -187,6 +187,7 @@ const {
     getIpFeedbackReport,
     insertCallCenterDetail,
     getAllPREMDetail,
+    getNursingStationLastDate,
 } = require("./Feedback.service");
 
 module.exports = {
@@ -576,6 +577,32 @@ module.exports = {
             }
         })
     },
+    getNursingStationLastDate: (req, res) => {
+        getNursingStationLastDate((error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Error in fetching data!"
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No data Found',
+                    data: []
+                })
+            }
+            if (results.length > 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "Successfully Fetched Data",
+                    data: results
+                })
+            }
+        })
+    },
+
+    // 
 
     UpdateFeedbackName: (req, res) => {
         const body = req.body;
@@ -1777,8 +1804,6 @@ module.exports = {
             })
         })
     },
-
-
 
     // insertbddetail: async (req, res) => {
     //     const { bedinfo } = req.body;

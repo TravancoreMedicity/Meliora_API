@@ -8,7 +8,7 @@ module.exports = {
         // let token = req.get('authorization')
         // let token = req.headers["authorization"];  
         const token = req.cookies.accessToken;
-
+       
         if (token) {
             // Remove Bearer from string
             // token = token.slice(7);

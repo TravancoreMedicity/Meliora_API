@@ -1,7 +1,7 @@
 // @ts-nocheck
 const dotenv = require("dotenv").config();
 const jwt = require("jsonwebtoken");
-const logger = require("../../logger/logger");
+// const logger = require("../../logger/logger");
 module.exports = {
   verifyToken: (req, res, next) => {
     // let token = req.get('authorization')
@@ -24,7 +24,7 @@ module.exports = {
         }
       });
     } else {
-      logger.error("No token");
+      // logger.error("No token");
       return res.status(401).json({
         status: 401,
         message: "Invalid Token 2",
@@ -34,7 +34,7 @@ module.exports = {
 
   validateAccessToken: (req, res) => {
     const token = req.cookies.accessToken;
- 
+
 
     if (!token) {
       return res

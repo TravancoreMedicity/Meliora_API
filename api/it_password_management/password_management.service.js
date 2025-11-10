@@ -104,6 +104,7 @@ module.exports = {
             psw_detail_username,
             psw_detail_password,
             psw_detail_port,
+            psw_detail_ip_num,
             psw_detail_remarks,                     
             create_user
           )
@@ -141,6 +142,7 @@ PasswordMasterView: (callback) => {
             psw_detail_username,
             psw_detail_password,
             psw_detail_port,
+            psw_detail_ip_num,
             psw_detail_remarks,
             credential_name
             FROM it_pswd_master
@@ -169,6 +171,7 @@ PasswordMasterView: (callback) => {
             psw_detail_username,
             psw_detail_password,
             psw_detail_port,
+            psw_detail_ip_num,
             credential_name,
             psw_detail_remarks
             FROM it_pswd_mast_detail
@@ -220,6 +223,7 @@ PasswordMasterView: (callback) => {
                    psw_detail_username=?,
                    psw_detail_password=?,
                    psw_detail_port=?,
+                   psw_detail_ip_num=?,
                    psw_detail_remarks=?,
                    edit_user=?       
                    WHERE 
@@ -231,6 +235,7 @@ PasswordMasterView: (callback) => {
                         data.psw_detail_username,
                         data.psw_detail_password,
                         data.psw_detail_port,
+                        data.psw_detail_ip_num,
                         data.psw_detail_remarks,
                         data.edit_user,
                         data.pswd_detail_slno

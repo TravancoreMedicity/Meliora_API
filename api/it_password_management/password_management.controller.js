@@ -88,6 +88,7 @@ module.exports = {
             val.psw_detail_username,
             val.psw_detail_password,
             val.psw_detail_port,
+            val.psw_detail_ip_num,
             val.psw_detail_remarks,
             val.create_user
             ]

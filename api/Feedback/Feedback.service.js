@@ -249,14 +249,16 @@ WHERE fb_subcategory_master.fb_category_slno= ?`,
             feedback_name,
             fdmast_slno,
             feedback_status,
+            fb_qr_status,
             create_user
             ) 
-            VALUES(?,?,?,?)
+            VALUES(?,?,?,?,?)
             `,
             [
                 data.feedback_name,
                 data.fdmast_slno_value,
                 data.feedback_status,
+                data.fb_qr_status,
                 data.create_user
             ],
             (error, results, fields) => {
@@ -265,7 +267,6 @@ WHERE fb_subcategory_master.fb_category_slno= ?`,
                 }
                 return callBack(null, results)
             })
-
     },
     getFeedbackName: (callBack) => {
         pool.query(
@@ -279,7 +280,7 @@ WHERE fb_subcategory_master.fb_category_slno= ?`,
             FROM 
             fb_mast
             where
-            feedback_status = 1 and fb_qr_status = 0
+            feedback_status = 1 
             `,
             []
             , (error, results, fields) => {
@@ -319,12 +320,14 @@ WHERE fb_subcategory_master.fb_category_slno= ?`,
             SET
             feedback_name = ?,
             feedback_status = ?,
+            fb_qr_status = ?,
             update_user = ?
             WHERE fd_slno = ?
             `,
             [
                 data.feedback_name,
                 data.feedback_status,
+                data.fb_qr_status,
                 data.edit_user,
                 data.feedback_slno
             ],
@@ -334,15 +337,14 @@ WHERE fb_subcategory_master.fb_category_slno= ?`,
                 }
                 return callBack(null, results)
             })
-
     },
     updateSerialMaster: (callBack) => {
         pool.query(
             `
             UPDATE serial_master 
-SET
-serial_current = serial_current + 1
-WHERE serial_slno = 1
+                SET
+                serial_current = serial_current + 1
+                WHERE serial_slno = 1
             `,
             [],
             (error, results, fields) => {

@@ -24,7 +24,7 @@ module.exports = {
         }
       });
     } else {
-      logger.error("No token");
+      // logger.error("No token");
       return res.status(401).json({
         status: 401,
         message: "Invalid Token 2",
@@ -34,8 +34,6 @@ module.exports = {
 
   validateAccessToken: (req, res) => {
     const token = req.cookies.accessToken;
- 
-
     if (!token) {
       return res
         .status(401)

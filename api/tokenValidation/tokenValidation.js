@@ -1,7 +1,7 @@
 // @ts-nocheck
 const dotenv = require("dotenv").config();
 const jwt = require("jsonwebtoken");
-const logger = require("../../logger/logger");
+// const logger = require("../../logger/logger");
 module.exports = {
   verifyToken: (req, res, next) => {
     // let token = req.get('authorization')

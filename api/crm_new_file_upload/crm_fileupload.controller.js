@@ -705,7 +705,7 @@ module.exports = {
         const folderPath = path.join('D:/DocMeliora/Meliora/CRF/crf_registration', id);
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -813,7 +813,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/KMCMeliora/CRF/crf_registration/${id}/ManageUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -873,7 +873,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${reqslno}/datacollection/${datacollslno}`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -1437,7 +1437,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/HodUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -1495,7 +1495,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/DMSUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -1551,7 +1551,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/MSUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -1608,7 +1608,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/MOUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -1665,7 +1665,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/SMOUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -1724,7 +1724,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/GMUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -1781,7 +1781,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/MDUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -1838,7 +1838,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/EDUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -1968,7 +1968,7 @@ module.exports = {
         // const folderPath = `D:/DocMeliora/Meliora/CRF/crf_registration/${id}/EDUpload`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -2022,7 +2022,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/fileshows/HOSPITAL MANUAL`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -2079,7 +2079,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/fileshows/STANDARD TREATMENT GUIDLINE`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -2117,7 +2117,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/fileshows/Employee Guide`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -2154,7 +2154,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/fileshows/Sound Alike Drugs`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -2190,7 +2190,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/fileshows/Saradha Policy`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -2227,7 +2227,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/fileshows/MSDS`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -2265,7 +2265,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/fileshows/MEDF`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -2301,7 +2301,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/fileshows/Abbrevation`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -2338,7 +2338,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/fileshows/Fridge Medicines`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -2374,7 +2374,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/fileshows/High Risk Drugs`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -2410,7 +2410,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/fileshows/Look Alike`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -2446,7 +2446,7 @@ module.exports = {
         const folderPath = `D:/DocMeliora/Meliora/fileshows/Psychotropic Drugs`;
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error(err);
+                // console.error(err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,

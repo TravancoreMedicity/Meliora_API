@@ -124,6 +124,7 @@ const {
     getCommonFeedbackReport,
     getIpFeedbackReport,
     getAllPREMDetail,
+    getNursingStationLastDate,
     // getallscheduledate,
 } = require("./Feedback.controller");
 
@@ -302,6 +303,7 @@ router.post('/ipfbreport', verifyToken, getIpFeedbackReport);
 
 
 router.get('/premdetail', verifyToken, getAllPREMDetail)
+router.get('/getlastnsupdate', verifyToken, getNursingStationLastDate)
 
 //edlider meliora table
 // router.post('/insertbddetail', insertbddetail)

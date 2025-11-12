@@ -46,7 +46,7 @@ module.exports = {
             `SELECT 
             em_id,
             em_name
-            FROM co_employee_master `,
+            FROM co_employee_master where em_status=1 and  em_no!=1`,
             [],
             (error, results, feilds) => {
                 if (error) {

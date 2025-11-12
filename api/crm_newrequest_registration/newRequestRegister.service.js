@@ -472,7 +472,7 @@ module.exports = {
                  LEFT JOIN crm_company_master ON crm_request_master.company_slno=crm_company_master.company_slno
             
         WHERE
-             user_deptsec IN (?) AND user_acknldge is null
+             request_deptsec_slno IN (?) AND user_acknldge is null
              GROUP BY crm_request_master.req_slno
              ORDER BY crm_request_master.req_slno DESC`,
             [

@@ -2,7 +2,79 @@ const {
     IncidetDetailInsert, IncidentDetailsUpdate, UpdateMarkedIncidentDetails, deleteIncident, ErrorIncidentUpdate,
     RedosIncidentUpdate, IdentifErrorIncidentUpdate, FallsIncidentUpdate, SentinelIncidentUpdate, NearMissessIncidentUpdate,
     SearchIncidentDetails, IncidentApprovalChecks, IPErrorIncidentUpdate, IPRedosIncidentUpdate, IPIdentifErrorIncidentUpdate,
-    IPFallsIncidentUpdate, IPSentinelIncidentUpdate, IPNearMissessIncidentUpdate
+    IPFallsIncidentUpdate, IPSentinelIncidentUpdate, IPNearMissessIncidentUpdate,
+    IncidentCategoryMaster,
+    getAllIncidentCategory,
+    IncidentCategoryUpdate,
+    IncidentSubCategoryInsert,
+    getAllIncidentSubCategory,
+    IncidentSubCategoryUpdate,
+    FindIncidentSubCategoryIfAlreadyExist,
+    getPatientDetail,
+    getProfessionalStaff,
+    getHsPgStaffDetail,
+    getAllassetDtl,
+    IncidentRegistration,
+    InsertIncPatientDetail,
+    InsertIncStaffDetail,
+    IncidentVisitorDetail,
+    IncidentAssetDtl,
+    getAllIncidentDetail,
+    IncidentUpdation,
+    getAllIncidentHodIncharge,
+    InchargeApproval,
+    hodApproval,
+    fetchAllLevelApprovals,
+    insertIncidentLevelApproval,
+    updateIncidentLevelApproval,
+    checkIfLevelExist,
+    getAllQADIncident,
+    QadApproval,
+    hodRcaApproval,
+    qadRcaApproval,
+    hodCorrectiveApproval,
+    qadPreventiveApproval,
+    hodCorrectiveUpdate,
+    hodPreventiveUpdate,
+    qadEvalutaionUpdate,
+    rcaUpdation,
+    getAllCurrentLevelApproval,
+    highLevelApprovals,
+    requestDataCollection,
+    checkDataCollectionAlreadyExist,
+    UpdateDataCollectionReqStatus,
+    getAllInvolvedDepartment,
+    getCurrentEmployeeType,
+    getDepartmentDataCollection,
+    departmentRcaPreventiveSubmission,
+    insertDataCollectionMap,
+    updateDataCollectionMap,
+    FetchAllCollectionMap,
+    FetchAllDepartmentType,
+    getEmployeeDepartmentType,
+    getAllSettings,
+    IsDepartmentDataCollectionAlreadyExist,
+    getAllCommonSetting,
+    insertCommonSetting,
+    updateCommonSetting,
+    getAllCommonSettingMapMaster,
+    insertCommonSettingMapMaster,
+    updateCommonSettingMapMaster,
+    getAllDataCollectionCommonSetting,
+    insertFishBoneQuestion,
+    getFishboneDetails,
+    getAllFishBoneAnalysisDetail,
+    getAllActiveDeparments,
+    InsertLevelReviewDetail,
+    getAllHighLevelReview,
+    InsertDepartmentAction,
+    getAllDepartmentActions,
+    getAllActionDetails,
+    getDepActions,
+    getDeparmentAcknowledge,
+    UpdateIncidentReviews,
+    UpdateFileStatus,
+
 } = require('./incident.service')
 module.exports = {
     IncidetDetailInsert: (req, res) => {
@@ -863,10 +935,1795 @@ module.exports = {
             }
         });
     },
+    IncidentCategoryMaster: (req, res) => {
+        const body = req.body;
+        IncidentCategoryMaster(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+    insertIncidentLevelApproval: (req, res) => {
+        const body = req.body;
+        checkIfLevelExist(body, (err, result) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+
+            if (result && result?.length > 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "Level Already Exist"
+                })
+            }
+
+            insertIncidentLevelApproval(body, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    })
+                }
+                return res.status(200).json({
+                    success: 2,
+                    message: "Level Inserted Successfully"
+                })
+            })
+        })
+
+    },
+
+    getAllIncidentCategory: (req, res) => {
+        getAllIncidentCategory((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+    getAllIncidentSubCategory: (req, res) => {
+        getAllIncidentSubCategory((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+    fetchAllLevelApprovals: (req, res) => {
+        fetchAllLevelApprovals((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+
+    FetchAllCollectionMap: (req, res) => {
+        FetchAllCollectionMap((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    FetchAllDepartmentType: (req, res) => {
+        FetchAllDepartmentType((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getAllSettings: (req, res) => {
+        getAllSettings((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getAllCommonSetting: (req, res) => {
+        getAllCommonSetting((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getFishboneDetails: (req, res) => {
+        const data = req.body;
+        getFishboneDetails(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getAllFishBoneAnalysisDetail: (req, res) => {
+        const data = req.body;
+        getAllFishBoneAnalysisDetail(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getAllActiveDeparments: (req, res) => {
+        const data = req.body;
+        getAllActiveDeparments(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getAllHighLevelReview: (req, res) => {
+        const data = req.body;
+        getAllHighLevelReview(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: 'Fetch Succefully'
+            })
+        })
+    },
+    InsertDepartmentAction: (req, res) => {
+        const data = req.body;
+        const values = data?.flatMap(item =>
+            item.inc_action_collect_dep?.map(dep_id => [
+                item.inc_register_slno,
+                item.inc_action_req_dep,
+                dep_id,
+                item.inc_action_req_user,
+                item.inc_dep_action_remark,
+                item.inc_dep_action_detail_status,
+                item.inc_cs_slno,
+            ])
+        );
+
+        InsertDepartmentAction(values, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: 'Action Request Sent Successfully!'
+            })
+        })
+    },
+
+    getAllCommonSettingMapMaster: (req, res) => {
+        getAllCommonSettingMapMaster((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getAllDepartmentActions: (req, res) => {
+        const body = req.body;
+        getAllDepartmentActions(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Updated Successfully',
+                data: results
+            });
+        });
+    },
+    getAllDataCollectionCommonSetting: (req, res) => {
+        getAllDataCollectionCommonSetting((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+
+    getAllQADIncident: (req, res) => {
+        getAllQADIncident((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+
+    },
+
+
+    IncidentCategoryUpdate: (req, res) => {
+        const body = req.body;
+        IncidentCategoryUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Updated Successfully'
+            });
+        });
+    },
+    updateIncidentLevelApproval: (req, res) => {
+        const body = req.body;
+        updateIncidentLevelApproval(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Updated Successfully'
+            });
+        });
+    },
+    hodRcaApproval: (req, res) => {
+        const body = req.body;
+        hodRcaApproval(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Hod Approved Successfully'
+            });
+        });
+    },
+    hodCorrectiveApproval: (req, res) => {
+        const body = req.body;
+        hodCorrectiveApproval(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Hod Approved Successfully'
+            });
+        });
+    },
+    hodCorrectiveUpdate: (req, res) => {
+        const body = req.body;
+        hodCorrectiveUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Hod Approved Successfully'
+            });
+        });
+    },
+    hodPreventiveUpdate: (req, res) => {
+        const body = req.body;
+        hodPreventiveUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Hod Approved Successfully'
+            });
+        });
+    },
+    qadEvalutaionUpdate: (req, res) => {
+        const body = req.body;
+        qadEvalutaionUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Hod Approved Successfully'
+            });
+        });
+    },
+    rcaUpdation: (req, res) => {
+        const body = req.body;
+        rcaUpdation(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Hod Approved Successfully'
+            });
+        });
+    },
+    updateDataCollectionMap: (req, res) => {
+        const body = req.body;
+        updateDataCollectionMap(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Hod Approved Successfully'
+            });
+        });
+    },
+    updateCommonSetting: (req, res) => {
+        const body = req.body;
+        updateCommonSetting(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Hod Approved Successfully'
+            });
+        });
+    },
+    updateCommonSettingMapMaster: (req, res) => {
+        const body = req.body;
+        updateCommonSettingMapMaster(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Hod Approved Successfully'
+            });
+        });
+    },
+
+
+    qadPreventiveApproval: (req, res) => {
+        const body = req.body;
+        qadPreventiveApproval(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Hod Approved Successfully'
+            });
+        });
+    },
+    qadRcaApproval: (req, res) => {
+        const body = req.body;
+        qadRcaApproval(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Quality Approved Successfully'
+            });
+        });
+    },
+
+    IncidentSubCategoryInsert: (req, res) => {
+        const data = req.body;
+        FindIncidentSubCategoryIfAlreadyExist(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length > 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "SubCategory Already Exist",
+                })
+            }
+            IncidentSubCategoryInsert(data, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    })
+                }
+                return res.status(200).json({
+                    success: 2,
+                    message: 'Data Inserted Successfully'
+                });
+            })
+        })
+    },
+    IncidentSubCategoryUpdate: (req, res) => {
+        const data = req.body;
+        IncidentSubCategoryUpdate(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Updated Successfully'
+            });
+        });
+    },
+    getPatientDetail: (req, res) => {
+        const data = req.body;
+        getPatientDetail(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+    getProfessionalStaff: (req, res) => {
+        const data = req.body;
+        getProfessionalStaff(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+    getHsPgStaffDetail: (req, res) => {
+        const data = req.body;
+        getHsPgStaffDetail(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+    getAllassetDtl: (req, res) => {
+        const data = req.body;
+        getAllassetDtl(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+    getAllIncidentDetail: (req, res) => {
+        const data = req.body;
+        getAllIncidentDetail(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+    getAllCurrentLevelApproval: (req, res) => {
+        const data = req.body;
+        getAllCurrentLevelApproval(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+    insertDataCollectionMap: (req, res) => {
+        const data = req.body;
+        insertDataCollectionMap(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+    insertCommonSetting: (req, res) => {
+        const data = req.body;
+        insertCommonSetting(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+    insertCommonSettingMapMaster: (req, res) => {
+        const data = req.body;
+        insertCommonSettingMapMaster(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+    insertFishBoneQuestion: (req, res) => {
+        const data = req.body;
+        insertFishBoneQuestion(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+
+
+    getEmployeeDepartmentType: (req, res) => {
+        const data = req.body;
+        getEmployeeDepartmentType(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+
+    highLevelApprovals: (req, res) => {
+        const data = req.body;
+
+        const {
+            inc_current_level,
+            inc_current_level_review_state,
+            inc_register_slno,
+            level_no,
+            level_review_state,
+            level_review,
+            level_employee,
+            level_review_status
+        } = data;
+
+        const highleveldata = {
+            inc_current_level,
+            inc_current_level_review_state,
+            inc_register_slno
+        }
+
+        const reviewdetail = {
+            inc_register_slno,
+            level_no,
+            level_review_state,
+            level_review,
+            level_employee,
+            level_review_status
+        }
+
+        highLevelApprovals(highleveldata, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            InsertLevelReviewDetail(reviewdetail, (err, results) => {
+                console.log(err, "err");
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+            });
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Process completed',
+                data: results
+            });
+        });
+    },
+
+    requestDataCollection: (req, res) => {
+        const {
+            slno,
+            departments,
+            status,
+            remark,
+            createUser,
+            requested_department
+        } = req.body;
+
+
+        // console.log(departments, "departments");
+
+        // Prepare values for insert
+        const value = departments?.map((item) => [
+            slno,
+            // item?.dept_id,
+            item,
+            createUser,
+            status,
+            remark,
+            requested_department
+        ]);
+
+        // Step 1: Check if data collection already exists for this slno
+        checkDataCollectionAlreadyExist(slno, (err, checkresult) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            requestDataCollection(value, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                // Step 3: Only update the status ONCE if inc_data_collection_req === 0
+                if (checkresult[0]?.inc_data_collection_req === 0) {
+                    UpdateDataCollectionReqStatus(slno, (err, updateResult) => {
+                        if (err) {
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+
+                        // Step 4: Send final success response after update
+                        return res.status(200).json({
+                            success: 2,
+                            message: 'Process completed and incident updated.',
+                            data: results
+                        });
+                    });
+                } else {
+                    // If update not needed, send success response
+                    return res.status(200).json({
+                        success: 2,
+                        message: 'Process completed. No update needed.',
+                        data: results
+                    });
+                }
+            });
+
+            // IsDepartmentDataCollectionAlreadyExist(searchdata, (err, searchresult) => {
+            //     if (err) {
+            //         return res.status(200).json({
+            //             success: 0,
+            //             message: err
+            //         });
+            //     }
+
+            //     // Filter out departments that already exist
+            //     const existingDepIds = searchresult?.map(r => r.inc_req_collect_dep);
+            //     const newValue = value.filter(v => !existingDepIds.includes(v[1]));
+
+            //     if (newValue.length === 0) {
+            //         return res.status(200).json({
+            //             success: 0,
+            //             message: 'Data collection already exists for selected departments.'
+            //         });
+            //     }
+
+
+            //     requestDataCollection(value, (err, results) => {
+            //         if (err) {
+            //             return res.status(200).json({
+            //                 success: 0,
+            //                 message: err
+            //             });
+            //         }
+
+            //         // Step 3: Only update the status ONCE if inc_data_collection_req === 0
+            //         if (checkresult[0]?.inc_data_collection_req === 0) {
+            //             UpdateDataCollectionReqStatus(slno, (err, updateResult) => {
+            //                 if (err) {
+            //                     return res.status(200).json({
+            //                         success: 0,
+            //                         message: err
+            //                     });
+            //                 }
+
+            //                 // Step 4: Send final success response after update
+            //                 return res.status(200).json({
+            //                     success: 2,
+            //                     message: 'Process completed and incident updated.',
+            //                     data: results
+            //                 });
+            //             });
+            //         } else {
+            //             // If update not needed, send success response
+            //             return res.status(200).json({
+            //                 success: 2,
+            //                 message: 'Process completed. No update needed.',
+            //                 data: results
+            //             });
+            //         }
+            //     });
+            // });
+        });
+    },
+
+    getAllIncidentHodIncharge: (req, res) => {
+        const data = req.body;
+        getAllIncidentHodIncharge(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+
+    getAllInvolvedDepartment: (req, res) => {
+        const data = req.body;
+        getAllInvolvedDepartment(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+    getCurrentEmployeeType: (req, res) => {
+        const data = req.body;
+        getCurrentEmployeeType(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+    getDepartmentDataCollection: (req, res) => {
+        const data = req.body;
+        getDepartmentDataCollection(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+    getAllActionDetails: (req, res) => {
+        const data = req.body;
+        getAllActionDetails(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+    getDepActions: (req, res) => {
+        const data = req.body;
+        getDepActions(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+    UpdateFileStatus: (req, res) => {
+        const data = req.body;
+        UpdateFileStatus(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'File Status RollBacked',
+
+            });
+        });
+    },
+
+
+    getDeparmentAcknowledge: (req, res) => {
+        const data = req.body;
+        getDeparmentAcknowledge(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+
+
+    UpdateIncidentReviews: (req, res) => {
+        const { inc_register_slno, inc_incharge_review, inc_hod_review, inc_qad_review } = req.body;
+
+        if (!inc_register_slno)
+            return res.status(400).json({ success: 0, message: "Incident ID is required" });
+        // Base query and parameters
+
+
+        const fields = [];
+        const values = [];
+
+        if (inc_incharge_review !== undefined) {
+            fields.push("inc_incharge_review = ?");
+            values.push(inc_incharge_review);
+        }
+        if (inc_hod_review !== undefined) {
+            fields.push("inc_hod_review = ?");
+            values.push(inc_hod_review);
+        }
+        if (inc_qad_review !== undefined) {
+            fields.push("inc_qad_review = ?");
+            values.push(inc_qad_review);
+        }
+
+        if (fields.length === 0) {
+            return res.status(400).json({ success: 0, message: "No review field provided" });
+        }
+
+        const sql = `UPDATE inc_register_master SET ${fields.join(", ")} WHERE inc_register_slno = ?`;
+        values.push(inc_register_slno);
+
+        UpdateIncidentReviews({ sql, values }, (err, results) => {
+            if (err) {
+                return res.status(500).json({
+                    success: 0,
+                    message: err.message || err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Successfully Completed Operations'
+            });
+        });
+    },
+
+
+    departmentRcaPreventiveSubmission: (req, res) => {
+        const data = req.body;
+        departmentRcaPreventiveSubmission(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Updated Successfully',
+                data: results
+            });
+        });
+    },
+
+    InchargeApproval: (req, res) => {
+        const data = req.body;
+        InchargeApproval(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Incident Approved '
+            });
+        });
+    },
+    // hodApproval: (req, res) => {
+    //    const data = req.body;
+    //     hodApproval(data, (err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+
+    //         return res.status(200).json({
+    //             success: 2,
+    //             message: 'Successfully Completed Operations'
+    //         });
+    //     });
+    // },
+    // hodApproval: (req, res) => {
+    //     const data = req.body;
+
+    //     // Base query and parameters
+    //     let sql = `
+    //     UPDATE inc_register_master 
+    //     SET    
+    //         inc_hod_ack = ?,
+    //         inc_hod_emp = ?,
+    //         inc_hod_reivew_state = ?,
+    //         inc_hod_review = ?,
+    //         inc_preventive_action = ?,
+    //         inc_hod_review_date = NOW()
+    // `;
+
+    //     const params = [
+    //         data.inc_hod_ack,
+    //         data.inc_hod_emp,
+    //         data.inc_hod_reivew_state,
+    //         data.inc_hod_review,
+    //         data.inc_preventive_action
+    //     ];
+
+    //     // Add corrective action + RCA if present
+    //     if (data.inc_corrective_action !== undefined && data.inc_rca !== undefined && data.inc_rca_hod_approve !== undefined &&
+    //         data.inc_corrective_hod_approval !== undefined) {
+    //         sql += `,
+    //         inc_corrective_action = ?,
+    //         inc_rca = ?,
+    //         inc_rca_hod_approve=?,
+    //         inc_corrective_hod_approval = ?,
+    //         inc_corrective_hod_aprvl_date = NOW(),
+    //         inc_rca_hod_approve_date = NOW()
+    //     `;
+    //         params.push(data.inc_corrective_action, data.inc_rca, data.inc_rca_hod_approve, data.inc_corrective_hod_approval);
+    //     }
+
+    //     // If HOD is acknowledging directly (no incharge review)
+    //     if (data.inc_incharge_ack !== undefined && data.inc_incharge_emp !== undefined) {
+    //         sql += `,
+    //         inc_incharge_ack = ?,
+    //         inc_incharge_emp = ?,
+    //         inc_incharge_reivew_state = ?,
+    //         inc_incharge_review = ?,
+    //         inc_incharge_review_date = NOW()
+    //     `;
+    //         params.push(
+    //             data.inc_incharge_ack,
+    //             data.inc_incharge_emp,
+    //             data.inc_incharge_reivew_state,
+    //             data.inc_incharge_review
+    //         );
+    //     }
+
+    //     sql += ` WHERE inc_register_slno = ?`;
+    //     params.push(data.inc_register_slno);
+
+    //     hodApproval({ sql, params }, (err, results) => {
+    //         if (err) {
+    //             return res.status(500).json({
+    //                 success: 0,
+    //                 message: err.message || err
+    //             });
+    //         }
+
+    //         return res.status(200).json({
+    //             success: 2,
+    //             message: 'Successfully Completed Operations'
+    //         });
+    //     });
+    // },
+    hodApproval: (req, res) => {
+        const data = req.body;
+
+        //  CASE 1: If HOD rejected (val === "R"), only update minimal fields
+        if (data.inc_hod_reivew_state === 'R') {
+            const sql = `
+            UPDATE inc_register_master 
+            SET    
+                inc_hod_ack = ?,
+                inc_hod_emp = ?,
+                inc_hod_reivew_state = ?,
+                inc_hod_review = ?,
+                inc_hod_review_date = NOW()
+            WHERE inc_register_slno = ?
+        `;
+
+            const params = [
+                data.inc_hod_ack,
+                data.inc_hod_emp,
+                data.inc_hod_reivew_state,
+                data.inc_hod_review,
+                data.inc_register_slno
+            ];
+
+            return hodApproval({ sql, params }, (err, results) => {
+                if (err) {
+                    return res.status(500).json({
+                        success: 0,
+                        message: err.message || err
+                    });
+                }
+                return res.status(200).json({
+                    success: 2,
+                    message: 'HOD Rejection Updated Successfully'
+                });
+            });
+        }
+
+        //  CASE 2: If not rejected (Normal Approval)
+        let sql = `
+        UPDATE inc_register_master 
+        SET    
+            inc_hod_ack = ?,
+            inc_hod_emp = ?,
+            inc_hod_reivew_state = ?,
+            inc_hod_review = ?,
+            inc_preventive_action = ?,
+            inc_hod_review_date = NOW()
+    `;
+
+        const params = [
+            data.inc_hod_ack,
+            data.inc_hod_emp,
+            data.inc_hod_reivew_state,
+            data.inc_hod_review,
+            data.inc_preventive_action
+        ];
+
+        // Add corrective + RCA if present
+        if (
+            data.inc_corrective_action !== undefined &&
+            data.inc_rca !== undefined &&
+            data.inc_rca_hod_approve !== undefined &&
+            data.inc_corrective_hod_approval !== undefined
+        ) {
+            sql += `,
+            inc_corrective_action = ?,
+            inc_rca = ?,
+            inc_rca_hod_approve = ?,
+            inc_corrective_hod_approval = ?,
+            inc_corrective_hod_aprvl_date = NOW(),
+            inc_rca_hod_approve_date = NOW()
+        `;
+            params.push(
+                data.inc_corrective_action,
+                data.inc_rca,
+                data.inc_rca_hod_approve,
+                data.inc_corrective_hod_approval
+            );
+        }
+
+        // If HOD is acknowledging directly (no incharge review)
+        if (data.inc_incharge_ack !== undefined && data.inc_incharge_emp !== undefined) {
+            sql += `,
+            inc_incharge_ack = ?,
+            inc_incharge_emp = ?,
+            inc_incharge_reivew_state = ?,
+            inc_incharge_review = ?,
+            inc_incharge_review_date = NOW()
+        `;
+            params.push(
+                data.inc_incharge_ack,
+                data.inc_incharge_emp,
+                data.inc_incharge_reivew_state,
+                data.inc_incharge_review
+            );
+        }
+
+        sql += ` WHERE inc_register_slno = ?`;
+        params.push(data.inc_register_slno);
+
+        hodApproval({ sql, params }, (err, results) => {
+            if (err) {
+                return res.status(500).json({
+                    success: 0,
+                    message: err.message || err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Successfully Completed Operations'
+            });
+        });
+    },
+
+
+    QadApproval: (req, res) => {
+        const data = req.body;
+        QadApproval(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Incident Approved '
+            });
+        });
+    },
+    IncidentRegistration: (req, res) => {
+        const {
+            inc_initiator_slno,
+            inc_staff_type_slno,
+            nature_of_inc,
+            inc_describtion,
+            file_status,
+            inc_status,
+            create_user,
+            inc_initiator_dtl,
+            dep_slno,
+            sec_slno,
+            inc_incharge_approval,
+            inc_hod_approval,
+            departments,
+            status,
+            remark,
+            createUser,
+            requested_department,
+            inc_data_collection_req
+        } = req.body;
+
+        const postDate = {
+            inc_initiator_slno,
+            inc_staff_type_slno,
+            nature_of_inc,
+            inc_describtion,
+            file_status,
+            inc_status,
+            create_user,
+            dep_slno,
+            sec_slno,
+            inc_incharge_approval,
+            inc_hod_approval,
+            inc_data_collection_req
+        };
 
 
 
+        // common code for sending error mesg and suceess mesg  for reducing code repeatetion
+        const sendError = (err) => res.status(200).json({ success: 0, message: err });
+        const sendSuccess = (id) => res.status(200).json({
+            success: 2,
+            message: "Incident Registered Successfully",
+            insertId: id
+        });
 
 
+        IncidentRegistration(postDate, (err, results) => {
+            if (err) return sendError(err);
+
+            const insertId = results.insertId;
+
+            const value = departments?.map((item) => [
+                insertId,
+                // item.inc_category_dep,
+                item.dept_id,
+                createUser,
+                status,
+                remark,
+                requested_department
+            ]);
+
+
+            if (insertId) {
+                requestDataCollection(value, (err, results) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err
+                        });
+                    }
+                });
+            }
+
+            if (inc_initiator_slno === 1) {
+                const insertPromises = inc_initiator_dtl?.map(patient => {
+                    const patientData = {
+                        inc_register_slno: insertId,
+                        inc_pt_name: patient.PTC_PTNAME,
+                        inc_pt_no: patient.PT_NO,
+                        inc_pt_gender: patient.PTC_SEX,
+                        inc_pt_mobile: patient.PTC_MOBILE,
+                        inc_pt_age: patient.PTN_YEARAGE,
+                        inc_pt_address: `${patient.PTC_LOADD1}, ${patient.PTC_LOADD2}`,
+                        create_user
+                    };
+
+                    return new Promise((resolve, reject) => {
+                        InsertIncPatientDetail(patientData, (err) => {
+                            if (err) return reject(err);
+                            resolve();
+                        });
+                    });
+                });
+
+                Promise.all(insertPromises)
+                    .then(() => sendSuccess(insertId))
+                    .catch(err => sendError(err));
+            }
+
+            if (inc_initiator_slno === 2) {
+                const insertPromises = inc_initiator_dtl?.map(staff => {
+                    const staffData = {
+                        inc_register_slno: insertId,
+                        inc_staff_type_slno: inc_staff_type_slno,
+                        emp_id: staff.em_id,
+                        emp_user_name: staff.em_no, // assuming emp_user_name is employee number
+                        emp_name: staff.em_name?.trim(),
+                        emp_age: staff.em_age_year,
+                        emp_gender: staff.em_gender,
+                        emp_desig: staff.em_designation,
+                        emp_dept: staff.em_department,
+                        emp_dept_sec: staff.em_dept_section,
+                        emp_mob: staff.em_mobile,
+                        emp_email: staff.em_email,
+                        emp_address: `${staff.addressPermnt1 || ""}, ${staff.addressPermnt2 || ""}`.trim(),
+                        emp_joining_date: staff.em_doj,
+                        create_user
+                    };
+
+                    return new Promise((resolve, reject) => {
+                        InsertIncStaffDetail(staffData, (err) => {
+                            if (err) return reject(err);
+                            resolve();
+                        });
+                    });
+                });
+
+                Promise.all(insertPromises)
+                    .then(() => sendSuccess(insertId))
+                    .catch(err => sendError(err));
+            }
+
+            if (inc_initiator_slno === 3) {
+                const insertPromises = inc_initiator_dtl.map(visitor => {
+                    const visitorData = {
+                        inc_register_slno: insertId,
+                        inc_visitor_name: visitor.visitor_name,
+                        inc_visitor_age: visitor.visitor_age,
+                        inc_visitor_gender: visitor.visitor_gender,
+                        inc_visitor_mobile: visitor.visitor_mobile,
+                        inc_visitor_address: visitor.visitor_address,
+                        inc_visit_purpose: visitor.purpose,
+                        create_user
+                    };
+
+                    return new Promise((resolve, reject) => {
+                        IncidentVisitorDetail(visitorData, (err) => {
+                            if (err) return reject(err);
+                            resolve();
+                        });
+                    });
+                });
+
+                Promise.all(insertPromises)
+                    .then(() => sendSuccess(insertId))
+                    .catch(err => sendError(err));
+            }
+
+            if (inc_initiator_slno === 4) {
+
+                const insertPromises = inc_initiator_dtl.map(asset => {
+                    const assetData = {
+                        inc_register_slno: insertId,
+                        inc_is_asset: asset.item_isAsset ? 1 : 0,
+                        asset_item_slno: asset.item_isAsset ? asset.item_slno : null,
+                        custodian_dept_slno: asset.item_custodian_dept_slno || asset.am_custodian_slno || null,
+                        item_name: asset.item_name,
+                        item_location: asset.location,
+                        manufacture_slno: asset.am_manufacture_no,
+                        create_user
+                    };
+
+                    return new Promise((resolve, reject) => {
+                        IncidentAssetDtl(assetData, (err) => {
+                            if (err) return reject(err);
+                            resolve();
+                        });
+                    });
+                });
+
+                Promise.all(insertPromises)
+                    .then(() => sendSuccess(insertId))
+                    .catch(err => sendError(err));
+            }
+
+
+
+        });
+    },
+
+
+    IncidentUpdation: (req, res) => {
+        const {
+            nature_of_inc,
+            inc_describtion,
+            file_status,
+            inc_status,
+            edit_user,
+            inc_register_slno
+        } = req.body;
+
+        const postDate = {
+            nature_of_inc,
+            inc_describtion,
+            file_status,
+            inc_status,
+            edit_user,
+            inc_register_slno
+        };
+
+
+        // common code for sending error mesg and suceess mesg  for reducing code repeatetion
+        const sendError = (err) => res.status(200).json({ success: 0, message: err });
+        const sendSuccess = (id) => res.status(200).json({
+            success: 2,
+            message: "Incident Updation Successfully",
+        });
+
+        IncidentUpdation(postDate, (err, results) => {
+            if (err) return sendError(err);
+            sendSuccess()
+
+        });
+    },
 
 }

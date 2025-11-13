@@ -41,6 +41,7 @@ const allowedOrigins = [
 // Dynamically allow based on Origin
 app.use(
   cors({
+
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
@@ -49,6 +50,7 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
+
     credentials: true,
   })
 );

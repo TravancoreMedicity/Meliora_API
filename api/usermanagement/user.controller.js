@@ -40,7 +40,7 @@ module.exports = {
 
     validateUserCredExcistOrNot(body, (error, results) => {
       if (error) {
-        logger.error(error);
+        // logger.error(error);
         return res.status(200).json({
           success: 0,
           message: "Database connection error" + error,
@@ -64,7 +64,7 @@ module.exports = {
 
       insertUser(bodtData, (error, results) => {
         if (error) {
-          logger.error(error);
+          // logger.error(error);
           return res.status(200).json({
             success: 0,
             message: "Database connection error" + error,
@@ -81,7 +81,7 @@ module.exports = {
     const body = req.body;
     editUser(body, (error, results) => {
       if (error) {
-        logger.error(error);
+        // logger.error(error);
         return res.status(500).json({
           success: 0,
           message: "Database connection error",
@@ -97,7 +97,7 @@ module.exports = {
     const id = req.params.id;
     deleteUser(id, (error, results) => {
       if (error) {
-        logger.error(error);
+        // logger.error(error);
         return res.status(500).json({
           success: 0,
           message: "Database connection error",
@@ -113,7 +113,7 @@ module.exports = {
     const id = req.params.id;
     getUser(id, (error, results) => {
       if (error) {
-        logger.error(error);
+        // logger.error(error);
         return res.status(500).json({
           success: 0,
           message: "Database connection error",
@@ -136,7 +136,7 @@ module.exports = {
   getAllUser: (req, res) => {
     getAllUser((error, results) => {
       if (error) {
-        logger.error(error);
+        // logger.error(error);
         return res.status(500).json({
           success: 0,
           message: "Database connection error",
@@ -161,10 +161,10 @@ module.exports = {
     const id = req.params.id;
     getRefershToken(id, (error, results) => {
       if (error) {
-        logger.error(error);
+        // logger.error(error);
         deleteRefreshToken(id, (error, results) => {
           if (error) {
-            logger.error(error);
+            // logger.error(error);
             res.clearCookie("accessToken");
             return res.status(403).json({ message: "Invalid refresh token" });
           }
@@ -196,7 +196,7 @@ module.exports = {
               // DELETE REFRESH TOKEN
               deleteRefreshToken(id, (error, results) => {
                 if (error) {
-                  logger.error(error);
+                  // logger.error(error);
                   res.clearCookie("accessToken");
                   return res
                     .status(403)
@@ -230,7 +230,7 @@ module.exports = {
     const id = req.params.id;
     deleteRefreshToken(id, (error, results) => {
       if (error) {
-        logger.error(error);
+        // logger.error(error);
         res.clearCookie("accessToken");
         return res.status(200).json({ message: "Invalid refresh token" });
       }
@@ -243,7 +243,7 @@ module.exports = {
     // CHECK USER BASED VALIDATION FIRST CHECK THE PASSWORD CREDENTIAL THEN REST
     userBasedValidationCheck(body, (error, results) => {
       if (error) {
-        logger.error(error);
+        // logger.error(error);
         return res.status(500).json({
           success: 0,
           message: "Database connection error",
@@ -369,19 +369,6 @@ module.exports = {
                 }
               }
             );
-
-            // userBasedInsertEliderToken(
-            //   { Elider_token: elidertoken, Elider_Id: eliderID },
-            //   (error, results) => {
-            //     if (error) {
-            //       // logger.error(error);
-            //       return res.status(500).json({
-            //         success: 0,
-            //         message: "Database connection error while insert Elider Token",
-            //       });
-            //     }
-            //   }
-            // );
           }
         } else {
           return res.status(200).json({

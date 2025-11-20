@@ -33,6 +33,7 @@ const allowedOrigins = [
   "http://195.168.34.25:3000",
   "http://192.168.22.170:3000",
   "http://192.168.22.5:3000",
+  "http://192.168.22.8:3000",
 ];
 
 
@@ -480,6 +481,7 @@ app.use("/api/melioraDepMaster", melioraDepMaster);
 app.use("/api/ContractMaster", ContractMaster);
 app.use('/api/condemApprovalLevel', condemApprovalLevel)
 app.use('/api/condemMasters', condemMasters)
+
 
 
 server.listen(

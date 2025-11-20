@@ -36,7 +36,7 @@ module.exports = {
         data.lastPasswordChangeDate,
       ],
       (error, results, fields) => {
-        logger.error(error);
+        // logger.error(error);
         if (error) {
           return callBack(error);
         }
@@ -73,7 +73,7 @@ module.exports = {
       ],
       (error, results, fields) => {
         if (error) {
-          logger.error(error);
+          // logger.error(error);
           return callBack(error);
         }
         return callBack(null, results);
@@ -86,7 +86,7 @@ module.exports = {
       [id],
       (error, results, fields) => {
         if (error) {
-          logger.error(error);
+          // logger.error(error);
           return callBack(error);
         }
         return callBack(null, results);
@@ -99,7 +99,7 @@ module.exports = {
       [id],
       (error, results, fields) => {
         if (error) {
-          logger.error(error);
+          // logger.error(error);
           return callBack(error);
         }
         return callBack(null, results);
@@ -109,7 +109,7 @@ module.exports = {
   getAllUser: (callBack) => {
     pool.query("SELECT * FROM user", (error, results, fields) => {
       if (error) {
-        logger.error(error);
+        // logger.error(error);
         return callBack(error);
       }
       return callBack(null, results);
@@ -124,7 +124,7 @@ module.exports = {
       [data.refresh_token, data.user_slno, data.user_slno],
       (error, results, fields) => {
         if (error) {
-          logger.error(error);
+          // logger.error(error);
           return callBack(error);
         }
         return callBack(null, results);
@@ -167,7 +167,7 @@ module.exports = {
       [data.mobile, data.email, data.name],
       (error, results, fields) => {
         if (error) {
-          logger.error(error);
+          // logger.error(error);
           return callBack(error);
         }
         return callBack(null, results);
@@ -220,7 +220,7 @@ module.exports = {
       [data.userName],
       (error, results, fields) => {
         if (error) {
-          logger.error(error);
+          // logger.error(error);
           return callBack(error);
         }
         return callBack(null, results);
@@ -290,7 +290,7 @@ module.exports = {
       [],
       (error, results, fields) => {
         if (error) {
-          logger.error(error);
+          // logger.error(error);
           return callBack(error);
         }
         return callBack(null, results);

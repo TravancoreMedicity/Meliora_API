@@ -1,6 +1,8 @@
 const { getCategory, getGroup, getAssetType, getAmItemType, getAmSubcategory, getAmSubGroup,
     getAmManufacture, getAmModel, getUOM, getSubmodel, modelNoSelect, ItemBasedOnDeptSec,
-    SpareItemBasedOnDeptSec, rackselect, RoomBasedOnDeptSec, SubRoomunderRoom
+    SpareItemBasedOnDeptSec, rackselect, RoomBasedOnDeptSec, SubRoomunderRoom,
+    AssetItemUnderCustoidian,
+    SpareItemUnderCustoidian
 } = require('../am_selectcomponents/select.services')
 const logger = require('../../logger/logger');
 
@@ -360,6 +362,55 @@ module.exports = {
                 });
             }
             if (results.length === 0) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+
+        AssetItemUnderCustoidian: (req, res) => {
+        const id = req.params.id
+        AssetItemUnderCustoidian(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
+                logger.infologwindow("No Results Found")
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Results Found"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    SpareItemUnderCustoidian: (req, res) => {
+        const id = req.params.id
+        SpareItemUnderCustoidian(id, (err, results) => {
+            if (err) {
+                logger.logwindow(err)
+                return res.status(200).json({
+                    success: 2,
+                    message: err
+                });
+            }
+            if (!results) {
                 logger.infologwindow("No Results Found")
                 return res.status(200).json({
                     success: 0,

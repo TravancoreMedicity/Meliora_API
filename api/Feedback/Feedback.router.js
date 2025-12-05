@@ -125,6 +125,9 @@ const {
     getIpFeedbackReport,
     getAllPREMDetail,
     getNursingStationLastDate,
+    getPatientDetail,
+    InsertPatineDetail,
+    checkIpAlreadyExist,
     // getallscheduledate,
 } = require("./Feedback.controller");
 
@@ -304,6 +307,11 @@ router.post('/ipfbreport', verifyToken, getIpFeedbackReport);
 
 router.get('/premdetail', verifyToken, getAllPREMDetail)
 router.get('/getlastnsupdate', verifyToken, getNursingStationLastDate)
+
+
+router.post('/getpatientdetail', verifyToken, getPatientDetail)
+router.post('/insertpatientdetail', verifyToken, InsertPatineDetail)
+router.post('/checkipexist', verifyToken, checkIpAlreadyExist)
 
 //edlider meliora table
 // router.post('/insertbddetail', insertbddetail)

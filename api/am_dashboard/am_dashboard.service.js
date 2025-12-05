@@ -398,7 +398,7 @@ module.exports = {
             am_item_name_creation
             left join am_spare_item_map_master on am_spare_item_map_master.spare_creation_slno =am_item_name_creation.item_creation_slno
             left join am_item_map_details on am_item_map_details.am_spare_item_map_slno =am_spare_item_map_master.am_spare_item_map_slno
-              left join am_custodian_department on am_custodian_department.am_custodian_slno = am_spare_item_map_master.item_custodian_dept 
+            left join am_custodian_department on am_custodian_department.am_custodian_slno = am_spare_item_map_master.spare_custodian_dept 
             where 
             am_item_name_creation.item_creation_status=1
             and

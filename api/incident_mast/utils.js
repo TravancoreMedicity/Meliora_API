@@ -89,7 +89,6 @@ const handleGetIncidentFiles = (baseFolder) => {
 
         fs.readdir(folderPath, (err, files) => {
             if (err) {
-                console.error("Read error:", err);
                 return res.status(200).json({
                     success: 0,
                     message: err.message,
@@ -99,21 +98,22 @@ const handleGetIncidentFiles = (baseFolder) => {
             if (!files || files.length === 0) {
                 return res.status(200).json({
                     success: 1,
-                    data: [], // Empty folder
+                    data: [], // No files found
                 });
             }
 
-            // Stream ZIP response
-            res.setHeader('Content-Type', 'application/zip');
+            // Stream ZIP
+            res.setHeader("Content-Type", "application/zip");
             res.setHeader(
-                'Content-Disposition',
+                "Content-Disposition",
                 `attachment; filename="${id}_files.zip"`
             );
 
-            const archive = archiver('zip', { zlib: { level: 9 } });
-            archive.on('error', (archiveErr) => {
+            const archive = archiver("zip", { zlib: { level: 9 } });
+
+            archive.on("error", (archiveErr) => {
                 console.error("Archive error:", archiveErr);
-                res.status(500).json({
+                return res.status(500).json({
                     success: 0,
                     message: archiveErr.message,
                 });
@@ -121,9 +121,11 @@ const handleGetIncidentFiles = (baseFolder) => {
 
             archive.pipe(res);
 
-            // Filter image/pdf files
+            // Filter accepted file types
+            const allowedExtensions = /\.(jpe?g|png|gif|pdf)$/i;
+
             files.forEach((filename) => {
-                if (/\.(jpe?g|png|gif|pdf)$/i.test(filename)) {
+                if (allowedExtensions.test(filename)) {
                     const filePath = path.join(folderPath, filename);
                     archive.file(filePath, { name: filename });
                 }
@@ -133,5 +135,6 @@ const handleGetIncidentFiles = (baseFolder) => {
         });
     };
 };
+
 
 module.exports = { handleFileUpload, handleGetIncidentFiles };

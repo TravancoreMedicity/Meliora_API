@@ -692,6 +692,114 @@ module.exports = {
             }
         )
     },
+    getallMasterActionDetail: (callback) => {
+        pool.query(
+            `SELECT 
+                inc_action_slno,
+                inc_action_name,
+                inc_action_status,
+                inc_is_analysis,
+                 inc_is_datacollection,
+                 inc_is_action,
+                 inc_action_item_stauts
+            FROM
+                inc_action_master 
+        `,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    getAllLevelItemMapDetail: (callback) => {
+        pool.query(
+            `SELECT 
+                iltm.inc_level_item_slno,
+                iam.inc_action_name,
+                iam.inc_action_item_stauts,
+                apm.level_name,
+                apm.level_count as level_no,
+                iltm.level_slno,
+                iltm.inc_action_slno,
+                iltm.inc_level_item_status,
+                cd.dept_name,
+                cs.sec_name,
+                iltm.dep_id,
+                iltm.sec_id
+            FROM
+                    meliora.inc_level_item_map_master iltm
+            LEFT JOIN inc_action_master iam on iam.inc_action_slno = iltm.inc_action_slno
+            LEFT JOIN co_level_details apm on apm.detail_slno = iltm.level_slno
+			LEFT JOIN co_department_mast cd on cd.dept_id = iltm.dep_id
+			LEFT JOIN co_deptsec_mast cs on cs.sec_id = iltm.sec_id
+        `,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    getAllLevelItems: (data, callback) => {
+        pool.query(
+            `SELECT 
+                iltm.inc_level_item_slno,
+                iam.inc_action_name,
+                apm.level_name,
+                apm.level_count as level_no,
+                iltm.inc_level_item_status,
+                 iam.inc_is_analysis,
+                 iam.inc_action_slno,
+                 iam.inc_is_datacollection,
+                 iam.inc_is_action,
+                 iam.inc_action_item_stauts
+            FROM
+                    inc_level_item_map_master iltm
+            LEFT JOIN inc_action_master iam on iam.inc_action_slno = iltm.inc_action_slno
+			LEFT JOIN co_level_details apm on apm.detail_slno = iltm.level_slno
+            WHERE iltm.level_slno = ? AND iltm.inc_level_item_status = 1
+        `,
+            [
+                data.level_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
+    checkAlreadyItemMaped: (data, callback) => {
+        pool.query(
+            `select 
+            inc_level_item_slno
+             from 
+             meliora.inc_level_item_map_master 
+             where 
+             level_slno =  ? and inc_action_slno = ?  and sec_id = ? and dep_id = ?`,
+            [
+                data.level_slno,
+                data.inc_action_slno,
+                data.dep_id,
+                data.sec_id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
+
     FetchAllDepartmentType: (callback) => {
         pool.query(
             `SELECT 
@@ -840,18 +948,19 @@ module.exports = {
         pool.query(
             `SELECT 
                 level_review_slno,
-                ilr.level_no,
+                ilr.level_slno,
                 level_review_state,
                 level_review,
                 ilr.level_employee,
                 level_review_date,
                 level_review_status,
                 cem.em_name,
-                level_name
+                level_name,
+                apm.level_count as level_no
             FROM
                 inc_levels_review ilr
-            left join co_employee_master cem on cem.em_id = ilr.level_employee
-            left join inc_approval_level_master ilm on ilm.level_slno = ilr.level_no
+			LEFT JOIN co_employee_master cem on cem.em_id = ilr.level_employee
+			LEFT JOIN co_level_details apm on apm.detail_slno = ilr.level_slno AND apm.status= 1
             WHERE
                 inc_register_slno = ? and level_review_status = 1`,
             [
@@ -875,7 +984,8 @@ module.exports = {
             inc_action_req_user,
             inc_dep_action_remark,
             inc_dep_action_detail_status,
-            inc_cs_slno
+            inc_cs_slno,
+            level_no
           )
            VALUES ?`,
             [data],
@@ -918,20 +1028,21 @@ FROM
     getAllDataCollectionCommonSetting: (callback) => {
         pool.query(
             `SELECT 
-    inc_cs_dep_map_slno,
-    ics.inc_cs_slno,
-    inc_dep_id,
-    inc_dep_map_status,
-    cdm.dept_name,
-    inc_setting_key,
-    inc_setting_label
-FROM
-    inc_common_settings ics
-        LEFT JOIN
-    inc_common_setting_dep_map_master icdm ON ics.inc_cs_slno = icdm.inc_cs_slno
-		LEFT JOIN 
-	co_department_mast cdm on cdm.dept_id = icdm.inc_dep_id
-WHERE inc_cs_status = 1`,
+                inc_cs_dep_map_slno,
+                ics.inc_cs_slno,
+                inc_dep_id,
+                inc_dep_map_status,
+                cdm.dept_name,
+                inc_setting_key,
+                inc_setting_label
+            FROM inc_common_settings ics
+            INNER JOIN inc_common_setting_dep_map_master icdm 
+                ON ics.inc_cs_slno = icdm.inc_cs_slno 
+                AND icdm.inc_dep_map_status = 1
+            INNER JOIN co_department_mast cdm 
+                ON cdm.dept_id = icdm.inc_dep_id
+            WHERE 
+                inc_cs_status = 1`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -962,25 +1073,23 @@ WHERE inc_cs_status = 1`,
         )
     },
 
-
-
     fetchAllLevelApprovals: (callback) => {
         pool.query(
             `
-SELECT 
-    level_slno, 
-    level_no,
-    level_name,
-    emp_id,
-    level_status,
-    em_name,
-    sec_name,
-    inc_approval_level_master.sec_id
-FROM
-    inc_approval_level_master 
-        LEFT JOIN co_employee_master ON co_employee_master.em_id = inc_approval_level_master.emp_id
-        LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id = inc_approval_level_master.sec_id
-    `,
+            SELECT 
+                level_slno, 
+                level_no,
+                level_name,
+                emp_id,
+                level_status,
+                em_name,
+                sec_name,
+                level_priority,
+                inc_approval_level_master.sec_id
+            FROM
+                inc_approval_level_master 
+                    LEFT JOIN co_employee_master ON co_employee_master.em_id = inc_approval_level_master.emp_id
+                    LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id = inc_approval_level_master.sec_id`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -1078,7 +1187,7 @@ FROM
     LEFT JOIN
     co_designation cd ON cm.em_designation = cd.desg_slno
 WHERE
-    inc_register_slno = ? and inc_dep_action_detail_status =  1;`,
+    inc_register_slno = ? and inc_dep_action_detail_status =  1`,
             [
                 data.inc_register_slno
             ],
@@ -1341,8 +1450,9 @@ WHERE
             inc_incharge_ack,
             inc_hod_ack,
             create_user,
-            inc_data_collection_req
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+            inc_data_collection_req,
+            inc_reg_corrective
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.inc_initiator_slno,
                 JSON.stringify(data.nature_of_inc), // if array, store as JSON string
@@ -1355,6 +1465,7 @@ WHERE
                 data.inc_hod_approval,
                 data.create_user,
                 data.inc_data_collection_req,
+                data.inc_reg_corrective
             ],
             (error, results, fields) => {
                 if (error) {
@@ -1510,20 +1621,11 @@ WHERE
                 irm.create_user,
                 irm.edit_user,
                 irm.create_date,
-                irm.inc_incharge_ack,
-                irm.inc_hod_ack,
-                irm.inc_incharge_reivew_state,
-                irm.inc_incharge_review,
-                irm.inc_incharge_review_date,
-                irm.inc_hod_reivew_state,
-                irm.inc_hod_review,
-                irm.inc_hod_review_date,
-                irm.inc_current_level,
-                irm.inc_qad_ack,
-                irm.inc_qad_review,
-                irm.inc_qad_review_date,
-                irm.inc_qad_review_state,
                 irm.inc_sacmatrix_detail,
+                irm.inc_reg_corrective,
+                irm.inc_all_approved,
+                irm.inc_current_level,
+                irm.inc_current_level_review_state,
                 ipd.mrd_no,
                 ipd.inc_pt_name,
                 ipd.inc_pt_gender,
@@ -1563,14 +1665,9 @@ WHERE
                 inch.em_name as incharge_name,
                 hod.em_name as hod_name,
                 qad.em_name as qad_name,
-                irm.inc_evaluation_status,
-                irm.inc_preventive_action,
-                irm.inc_corrective_action,
-                irm.inc_rca,
-                irm.inc_rca_qad_approve,
-                irm.inc_rca_hod_approve,
-                irm.inc_corrective_hod_approval,
-                irm.inc_preventive_qad_approval,
+                level_slno,
+                level_review_state,
+                cld.level_name,
                 cd.desg_name,
                 irm.inc_data_collection_req,
                 JSON_ARRAYAGG(
@@ -1620,6 +1717,10 @@ WHERE
                 co_employee_master cem ON cem.em_id = idc.inc_req_user
                     LEFT JOIN 
                 co_employee_master mc ON mc.em_id = idc.inc_req_ack_user
+                LEFT JOIN 
+                inc_levels_review ilr ON ilr.inc_register_slno = irm.inc_register_slno
+                LEFT JOIN 
+                co_level_details cld ON cld.detail_slno = ilr.level_slno   
             WHERE
                 irm.inc_status = 1 and irm.create_user = ?
             GROUP BY irm.inc_register_slno
@@ -1634,150 +1735,184 @@ WHERE
             }
         );
     },
-    getAllCurrentLevelApproval: (data, callback) => {
-        // console.log(data, "data");
-        pool.query(`
-            SELECT 
-                irm.inc_register_slno,
-                irm.inc_initiator_slno,
-                irm.nature_of_inc,
-                irm.inc_describtion,
-                irm.file_status,
-                irm.inc_status,
-                irm.create_user,
-                irm.edit_user,
-                irm.create_date,
-                irm.inc_incharge_ack,
-                irm.inc_hod_ack,
-                irm.inc_incharge_reivew_state,
-                irm.inc_incharge_review,
-                irm.inc_incharge_review_date,
-                irm.inc_hod_reivew_state,
-                irm.inc_hod_review,
-                irm.inc_hod_review_date,
-                irm.inc_current_level,
-                irm.inc_current_level_review_state,
-                irm.inc_qad_ack,
-                irm.inc_qad_review,
-                irm.inc_qad_review_date,
-                irm.inc_qad_review_state,
-                irm.inc_sacmatrix_detail,
-                ipd.mrd_no,
-                ipd.inc_pt_name,
-                ipd.inc_pt_gender,
-                ipd.inc_pt_mobile,
-                ipd.inc_pt_age,
-                ipd.inc_pt_address,
-                isd.inc_staff_type_slno,
-                isd.emp_id,
-                isd.emp_user_name,
-                isd.emp_name,
-                isd.emp_age,
-                isd.emp_gender,
-                isd.emp_desig,
-                isd.emp_dept,
-                isd.emp_dept_sec,
-                isd.emp_mob,
-                isd.emp_email,
-                isd.emp_address,
-                isd.emp_joining_date,
-                ivd.inc_visitor_name,
-                ivd.inc_visitor_age,
-                ivd.inc_visitor_gender,
-                ivd.inc_visitor_mobile,
-                ivd.inc_visitor_address,
-                ivd.inc_visit_purpose,
-                iad.inc_is_asset,
-                iad.asset_item_slno,
-                iad.custodian_dept_slno,
-                iad.item_name,
-                iad.item_location,
-                iad.manufacture_slno,
-                cm.em_name,
-                dp.dept_name,
-                ds.sec_name,
-                iniat.inc_initiator_name,
-                ist.inc_staff_type_name,
-                inch.em_name as incharge_name,
-                hod.em_name as hod_name,
-                qad.em_name as qad_name,
-                irm.inc_evaluation_status,
-                irm.inc_preventive_action,
-                irm.inc_corrective_action,
-                irm.inc_rca,
-                irm.inc_rca_qad_approve,
-                irm.inc_rca_hod_approve,
-                irm.inc_corrective_hod_approval,
-                irm.inc_preventive_qad_approval,
-             
-                cd.desg_name,
-                irm.inc_data_collection_req,
-                JSON_ARRAYAGG(
-                    JSON_OBJECT(
-                        'section', cds.dept_name,
-                        'inc_dep_status', idc.inc_dep_status,
-            'fba_status',idc.inc_dep_fba_status
-                    )
-                ) AS data_collection_details
-            FROM
-                inc_register_master irm
-                    LEFT JOIN
-                inc_patient_dtl ipd ON irm.inc_register_slno = ipd.inc_register_slno
-                    AND irm.inc_initiator_slno = 1
-                    LEFT JOIN
-                inc_staff_dtl isd ON irm.inc_register_slno = isd.inc_register_slno
-                    AND irm.inc_initiator_slno = 2
-                    LEFT JOIN
-                inc_visitor_dtl ivd ON irm.inc_register_slno = ivd.inc_register_slno
-                    AND irm.inc_initiator_slno = 3
-                    LEFT JOIN
-                inc_asset_dtl iad ON irm.inc_register_slno = iad.inc_register_slno
-                    AND irm.inc_initiator_slno = 4
-                    LEFT JOIN
-                co_employee_master cm ON irm.create_user = cm.em_id
-                    LEFT JOIN
-                co_department_mast dp ON cm.em_department = dp.dept_id
-                    LEFT JOIN
-                co_deptsec_mast ds ON cm.em_dept_section = ds.sec_id
-                    LEFT JOIN
-                inc_initiator iniat ON iniat.inc_initiator_slno = irm.inc_initiator_slno
-                    LEFT JOIN
-                inc_staff_type ist ON ist.inc_staff_type_slno = isd.inc_staff_type_slno
-                LEFT JOIN
-                co_employee_master inch  ON inch.em_id = irm.inc_incharge_emp
-                LEFT JOIN
-                co_employee_master hod  ON hod.em_id = irm.inc_hod_emp
-                LEFT JOIN
-                co_employee_master qad  ON qad.em_id = irm.inc_qad_emp
-                LEFT JOIN
-                co_designation as cd on cd.desg_slno =  cm.em_designation
-                LEFT JOIN 
-                inc_data_collection idc ON idc.inc_register_slno = irm.inc_register_slno
-                    LEFT JOIN 
-                co_department_mast cds ON cds.dept_id = idc.inc_req_collect_dep
-                    LEFT JOIN
-                co_employee_master cem ON cem.em_id = idc.inc_req_user
-                    LEFT JOIN 
-                co_employee_master mc ON mc.em_id = idc.inc_req_ack_user
-                WHERE
-                    irm.inc_status = 1
-                       AND ((irm.inc_current_level >= ?)OR (irm.inc_current_level >= ? AND (irm.inc_current_level_review_state = 'A' OR inc_current_level_review_state is null)))
-                    and inc_hod_reivew_state ='A'         
-            GROUP BY irm.inc_register_slno
-            `
-            ,
-            [
-                data.current_level,
-                data.minus_level
-            ],
-            (error, results) => {
-                if (error) return callback(error);
-                callback(null, results);
+
+    // getAllCurrentLevelApproval: (data, callback) => {
+    //     console.log(data, "data");
+    //     pool.query(`
+    //         SELECT 
+    //             irm.inc_register_slno,
+    //             irm.inc_initiator_slno,
+    //             irm.nature_of_inc,
+    //             irm.inc_describtion,
+    //             irm.file_status,
+    //             irm.inc_status,
+    //             irm.create_user,
+    //             irm.edit_user,
+    //             irm.create_date,
+    //             irm.inc_incharge_ack,
+    //             irm.inc_hod_ack,
+    //             irm.inc_incharge_reivew_state,
+    //             irm.inc_incharge_review,
+    //             irm.inc_incharge_review_date,
+    //             irm.inc_hod_reivew_state,
+    //             irm.inc_hod_review,
+    //             irm.inc_hod_review_date,
+    //             irm.inc_current_level,
+    //             irm.inc_current_level_review_state,
+    //             irm.inc_qad_ack,
+    //             irm.inc_qad_review,
+    //             irm.inc_qad_review_date,
+    //             irm.inc_qad_review_state,
+    //             irm.inc_sacmatrix_detail,
+    //             ipd.mrd_no,
+    //             ipd.inc_pt_name,
+    //             ipd.inc_pt_gender,
+    //             ipd.inc_pt_mobile,
+    //             ipd.inc_pt_age,
+    //             ipd.inc_pt_address,
+    //             isd.inc_staff_type_slno,
+    //             isd.emp_id,
+    //             isd.emp_user_name,
+    //             isd.emp_name,
+    //             isd.emp_age,
+    //             isd.emp_gender,
+    //             isd.emp_desig,
+    //             isd.emp_dept,
+    //             isd.emp_dept_sec,
+    //             isd.emp_mob,
+    //             isd.emp_email,
+    //             isd.emp_address,
+    //             isd.emp_joining_date,
+    //             ivd.inc_visitor_name,
+    //             ivd.inc_visitor_age,
+    //             ivd.inc_visitor_gender,
+    //             ivd.inc_visitor_mobile,
+    //             ivd.inc_visitor_address,
+    //             ivd.inc_visit_purpose,
+    //             iad.inc_is_asset,
+    //             iad.asset_item_slno,
+    //             iad.custodian_dept_slno,
+    //             iad.item_name,
+    //             iad.item_location,
+    //             iad.manufacture_slno,
+    //             cm.em_name,
+    //             dp.dept_name,
+    //             ds.sec_name,
+    //             iniat.inc_initiator_name,
+    //             ist.inc_staff_type_name,
+    //             inch.em_name as incharge_name,
+    //             hod.em_name as hod_name,
+    //             qad.em_name as qad_name,
+    //             irm.inc_evaluation_status,
+    //             irm.inc_preventive_action,
+    //             irm.inc_corrective_action,
+    //             irm.inc_rca,
+    //             irm.inc_rca_qad_approve,
+    //             irm.inc_rca_hod_approve,
+    //             irm.inc_corrective_hod_approval,
+    //             irm.inc_preventive_qad_approval,
+    //             irm.dep_slno,
+    //             irm.sec_slno,
+    //             cd.desg_name,
+    //             irm.inc_data_collection_req,
+    //             JSON_ARRAYAGG(
+    //                 JSON_OBJECT(
+    //                     'section', cds.dept_name,
+    //                     'inc_dep_status', idc.inc_dep_status,
+    //                     'fba_status',idc.inc_dep_fba_status,
+    //                     'level_no',idc.level_no
+    //                 )
+    //             ) AS data_collection_details,
+    //             JSON_ARRAYAGG(
+    //                 JSON_OBJECT(
+    //                     'inc_dep_action_status', idad.inc_dep_action_status,
+    //                     'level_no',idad.level_no
+    //                 )
+    //             ) AS inc_action_details
+    //         FROM
+    //             inc_register_master irm
+    //                 LEFT JOIN
+    //             inc_patient_dtl ipd ON irm.inc_register_slno = ipd.inc_register_slno
+    //                 AND irm.inc_initiator_slno = 1
+    //                 LEFT JOIN
+    //             inc_staff_dtl isd ON irm.inc_register_slno = isd.inc_register_slno
+    //                 AND irm.inc_initiator_slno = 2
+    //                 LEFT JOIN
+    //             inc_visitor_dtl ivd ON irm.inc_register_slno = ivd.inc_register_slno
+    //                 AND irm.inc_initiator_slno = 3
+    //                 LEFT JOIN
+    //             inc_asset_dtl iad ON irm.inc_register_slno = iad.inc_register_slno
+    //                 AND irm.inc_initiator_slno = 4
+    //                 LEFT JOIN
+    //             co_employee_master cm ON irm.create_user = cm.em_id
+    //                 LEFT JOIN
+    //             co_department_mast dp ON cm.em_department = dp.dept_id
+    //                 LEFT JOIN
+    //             co_deptsec_mast ds ON cm.em_dept_section = ds.sec_id
+    //                 LEFT JOIN
+    //             inc_initiator iniat ON iniat.inc_initiator_slno = irm.inc_initiator_slno
+    //                 LEFT JOIN
+    //             inc_staff_type ist ON ist.inc_staff_type_slno = isd.inc_staff_type_slno
+    //             LEFT JOIN
+    //             co_employee_master inch  ON inch.em_id = irm.inc_incharge_emp
+    //             LEFT JOIN
+    //             co_employee_master hod  ON hod.em_id = irm.inc_hod_emp
+    //             LEFT JOIN
+    //             co_employee_master qad  ON qad.em_id = irm.inc_qad_emp
+    //             LEFT JOIN
+    //             co_designation as cd on cd.desg_slno =  cm.em_designation
+    //             LEFT JOIN 
+    //             inc_data_collection idc ON idc.inc_register_slno = irm.inc_register_slno
+    //             LEFT JOIN 
+    //             inc_dep_action_detail idad ON idad.inc_register_slno = irm.inc_register_slno AND inc_dep_action_detail_status = 1
+    //                 LEFT JOIN 
+    //             co_department_mast cds ON cds.dept_id = idc.inc_req_collect_dep
+    //                 LEFT JOIN
+    //             co_employee_master cem ON cem.em_id = idc.inc_req_user
+    //                 LEFT JOIN 
+    //             co_employee_master mc ON mc.em_id = idc.inc_req_ack_user
+    //             WHERE
+    //                 irm.inc_status = 1
+    //                    AND ((irm.inc_current_level >= ?)OR (irm.inc_current_level >= ? AND (irm.inc_current_level_review_state = 'A' OR inc_current_level_review_state is null)))        
+    //         GROUP BY irm.inc_register_slno
+    //         `
+    //         ,
+    //         [
+    //             data.current_level,
+    //             data.minus_level
+    //         ],
+    //         (error, results) => {
+    //             if (error) return callback(error);
+    //             callback(null, results);
+    //         }
+    //     );
+    // },
+
+
+    getAllCurrentLevelApproval: ({ query, params }, callback) => {
+        pool.query(query, params, (error, results) => {
+            if (error) {
+                console.error("SQL Error:", error);
+                return callback(error);
             }
-        );
+            return callback(null, results);
+        });
+
     },
 
+    // get based on The Logged Employee
+    getAllCurrentInidentsForApproval: ({ query, params }, callback) => {
+        pool.query(query, params, (error, results) => {
+            if (error) {
+                console.error("SQL Error:", error);
+                return callback(error);
+            }
+            return callback(null, results);
+        });
 
+    },
+
+    // not using
     getAllQADIncident: (callback) => {
         pool.query(
             `
@@ -1915,11 +2050,11 @@ FROM
         );
     },
 
-    // need change in this Query later Remember that
+    // need change in this Query later Remember that  // not using
     getAllIncidentHodIncharge: (data, callback) => {
         pool.query(
             `
-SELECT 
+    SELECT 
     irm.inc_register_slno,
     irm.inc_initiator_slno,
     irm.nature_of_inc,
@@ -2066,7 +2201,8 @@ FROM
             inc_describtion = ?,
             file_status = ?,
             inc_status = ?,
-            edit_user = ?
+            edit_user = ?,
+            inc_reg_corrective=?
          WHERE inc_register_slno = ?`,
             [
                 JSON.stringify(data.nature_of_inc),
@@ -2074,6 +2210,7 @@ FROM
                 data.file_status,
                 data.inc_status,
                 data.edit_user,
+                data.inc_reg_corrective,
                 data.inc_register_slno
             ],
             (error, results, fields) => {
@@ -2165,30 +2302,74 @@ FROM
         });
     },
 
+    // highLevelApprovals: (data, callback) => {
+    //     pool.query(
+    //         `UPDATE inc_register_master 
+    //      SET    
+    //             inc_current_level = ?,
+    //             inc_current_level_review_state = ?
+    //      WHERE inc_register_slno = ?`,
+    //         [
+    //             data.inc_current_level,
+    //             data.inc_current_level_review_state,
+    //             data.inc_register_slno
+    //         ],
+    //         (error, results, fields) => {
+    //             if (error) {
+    //                 return callback(error);
+    //             }
+    //             if (results.affectedRows > 0) {
+    //                 return callback(null, { success: 2, message: "Incident Updated Successfully" });
+    //             } else {
+    //                 return callback(null, { success: 0, message: "No record found to update" });
+    //             }
+    //         }
+    //     );
+    // },
+
     highLevelApprovals: (data, callback) => {
-        pool.query(
-            `UPDATE inc_register_master 
-         SET    
-                inc_current_level = ?,
-                inc_current_level_review_state = ?
-         WHERE inc_register_slno = ?`,
-            [
-                data.inc_current_level,
-                data.inc_current_level_review_state,
-                data.inc_register_slno
-            ],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                if (results.affectedRows > 0) {
-                    return callback(null, { success: 2, message: "Incident Updated Successfully" });
-                } else {
-                    return callback(null, { success: 0, message: "No record found to update" });
-                }
-            }
-        );
+
+        let query = `UPDATE inc_register_master SET 
+                    inc_current_level = ?,
+                    inc_current_level_review_state = ?`;
+
+        const values = [
+            data.inc_current_level,
+            data.inc_current_level_review_state
+        ];
+
+        if (data.inc_category) {
+            query += `, inc_category = ?`;
+            values.push(data.inc_category);
+        }
+
+        if (data.inc_subcategory) {
+            query += `, inc_subcategory = ?`;
+            values.push(data.inc_subcategory);
+        }
+
+        if (data.inc_sacmatrix_detail) {
+            query += `, inc_sacmatrix_detail = ?`;
+            values.push(data.inc_sacmatrix_detail);
+        }
+        if (data.inc_all_approved) {
+            query += `, inc_all_approved = ?`;
+            values.push(data.inc_all_approved);
+        }
+
+        query += ` WHERE inc_register_slno = ?`;
+        values.push(data.inc_register_slno);
+
+        pool.query(query, values, (error, results) => {
+            if (error) return callback(error);
+
+            if (results.affectedRows > 0)
+                return callback(null, { success: 2, message: "Incident Updated Successfully" });
+
+            return callback(null, { success: 0, message: "No record found to update" });
+        });
     },
+
     insertDataCollectionMap: (data, callback) => {
         pool.query(
             `INSERT INTO inc_data_collection_map_master 
@@ -2215,7 +2396,7 @@ FROM
             `INSERT INTO inc_levels_review 
         ( 
             inc_register_slno,
-            level_no,
+            level_slno,
             level_review_state,
             level_review,
             level_employee,
@@ -2225,7 +2406,7 @@ FROM
         VALUES (?,?,?,?,?,NOW(),?)`,
             [
                 data.inc_register_slno,
-                data.level_no,
+                data.level_slno,
                 data.level_review_state,
                 data.level_review,
                 data.level_employee,
@@ -2237,6 +2418,41 @@ FROM
             }
         );
     },
+    ChangeIncidentStatus: (data, callback) => {
+        pool.query(
+            `UPDATE inc_register_master 
+                SET inc_status = 0
+            WHERE inc_register_slno = ?`,
+            [
+                data.incident_slno
+            ],
+            (error, results, fields) => {
+                if (error) return callback(error);
+                callback(null, results);
+            }
+        );
+    },
+    InsertLevelActionReview: (data, callback) => {
+        pool.query(
+            `INSERT INTO inc_level_action_review 
+        ( 
+            inc_register_slno,
+            level_review_slno,
+            inc_action_slno,
+            inc_action_review,
+            inc_action_review_status
+        ) 
+        VALUES ?`,
+            [
+                data
+            ],
+            (error, results, fields) => {
+                if (error) return callback(error);
+                callback(null, results);
+            }
+        );
+    },
+
 
 
 
@@ -2283,6 +2499,142 @@ FROM
             }
         );
     },
+    IncidentActionMaster: (data, callback) => {
+        pool.query(
+            `INSERT INTO inc_action_master 
+            (   inc_action_name, 
+                inc_action_status,
+                create_user
+            ) 
+            VALUES (?,?,?)`,
+            [
+                data.inc_action_name,
+                data.inc_action_status,
+                data.create_user
+            ],
+            (error, results, fields) => {
+                if (error) return callback(error);
+                callback(null, results);
+            }
+        );
+    },
+    getAllCommonLevelDetailMaster: (data, callback) => {
+        pool.query(
+            `SELECT 
+                lm.level_master_id,
+                lm.dep_id,
+                lm.sec_id,
+                lm.module_slno,
+                lm.section_lvl_count,
+                lm.create_date,
+                lm.update_date,
+                (
+                    SELECT JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            'section_id', lms.section_id,
+                            'level_slno', lms.level_master_slno,
+                            'lvl_count_section', lms.lvl_count_section,
+                            'mandatory', lms.mandatory,
+                            'secion_lvl',lms.secion_lvl
+
+                        )
+                    )
+                    FROM co_level_master_section lms
+                    WHERE lms.level_master_slno = lm.level_master_id
+                ) AS sections,
+
+
+                (
+                    SELECT JSON_ARRAYAGG(
+                        JSON_OBJECT(
+                            'detail_slno', ld.detail_slno,
+                            'section_slno', ld.section_slno,
+                            'level_slno', ld.level_master_slno,
+                            'level', ld.level,
+                            'level_name', ld.level_name,
+                            'level_emp_id', ld.level_emp_id,
+                            'level_priority', ld.priority_status,
+                            'level_status', ld.status,
+                            'level_no',ld.level_count,
+                            'em_name',cm.em_name
+                        )
+                    )
+                    FROM co_level_details ld
+                    LEFT JOIN co_employee_master cm ON cm.em_id = ld.level_emp_id
+                    WHERE ld.level_master_slno = lm.level_master_id
+                ) AS levels
+
+            FROM co_level_master lm
+            WHERE lm.dep_id =? and  sec_id =? and module_slno= 20`,
+            [
+                data.dep_slno,
+                data.sec_slno
+            ],
+            (error, results, fields) => {
+                if (error) return callback(error);
+                callback(null, results);
+            }
+        );
+    },
+
+    getAllCommonLevelDetail: ({ query, params }, callback) => {
+        pool.query(query, params, (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
+    getAllEmployeeApprovalDepartments: (data, callback) => {
+        pool.query(
+            `SELECT 
+                dep_id,
+                sec_id,
+                level_count as level_no,
+                level_name,
+                priority_status as level_priority,
+                detail_slno
+            FROM
+                co_level_details cld
+                    LEFT JOIN
+                co_level_master clm ON clm.level_master_id = cld.level_master_slno
+            WHERE
+                cld.level_emp_id = ?`,
+            [
+                data.emp_id
+            ],
+            (error, results, fields) => {
+                if (error) return callback(error);
+                callback(null, results);
+            }
+        );
+    },
+    InsertLevelItemMapDetail: (data, callback) => {
+        pool.query(
+            `INSERT INTO inc_level_item_map_master 
+            (   level_slno, 
+                inc_action_slno,
+                inc_level_item_status,
+                create_user,
+                dep_id,
+                sec_id
+            ) 
+            VALUES (?,?,?,?,?,?)`,
+            [
+                data.level_slno,
+                data.inc_action_slno,
+                data.inc_level_item_status,
+                data.create_user,
+                data.dep_id,
+                data.sec_id
+            ],
+            (error, results, fields) => {
+                if (error) return callback(error);
+                callback(null, results);
+            }
+        );
+    },
+
     insertFishBoneQuestion: (data, callback) => {
         pool.query(
             `INSERT INTO inc_fish_bone_analysis 
@@ -2319,8 +2671,22 @@ FROM
             }
         );
     },
-
-    //   inc_category_dep,
+    UpdateLevelDetiails: (data, callback) => {
+        pool.query(
+            `UPDATE inc_levels_review 
+                SET level_review = ?
+            WHERE level_review_slno = ?`,
+            [
+                data.level_review,
+                data.level_review_slno
+            ],
+            (error, results, fields) => {
+                if (error) return callback(error);
+                callback(null, results);
+            }
+        );
+    },
+    //inc_category_dep,
     getEmployeeDepartmentType: (data, callback) => {
         pool.query(
             `select 
@@ -2371,7 +2737,8 @@ FROM
                 inc_req_user,
                 inc_data_collection_status,
                 inc_req_remark,
-                inc_data_req_dep
+                inc_data_req_dep,
+                level_no
             ) 
             VALUES ?`,
             [
@@ -2402,6 +2769,25 @@ FROM
             }
         );
     },
+    // getAllDepartmentDataCollection: (data, callback) => {
+    //     pool.query(
+    //         `SELECT  inc_data_collection_req FROM inc_register_master WHERE inc_register_slno = ?`,
+    //         [
+    //             data
+    //         ],
+    //         (error, results, fields) => {
+    //             if (error) {
+    //                 return callback(error);
+    //             }
+    //             if (results.affectedRows > 0) {
+    //                 return callback(null, { success: 2, message: "Incident Updated Successfully" });
+    //             } else {
+    //                 callback(null, results);
+    //             }
+    //         }
+    //     );
+    // },
+
     UpdateDataCollectionReqStatus: (data, callback) => {
         pool.query(
             `UPDATE inc_register_master 
@@ -2698,6 +3084,62 @@ FROM
             }
         )
     },
+    UpdateLevelItemMapDetail: (data, callback) => {
+        pool.query(
+            `UPDATE 
+                   inc_level_item_map_master 
+             SET
+                  level_slno = ?,
+                  inc_action_slno = ?,
+                  inc_level_item_status = ?,
+                  edit_user = ?,
+                  dep_id=?,
+                  sec_id=?
+            WHERE 
+                  inc_level_item_slno=?`,
+            [
+                data.level_slno,
+                data.inc_action_slno,
+                data.inc_level_item_status,
+                data.edit_user,
+                data.dep_id,
+                data.sec_id,
+                data.inc_level_item_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
+    IndidentActionMasterUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE 
+                   inc_action_master 
+             SET
+                  inc_action_name = ?,
+                  inc_action_status = ?,
+                  edit_user = ?
+            WHERE 
+                  inc_action_slno=?`,
+            [
+                data.inc_action_name,
+                data.inc_action_status,
+                data.edit_user,
+                data.inc_action_slno
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
     // getAllInvolvedDepartment
     getAllInvolvedDepartment: (data, callback) => {
         pool.query(
@@ -2709,9 +3151,13 @@ FROM
             cm.em_name as Requested_user,
             mc.em_name as acknowledged_user,
             ds.dept_name,
+            dss.dept_name as requested_dep,
             idc.inc_req_ack_date,
-            idc.create_date,
-            inc_req_collect_dep
+            idc.create_date as Requested_date,
+            inc_req_collect_dep,
+            inc_ddc_file_status,
+            inc_data_collection_slno,
+            inc_req_remark
         FROM
             inc_data_collection idc
             LEFT JOIN
@@ -2720,6 +3166,8 @@ FROM
             co_employee_master mc ON idc.inc_req_ack_user = mc.em_id
             LEFT JOIN
             co_department_mast ds ON ds.dept_id = idc.inc_req_collect_dep
+            LEFT JOIN
+            co_department_mast dss ON dss.dept_id = idc.inc_data_req_dep            
         WHERE
             idc.inc_data_collection_status= 1 and idc.inc_register_slno = ?
 `,
@@ -2841,14 +3289,17 @@ SELECT
     idc.create_date AS Requested_date,
     cds.dept_name AS acknowledge_user_dep,
     idc.inc_data_collection_slno,
+    level_slno,
+    level_review_state,
+    cld.level_name,
     idc.inc_dep_status,
     cdd.sec_name AS requested_user_dep,
-
     JSON_ARRAYAGG(
         JSON_OBJECT(
             'section', cds.dept_name,
             'inc_dep_status', idc.inc_dep_status,
-            'fba_status',idc.inc_dep_fba_status
+            'fba_status',idc.inc_dep_fba_status,
+            'inc_ddc_file_status',idc.inc_ddc_file_status
         )
     ) AS data_collection_details
 
@@ -2884,7 +3335,8 @@ FROM inc_register_master irm
     LEFT JOIN co_deptsec_mast cdd ON cdd.sec_id = idc.inc_data_req_dep
     LEFT JOIN co_employee_master cem ON cem.em_id = idc.inc_req_user
     LEFT JOIN co_employee_master mc ON mc.em_id = idc.inc_req_ack_user
-
+    LEFT JOIN inc_levels_review ilr ON ilr.inc_register_slno = irm.inc_register_slno
+    LEFT JOIN co_level_details cld ON cld.detail_slno = ilr.level_slno        
 WHERE irm.inc_status = 1 
   AND idc.inc_req_collect_dep = ? 
   AND idc.inc_data_collection_status = 1
@@ -2929,6 +3381,7 @@ GROUP BY irm.inc_register_slno
                 irm.inc_qad_review_date,
                 irm.inc_qad_review_state,
                 irm.inc_sacmatrix_detail,
+                irm.inc_reg_corrective,
                 ipd.mrd_no,
                 ipd.inc_pt_name,
                 ipd.inc_pt_gender,
@@ -2989,6 +3442,9 @@ GROUP BY irm.inc_register_slno
                 cds.dept_name AS acknowledge_user_dep,
                 idc.inc_data_collection_slno,
                 idc.inc_dep_status,
+                level_slno,
+                level_review_state,
+                cld.level_name,
                 cdd.sec_name AS requested_user_dep,
                 idad.inc_dep_action_status,
 
@@ -3033,8 +3489,8 @@ GROUP BY irm.inc_register_slno
                 LEFT JOIN co_employee_master cem ON cem.em_id = idc.inc_req_user
                 LEFT JOIN co_employee_master mc ON mc.em_id = idc.inc_req_ack_user
                 LEFT JOIN inc_dep_action_detail idad ON idad.inc_register_slno = irm.inc_register_slno
-                
-
+                LEFT JOIN inc_levels_review ilr ON ilr.inc_register_slno = irm.inc_register_slno
+                LEFT JOIN co_level_details cld ON cld.detail_slno = ilr.level_slno 
             WHERE irm.inc_status = 1 
             AND idad.inc_action_collect_dep = ?
             AND idad.inc_dep_action_detail_status = 1
@@ -3149,6 +3605,61 @@ WHERE
             }
         );
     },
+    UpdateDepartMentDataCollectionFileStatus: (data, callback) => {
+        pool.query(
+            `
+            UPDATE 
+                   inc_data_collection 
+             SET
+                  inc_ddc_file_status = ?,
+            WHERE 
+                  inc_data_collection_slno=?`,
+            [
+                data.inc_ddc_file_status,
+                data.id
+            ],
+            (error, results, fields) => {
+                if (error) return callback(error);
+                callback(null, results);
+            }
+        );
+    },
+
+    FetchAllIncidentActionDetail: (data, callback) => {
+        pool.query(
+            `
+            SELECT 
+                ilar.inc_level_action_slno,
+                ilar.inc_register_slno,
+                ilar.level_review_slno,
+                ilar.inc_action_slno,
+                ilar.inc_action_review,
+                cm.em_name,
+                iam.inc_action_name,
+                iam.inc_is_datacollection,
+                iam.inc_is_action,
+                apm.level_name,
+                apm.detail_slno,
+                iam.inc_action_item_stauts
+            FROM
+                inc_level_action_review ilar
+            LEFT JOIN inc_levels_review ilr ON ilr.level_review_slno = ilar.level_review_slno AND ilr.level_review_status = 1
+            LEFT JOIN co_employee_master cm ON ilr.level_employee = cm.em_id
+            LEFT JOIN inc_action_master iam  ON iam.inc_action_slno = ilar.inc_action_slno AND iam.inc_action_status= 1
+            LEFT JOIN inc_approval_level_master ialm  ON ialm.level_slno = ilr.level_slno AND ialm.level_status= 1
+            LEFT JOIN co_level_details apm on apm.detail_slno = ilr.level_slno AND apm.status= 1
+            WHERE
+                ilar.inc_register_slno = ? AND ilar.inc_action_review_status = 1
+    `,
+            [
+                data.inc_register_slno,
+            ],
+            (error, results, fields) => {
+                if (error) return callback(error);
+                callback(null, results);
+            }
+        );
+    },
 
 
     UpdateIncidentReviews: (data, callback) => {
@@ -3176,7 +3687,8 @@ WHERE
                   inc_dep_status = ?,
                   inc_req_ack_date = NOW(),
                   inc_req_ack_user=?,
-                  inc_dep_fba_status=?
+                  inc_dep_fba_status=?,
+                  inc_ddc_file_status = ?
             WHERE 
                   inc_data_collection_slno=?`,
             [
@@ -3185,8 +3697,126 @@ WHERE
                 data.inc_dep_status,
                 data.inc_req_ack_user,
                 data.inc_dep_fba_status,
-                data.inc_data_collection_slno
+                data.inc_ddc_file_status,
+                data.inc_data_collection_slno,
             ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    getAllDashboardIncident: (callback) => {
+        pool.query(
+            `SELECT 
+            irm.inc_register_slno,
+            irm.inc_initiator_slno,
+            irm.nature_of_inc,
+            irm.inc_describtion,
+            irm.file_status,
+            irm.inc_status,
+            irm.create_user,
+            irm.edit_user,
+            irm.create_date,
+            irm.inc_current_level,
+            irm.inc_current_level_review_state,
+            irm.inc_sacmatrix_detail,
+            irm.inc_reg_corrective,
+            inc_all_approved,
+            ipd.mrd_no,
+            ipd.inc_pt_name,
+            ipd.inc_pt_gender,
+            ipd.inc_pt_mobile,
+            ipd.inc_pt_age,
+            ipd.inc_pt_address,
+            isd.inc_staff_type_slno,
+            isd.emp_id,
+            isd.emp_user_name,
+            isd.emp_name,
+            isd.emp_age,
+            isd.emp_gender,
+            isd.emp_desig,
+            isd.emp_dept,
+            isd.emp_dept_sec,
+            isd.emp_mob,
+            isd.emp_email,
+            isd.emp_address,
+            isd.emp_joining_date,
+            ivd.inc_visitor_name,
+            ivd.inc_visitor_age,
+            ivd.inc_visitor_gender,
+            ivd.inc_visitor_mobile,
+            ivd.inc_visitor_address,
+            ivd.inc_visit_purpose,
+            iad.inc_is_asset,
+            iad.asset_item_slno,
+            iad.custodian_dept_slno,
+            iad.item_name,
+            iad.item_location,
+            iad.manufacture_slno,
+            cm.em_name,
+            dp.dept_name,
+            ds.sec_name,
+            iniat.inc_initiator_name,
+            ist.inc_staff_type_name,
+            inch.em_name as incharge_name,
+            hod.em_name as hod_name,
+            qad.em_name as qad_name,
+            irm.dep_slno,
+            irm.sec_slno,
+            cd.desg_name,
+            irm.inc_data_collection_req,
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'section', cds.dept_name,
+                    'inc_dep_status', idc.inc_dep_status,
+                    'fba_status',idc.inc_dep_fba_status,
+                    'level_no',idc.level_no
+                )
+            ) AS data_collection_details,
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'inc_dep_action_status', idad.inc_dep_action_status,
+                    'level_no',idad.level_no
+                )
+            ) AS inc_action_details
+
+        FROM inc_register_master irm
+        LEFT JOIN inc_patient_dtl ipd ON irm.inc_register_slno = ipd.inc_register_slno AND irm.inc_initiator_slno = 1
+        LEFT JOIN inc_staff_dtl isd ON irm.inc_register_slno = isd.inc_register_slno AND irm.inc_initiator_slno = 2
+        LEFT JOIN inc_visitor_dtl ivd ON irm.inc_register_slno = ivd.inc_register_slno AND irm.inc_initiator_slno = 3
+        LEFT JOIN inc_asset_dtl iad ON irm.inc_register_slno = iad.inc_register_slno AND irm.inc_initiator_slno = 4
+        LEFT JOIN co_employee_master cm ON irm.create_user = cm.em_id
+        LEFT JOIN co_department_mast dp ON cm.em_department = dp.dept_id
+        LEFT JOIN co_deptsec_mast ds ON cm.em_dept_section = ds.sec_id
+        LEFT JOIN inc_initiator iniat ON iniat.inc_initiator_slno = irm.inc_initiator_slno
+        LEFT JOIN inc_staff_type ist ON ist.inc_staff_type_slno = isd.inc_staff_type_slno
+        LEFT JOIN co_employee_master inch  ON inch.em_id = irm.inc_incharge_emp
+        LEFT JOIN co_employee_master hod  ON hod.em_id = irm.inc_hod_emp
+        LEFT JOIN co_employee_master qad  ON qad.em_id = irm.inc_qad_emp
+        LEFT JOIN co_designation cd on cd.desg_slno = cm.em_designation
+        LEFT JOIN inc_data_collection idc ON idc.inc_register_slno = irm.inc_register_slno
+        LEFT JOIN inc_dep_action_detail idad ON idad.inc_register_slno = irm.inc_register_slno AND idad.inc_dep_action_detail_status = 1
+        LEFT JOIN co_department_mast cds ON cds.dept_id = idc.inc_req_collect_dep
+        LEFT JOIN co_employee_master cem ON cem.em_id = idc.inc_req_user
+        LEFT JOIN co_employee_master mc ON mc.em_id = idc.inc_req_ack_user
+        WHERE irm.inc_status = 1
+        GROUP BY irm.inc_register_slno`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+    getCompanyDetail: (callback) => {
+        pool.query(
+            `SELECT  company_slno FROM crm_common `,
+            [],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);

@@ -5320,6 +5320,116 @@ where fb_pro_check_bed.fb_bed_slno = ?;`,
         )
     },
 
+    getPatientDetail: (data, callBack) => {
+        const column = data.type === 1 ? "fb_ipd_date" : "fb_ipd_disc";
+        pool.query(
+            `  
+            select fb_ip_no from fb_ipadmiss  WHERE ${column} BETWEEN ? AND ?
+            `,
+            [
+                data.fromDate,
+                data.toDate
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    checkIpAlreadyExist: (data, callBack) => {
+        pool.query(
+            `  
+            select fb_ip_no from fb_ipadmiss  WHERE fb_ip_no =  ?
+            `,
+            [
+                data.fb_ip_no
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+
+
+    // InsertPatineDetail: (data, callBack) => {
+
+
+    //     pool.query(
+    //         `
+    //     INSERT INTO fb_ipadmiss (
+    //         fb_ip_no, fb_ipd_date, fb_pt_no, fb_ptc_name, fb_ptc_sex,
+    //         fb_ptd_dob, fb_ptn_dayage, fb_ptn_monthage, fb_ptn_yearage,
+    //         fb_ptc_loadd1, fb_ptc_loadd2, fb_ptc_loadd3, fb_ptc_loadd4,
+    //         fb_ptc_lopin, fb_rc_code, fb_bd_code, fb_do_code, fb_rs_code,
+    //         fb_ipc_curstatus, fb_ptc_mobile, fb_ipc_mhcode, fb_doc_name,
+    //         fb_dep_desc,fb_ipd_disc,fb_ipc_status,fb_dmc_slno,fb_dmd_date
+    //     ) VALUES ?
+    //     `,
+    //         [data],
+    //         (error, results) => {
+    //             if (error) return callBack(error);
+    //             return callBack(null, results);
+    //         }
+    //     );
+    // },
+
+    checkExistingIPs: (ipList, callBack) => {
+        pool.query(
+            `SELECT fb_ip_no FROM fb_ipadmiss WHERE fb_ip_no IN (?)`,
+            [ipList],
+            (err, results) => {
+                if (err) return callBack(err);
+                callBack(null, results.map(r => r.fb_ip_no));
+            }
+        )
+    },
+
+    InsertPatineDetail: (data, callBack) => {
+        pool.query(
+            `
+            INSERT INTO fb_ipadmiss (
+                fb_ip_no, fb_ipd_date, fb_pt_no, fb_ptc_name, fb_ptc_sex,
+                fb_ptd_dob, fb_ptn_dayage, fb_ptn_monthage, fb_ptn_yearage,
+                fb_ptc_loadd1, fb_ptc_loadd2, fb_ptc_loadd3, fb_ptc_loadd4,
+                fb_ptc_lopin, fb_rc_code, fb_bd_code, fb_do_code, fb_rs_code,
+                fb_ipc_curstatus, fb_ptc_mobile, fb_ipc_mhcode, fb_doc_name,
+                fb_dep_desc,fb_ipd_disc,fb_ipc_status,fb_dmc_slno,fb_dmd_date
+            ) VALUES ?
+            `,
+            [data],
+            (error, results) => {
+                if (error) return callBack(error);
+                return callBack(null, results);
+            }
+        );
+    },
+
+    UpdatePatientDetail: (data, callBack) => {
+
+        const query = `
+            UPDATE fb_ipadmiss SET
+                fb_ipd_date = ?, fb_pt_no = ?, fb_ptc_name = ?, fb_ptc_sex = ?,
+                fb_ptd_dob = ?, fb_ptn_dayage = ?, fb_ptn_monthage = ?, fb_ptn_yearage = ?,
+                fb_ptc_loadd1 = ?, fb_ptc_loadd2 = ?, fb_ptc_loadd3 = ?, fb_ptc_loadd4 = ?,
+                fb_ptc_lopin = ?, fb_rc_code = ?, fb_bd_code = ?, fb_do_code = ?, fb_rs_code = ?,
+                fb_ipc_curstatus = ?, fb_ptc_mobile = ?, fb_ipc_mhcode = ?, fb_doc_name = ?,
+                fb_dep_desc = ?, fb_ipd_disc = ?, fb_ipc_status = ?, fb_dmc_slno = ?, fb_dmd_date = ?
+            WHERE fb_ip_no = ?
+        `;
+
+        const values = [...data.slice(1), data[0]]; // IP_NO moved to last for WHERE
+
+        pool.query(query, values, (error, results) => {
+            if (error) return callBack(error);
+            callBack(null, results);
+        });
+    },
+
     gethkcomplaintdetails: (data, callBack) => {
         pool.query(
             `

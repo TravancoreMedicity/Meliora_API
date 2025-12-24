@@ -1,7 +1,6 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
-const { insertRateVariation, selectRateVariation, insertComment, getCommentsbyID, ResolvedRateVariation, insertRateVariationBulk, RateVarWithMarginDiff, ratevariationResolvedList } = require('./RateVariationReport.controller');
-router.post('/insertRateVariation', checkToken, insertRateVariation);
+const { selectRateVariation, insertComment, getCommentsbyID, insertRateVariationBulk, RateVarWithMarginDiff, ratevariationResolvedList } = require('./RateVariationReport.controller');
 router.get('/selectRateVariation', checkToken, selectRateVariation);
 router.post('/insertComment', checkToken, insertComment);
 router.get('/getCommentsbyID/:id', checkToken, getCommentsbyID);

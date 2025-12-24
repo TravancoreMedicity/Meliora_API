@@ -1,96 +1,58 @@
 const { pool } = require('../../config/database')
 module.exports = {
-    insertRateVariation: (data, callback) => {
-        pool.query(
-            `INSERT INTO rate_variation_report
-            ( 
-              grn_no, grn_date, item_name, grn_rate, grn_selling_rate, grn_dis, rate, disc,supplier_name,po_margin, rate_variation, quo_margin, purchase_margin, margin_diff, grn_variation_qty, grn_variation_free, date_diff, disc_variation,create_user
-            )
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-            [
-                data.grn_no,
-                data.grn_date,
-                data.item_name,
-                data.grn_rate,
-                data.grn_selling_rate,
-                data.grn_dis,
-                data.rate,
-                data.disc,
-                data.suplier_name,
-                data.po_margin,
-                data.rate_variation,
-                data.quo_margin,
-                data.purchase_margin,
-                data.margin_diff,
-                data.grn_variation_qty,
-                data.grn_variation_free,
-                data.date_diff,
-                data.disc_variation,
-                data.create_user
-            ],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
-                return callback(null, results);
 
-            }
-        );
-    },
-
-    insertRateVariationBulk: (data, callback) => {
+    checkInsertVal: (data, callback) => {
+        const values = data.map(item => [item.grn_no, item.item_name]);
         pool.query(
-            `INSERT INTO rate_variation_report
-            ( 
-              grn_no, grn_date, item_name, grn_rate, grn_selling_rate, grn_dis, rate, disc,po_margin, rate_variation, quo_margin, purchase_margin, margin_diff, grn_variation_qty, grn_variation_free, date_diff, disc_variation,create_user
-            )
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-            [
-                data.grn_no,
-                data.grn_date,
-                data.item_name,
-                data.grn_rate,
-                data.grn_selling_rate,
-                data.grn_dis,
-                data.rate,
-                data.disc,
-                data.po_margin,
-                data.rate_variation,
-                data.quo_margin,
-                data.purchase_margin,
-                data.margin_diff,
-                data.grn_variation_qty,
-                data.grn_variation_free,
-                data.date_diff,
-                data.disc_variation,
-                data.create_user
-            ],
-            (error, results, fields) => {
-                if (error) {
-                    return callback(error);
-                }
+            `SELECT grn_no, item_name
+         FROM rate_variation_report
+         WHERE (grn_no, item_name) IN (?)`,
+            [values],
+            (error, results) => {
+                if (error) return callback(error);
                 return callback(null, results);
             }
         );
     },
 
-    checkInsertVal: (data, callBack) => {
+    insertRateVariationBulkService: (data, callback) => {
+
+        const values = data.map(item => [
+            item.grn_no,
+            item.grn_date,
+            item.item_name,
+            item.grn_rate,
+            item.grn_selling_rate,
+            item.grn_dis,
+            item.rate,
+            item.disc,
+            item.po_margin,
+            item.rate_variation,
+            item.quo_margin,
+            item.purchase_margin,
+            item.margin_diff,
+            item.grn_variation_qty,
+            item.grn_variation_free,
+            item.date_diff,
+            item.disc_variation,
+            item.create_user
+        ]);
+
         pool.query(
-            `SELECT grn_no,
-            item_name
-            FROM rate_variation_report
-            WHERE grn_no=? and item_name=?`,
-            [
-                data.grn_no,
-                data.item_name, ,
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error)
-                }
-                return callBack(null, results)
-            }
+            `INSERT INTO rate_variation_report
+        (
+          grn_no, grn_date, item_name, grn_rate, grn_selling_rate, grn_dis,
+          rate, disc, po_margin, rate_variation, quo_margin, purchase_margin,
+          margin_diff, grn_variation_qty, grn_variation_free,
+          date_diff, disc_variation, create_user
         )
+        VALUES ?`,
+            [values],
+            (error, results) => {
+                if (error) return callback(error);
+                return callback(null, results);
+            }
+        );
     },
 
     selectRateVariation: (callBack) => {

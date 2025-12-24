@@ -313,9 +313,8 @@ router.get('/getlastnsupdate', verifyToken, getNursingStationLastDate)
 router.post('/getpatientdetail', verifyToken, getPatientDetail)
 router.post('/insertpatientdetail', verifyToken, InsertPatineDetail)
 router.post('/checkipexist', verifyToken, checkIpAlreadyExist)
-
-
 router.post('/dischargedpatient', verifyToken, getAllDischargedPatients)
+
 //edlider meliora table
 // router.post('/insertbddetail', insertbddetail)
 // router.post('/insertptdetailmlora', insertptdetailmlora)

@@ -1,5 +1,5 @@
 const { format } = require("date-fns");
-
+const { replyQuery } = require("../complaint_assign/complaintAssign.service");
 const {
     insertfeedbackcategory,
     getallcategories,
@@ -195,6 +195,7 @@ const {
     UpdatePatientDetail,
     checkIpAlreadyExist,
     getAllDischargedPatients,
+
 } = require("./Feedback.service");
 
 module.exports = {
@@ -3995,8 +3996,6 @@ module.exports = {
     },
 
 
-
-
     InsertPatineDetail: (req, res) => {
         const body = req.body;
 
@@ -4020,7 +4019,6 @@ module.exports = {
 
 
             body.forEach((item) => {
-
                 // COMBINE ADDRESS INTO ONE FIELD
                 const fullAddress = [
                     item.PTC_LOADD1,
@@ -4030,8 +4028,6 @@ module.exports = {
                 ]
                     .filter(Boolean)
                     .join(', ');
-
-
                 const row = [
                     item.IP_NO,
                     item.IPD_DATE ? format(new Date(item.IPD_DATE), "yyyy-MM-dd HH:mm:ss") : null,

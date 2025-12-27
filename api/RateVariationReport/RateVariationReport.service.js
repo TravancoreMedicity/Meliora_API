@@ -35,7 +35,9 @@ module.exports = {
             item.grn_variation_free,
             item.date_diff,
             item.disc_variation,
-            item.create_user
+            item.create_user,
+            item.suplier_name,
+            item.Variation_Amount
         ]);
 
         pool.query(
@@ -44,7 +46,7 @@ module.exports = {
           grn_no, grn_date, item_name, grn_rate, grn_selling_rate, grn_dis,
           rate, disc, po_margin, rate_variation, quo_margin, purchase_margin,
           margin_diff, grn_variation_qty, grn_variation_free,
-          date_diff, disc_variation, create_user
+          date_diff, disc_variation, create_user,supplier_name,variation_amount
         )
         VALUES ?`,
             [values],
@@ -58,7 +60,7 @@ module.exports = {
     selectRateVariation: (callBack) => {
         pool.query(
             ` SELECT slno, grn_no, grn_date, item_name, grn_rate, grn_selling_rate, grn_dis, rate, disc,supplier_name,po_margin, rate_variation, quo_margin, purchase_margin, ROUND(margin_diff, 0) AS margin_diff, grn_variation_qty, grn_variation_free,
-            date_diff, disc_variation, create_date, update_date, create_user, edit_user,comments FROM rate_variation_report where resolved_status=0
+            date_diff, disc_variation, create_date, update_date, create_user, edit_user,comments,variation_amount FROM rate_variation_report where resolved_status=0
                    `, [],
             (error, results, feilds) => {
                 if (error) {

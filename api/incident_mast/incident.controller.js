@@ -93,7 +93,9 @@ const {
     getAllEmployeeApprovalDepartments,
     getAllCurrentInidentsForApproval,
     getAllCommonLevelDetailMaster,
-    getAllDepartmentDataCollection
+    getAllDepartmentDataCollection,
+    fetchAllInvolvedEmployeeDep,
+    SingleDepartmentDataCollectionDetail,
 
 } = require('./incident.service');
 const { uploadFileIncidentDataCollectionFiles } = require('./UploadFile');
@@ -2448,6 +2450,9 @@ module.exports = {
         });
     },
 
+
+
+
     // getAllDepartmentDataCollection: (req, res) => {
     //     const data = req.body;
     //     getAllDepartmentDataCollection(data, (err, results) => {
@@ -2746,23 +2751,22 @@ module.exports = {
             remark,
             createUser,
             requested_department,
+            requested_employee,
             level_no
         } = req.body;
 
-
-        // console.log(departments, "departments");
-
-        // Prepare values for insert
-        const value = departments?.map((item) => [
+        const value = {
             slno,
-            // item?.dept_id,
-            item,
+            departments,
             createUser,
             status,
             remark,
             requested_department,
+            requested_employee,
             level_no
-        ]);
+        };
+
+
 
         // Step 1: Check if data collection already exists for this slno
         checkDataCollectionAlreadyExist(slno, (err, checkresult) => {
@@ -2779,7 +2783,36 @@ module.exports = {
                         success: 0,
                         message: err
                     });
+
                 }
+                // Dat CollectionFetch Detail Single Detail
+                const insertId = results.insertId;
+                const fetchdetail = {
+                    inc_register_slno: slno,
+                    em_id: requested_employee,
+                    id: insertId
+                }
+                if (insertId) {
+                    SingleDepartmentDataCollectionDetail(fetchdetail, (err, DatacollectonResult) => {
+                        if (err) {
+                            return res.status(200).json({
+                                success: 0,
+                                message: err
+                            });
+                        }
+                        // Step 5: Emit WebSocket event to all connected systems
+                        req.io.emit("new_data_collection_request", {
+                            RequestedEmplyee: requested_employee,
+                            requestdetail: DatacollectonResult,
+                            Incident_slno: slno,
+                            createdAt: new Date(),
+                        });
+                        // Optional older broadcast (you can remove if not used)
+                        req.io.emit("message", "new_data_collection_request! Please Check");
+
+                    });
+                }
+
 
                 // Step 3: Only update the status ONCE if inc_data_collection_req === 0
                 if (checkresult[0]?.inc_data_collection_req === 0) {
@@ -2790,7 +2823,6 @@ module.exports = {
                                 message: err
                             });
                         }
-
                         // Step 4: Send final success response after update
                         return res.status(200).json({
                             success: 2,
@@ -2917,6 +2949,35 @@ module.exports = {
             });
         });
     },
+
+    fetchAllInvolvedEmployeeDep: (req, res) => {
+        const data = req.body;
+        fetchAllInvolvedEmployeeDep(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+
+
+
     getCurrentEmployeeType: (req, res) => {
         const data = req.body;
         getCurrentEmployeeType(data, (err, results) => {

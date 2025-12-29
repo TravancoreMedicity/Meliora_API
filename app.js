@@ -441,7 +441,7 @@ app.use("/api/ItBillType", ItBillSupplierList);
 app.use("/api/qidepartment", qideptmast);
 app.use("/api/qiendoscopy", qiendoscopy);
 app.use("/api/newCRFStore", newCRFStore);
-app.use("/api/incidentMaster", incidentMast);
+app.use("/api/incidentMaster",socketIOMiddlewre, incidentMast);
 app.use("/api/qiTypeList", qitypeList);
 app.use("/api/qidialysis", dialysisqi);
 app.use("/api/CrmNewApprovals", CrmNewApprovals);

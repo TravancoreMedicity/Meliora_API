@@ -85,6 +85,7 @@ const { IncidetDetailInsert, IncidentDetailsUpdate, UpdateMarkedIncidentDetails,
     getAllDepartmentDataCollection,
     IncidentSubCategoryMaster,
     IncidentRegistrationFileUpload,
+    fetchAllInvolvedEmployeeDep,
 } = require('./incident.controller');
 const { uploadFileIncidentService,
     getIncidentFiles,
@@ -150,12 +151,13 @@ router.post('/fetchcurrentlevelapprvl', checkToken, normalRateLimiter, getAllCur
 router.post('/levelapproval', checkToken, strictRateLimiter, highLevelApprovals);
 router.post('/reqdatacollection', checkToken, strictRateLimiter, requestDataCollection);
 router.post('/getallinvolveddep', checkToken, normalRateLimiter, getAllInvolvedDepartment);
+router.post('/getallinvolveddepemp', checkToken, normalRateLimiter, fetchAllInvolvedEmployeeDep);
 router.post('/getemptype', checkToken, strictRateLimiter, getCurrentEmployeeType);
 router.post('/getdepdatacollection', checkToken, strictRateLimiter, getDepartmentDataCollection);
 router.post('/departmentactionsubmit', checkToken, strictRateLimiter, departmentRcaPreventiveSubmission);
 
 router.post('/insertdcmm', checkToken, normalRateLimiter, insertDataCollectionMap);
-router.post('/getempdeptype', checkToken, normalRateLimiter, getEmployeeDepartmentType);
+router.post('/getempdeptype', checkToken, normalRateLimiter, getEmployeeDepartmentType);//not using
 router.get('/fetchalldcmm', checkToken, normalRateLimiter, FetchAllCollectionMap);
 router.patch('/updatedcmm', checkToken, normalRateLimiter, updateDataCollectionMap);
 
@@ -208,6 +210,8 @@ router.post('/updatelevelreview', checkToken, normalRateLimiter, UpdateLevelDeti
 router.get('/dashboarddata', checkToken, normalRateLimiter, getAllDashboardIncident)
 router.get('/getcompany', checkToken, normalRateLimiter, getCompanyDetail)
 router.post('/approvaldeps', checkToken, normalRateLimiter, getAllEmployeeApprovalDepartments)
+
+
 
 
 // router.post('/getalldatacollection', checkToken, normalRateLimiter, getAllDepartmentDataCollection)

@@ -1145,6 +1145,60 @@ FROM
             }
         )
     },
+    getAllDataCollectionEmployeeDetail: (callback) => {
+        pool.query(
+            `SELECT 
+                inc_dc_emp_slno,
+                inc_sec_id,
+                inc_emp_id,
+                inc_dc_emp_status,
+                cm.em_name,
+                cds.sec_name
+            FROM
+                inc_data_collection_emp_master idce
+            LEFT JOIN
+                co_employee_master cm ON idce.inc_emp_id = cm.em_id
+            LEFT JOIN
+                co_deptsec_mast cds ON idce.inc_sec_id = cds.sec_id
+            `,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
+    getAllActiveDataCollectionEmployeeDetail: (data, callback) => {
+        pool.query(
+            `SELECT 
+                inc_dc_emp_slno,
+                inc_sec_id,
+                inc_emp_id as em_id,
+                inc_dc_emp_status,
+                cm.em_name,
+                cds.sec_name
+            FROM
+                inc_data_collection_emp_master idce
+            LEFT JOIN
+                co_employee_master cm ON idce.inc_emp_id = cm.em_id
+            LEFT JOIN
+                co_deptsec_mast cds ON idce.inc_sec_id = cds.sec_id
+            WHERE
+                inc_dc_emp_status = 1 and inc_sec_id = ? `,
+            [
+                data.sec_id
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
     getAllDepartmentActions: (data, callback) => {
 
         pool.query(
@@ -2610,6 +2664,47 @@ FROM
             }
         );
     },
+    insertDataCollectionEmployeeDetail: (data, callback) => {
+        pool.query(
+            `INSERT INTO inc_data_collection_emp_master 
+            (  
+                inc_sec_id,
+                inc_emp_id,
+                inc_dc_emp_status
+            ) 
+            VALUES (?,?,?)`,
+            [
+                data.inc_sec_id,
+                data.inc_emp_id,
+                data.inc_dc_emp_status
+            ],
+            (error, results, fields) => {
+                if (error) return callback(error);
+                callback(null, results);
+            }
+        );
+    },
+    insertIncidentNature: (data, callback) => {
+        pool.query(
+            `INSERT INTO inc_nature 
+            (  
+                inc_nature_name,
+                inc_nature_status,
+                create_user
+            ) 
+            VALUES (?,?,?)`,
+            [
+                data.inc_nature_name,
+                data.inc_nature_status,
+                data.create_user
+            ],
+            (error, results, fields) => {
+                if (error) return callback(error);
+                callback(null, results);
+            }
+        );
+    },
+
     InsertLevelItemMapDetail: (data, callback) => {
         pool.query(
             `INSERT INTO inc_level_item_map_master 
@@ -2778,6 +2873,29 @@ FROM
             }
         );
     },
+    checkAlreadyMapedEmployee: (data, callback) => {
+        pool.query(
+            `SELECT  inc_dc_emp_slno 
+            FROM inc_data_collection_emp_master
+             WHERE inc_sec_id = ? and inc_emp_id = ?`,
+            [
+                data.inc_sec_id,
+                data.inc_emp_id
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                if (results.affectedRows > 0) {
+                    return callback(null, { success: 2, message: "Incident Updated Successfully" });
+                } else {
+                    callback(null, results);
+                }
+            }
+        );
+    },
+
+
     // getAllDepartmentDataCollection: (data, callback) => {
     //     pool.query(
     //         `SELECT  inc_data_collection_req FROM inc_register_master WHERE inc_register_slno = ?`,
@@ -2805,6 +2923,58 @@ FROM
          WHERE inc_register_slno = ?`,
             [
                 data
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                if (results.affectedRows > 0) {
+                    return callback(null, { success: 2, message: "Incident Updated Successfully" });
+                } else {
+                    return callback(null, { success: 0, message: "No record found to update" });
+                }
+            }
+        );
+    },
+    updateDataCollectionEmployeeDetail: (data, callback) => {
+        pool.query(
+            `UPDATE inc_data_collection_emp_master 
+                SET    
+                        inc_sec_id = ?,
+                        inc_emp_id = ?,
+                        inc_dc_emp_status = ?
+                WHERE inc_dc_emp_slno = ?`,
+            [
+                data.inc_sec_id,
+                data.inc_emp_id,
+                data.inc_dc_emp_status,
+                data.inc_dc_emp_slno
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                if (results.affectedRows > 0) {
+                    return callback(null, { success: 2, message: "Incident Updated Successfully" });
+                } else {
+                    return callback(null, { success: 0, message: "No record found to update" });
+                }
+            }
+        );
+    },
+    updateIncidentNature: (data, callback) => {
+        pool.query(
+            `UPDATE inc_nature 
+                SET    
+                        inc_nature_name = ?,
+                        inc_nature_status = ?,
+                        edit_user = ?
+                WHERE inc_nature_slno = ?`,
+            [
+                data.inc_nature_name,
+                data.inc_nature_status,
+                data.edit_user,
+                data.inc_nature_slno
             ],
             (error, results, fields) => {
                 if (error) {
@@ -3046,18 +3216,18 @@ FROM
             `UPDATE 
                    inc_common_settings 
              SET
-                  inc_setting_key = ?, 
+                inc_setting_key = ?, 
                 inc_setting_label = ?,
                 inc_cs_status = ?,
                 edit_user = ?
             WHERE 
-                  inc_cs_slno=?`,
+                  inc_cs_slno= ?`,
             [
-                data.inc_category,
-                data.inc_category_dep,
-                data.inc_data_map_status,
+                data.inc_setting_key,
+                data.inc_setting_label,
+                data.inc_cs_status,
                 data.edit_user,
-                data.inc_data_map_slno
+                data.inc_cs_slno
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -3685,7 +3855,7 @@ GROUP BY irm.inc_register_slno`,
                 cem.em_name AS Requested_user,
                 mc.em_name AS Acknowledged_user,
                 idc.create_date AS Requested_date,
-                cds.dept_name AS acknowledge_user_dep,
+                cds.sec_name AS acknowledge_user_dep,
                 idc.inc_data_collection_slno,
                 idc.inc_dep_status,
                 level_slno,
@@ -4069,6 +4239,71 @@ WHERE
         pool.query(
             `SELECT  company_slno FROM crm_common `,
             [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
+    getAllIncidentNature: (callback) => {
+        pool.query(
+            `SELECT 
+                 inc_nature_slno,
+                inc_nature_name ,
+                inc_nature_status
+            FROM
+                inc_nature`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
+    SingleDepartmentActionDetail: (data, callback) => {
+        pool.query(
+            `SELECT 
+    inc_dep_action_detail_slno,
+    inc_action_collect_dep,
+    inc_dep_action_remark,
+    ics.inc_cs_slno,
+    cdm.dept_name as requested_department,
+    adm.dept_name as acknowledged_department,
+    ics.inc_setting_key,
+    ics.inc_setting_label,
+    cm.em_name as requested_employee,
+    cma.em_name as acknowledge_employee,
+    cds.sec_name as requested_emp_sec,
+    cd.desg_name,
+    idad.create_date
+FROM
+    inc_dep_action_detail idad
+        LEFT JOIN
+    inc_common_settings ics ON ics.inc_cs_slno = idad.inc_cs_slno
+		LEFT JOIN 
+	co_department_mast cdm on cdm.dept_id = idad.inc_action_req_dep
+    LEFT JOIN 
+	co_department_mast adm on adm.dept_id = idad.inc_action_collect_dep
+    LEFT JOIN
+    co_employee_master cm ON idad.inc_action_req_user = cm.em_id
+        LEFT JOIN
+    co_deptsec_mast cds ON cm.em_dept_section = cds.sec_id
+     LEFT JOIN
+    co_employee_master cma ON idad.inc_action_ack_user = cma.em_id
+    LEFT JOIN
+    co_designation cd ON cm.em_designation = cd.desg_slno
+WHERE
+    inc_register_slno = ? and inc_action_collect_dep = ? and inc_dep_action_detail_status =  1`,
+            [
+                data.inc_register_slno,
+                data.dep_id
+            ],
             (error, results, feilds) => {
                 if (error) {
                     return callback(error);

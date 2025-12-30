@@ -53,7 +53,6 @@ const {
     FetchAllDepartmentType,
     getEmployeeDepartmentType,
     getAllSettings,
-    IsDepartmentDataCollectionAlreadyExist,
     getAllCommonSetting,
     insertCommonSetting,
     updateCommonSetting,
@@ -93,12 +92,20 @@ const {
     getAllEmployeeApprovalDepartments,
     getAllCurrentInidentsForApproval,
     getAllCommonLevelDetailMaster,
-    getAllDepartmentDataCollection,
     fetchAllInvolvedEmployeeDep,
     SingleDepartmentDataCollectionDetail,
+    SingleDepartmentActionDetail,
+    getAllDataCollectionEmployeeDetail,
+    insertDataCollectionEmployeeDetail,
+    checkAlreadyMapedEmployee,
+    updateDataCollectionEmployeeDetail,
+    getAllActiveDataCollectionEmployeeDetail,
+    getAllIncidentNature,
+    insertIncidentNature,
+    updateIncidentNature,
 
 } = require('./incident.service');
-const { uploadFileIncidentDataCollectionFiles } = require('./UploadFile');
+
 
 module.exports = {
     IncidetDetailInsert: (req, res) => {
@@ -1155,8 +1162,74 @@ module.exports = {
             })
         })
     },
+    getAllDataCollectionEmployeeDetail: (req, res) => {
+        getAllDataCollectionEmployeeDetail((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+
+
+    getAllActiveDataCollectionEmployeeDetail: (req, res) => {
+        const data = req.body;
+        getAllActiveDataCollectionEmployeeDetail(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
     getCompanyDetail: (req, res) => {
         getCompanyDetail((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Report Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
+        })
+    },
+    getAllIncidentNature: (req, res) => {
+        getAllIncidentNature((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -1369,6 +1442,14 @@ module.exports = {
             ])
         );
 
+        if (!Array.isArray(values) || values.length === 0) {
+            return res.status(400).json({
+                success: 0,
+                message: "No department action data to insert"
+            });
+        };
+
+
         InsertDepartmentAction(values, (err, results) => {
             if (err) {
                 return res.status(200).json({
@@ -1377,11 +1458,77 @@ module.exports = {
                 })
             }
 
+            // 3 Emit socket PER ITEM + PER DEPARTMENT
+            data.forEach(item => {
+                item.inc_action_collect_dep.forEach(dep_id => {
+
+                    const fetchActionDetail = {
+                        inc_register_slno: item.inc_register_slno,
+                        dep_id: dep_id
+                    };
+
+                    SingleDepartmentActionDetail(fetchActionDetail, (err, actionResult) => {
+                        if (err) {
+                            console.error("Fetch error:", err);
+                            return;
+                        }
+
+                        if (actionResult?.length > 0) {
+                            req.io.emit("new_action_requested", {
+                                actionDetail: actionResult,
+                                inc_register_slno: item.inc_register_slno,
+                                level_no: item.level_no,
+                                createdAt: new Date()
+                            });
+                        }
+                    });
+                });
+            });
+
+
             return res.status(200).json({
                 success: 2,
                 data: results,
                 message: 'Action Request Sent Successfully!'
             })
+
+            // if (insertId) {
+            //     SingleDepartmentActionDetail(fetchActionDetail, (err, actionResult) => {
+            //         if (err) {
+            //             return res.status(200).json({
+            //                 success: 0,
+            //                 message: err
+            //             });
+            //         }
+
+            //         // ?? SOCKET EVENT
+            //         req.io.emit("new_action_requested", {
+            //             actionDetail: actionResult,
+            //             inc_register_slno: fetchActionDetail.inc_register_slno,
+            //             requestedBy: fetchActionDetail.inc_action_req_user,
+            //             createdAt: new Date()
+            //         });
+
+            //         // Optional broadcast
+            //         req.io.emit(
+            //             "message",
+            //             "New department action request received"
+            //         );
+
+            //         return res.status(200).json({
+            //             success: 2,
+            //             data: results,
+            //             message: 'Action Request Sent Successfully!'
+            //         });
+            //     });
+            // } else {
+            //     return res.status(200).json({
+            //         success: 2,
+            //         data: results,
+            //         message: 'Action Request Sent Successfully!'
+            //     });
+            // }
+
         })
     },
 
@@ -1887,193 +2034,6 @@ module.exports = {
         });
     },
 
-    // getAllCurrentLevelApproval: (req, res) => {
-    //     const data = req.body;
-    //     getAllCurrentLevelApproval(data, (err, results) => {
-    //         if (err) {
-    //             return res.status(200).json({
-    //                 success: 0,
-    //                 message: err
-    //             });
-    //         }
-
-    //         if (results?.length === 0) {
-    //             return res.status(200).json({
-    //                 success: 1,
-    //                 message: 'No Record Found',
-    //                 data: []
-    //             });
-    //         }
-
-    //         return res.status(200).json({
-    //             success: 2,
-    //             message: 'Data Fetched Successfully',
-    //             data: results
-    //         });
-    //     });
-    // },
-
-    //old
-    // getAllCurrentLevelApproval: (req, res) => {
-    //     const data = req.body;
-    //     // Step 1: Build WHERE condition & params
-    //     let whereCondition = "";
-    //     let params = [];
-
-    //     if (data.level_priority === 0) {
-    //         // Case: Department + Section filtering
-    //         whereCondition = `
-    //         irm.inc_status = 1 
-    //         AND irm.dep_slno = ? 
-    //         AND irm.sec_slno = ?
-    //     `;
-    //         params = [data.dep_slno, data.sec_slno];
-
-    //     } else {
-    //         // Case: Normal current level filtering
-    //         whereCondition = `
-    //         irm.inc_status = 1
-    //          AND irm.dep_slno = ? 
-    //         AND (
-    //             irm.inc_current_level >= ?
-    //             OR (
-    //                 irm.inc_current_level >= ? 
-    //                 AND (
-    //                     irm.inc_current_level_review_state = 'A' 
-    //                     OR irm.inc_current_level_review_state IS NULL
-    //                 )
-    //             )
-    //         )
-    //     `;
-    //         params = [data.dep_slno, data.current_level, data.minus_level];
-    //     }
-
-    //     // Step 2: Final SQL Query
-    //     const query = `
-    //     SELECT 
-    //         irm.inc_register_slno,
-    //         irm.inc_initiator_slno,
-    //         irm.nature_of_inc,
-    //         irm.inc_describtion,
-    //         irm.file_status,
-    //         irm.inc_status,
-    //         irm.create_user,
-    //         irm.edit_user,
-    //         irm.create_date,
-    //         irm.inc_current_level,
-    //         irm.inc_current_level_review_state,
-    //         irm.inc_sacmatrix_detail,
-    //         irm.inc_reg_corrective,
-    //         irm.inc_all_approved,
-    //         ipd.mrd_no,
-    //         ipd.inc_pt_name,
-    //         ipd.inc_pt_gender,
-    //         ipd.inc_pt_mobile,
-    //         ipd.inc_pt_age,
-    //         ipd.inc_pt_address,
-    //         isd.inc_staff_type_slno,
-    //         isd.emp_id,
-    //         isd.emp_user_name,
-    //         isd.emp_name,
-    //         isd.emp_age,
-    //         isd.emp_gender,
-    //         isd.emp_desig,
-    //         isd.emp_dept,
-    //         isd.emp_dept_sec,
-    //         isd.emp_mob,
-    //         isd.emp_email,
-    //         isd.emp_address,
-    //         isd.emp_joining_date,
-    //         ivd.inc_visitor_name,
-    //         ivd.inc_visitor_age,
-    //         ivd.inc_visitor_gender,
-    //         ivd.inc_visitor_mobile,
-    //         ivd.inc_visitor_address,
-    //         ivd.inc_visit_purpose,
-    //         iad.inc_is_asset,
-    //         iad.asset_item_slno,
-    //         iad.custodian_dept_slno,
-    //         iad.item_name,
-    //         iad.item_location,
-    //         iad.manufacture_slno,
-    //         cm.em_name,
-    //         dp.dept_name,
-    //         ds.sec_name,
-    //         iniat.inc_initiator_name,
-    //         ist.inc_staff_type_name,
-    //         inch.em_name as incharge_name,
-    //         hod.em_name as hod_name,
-    //         qad.em_name as qad_name,
-    //         irm.dep_slno,
-    //         irm.sec_slno,
-    //         cd.desg_name,
-    //         irm.inc_data_collection_req,
-    //         JSON_ARRAYAGG(
-    //             JSON_OBJECT(
-    //                 'section', cds.dept_name,
-    //                 'inc_dep_status', idc.inc_dep_status,
-    //                 'fba_status',idc.inc_dep_fba_status,
-    //                 'level_no',idc.level_no
-    //             )
-    //         ) AS data_collection_details,
-    //         JSON_ARRAYAGG(
-    //             JSON_OBJECT(
-    //                 'inc_dep_action_status', idad.inc_dep_action_status,
-    //                 'level_no',idad.level_no
-    //             )
-    //         ) AS inc_action_details
-
-    //     FROM inc_register_master irm
-    //     LEFT JOIN inc_patient_dtl ipd ON irm.inc_register_slno = ipd.inc_register_slno AND irm.inc_initiator_slno = 1
-    //     LEFT JOIN inc_staff_dtl isd ON irm.inc_register_slno = isd.inc_register_slno AND irm.inc_initiator_slno = 2
-    //     LEFT JOIN inc_visitor_dtl ivd ON irm.inc_register_slno = ivd.inc_register_slno AND irm.inc_initiator_slno = 3
-    //     LEFT JOIN inc_asset_dtl iad ON irm.inc_register_slno = iad.inc_register_slno AND irm.inc_initiator_slno = 4
-    //     LEFT JOIN co_employee_master cm ON irm.create_user = cm.em_id
-    //     LEFT JOIN co_department_mast dp ON cm.em_department = dp.dept_id
-    //     LEFT JOIN co_deptsec_mast ds ON cm.em_dept_section = ds.sec_id
-    //     LEFT JOIN inc_initiator iniat ON iniat.inc_initiator_slno = irm.inc_initiator_slno
-    //     LEFT JOIN inc_staff_type ist ON ist.inc_staff_type_slno = isd.inc_staff_type_slno
-    //     LEFT JOIN co_employee_master inch  ON inch.em_id = irm.inc_incharge_emp
-    //     LEFT JOIN co_employee_master hod  ON hod.em_id = irm.inc_hod_emp
-    //     LEFT JOIN co_employee_master qad  ON qad.em_id = irm.inc_qad_emp
-    //     LEFT JOIN co_designation cd on cd.desg_slno = cm.em_designation
-    //     LEFT JOIN inc_data_collection idc ON idc.inc_register_slno = irm.inc_register_slno
-    //     LEFT JOIN inc_dep_action_detail idad ON idad.inc_register_slno = irm.inc_register_slno AND idad.inc_dep_action_detail_status = 1
-    //     LEFT JOIN co_department_mast cds ON cds.dept_id = idc.inc_req_collect_dep
-    //     LEFT JOIN co_employee_master cem ON cem.em_id = idc.inc_req_user
-    //     LEFT JOIN co_employee_master mc ON mc.em_id = idc.inc_req_ack_user
-    //     WHERE ${whereCondition}
-    //     GROUP BY irm.inc_register_slno
-    // `;
-
-
-    //     // Step 3: Call model
-    //     getAllCurrentLevelApproval({ query, params }, (err, results) => {
-
-    //         if (err) {
-    //             return res.status(200).json({
-    //                 success: 0,
-    //                 message: err
-    //             });
-    //         }
-
-    //         if (!results || results.length === 0) {
-    //             return res.status(200).json({
-    //                 success: 1,
-    //                 message: "No Record Found",
-    //                 data: []
-    //             });
-    //         }
-
-    //         return res.status(200).json({
-    //             success: 2,
-    //             message: "Data Fetched Successfully",
-    //             data: results
-    //         });
-    //     });
-    // }
-
-
     getAllCurrentLevelApproval: async (req, res) => {
         const data = req.body;
         try {
@@ -2450,6 +2410,61 @@ module.exports = {
         });
     },
 
+    insertIncidentNature: (req, res) => {
+        const data = req.body;
+        insertIncidentNature(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Departments Fetched Successfully',
+                data: results
+            });
+        });
+    },
+
+
+    insertDataCollectionEmployeeDetail: (req, res) => {
+        const data = req.body;
+        checkAlreadyMapedEmployee(data, (err, result) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (Array.isArray(result) && result?.length > 0) {
+                return res.json({
+                    success: 1,
+                    message: 'Employee Already present'
+                })
+            }
+            insertDataCollectionEmployeeDetail(data, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 2,
+                    message: 'Inserted Successfully',
+                    data: results
+                });
+            });
+        });
+
+    },
+
+
+
 
 
 
@@ -2507,80 +2522,6 @@ module.exports = {
         })
 
     },
-
-    // submitDepartmentDataCollectionController: (req, res) => {
-
-    //     console.log(req.body, "body");
-
-    //     let departmentData, fishboneData;
-    //     try {
-    //         // Remove extra quotes if any (common issue from frontend)
-    //         departmentData = JSON.parse(req.body.departmentData.replace(/^"+|"+$/g, ''));
-    //         fishboneData = JSON.parse(req.body.fishboneData.replace(/^"+|"+$/g, ''));
-    //     } catch (err) {
-    //         console.error("Invalid JSON payload:", req.body);
-    //         return res.status(400).json({ success: 0, message: "Invalid JSON payload" });
-    //     }
-    //     const files = req.files || [];
-    //     // 1 Update Department RCA + Preventive Action
-    //     departmentRcaPreventiveSubmission(departmentData, (err, depRes) => {
-    //         if (err) {
-    //             return res.status(200).json({
-    //                 success: 0,
-    //                 message: "Department update failed",
-    //                 error: err
-    //             });
-    //         }
-
-    //         // 2 Insert Fishbone Data
-    //         insertFishBoneQuestion(fishboneData, (err, fishRes) => {
-    //             if (err) {
-    //                 return res.status(200).json({
-    //                     success: 0,
-    //                     message: "Fishbone insert failed",
-    //                     error: err
-    //                 });
-    //             }
-
-    //             // 3 FILE UPLOAD (only if files exist)
-    //             if (files.length > 0) {
-
-    //                 // important: match your file upload service signature
-    //                 uploadFileIncidentDataCollectionFiles(
-    //                     departmentData.inc_data_collection_slno, // ID
-    //                     files,                                   // uploaded files
-    //                     (err, fileRes) => {
-    //                         if (err) {
-    //                             return res.status(200).json({
-    //                                 success: 0,
-    //                                 message: "File upload failed",
-    //                                 error: err
-    //                             });
-    //                         }
-
-    //                         return res.status(200).json({
-    //                             success: 1,
-    //                             message: "Department, fishbone & files saved successfully",
-    //                             depRes,
-    //                             fishRes,
-    //                             fileRes
-    //                         });
-    //                     }
-    //                 );
-
-    //             } else {
-    //                 //No files → success
-    //                 return res.status(200).json({
-    //                     success: 1,
-    //                     message: "Department & fishbone saved successfully",
-    //                     depRes,
-    //                     fishRes
-    //                 });
-    //             }
-    //         });
-    //     });
-    // },
-
 
     insertFishBoneQuestion: (req, res) => {
         const data = req.body;
@@ -2813,7 +2754,6 @@ module.exports = {
                     });
                 }
 
-
                 // Step 3: Only update the status ONCE if inc_data_collection_req === 0
                 if (checkresult[0]?.inc_data_collection_req === 0) {
                     UpdateDataCollectionReqStatus(slno, (err, updateResult) => {
@@ -2839,62 +2779,6 @@ module.exports = {
                     });
                 }
             });
-
-            // IsDepartmentDataCollectionAlreadyExist(searchdata, (err, searchresult) => {
-            //     if (err) {
-            //         return res.status(200).json({
-            //             success: 0,
-            //             message: err
-            //         });
-            //     }
-
-            //     // Filter out departments that already exist
-            //     const existingDepIds = searchresult?.map(r => r.inc_req_collect_dep);
-            //     const newValue = value.filter(v => !existingDepIds.includes(v[1]));
-
-            //     if (newValue.length === 0) {
-            //         return res.status(200).json({
-            //             success: 0,
-            //             message: 'Data collection already exists for selected departments.'
-            //         });
-            //     }
-
-
-            //     requestDataCollection(value, (err, results) => {
-            //         if (err) {
-            //             return res.status(200).json({
-            //                 success: 0,
-            //                 message: err
-            //             });
-            //         }
-
-            //         // Step 3: Only update the status ONCE if inc_data_collection_req === 0
-            //         if (checkresult[0]?.inc_data_collection_req === 0) {
-            //             UpdateDataCollectionReqStatus(slno, (err, updateResult) => {
-            //                 if (err) {
-            //                     return res.status(200).json({
-            //                         success: 0,
-            //                         message: err
-            //                     });
-            //                 }
-
-            //                 // Step 4: Send final success response after update
-            //                 return res.status(200).json({
-            //                     success: 2,
-            //                     message: 'Process completed and incident updated.',
-            //                     data: results
-            //                 });
-            //             });
-            //         } else {
-            //             // If update not needed, send success response
-            //             return res.status(200).json({
-            //                 success: 2,
-            //                 message: 'Process completed. No update needed.',
-            //                 data: results
-            //             });
-            //         }
-            //     });
-            // });
         });
     },
 
@@ -3242,93 +3126,6 @@ module.exports = {
             });
         });
     },
-    // hodApproval: (req, res) => {
-    //    const data = req.body;
-    //     hodApproval(data, (err, results) => {
-    //         if (err) {
-    //             return res.status(200).json({
-    //                 success: 0,
-    //                 message: err
-    //             });
-    //         }
-
-    //         return res.status(200).json({
-    //             success: 2,
-    //             message: 'Successfully Completed Operations'
-    //         });
-    //     });
-    // },
-    // hodApproval: (req, res) => {
-    //     const data = req.body;
-
-    //     // Base query and parameters
-    //     let sql = `
-    //     UPDATE inc_register_master 
-    //     SET    
-    //         inc_hod_ack = ?,
-    //         inc_hod_emp = ?,
-    //         inc_hod_reivew_state = ?,
-    //         inc_hod_review = ?,
-    //         inc_preventive_action = ?,
-    //         inc_hod_review_date = NOW()
-    // `;
-
-    //     const params = [
-    //         data.inc_hod_ack,
-    //         data.inc_hod_emp,
-    //         data.inc_hod_reivew_state,
-    //         data.inc_hod_review,
-    //         data.inc_preventive_action
-    //     ];
-
-    //     // Add corrective action + RCA if present
-    //     if (data.inc_corrective_action !== undefined && data.inc_rca !== undefined && data.inc_rca_hod_approve !== undefined &&
-    //         data.inc_corrective_hod_approval !== undefined) {
-    //         sql += `,
-    //         inc_corrective_action = ?,
-    //         inc_rca = ?,
-    //         inc_rca_hod_approve=?,
-    //         inc_corrective_hod_approval = ?,
-    //         inc_corrective_hod_aprvl_date = NOW(),
-    //         inc_rca_hod_approve_date = NOW()
-    //     `;
-    //         params.push(data.inc_corrective_action, data.inc_rca, data.inc_rca_hod_approve, data.inc_corrective_hod_approval);
-    //     }
-
-    //     // If HOD is acknowledging directly (no incharge review)
-    //     if (data.inc_incharge_ack !== undefined && data.inc_incharge_emp !== undefined) {
-    //         sql += `,
-    //         inc_incharge_ack = ?,
-    //         inc_incharge_emp = ?,
-    //         inc_incharge_reivew_state = ?,
-    //         inc_incharge_review = ?,
-    //         inc_incharge_review_date = NOW()
-    //     `;
-    //         params.push(
-    //             data.inc_incharge_ack,
-    //             data.inc_incharge_emp,
-    //             data.inc_incharge_reivew_state,
-    //             data.inc_incharge_review
-    //         );
-    //     }
-
-    //     sql += ` WHERE inc_register_slno = ?`;
-    //     params.push(data.inc_register_slno);
-
-    //     hodApproval({ sql, params }, (err, results) => {
-    //         if (err) {
-    //             return res.status(500).json({
-    //                 success: 0,
-    //                 message: err.message || err
-    //             });
-    //         }
-
-    //         return res.status(200).json({
-    //             success: 2,
-    //             message: 'Successfully Completed Operations'
-    //         });
-    //     });
-    // },
     hodApproval: (req, res) => {
         const data = req.body;
 
@@ -3701,5 +3498,53 @@ module.exports = {
 
         });
     },
+
+
+    updateDataCollectionEmployeeDetail: (req, res) => {
+        const body = req.body;
+        checkAlreadyMapedEmployee(body, (err, result) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (Array.isArray(result) && result?.length > 0) {
+                return res.json({
+                    success: 1,
+                    message: 'Item Already present'
+                })
+            }
+            updateDataCollectionEmployeeDetail(body, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                return res.status(200).json({
+                    success: 2,
+                    message: 'Data Updated Successfully'
+                });
+            });
+        });
+    },
+    updateIncidentNature: (req, res) => {
+        const body = req.body;
+        updateIncidentNature(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Updated Successfully'
+            });
+        });
+    },
+
 
 }

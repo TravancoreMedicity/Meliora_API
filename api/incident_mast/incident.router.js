@@ -81,29 +81,25 @@ const { IncidetDetailInsert, IncidentDetailsUpdate, UpdateMarkedIncidentDetails,
     getCompanyDetail,
     getAllEmployeeApprovalDepartments,
     getAllCommonLevelDetailMaster,
-    submitDepartmentDataCollectionController,
-    getAllDepartmentDataCollection,
-    IncidentSubCategoryMaster,
-    IncidentRegistrationFileUpload,
     fetchAllInvolvedEmployeeDep,
+    getAllDataCollectionEmployeeDetail,
+    insertDataCollectionEmployeeDetail,
+    updateDataCollectionEmployeeDetail,
+    getAllActiveDataCollectionEmployeeDetail,
+    getAllIncidentNature,
+    insertIncidentNature,
+    updateIncidentNature,
 } = require('./incident.controller');
 const { uploadFileIncidentService,
     getIncidentFiles,
-    syncFiles,
     getIncidenActiontFiles,
     uploadFileIncidentActionFiles,
     uploadFileIncidentDataCollectionFiles,
     getDataCollectionFiles
 } = require("./UploadFile");
 
-router.post('/incidentsave', checkToken, IncidetDetailInsert);
-router.patch('/incidentUpdate', checkToken, IncidentDetailsUpdate);
-router.patch('/markIncident', checkToken, UpdateMarkedIncidentDetails);
-router.post('/search', checkToken, SearchIncidentDetails);
-router.post('/apprvcheck', checkToken, IncidentApprovalChecks);
-// ipendoscopy
-router.post('/ipIncidentSave', checkToken, InpatientIncidetDetailInsert);
-router.patch('/ipincidentUpdate', checkToken, InpatientIncidetDetailsUpdate);
+
+
 //incident category and subcategory master
 router.post('/incidentcategoryinsert', checkToken, normalRateLimiter, IncidentCategoryMaster);
 router.get('/allcategory', checkToken, normalRateLimiter, getAllIncidentCategory)
@@ -129,24 +125,6 @@ router.get('/getincidentfile/:id', checkToken, strictRateLimiter, getIncidentFil
 router.get('/getincidentactionfile/:id', checkToken, strictRateLimiter, getIncidenActiontFiles)// fetch files
 router.get('/getdatacollectionfiles/:id', checkToken, normalRateLimiter, getDataCollectionFiles)// fetch files
 
-router.post('/inchargeapproval', checkToken, strictRateLimiter, InchargeApproval)//not using 
-router.post('/hodapproval', checkToken, strictRateLimiter, hodApproval) // not using 
-router.post('/qadapproval', checkToken, strictRateLimiter, QadApproval) // not using
-router.get('/fetchlevelapproval', checkToken, normalRateLimiter, fetchAllLevelApprovals) // not using but using 
-router.post('/insertlevelapproval', checkToken, normalRateLimiter, insertIncidentLevelApproval) // no t using
-router.patch('/updatelevelapproval', checkToken, normalRateLimiter, updateIncidentLevelApproval) // not using 
-router.patch('/hodrcaapprovals', checkToken, strictRateLimiter, hodRcaApproval) // not using 
-router.patch('/qadrcaapprovals', checkToken, strictRateLimiter, qadRcaApproval) // not using 
-router.patch('/hodcrctiveapprovals', checkToken, strictRateLimiter, hodCorrectiveApproval) // not uisng 
-router.patch('/qadprtvapprovals', checkToken, strictRateLimiter, qadPreventiveApproval)// not using 
-router.get('/qadincidents', checkToken, normalRateLimiter, getAllQADIncident) // not using
-router.patch('/hodcorrectiveupdate', checkToken, strictRateLimiter, hodCorrectiveUpdate) // not using 
-router.patch('/hodpreventiveupdate', checkToken, strictRateLimiter, hodPreventiveUpdate) // not using 
-router.patch('/qadevaluationupdate', checkToken, strictRateLimiter, qadEvalutaionUpdate) // not using 
-router.post('/hodinchargeaprvl', checkToken, normalRateLimiter, getAllIncidentHodIncharge) // not using
-router.patch('/rcaupdation', checkToken, strictRateLimiter, rcaUpdation); // not using 
-router.post('/updateIncident', checkToken, strictRateLimiter, UpdateIncidentReviews) // not using
-
 router.post('/fetchcurrentlevelapprvl', checkToken, normalRateLimiter, getAllCurrentLevelApproval);
 router.post('/levelapproval', checkToken, strictRateLimiter, highLevelApprovals);
 router.post('/reqdatacollection', checkToken, strictRateLimiter, requestDataCollection);
@@ -157,7 +135,6 @@ router.post('/getdepdatacollection', checkToken, strictRateLimiter, getDepartmen
 router.post('/departmentactionsubmit', checkToken, strictRateLimiter, departmentRcaPreventiveSubmission);
 
 router.post('/insertdcmm', checkToken, normalRateLimiter, insertDataCollectionMap);
-router.post('/getempdeptype', checkToken, normalRateLimiter, getEmployeeDepartmentType);//not using
 router.get('/fetchalldcmm', checkToken, normalRateLimiter, FetchAllCollectionMap);
 router.patch('/updatedcmm', checkToken, normalRateLimiter, updateDataCollectionMap);
 
@@ -210,12 +187,58 @@ router.post('/updatelevelreview', checkToken, normalRateLimiter, UpdateLevelDeti
 router.get('/dashboarddata', checkToken, normalRateLimiter, getAllDashboardIncident)
 router.get('/getcompany', checkToken, normalRateLimiter, getCompanyDetail)
 router.post('/approvaldeps', checkToken, normalRateLimiter, getAllEmployeeApprovalDepartments)
+router.post('/insertDcEmpMap', checkToken, normalRateLimiter, insertDataCollectionEmployeeDetail)
+router.get('/getalldatacollectionemp', checkToken, normalRateLimiter, getAllDataCollectionEmployeeDetail)
+router.post('/getallactiveDcEmp', checkToken, normalRateLimiter, getAllActiveDataCollectionEmployeeDetail)
+router.patch('/updateDcEmpMap', checkToken, normalRateLimiter, updateDataCollectionEmployeeDetail)
+
+router.get('/getallincnature', checkToken, normalRateLimiter, getAllIncidentNature)
+router.post('/insertNature', checkToken, normalRateLimiter, insertIncidentNature)
+router.patch('/updateNature', checkToken, normalRateLimiter, updateIncidentNature)
 
 
 
 
-// router.post('/getalldatacollection', checkToken, normalRateLimiter, getAllDepartmentDataCollection)
-// router.post('/submitDepartmentDataCollection', checkToken, normalRateLimiter, submitDepartmentDataCollectionController );
+
+/**
+ * 
+ * 
+ * 
+ * 
+ * API CURRENTLY NOT USING 
+ * THIS BELOW API ARE CREATED BASED ON PREVIOUSE REQUIUREMENTS BUT CURRENT NOT USING.
+ * ONLY AFTER RECHECKING EVERYTHING THIS WOULD BE REMOVE FOR SAFETY PURPOSE AND DATA CONSISTENCY
+ * 
+ * 
+ * */
+router.post('/inchargeapproval', checkToken, strictRateLimiter, InchargeApproval)//not using 
+router.post('/hodapproval', checkToken, strictRateLimiter, hodApproval) // not using 
+router.post('/qadapproval', checkToken, strictRateLimiter, QadApproval) // not using
+router.get('/fetchlevelapproval', checkToken, normalRateLimiter, fetchAllLevelApprovals) // not using but using 
+router.post('/insertlevelapproval', checkToken, normalRateLimiter, insertIncidentLevelApproval) // no t using
+router.patch('/updatelevelapproval', checkToken, normalRateLimiter, updateIncidentLevelApproval) // not using 
+router.patch('/hodrcaapprovals', checkToken, strictRateLimiter, hodRcaApproval) // not using 
+router.patch('/qadrcaapprovals', checkToken, strictRateLimiter, qadRcaApproval) // not using 
+router.patch('/hodcrctiveapprovals', checkToken, strictRateLimiter, hodCorrectiveApproval) // not uisng 
+router.patch('/qadprtvapprovals', checkToken, strictRateLimiter, qadPreventiveApproval)// not using 
+router.get('/qadincidents', checkToken, normalRateLimiter, getAllQADIncident) // not using
+router.patch('/hodcorrectiveupdate', checkToken, strictRateLimiter, hodCorrectiveUpdate) // not using 
+router.patch('/hodpreventiveupdate', checkToken, strictRateLimiter, hodPreventiveUpdate) // not using 
+router.patch('/qadevaluationupdate', checkToken, strictRateLimiter, qadEvalutaionUpdate) // not using 
+router.post('/hodinchargeaprvl', checkToken, normalRateLimiter, getAllIncidentHodIncharge) // not using
+router.patch('/rcaupdation', checkToken, strictRateLimiter, rcaUpdation); // not using 
+router.post('/updateIncident', checkToken, strictRateLimiter, UpdateIncidentReviews) // not using
+router.post('/getempdeptype', checkToken, normalRateLimiter, getEmployeeDepartmentType);//not using
+
+// PREVIOUS DEV ROUTES
+router.post('/incidentsave', checkToken, IncidetDetailInsert);
+router.patch('/incidentUpdate', checkToken, IncidentDetailsUpdate);
+router.patch('/markIncident', checkToken, UpdateMarkedIncidentDetails);
+router.post('/search', checkToken, SearchIncidentDetails);
+router.post('/apprvcheck', checkToken, IncidentApprovalChecks);
+// ipendoscopy
+router.post('/ipIncidentSave', checkToken, InpatientIncidetDetailInsert);
+router.patch('/ipincidentUpdate', checkToken, InpatientIncidetDetailsUpdate);
 
 
 module.exports = router;

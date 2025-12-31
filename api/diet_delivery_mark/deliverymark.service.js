@@ -18,7 +18,8 @@ module.exports = {
                         LEFT JOIN diet_master ON diet_master.diet_slno=diet_process_mast.diet_slno
                         LEFT JOIN diet_type ON diet_type.type_slno=diet_process_detl.type_slno
                         LEFT JOIN diet_patient ON diet_patient.pt_no=diet_process_mast.pt_no
-             WHERE  rm_code=? and  date(diet_process_mast.process_date)=current_date() and supply_stat = 0`,
+             WHERE  rm_code=? and  date(diet_process_mast.process_date)=current_date() and supply_stat = 0
+             group by diet_type.type_slno`,
             [id],
             (error, results, feilds) => {
                 if (error) {

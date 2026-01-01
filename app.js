@@ -34,6 +34,8 @@ const allowedOrigins = [
   "http://192.168.22.170:3000",
   "http://192.168.22.5:3000",
   "http://192.168.22.8:3000",
+  "http://192.168.22.3:3000",
+
 ];
 
 
@@ -285,7 +287,8 @@ const validateAuthentication = require("./api/validate_authentication/employeeDa
 const melioraDepMaster = require("./api/Meliora_department_master/meliora_dep_master.router");
 const ContractMaster = require("./api/contract_master/contract.router");
 const condemMasters = require('./api/am_condemnation_master/condem_master.router')
-
+const RateVariationReport = require('./api/RateVariationReport/RateVariationReport.router')
+const store_master = require('./api/store_master/store_master.router')
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -483,8 +486,8 @@ app.use("/api/melioraDepMaster", melioraDepMaster);
 app.use("/api/ContractMaster", ContractMaster);
 app.use('/api/condemApprovalLevel', condemApprovalLevel)
 app.use('/api/condemMasters', condemMasters)
-
-
+app.use('/api/RateVariationReport', RateVariationReport)
+app.use('/api/store_master', store_master)
 
 server.listen(
   process.env.APP_PORT,

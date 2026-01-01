@@ -41,6 +41,8 @@ module.exports = {
     },
 
     PasswordMasterInsert: (data, callback) => {
+      
+        
         pool.query(
             `INSERT INTO it_pswd_master
           ( 
@@ -95,6 +97,7 @@ module.exports = {
 
 
     PasswordDetailInsert: (data, callback) => {
+
         pool.query(
             `INSERT INTO it_pswd_mast_detail
           (            
@@ -188,7 +191,7 @@ PasswordMasterView: (callback) => {
         );
     },
 
-    PasswordMasterUpdate: (data, callback) => {
+    PasswordMasterUpdate: (data, callback) => {         
         pool.query(
 
             `UPDATE it_pswd_master SET           
@@ -213,6 +216,7 @@ PasswordMasterView: (callback) => {
 
     PasswordDetailUpdate: (body) => {
         return Promise.all(body.map((data) => {
+                
             return new Promise((resolve, reject) => {
                 pool.query(
                     `UPDATE it_pswd_mast_detail

@@ -1,3 +1,4 @@
+const { format } = require("date-fns");
 const { replyQuery } = require("../complaint_assign/complaintAssign.service");
 const {
     insertfeedbackcategory,
@@ -188,6 +189,13 @@ const {
     insertCallCenterDetail,
     getAllPREMDetail,
     getNursingStationLastDate,
+    getPatientDetail,
+    InsertPatineDetail,
+    checkExistingIPs,
+    UpdatePatientDetail,
+    checkIpAlreadyExist,
+    getAllDischargedPatients,
+
 } = require("./Feedback.service");
 
 module.exports = {
@@ -1598,7 +1606,7 @@ module.exports = {
             if (error) {
                 return res.status(200).json({
                     success: 2,
-                    message: err
+                    message: error
                 });
             }
             if (!results || results.length === 0) {
@@ -3657,7 +3665,7 @@ module.exports = {
         });
     },
 
-    //discharge
+    //discharge changed
     getdischargepatient: (req, res) => {
         const data = req.body;
         const { NS_CODE, FROM_DATE, TO_DATE } = data;
@@ -3673,9 +3681,6 @@ module.exports = {
                 fb_ptd_dob,
                 fb_ptn_yearage,
                 fb_ptc_loadd1,
-                fb_ptc_loadd2,
-                fb_ptc_loadd3,
-                fb_ptc_loadd4,
                 fb_ipd_disc,
                 fb_ipc_status,
                 fb_dmd_date,
@@ -3715,9 +3720,6 @@ module.exports = {
                 fb_ptd_dob,
                 fb_ptn_yearage,
                 fb_ptc_loadd1,
-                fb_ptc_loadd2,
-                fb_ptc_loadd3,
-                fb_ptc_loadd4,
                 fb_ipd_disc,
                 fb_ipc_status,
                 fb_dmd_date,
@@ -3920,6 +3922,163 @@ module.exports = {
 
             });
         })
+    },
+    getPatientDetail: (req, res) => {
+        const body = req.body;
+        getPatientDetail(body, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+
+            });
+        })
+    },
+
+    checkIpAlreadyExist: (req, res) => {
+        const body = req.body;
+        checkIpAlreadyExist(body, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'Patient not Exists',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: 'Patient Already Exist'
+
+            });
+        })
+    },
+    getAllDischargedPatients: (req, res) => {
+        const body = req.body;
+        getAllDischargedPatients(body, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: error
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'Discharge Patient not Exists',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: 'Successfully Fetched Data!'
+            });
+        })
+    },
+
+
+    InsertPatineDetail: (req, res) => {
+        const body = req.body;
+
+        if (!Array.isArray(body)) {
+            return res.status(400).json({
+                success: 0,
+                message: "Body must be an array"
+            });
+        }
+
+        const ipList = body.map(item => item.IP_NO);
+
+        //  Check existing IP numbers
+        checkExistingIPs(ipList, (err, existingIPs) => {
+            if (err) {
+                return res.status(500).json({ success: 0, message: err });
+            }
+
+            const insertValues = [];
+            const updateValues = [];
+
+
+            body.forEach((item) => {
+                // COMBINE ADDRESS INTO ONE FIELD
+                const fullAddress = [
+                    item.PTC_LOADD1,
+                    item.PTC_LOADD2,
+                    item.PTC_LOADD3,
+                    item.PTC_LOADD4,
+                ]
+                    .filter(Boolean)
+                    .join(', ');
+                const row = [
+                    item.IP_NO,
+                    item.IPD_DATE ? format(new Date(item.IPD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
+                    item.PT_NO,
+                    item.PTC_PTNAME?.trim(),
+                    item.PTC_SEX,
+                    item.PTD_DOB ? format(new Date(item.PTD_DOB), "yyyy-MM-dd HH:mm:ss") : null,
+                    fullAddress,
+                    item.PTC_LOPIN,
+                    item.BD_CODE,
+                    item.DO_CODE,
+                    item.IPC_CURSTATUS,
+                    item.PTC_MOBILE,
+                    item.IPC_MHCODE,
+                    item.DOC_NAME,
+                    item.DPC_DESC,
+                    item.IPD_DISC ? format(new Date(item.IPD_DISC), "yyyy-MM-dd HH:mm:ss") : null,
+                    item.IPC_STATUS,
+                    item.DMC_SLNO,
+                    item.DMD_DATE ? format(new Date(item.DMD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
+                ];
+
+                if (existingIPs.includes(item.IP_NO)) {
+                    updateValues.push(row);
+                } else {
+                    insertValues.push(row);
+                }
+            });
+
+            // INSERT
+            if (insertValues.length > 0) {
+                InsertPatineDetail(insertValues, (err) => {
+                    if (err) console.log("Insert error:", err);
+                });
+            }
+
+            // 3 UPDATE
+            updateValues.forEach(row => {
+                UpdatePatientDetail(row, (err) => {
+                    if (err) console.log("Update error:", err);
+                });
+            });
+
+            return res.status(200).json({
+                success: 2,
+                message: "Process Completed",
+                inserted: insertValues.length,
+                updated: updateValues.length
+            });
+
+        });
     },
 
     houekeepingComplaintregistration: (req, res) => {

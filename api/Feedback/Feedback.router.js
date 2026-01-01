@@ -125,6 +125,10 @@ const {
     getIpFeedbackReport,
     getAllPREMDetail,
     getNursingStationLastDate,
+    getPatientDetail,
+    InsertPatineDetail,
+    checkIpAlreadyExist,
+    getAllDischargedPatients,
     // getallscheduledate,
 } = require("./Feedback.controller");
 
@@ -261,7 +265,7 @@ router.get('/getprocheckcompletebed', verifyToken, getprocheckcompletebed)
 
 router.get('/getprochecklistdetail/:id', verifyToken, getprochecklistdetail)
 
-router.get('/getdischargeentrybed', verifyToken, getdischargeentrybed)
+router.get('/getdischargeentrybed', verifyToken, getdischargeentrybed) // NOT USING MODULE NOT UP YET
 router.get('/getdepassetonly/:id', verifyToken, getdepassetonly)
 router.get('/getroomassetdetail', verifyToken, getroomassetdetail)
 
@@ -304,6 +308,12 @@ router.post('/ipfbreport', verifyToken, getIpFeedbackReport);
 
 router.get('/premdetail', verifyToken, getAllPREMDetail)
 router.get('/getlastnsupdate', verifyToken, getNursingStationLastDate)
+
+
+router.post('/getpatientdetail', verifyToken, getPatientDetail)
+router.post('/insertpatientdetail', verifyToken, InsertPatineDetail)
+router.post('/checkipexist', verifyToken, checkIpAlreadyExist)
+router.post('/dischargedpatient', verifyToken, getAllDischargedPatients)
 
 //edlider meliora table
 // router.post('/insertbddetail', insertbddetail)

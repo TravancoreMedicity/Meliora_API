@@ -43,6 +43,7 @@ const allowedOrigins = [
 // Dynamically allow based on Origin
 app.use(
   cors({
+
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
@@ -51,6 +52,7 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
+
     credentials: true,
   })
 );
@@ -442,7 +444,7 @@ app.use("/api/ItBillType", ItBillSupplierList);
 app.use("/api/qidepartment", qideptmast);
 app.use("/api/qiendoscopy", qiendoscopy);
 app.use("/api/newCRFStore", newCRFStore);
-app.use("/api/incidentMaster", incidentMast);
+app.use("/api/incidentMaster",socketIOMiddlewre, incidentMast);
 app.use("/api/qiTypeList", qitypeList);
 app.use("/api/qidialysis", dialysisqi);
 app.use("/api/CrmNewApprovals", CrmNewApprovals);

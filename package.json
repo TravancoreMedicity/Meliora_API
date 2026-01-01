@@ -20,6 +20,7 @@
     "dotenv": "^8.2.0",
     "expo-server-sdk": "^3.7.0",
     "express": "^4.17.1",
+    "express-rate-limit": "^8.2.1",
     "joi": "^17.4.0",
     "jsonwebtoken": "^8.5.1",
     "lusca": "^1.7.0",

@@ -11,8 +11,8 @@ const buildKey = (req) => {
 
 // Normal limiter → 200 requests per 10 minutes PER USER
 const normalRateLimiter = rateLimit({
-    windowMs: 2 * 60 * 1000, // 10 minute
-    max: 200, // limit each IP to 30 requests per windowMs
+    windowMs: 2 * 60 * 1000, // 2 minute
+    max: 200, // limit each IP to 200 requests per windowMs
     message: {
         status: 429,
         success: 4,

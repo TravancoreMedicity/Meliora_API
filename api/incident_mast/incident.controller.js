@@ -2150,9 +2150,6 @@ module.exports = {
                             ds.sec_name,
                             iniat.inc_initiator_name,
                             ist.inc_staff_type_name,
-                            inch.em_name as incharge_name,
-                            hod.em_name as hod_name,
-                            qad.em_name as qad_name,
                             irm.dep_slno,
                             irm.sec_slno,
                             cd.desg_name,
@@ -2181,9 +2178,6 @@ module.exports = {
                         LEFT JOIN co_deptsec_mast ds ON cm.em_dept_section = ds.sec_id
                         LEFT JOIN inc_initiator iniat ON iniat.inc_initiator_slno = irm.inc_initiator_slno
                         LEFT JOIN inc_staff_type ist ON ist.inc_staff_type_slno = isd.inc_staff_type_slno
-                        LEFT JOIN co_employee_master inch  ON inch.em_id = irm.inc_incharge_emp
-                        LEFT JOIN co_employee_master hod  ON hod.em_id = irm.inc_hod_emp
-                        LEFT JOIN co_employee_master qad  ON qad.em_id = irm.inc_qad_emp
                         LEFT JOIN co_designation cd on cd.desg_slno = cm.em_designation
                         LEFT JOIN inc_data_collection idc ON idc.inc_register_slno = irm.inc_register_slno
                         LEFT JOIN inc_dep_action_detail idad ON idad.inc_register_slno = irm.inc_register_slno AND idad.inc_dep_action_detail_status = 1

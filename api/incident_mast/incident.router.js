@@ -114,25 +114,25 @@ router.post('/getpssstaff', checkToken, normalRateLimiter, getProfessionalStaff)
 router.post('/gethspgstaff', checkToken, normalRateLimiter, getHsPgStaffDetail);
 router.post('/getassetdtl', checkToken, normalRateLimiter, getAllassetDtl);
 
-router.post('/incregistration', checkToken, strictRateLimiter, IncidentRegistration);
-router.post('/incidentupdation', checkToken, strictRateLimiter, IncidentUpdation);
-router.post('/uploadFiles', checkToken, strictRateLimiter, uploadFileIncidentService); //uploading file 
-router.post('/uploadActionFiles', checkToken, strictRateLimiter, uploadFileIncidentActionFiles); //uploading file 
-router.post('/uploaddatacollectionFiles', checkToken, strictRateLimiter, uploadFileIncidentDataCollectionFiles); //uploading file 
+router.post('/incregistration', checkToken, normalRateLimiter, IncidentRegistration);
+router.post('/incidentupdation', checkToken, normalRateLimiter, IncidentUpdation);
+router.post('/uploadFiles', checkToken, normalRateLimiter, uploadFileIncidentService); //uploading file 
+router.post('/uploadActionFiles', checkToken, normalRateLimiter, uploadFileIncidentActionFiles); //uploading file 
+router.post('/uploaddatacollectionFiles', checkToken, normalRateLimiter, uploadFileIncidentDataCollectionFiles); //uploading file 
 
 router.post('/getallincident', checkToken, normalRateLimiter, getAllIncidentDetail)
-router.get('/getincidentfile/:id', checkToken, strictRateLimiter, getIncidentFiles)// fetch files
-router.get('/getincidentactionfile/:id', checkToken, strictRateLimiter, getIncidenActiontFiles)// fetch files
+router.get('/getincidentfile/:id', checkToken, normalRateLimiter, getIncidentFiles)// fetch files
+router.get('/getincidentactionfile/:id', checkToken, normalRateLimiter, getIncidenActiontFiles)// fetch files
 router.get('/getdatacollectionfiles/:id', checkToken, normalRateLimiter, getDataCollectionFiles)// fetch files
 
 router.post('/fetchcurrentlevelapprvl', checkToken, normalRateLimiter, getAllCurrentLevelApproval);
-router.post('/levelapproval', checkToken, strictRateLimiter, highLevelApprovals);
-router.post('/reqdatacollection', checkToken, strictRateLimiter, requestDataCollection);
+router.post('/levelapproval', checkToken, normalRateLimiter, highLevelApprovals);
+router.post('/reqdatacollection', checkToken, normalRateLimiter, requestDataCollection);
 router.post('/getallinvolveddep', checkToken, normalRateLimiter, getAllInvolvedDepartment);
 router.post('/getallinvolveddepemp', checkToken, normalRateLimiter, fetchAllInvolvedEmployeeDep);
-router.post('/getemptype', checkToken, strictRateLimiter, getCurrentEmployeeType);
-router.post('/getdepdatacollection', checkToken, strictRateLimiter, getDepartmentDataCollection);
-router.post('/departmentactionsubmit', checkToken, strictRateLimiter, departmentRcaPreventiveSubmission);
+router.post('/getemptype', checkToken, normalRateLimiter, getCurrentEmployeeType);
+router.post('/getdepdatacollection', checkToken, normalRateLimiter, getDepartmentDataCollection);
+router.post('/departmentactionsubmit', checkToken, normalRateLimiter, departmentRcaPreventiveSubmission);
 
 router.post('/insertdcmm', checkToken, normalRateLimiter, insertDataCollectionMap);
 router.get('/fetchalldcmm', checkToken, normalRateLimiter, FetchAllCollectionMap);
@@ -150,10 +150,10 @@ router.post('/insertcsmapmaster', checkToken, normalRateLimiter, insertCommonSet
 router.patch('/updatecsmapmaster', checkToken, normalRateLimiter, updateCommonSettingMapMaster);
 
 router.get('/getdatacollectioncs', checkToken, normalRateLimiter, getAllDataCollectionCommonSetting);
-router.post('/insertfishbone', checkToken, strictRateLimiter, insertFishBoneQuestion);
-router.post('/getfishbonedetail', checkToken, strictRateLimiter, getFishboneDetails);
+router.post('/insertfishbone', checkToken, normalRateLimiter, insertFishBoneQuestion);
+router.post('/getfishbonedetail', checkToken, normalRateLimiter, getFishboneDetails);
 
-router.post('/getallfbadetail', checkToken, strictRateLimiter, getAllFishBoneAnalysisDetail);
+router.post('/getallfbadetail', checkToken, normalRateLimiter, getAllFishBoneAnalysisDetail);
 router.get('/getallactivedepartment', checkToken, normalRateLimiter, getAllActiveDeparments);
 router.post('/gethighlevelreview', checkToken, normalRateLimiter, getAllHighLevelReview);
 router.post('/insertdepaction', checkToken, normalRateLimiter, InsertDepartmentAction);
@@ -162,8 +162,8 @@ router.post('/getactiondetails', checkToken, normalRateLimiter, getAllActionDeta
 router.post('/getdepactions', checkToken, normalRateLimiter, getDepActions);
 router.post('/depactionack', checkToken, normalRateLimiter, getDeparmentAcknowledge);
 
-router.post('/updateFileStatus', checkToken, strictRateLimiter, UpdateFileStatus)
-router.post('/updateddcfilestatus', checkToken, strictRateLimiter, UpdateDepartMentDataCollectionFileStatus)
+router.post('/updateFileStatus', checkToken, normalRateLimiter, UpdateFileStatus)
+router.post('/updateddcfilestatus', checkToken, normalRateLimiter, UpdateDepartMentDataCollectionFileStatus)
 router.post('/getlevelitems', checkToken, normalRateLimiter, getAllLevelItems)
 
 // NEW

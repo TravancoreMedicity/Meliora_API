@@ -169,63 +169,54 @@ module.exports = {
                 });
             };
 
-            if (results && results?.length === 0) {
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Rights Under this Module"
-                });
-            };
-
             const SearchMenu = {
                 module_slno: body.module_slno,
                 sub_module_slno: body.sub_module_slno
             }
 
-            if (results?.length > 0) {
-                getMenuSlno(SearchMenu, (err, TotalMenus) => {
-                    if (err) {
-                        logger.logwindow(res.err)
-                        return res.status(200).json({
-                            success: 0,
-                            message: err
-                        });
-                    }
-                    if (TotalMenus && TotalMenus?.length === 0) {
-                        return res.status(200).json({
-                            success: 0,
-                            message: "No Menus Under this Module"
-                        });
-                    }
-                    if (TotalMenus && TotalMenus?.length > 0) {
-                        const FinalResponseData = Array.isArray(TotalMenus)
-                            ? TotalMenus.map((item) => {
-                                const rights = results.find(
-                                    (r) => Number(r.menu_slno) === Number(item.menu_slno)
-                                );
+            getMenuSlno(SearchMenu, (err, TotalMenus) => {
+                if (err) {
+                    logger.logwindow(res.err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                if (TotalMenus && TotalMenus?.length === 0) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Menus Under this Module"
+                    });
+                }
+                if (TotalMenus && TotalMenus?.length > 0) {
+                    const FinalResponseData = Array.isArray(TotalMenus)
+                        ? TotalMenus.map((item) => {
+                            const rights = results.find(
+                                (r) => Number(r.menu_slno) === Number(item.menu_slno)
+                            );
 
-                                return {
-                                    menu_slno: item.menu_slno,
-                                    menu_name: item.menu_name,
-                                    menu_view: rights ? Number(rights?.menu_view) : 0, // default 0
-                                    group_right_slno: rights ? rights?.group_right_slno : null,
-                                    module_slno: body.module_slno,
-                                    sub_module_slno: body.sub_module_slno,
-                                    user_group_slno: body.user_group_slno
-                                };
-                            })
-                            : [];
+                            return {
+                                menu_slno: item.menu_slno,
+                                menu_name: item.menu_name,
+                                menu_view: rights ? Number(rights?.menu_view) : 0, // default 0
+                                group_right_slno: rights ? rights?.group_right_slno : null,
+                                module_slno: body.module_slno,
+                                sub_module_slno: body.sub_module_slno,
+                                user_group_slno: body.user_group_slno
+                            };
+                        })
+                        : [];
 
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Successfully Fetched Data",
-                            data: FinalResponseData
-                        });
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Successfully Fetched Data",
+                        data: FinalResponseData
+                    });
 
-                    }
+                }
 
 
-                })
-            }
+            })
 
 
             // OLD VERSION OF DATA

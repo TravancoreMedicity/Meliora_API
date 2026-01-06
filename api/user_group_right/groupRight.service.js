@@ -128,7 +128,7 @@ module.exports = {
     validateGroupRights: (data, callBack) => {
         pool.query(
             `SELECT 
-            group_right_slno
+            group_right_slno,menu_slno,menu_view
         FROM user_group_rights 
         WHERE user_group_slno = ? AND module_slno =? and sub_module_slno=?`,
             [
@@ -147,7 +147,8 @@ module.exports = {
     },
     getMenuSlno: (data, callBack) => {
         pool.query(
-            `SELECT menu_slno
+            `SELECT menu_slno,
+            menu_name
             FROM menu_master 
             WHERE menu_module_slno = ? and sub_module_slno= ? and menu_status=1`,
             [
@@ -164,7 +165,7 @@ module.exports = {
         )
     },
 
-    insertGroupRight: (data, callBack) => { //Inser Group Rights              
+    insertGroupRight: (data, callBack) => { //Inser Group Rights       
         pool.query(
             `INSERT INTO user_group_rights (
                 user_group_slno,
@@ -172,9 +173,12 @@ module.exports = {
                 sub_module_slno,
                 menu_slno
             )
-            VALUES ?`,
+            VALUES (?,?,?,?)`,
             [
-                data
+                data.user_group_slno,
+                data.module_slno,
+                data.sub_module_slno,
+                data.menu_slno
             ],
             (error, results, feilds) => {
                 if (error) {

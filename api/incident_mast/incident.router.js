@@ -89,6 +89,7 @@ const { IncidetDetailInsert, IncidentDetailsUpdate, UpdateMarkedIncidentDetails,
     getAllIncidentNature,
     insertIncidentNature,
     updateIncidentNature,
+    getIncidentFromDashboard,
 } = require('./incident.controller');
 const { uploadFileIncidentService,
     getIncidentFiles,
@@ -196,6 +197,8 @@ router.get('/getallincnature', checkToken, normalRateLimiter, getAllIncidentNatu
 router.post('/insertNature', checkToken, normalRateLimiter, insertIncidentNature)
 router.patch('/updateNature', checkToken, normalRateLimiter, updateIncidentNature)
 
+
+router.post('/getincidentcommon',checkToken,normalRateLimiter,getIncidentFromDashboard)
 
 
 

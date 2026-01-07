@@ -3924,5 +3924,106 @@ WHERE
             }
         )
     },
+    getIncidentFromDashboard: (data, callback) => {
+        pool.query(
+            `SELECT 
+                irm.inc_register_slno,
+                irm.inc_initiator_slno,
+                irm.nature_of_inc,
+                irm.inc_describtion,
+                irm.file_status,
+                irm.inc_status,
+                irm.create_user,
+                irm.edit_user,
+                irm.create_date,
+                irm.inc_current_level,
+                irm.inc_current_level_review_state,
+                irm.inc_sacmatrix_detail,
+                irm.inc_reg_corrective,
+                irm.inc_all_approved,
+                ipd.mrd_no,
+                ipd.inc_pt_name,
+                ipd.inc_pt_gender,
+                ipd.inc_pt_mobile,
+                ipd.inc_pt_age,
+                ipd.inc_pt_address,
+                isd.inc_staff_type_slno,
+                isd.emp_id,
+                isd.emp_user_name,
+                isd.emp_name,
+                isd.emp_age,
+                isd.emp_gender,
+                isd.emp_desig,
+                isd.emp_dept,
+                isd.emp_dept_sec,
+                isd.emp_mob,
+                isd.emp_email,
+                isd.emp_address,
+                isd.emp_joining_date,
+                ivd.inc_visitor_name,
+                ivd.inc_visitor_age,
+                ivd.inc_visitor_gender,
+                ivd.inc_visitor_mobile,
+                ivd.inc_visitor_address,
+                ivd.inc_visit_purpose,
+                iad.inc_is_asset,
+                iad.asset_item_slno,
+                iad.custodian_dept_slno,
+                iad.item_name,
+                iad.item_location,
+                iad.manufacture_slno,
+                cm.em_name,
+                dp.dept_name,
+                ds.sec_name,
+                iniat.inc_initiator_name,
+                ist.inc_staff_type_name,
+                irm.dep_slno,
+                irm.sec_slno,
+                cd.desg_name,
+                irm.inc_data_collection_req,
+                JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'section', cds.dept_name,
+                        'inc_dep_status', idc.inc_dep_status,
+                        'fba_status',idc.inc_dep_fba_status,
+                        'level_no',idc.level_no
+                    )
+                ) AS data_collection_details,
+                JSON_ARRAYAGG( 
+                    JSON_OBJECT(
+                        'inc_dep_action_status', idad.inc_dep_action_status,
+                        'level_no',idad.level_no
+                    )
+                ) AS inc_action_detail
+                FROM inc_register_master irm
+                LEFT JOIN inc_patient_dtl ipd ON irm.inc_register_slno = ipd.inc_register_slno AND irm.inc_initiator_slno = 1
+                LEFT JOIN inc_staff_dtl isd ON irm.inc_register_slno = isd.inc_register_slno AND irm.inc_initiator_slno = 2
+                LEFT JOIN inc_visitor_dtl ivd ON irm.inc_register_slno = ivd.inc_register_slno AND irm.inc_initiator_slno = 3
+                LEFT JOIN inc_asset_dtl iad ON irm.inc_register_slno = iad.inc_register_slno AND irm.inc_initiator_slno = 4
+                LEFT JOIN co_employee_master cm ON irm.create_user = cm.em_id
+                LEFT JOIN co_department_mast dp ON cm.em_department = dp.dept_id
+                LEFT JOIN co_deptsec_mast ds ON cm.em_dept_section = ds.sec_id
+                LEFT JOIN inc_initiator iniat ON iniat.inc_initiator_slno = irm.inc_initiator_slno
+                LEFT JOIN inc_staff_type ist ON ist.inc_staff_type_slno = isd.inc_staff_type_slno
+                LEFT JOIN co_designation cd on cd.desg_slno = cm.em_designation
+                LEFT JOIN inc_data_collection idc ON idc.inc_register_slno = irm.inc_register_slno
+                LEFT JOIN inc_dep_action_detail idad ON idad.inc_register_slno = irm.inc_register_slno AND idad.inc_dep_action_detail_status = 1
+                LEFT JOIN co_department_mast cds ON cds.dept_id = idc.inc_req_collect_dep
+                LEFT JOIN co_employee_master cem ON cem.em_id = idc.inc_req_user
+                LEFT JOIN co_employee_master mc ON mc.em_id = idc.inc_req_ack_user
+                WHERE irm.inc_register_slno = ?
+                GROUP BY irm.inc_register_slno`,
+            [
+                data.inc_register_slno,
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
 
 }

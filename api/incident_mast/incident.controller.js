@@ -103,6 +103,7 @@ const {
     getAllIncidentNature,
     insertIncidentNature,
     updateIncidentNature,
+    getIncidentFromDashboard,
 
 } = require('./incident.service');
 
@@ -2061,6 +2062,9 @@ module.exports = {
             };
 
             for (const item of ApprovalDepartments) {
+
+                // console.log({ dep_slno, sec_slno, current_level, minus_level, level_priority });
+
                 const dep_slno = item.dep_id;
                 const sec_slno = item.sec_id;
                 const current_level = Number(item.level_no) || 0;
@@ -2083,7 +2087,7 @@ module.exports = {
                     // Normal current-level filtering
                     whereCondition = `
                     irm.inc_status = 1
-                    AND irm.dep_slno = ?
+                    AND irm.sec_slno = ?
                     AND (
                         irm.inc_current_level >= ?
                         OR (
@@ -2095,7 +2099,7 @@ module.exports = {
                         )
                     )
                 `;
-                    params = [dep_slno, current_level, minus_level];
+                    params = [sec_slno, current_level, minus_level];
                 }
 
                 const query = `
@@ -2207,6 +2211,9 @@ module.exports = {
             });
 
         } catch (error) {
+
+            console.log({ error });
+
             return res.status(500).json({
                 success: 0,
                 message: "Internal Server Error"
@@ -3539,6 +3546,23 @@ module.exports = {
             });
         });
     },
+    getIncidentFromDashboard: (req, res) => {
+        const body = req.body;
+        getIncidentFromDashboard(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Updated Successfully',
+                data: results
+            });
+        });
+    }
+
 
 
 }

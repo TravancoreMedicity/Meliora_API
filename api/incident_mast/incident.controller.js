@@ -1805,31 +1805,32 @@ module.exports = {
     },
     UpdateLevelItemMapDetail: (req, res) => {
         const body = req.body;
-        checkAlreadyItemMaped(body, (err, result) => {
+        // checkAlreadyItemMaped(body, (err, result) => {
+        //     if (err) {
+        //         return res.status(200).json({
+        //             success: 0,
+        //             message: err
+        //         });
+        //     }
+
+        //     if (Array.isArray(result) && result?.length > 0) {
+        //         return res.json({
+        //             success: 1,
+        //             message: 'Item Already present'
+        //         })
+        //     }
+
+        // });
+        UpdateLevelItemMapDetail(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
                     message: err
                 });
             }
-
-            if (Array.isArray(result) && result?.length > 0) {
-                return res.json({
-                    success: 1,
-                    message: 'Item Already present'
-                })
-            }
-            UpdateLevelItemMapDetail(body, (err, results) => {
-                if (err) {
-                    return res.status(200).json({
-                        success: 0,
-                        message: err
-                    });
-                }
-                return res.status(200).json({
-                    success: 2,
-                    message: 'Data Updated Successfully'
-                });
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Updated Successfully'
             });
         });
     },
@@ -2062,8 +2063,6 @@ module.exports = {
             };
 
             for (const item of ApprovalDepartments) {
-
-                // console.log({ dep_slno, sec_slno, current_level, minus_level, level_priority });
 
                 const dep_slno = item.dep_id;
                 const sec_slno = item.sec_id;
@@ -2596,7 +2595,8 @@ module.exports = {
             inc_category,
             inc_subcategory,
             inc_sacmatrix_detail,
-            inc_all_approved
+            inc_all_approved,
+            file_status
         } = data;
 
         const highleveldata = {
@@ -2612,6 +2612,9 @@ module.exports = {
             }),
             ...(inc_all_approved && {
                 inc_all_approved
+            }),
+            ...(file_status && {
+                file_status
             }),
         };
 

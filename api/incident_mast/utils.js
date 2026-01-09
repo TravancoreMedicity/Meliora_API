@@ -27,7 +27,16 @@ const handleFileUpload = (uploadMiddleware, baseFolder) => {
             try {
                 const files = req.files || [];
                 const id = body.id;
-                const keptFiles = req.body.keptFiles ? JSON.parse(req.body.keptFiles) : [];
+                // const keptFiles = req.body.keptFiles ? JSON.parse(req.body.keptFiles) : [];
+
+                const keptFilesRaw = req.body.keptFiles
+                    ? JSON.parse(req.body.keptFiles)
+                    : [];
+
+                const keptFiles = keptFilesRaw.map(f =>
+                    typeof f === "string" ? f : f.imageName
+                );
+
 
                 // Construct target folder dynamically
                 const targetFolder = path.join(baseFolder, `${id}`);

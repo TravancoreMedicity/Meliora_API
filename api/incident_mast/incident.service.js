@@ -2221,6 +2221,10 @@ FROM
             query += `, inc_all_approved = ?`;
             values.push(data.inc_all_approved);
         }
+        if (data.file_status) {
+            query += `, file_status = ?`;
+            values.push(data.file_status);
+        }
 
         query += ` WHERE inc_register_slno = ?`;
         values.push(data.inc_register_slno);
@@ -2464,7 +2468,7 @@ FROM
                     LEFT JOIN
                 co_level_master clm ON clm.level_master_id = cld.level_master_slno
             WHERE
-                cld.level_emp_id = ? and and clm.module_slno=20`,
+                cld.level_emp_id = ? and clm.module_slno=20`,
             [
                 data.emp_id
             ],

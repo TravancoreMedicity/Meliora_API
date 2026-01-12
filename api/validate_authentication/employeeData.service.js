@@ -1,8 +1,8 @@
 const { pool } = require('../../config/database')
 
-module.exports = {     
+module.exports = {
 
-     getValidateAuthentication: (id, callback) => {
+    getValidateAuthentication: (id, callback) => {
         pool.query(
             `SELECT 
             co_employee_master.em_name,

@@ -30,9 +30,22 @@ const psspool = createPool({
     dateStrings: true
 });
 
+
+const hspgspool = createPool({
+    port: process.env.DB_PORT,
+    host: process.env.HSPG_HOST,
+    user: process.env.HSPG_DB_USER,
+    password: process.env.HSPG_DB_PASS,
+    database: process.env.HSPG_SQL,
+    connectionLimit: 10,
+    dateStrings: true
+});
+
+
 module.exports = {
     pool,
     hrpool,
-    psspool
+    psspool,
+    hspgspool
 };
 //module.exports = hrpool;

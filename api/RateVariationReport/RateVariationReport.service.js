@@ -23,6 +23,7 @@ module.exports = {
             item.item_name,
             item.grn_rate,
             item.grn_selling_rate,
+            item.po_mrp,
             item.grn_dis,
             item.rate,
             item.disc,
@@ -43,7 +44,7 @@ module.exports = {
         pool.query(
             `INSERT INTO rate_variation_report
         (
-          grn_no, grn_date, item_name, grn_rate, grn_selling_rate, grn_dis,
+          grn_no, grn_date, item_name, grn_rate, grn_selling_rate,po_mrp,grn_dis,
           rate, disc, po_margin, rate_variation, quo_margin, purchase_margin,
           margin_diff, grn_variation_qty, grn_variation_free,
           date_diff, disc_variation, create_user,supplier_name,variation_amount
@@ -59,7 +60,7 @@ module.exports = {
 
     selectRateVariation: (callBack) => {
         pool.query(
-            ` SELECT slno, grn_no, grn_date, item_name, grn_rate, grn_selling_rate, grn_dis, rate, disc,supplier_name,po_margin, rate_variation, quo_margin, purchase_margin, ROUND(margin_diff, 0) AS margin_diff, grn_variation_qty, grn_variation_free,
+            ` SELECT slno, grn_no, grn_date, item_name, grn_rate, grn_selling_rate,po_mrp, grn_dis, rate, disc,supplier_name,po_margin, rate_variation, quo_margin, purchase_margin, ROUND(margin_diff, 0) AS margin_diff, grn_variation_qty, grn_variation_free,
             date_diff, disc_variation, create_date, update_date, create_user, edit_user,comments,variation_amount,cmt_description FROM rate_variation_report where resolved_status=0
                    `, [],
             (error, results, feilds) => {

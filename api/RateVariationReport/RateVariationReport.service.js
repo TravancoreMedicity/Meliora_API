@@ -61,7 +61,8 @@ module.exports = {
     selectRateVariation: (callBack) => {
         pool.query(
             ` SELECT slno, grn_no, grn_date, item_name, grn_rate, grn_selling_rate,po_mrp, grn_dis, rate, disc,supplier_name,po_margin, rate_variation, quo_margin, purchase_margin, ROUND(margin_diff, 0) AS margin_diff, grn_variation_qty, grn_variation_free,
-            date_diff, disc_variation, create_date, update_date, create_user, edit_user,comments,variation_amount,cmt_description FROM rate_variation_report where resolved_status=0
+            date_diff, disc_variation, create_date, update_date, create_user, edit_user,comments,variation_amount,cmt_description,
+            accounts_status,purchase_status,ed_md_status FROM rate_variation_report where resolved_status=0
                    `, [],
             (error, results, feilds) => {
                 if (error) {
@@ -96,8 +97,10 @@ module.exports = {
     },
     getCommentsbyID: (id, callBack) => {
         pool.query(
-            `SELECT cmt_slno, rate_variation_report_slno, cmt_grn_no, cmt_item_name, comment, cmt_done_by, cmt_user, cmt_date
-             FROM rate_variation_comment_tbl where rate_variation_report_slno=?
+            `  SELECT cmt_slno, rate_variation_report_slno, cmt_grn_no, cmt_item_name, comment, cmt_done_by, cmt_user, cmt_date,em_name
+             FROM rate_variation_comment_tbl 
+             LEFT JOIN co_employee_master ON co_employee_master.em_id= rate_variation_comment_tbl.cmt_user
+			 where rate_variation_report_slno=?
              `, [id],
             (error, results, feilds) => {
                 if (error) {
@@ -113,10 +116,22 @@ module.exports = {
             `UPDATE rate_variation_report SET
             comments= ?,
             cmt_description=?,
-            resolved_status=?
+            resolved_status=?,
+            accounts_status=?,
+            purchase_status=?,
+            ed_md_status=?
             WHERE
             slno = ?`,
-            [data.selectedAction, data.comment, data.checkResolved, data.rate_variation_slno],
+            [
+                data.selectedAction,
+                data.comment,
+                data.checkResolved,
+                data.accounts_status,
+                data.purchase_status,
+                data.ed_md_status,
+                data.rate_variation_slno,
+
+            ],
             (error, results, fields) => {
                 if (error) {
                     return callback(error);
@@ -192,7 +207,22 @@ module.exports = {
             }
         );
     },
-
+    getResolvedComments: (id, callBack) => {
+        pool.query(
+            `
+           SELECT cmt_slno, rate_variation_report_slno, cmt_grn_no, cmt_item_name, comment, cmt_done_by, cmt_user, cmt_date, cmt_status,co_employee_master.em_name
+           from rate_variation_comment_tbl
+           LEFT JOIN co_employee_master ON co_employee_master.em_id=rate_variation_comment_tbl.cmt_user
+           where rate_variation_report_slno=?
+             `, [id],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 }
 
 

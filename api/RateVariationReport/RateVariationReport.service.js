@@ -72,6 +72,21 @@ module.exports = {
             }
         );
     },
+    getInsertedVarationData: (callBack) => {
+        pool.query(
+            ` SELECT slno, grn_no, grn_date, item_name, grn_rate, grn_selling_rate,po_mrp, grn_dis, rate, disc,supplier_name,po_margin, rate_variation, quo_margin, purchase_margin, ROUND(margin_diff, 0) AS margin_diff, grn_variation_qty, grn_variation_free,
+            date_diff, disc_variation, create_date, update_date, create_user, edit_user,comments,variation_amount,cmt_description,
+            accounts_status,purchase_status,ed_md_status FROM rate_variation_report
+                   `, [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
     insertComment: (data, callback) => {
         pool.query(
             `INSERT INTO rate_variation_comment_tbl

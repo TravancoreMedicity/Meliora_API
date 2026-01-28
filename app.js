@@ -13,8 +13,9 @@ const fs = require("fs");
 
 //sockect io configuration
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+// app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
 // app.use(lusca.csrf());
 
@@ -447,7 +448,7 @@ app.use("/api/ItBillType", ItBillSupplierList);
 app.use("/api/qidepartment", qideptmast);
 app.use("/api/qiendoscopy", qiendoscopy);
 app.use("/api/newCRFStore", newCRFStore);
-app.use("/api/incidentMaster",socketIOMiddlewre, incidentMast);
+app.use("/api/incidentMaster", socketIOMiddlewre, incidentMast);
 app.use("/api/qiTypeList", qitypeList);
 app.use("/api/qidialysis", dialysisqi);
 app.use("/api/CrmNewApprovals", CrmNewApprovals);

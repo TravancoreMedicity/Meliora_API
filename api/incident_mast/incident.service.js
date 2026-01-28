@@ -2455,6 +2455,7 @@ FROM
         });
     },
     getAllEmployeeApprovalDepartments: (data, callback) => {
+
         pool.query(
             `SELECT 
                 dep_id,
@@ -2468,9 +2469,10 @@ FROM
                     LEFT JOIN
                 co_level_master clm ON clm.level_master_id = cld.level_master_slno
             WHERE
-                cld.level_emp_id = ? and clm.module_slno=20`,
+                cld.level_emp_id = ? and clm.module_slno = ?`,
             [
-                data.emp_id
+                data.emp_id,
+                data.level_no
             ],
             (error, results, fields) => {
                 if (error) return callback(error);

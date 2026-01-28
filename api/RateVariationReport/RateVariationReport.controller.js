@@ -1,7 +1,7 @@
 const logger = require('../../logger/logger');
 const { validateQiDepartment } = require('../../validation/validation_schema');
 validateQiDepartment
-const { checkInsertVal, selectRateVariation, insertComment, getCommentsbyID, updateRateVariationReport, RateVarWithMarginDiff, checkInsertValofMarginDiff, ratevariationResolvedList, insertRateVariationBulkService, getResolvedComments } = require('./RateVariationReport.service')
+const { checkInsertVal, selectRateVariation, insertComment, getCommentsbyID, updateRateVariationReport, RateVarWithMarginDiff, checkInsertValofMarginDiff, ratevariationResolvedList, insertRateVariationBulkService, getResolvedComments, getInsertedVarationData } = require('./RateVariationReport.service')
 module.exports = {
 
     insertRateVariationBulk: (req, res) => {
@@ -65,6 +65,28 @@ module.exports = {
             })
         })
     },
+    getInsertedVarationData: (req, res) => {
+        getInsertedVarationData((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data Found",
+                    data: []
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+
 
     insertComment: (req, res) => {
         const body = req.body;

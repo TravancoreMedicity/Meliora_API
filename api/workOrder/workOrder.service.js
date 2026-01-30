@@ -409,16 +409,15 @@ WHERE w.wo_slno = ?
     woLevelApproval: (data, callback) => {
         pool.query(
             `INSERT INTO wo_approval_log_tbl
-            ( 
-             wo_no,wo_approval_remark,wo_approval_level_name,wo_appproval_level_no,wo_level_review_state,wo_approval_user)
-            VALUES(?,?,?,?,?,?,?)`,
+            ( wo_no,wo_approval_remark,wo_approval_level_name,wo_appproval_level_no,wo_level_review_state,wo_approval_user)
+            VALUES(?,?,?,?,?,?)`,
             [
-                wo_slno,
-                remarks,
-                level_name,
-                level_no,
-                review_status,
-                empid
+                data.wo_slno,
+                data.remarks,
+                data.level_name,
+                data.level_no,
+                data.review_status,
+                data.empid
             ],
             (error, results, fields) => {
                 if (error) {
@@ -436,13 +435,9 @@ WHERE w.wo_slno = ?
              wo_current_level_review_status=?
              where wo_slno=?`,
             [
-                data.rate_variation_slno,
-                data.grn_no,
-                data.item_name,
-                data.comment,
-                data.Cmt_Dept,
-                data.loginId,
-                data.selectedAction
+                data.level_no,
+                data.review_status,
+                data.wo_slno
             ],
             (error, results, fields) => {
                 if (error) {

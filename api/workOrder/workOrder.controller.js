@@ -169,15 +169,15 @@ module.exports = {
     },
 
     woLevelApproval: (req, res) => {
-        const insertData = req.body; // 👈 array directly
-
-        if (!Array.isArray(insertData) || insertData.length === 0) {
+        const data = req.body; // 👈 array directly
+        if (data.length === 0) {
             return res.status(400).json({
                 success: 0,
                 message: "Invalid data"
             });
         }
-        woLevelApproval(insertData, (err, results) => {
+        woLevelApproval(data, (err, results) => {
+
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -190,7 +190,7 @@ module.exports = {
             //     message: "Work Order Approved Successfully"
             // });
 
-            updateWoApprovalStatus(insertData, (err, results) => {
+            updateWoApprovalStatus(data, (err, results) => {
                 if (err) {
                     return res.status(200).json({
                         success: 0,

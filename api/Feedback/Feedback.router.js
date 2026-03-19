@@ -129,6 +129,12 @@ const {
     InsertPatineDetail,
     checkIpAlreadyExist,
     getAllDischargedPatients,
+    getPremFeedbackReport,
+    getProFollowupReport,
+    getAllPremDashBoardDetail,
+    getAllPremTargets,
+    InsertPremTargets,
+    UpdatePremTargets,
     // getallscheduledate,
 } = require("./Feedback.controller");
 
@@ -304,15 +310,24 @@ router.post('/gethkbeddetail', verifyToken, gethkbedDetails)
 
 router.post('/commonfbreport', verifyToken, getCommonFeedbackReport);
 router.post('/ipfbreport', verifyToken, getIpFeedbackReport);
+router.post('/premreport', verifyToken, getPremFeedbackReport);
+router.post('/profollowupdtl', verifyToken, getProFollowupReport);
 
 
 router.get('/premdetail', verifyToken, getAllPREMDetail)
-router.get('/getlastnsupdate', verifyToken, getNursingStationLastDate)
+router.get('/getlastnsupdate', verifyToken, getNursingStationLastDate);
+
+router.post('/premdashdetial', verifyToken, getAllPremDashBoardDetail)
 
 
 router.post('/getpatientdetail', verifyToken, getPatientDetail)
 router.post('/insertpatientdetail', verifyToken, InsertPatineDetail)
 router.post('/checkipexist', verifyToken, checkIpAlreadyExist)
+
+
+router.get('/getallpremtarget', verifyToken, getAllPremTargets);
+router.post('/insertpremtarget', verifyToken, InsertPremTargets);
+router.post('/updatepremtarget', verifyToken, UpdatePremTargets);
 
 
 router.post('/dischargedpatient', verifyToken, getAllDischargedPatients)

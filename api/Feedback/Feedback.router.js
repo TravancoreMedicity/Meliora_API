@@ -331,6 +331,7 @@ router.post('/updatepremtarget', verifyToken, UpdatePremTargets);
 
 
 router.post('/dischargedpatient', verifyToken, getAllDischargedPatients)
+
 //edlider meliora table
 // router.post('/insertbddetail', insertbddetail)
 // router.post('/insertptdetailmlora', insertptdetailmlora)

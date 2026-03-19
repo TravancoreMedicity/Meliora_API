@@ -5,7 +5,7 @@ const { crfRegistration, crfRegimageGet, crfDataCollection, getDataCollectionIma
     ImageInsertGM, ImageInsertMD, ImageInsertED, crfHodImageGet, crfDMSImageGet, GetEmployeeGuide,
     crfMSImageGet, crfMOImageGet, crfSMOImageGet, crfGMImageGet, crfMDImageGet, crfNabhImageGet, crfNabhGuidImageGet,
     crfEDImageGet, ImageInsertManaging, crfManageImageGet, ImageInsertMDKmch, crfKMCHMDImageGet, crfDeliveryMarking, crfDMimageGet, GetSoundAlike,
-    GetSradhaPolicy, GetMSDS, GetMEDF, GetAbbreviation, GetFridge, GetHighRisk, GetLookAlike, GetPsychotropic
+    GetSradhaPolicy, GetMSDS, GetMEDF, GetAbbreviation, GetFridge, GetHighRisk, GetLookAlike, GetPsychotropic, Getmfhi
 } = require('../crm_new_file_upload/crm_fileupload.controller')
 
 router.post("/InsertRegisterImage", checkToken, crfRegistration)
@@ -51,6 +51,7 @@ router.get("/Fridge", checkToken, GetFridge)
 router.get("/HighRisk", checkToken, GetHighRisk)
 router.get("/LookAlike", checkToken, GetLookAlike)
 router.get("/Psychotropic", checkToken, GetPsychotropic)
+router.get("/mfhi", checkToken, Getmfhi)
 
 
 module.exports = router;

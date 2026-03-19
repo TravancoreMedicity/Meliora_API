@@ -195,6 +195,14 @@ const {
     UpdatePatientDetail,
     checkIpAlreadyExist,
     getAllDischargedPatients,
+    getPremFeedbackReport,
+    getProFollowupReport,
+    getAllPremDashBoardDetail,
+    getAllPremTargets,
+    InsertPremTargets,
+    UpdatePremTargets,
+    checkTargetAlreadyExist,
+    checkUpdateTargetAlreadyExist,
 
 } = require("./Feedback.service");
 
@@ -4193,9 +4201,161 @@ module.exports = {
 
             });
         })
-    }
+    },
+    getPremFeedbackReport: (req, res) => {
+        const data = req.body;
+        getPremFeedbackReport(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getProFollowupReport: (req, res) => {
+        const data = req.body;
+        getProFollowupReport(data, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getAllPremDashBoardDetail: (req, res) => {
+        const data = req.body;
+        getAllPremDashBoardDetail(data, (error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "Error in fetching data!"
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Data Found Here'
+                })
+            }
+            if (results.length > 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "Successfully Fetched Data",
+                    data: results
+                })
+            }
+        })
+    },
+    getAllPremTargets: (req, res) => {
+        getAllPremTargets((error, results) => {
+            if (error) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "Error in fetching data!"
+                })
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No data Found'
+                })
+            }
+            if (results.length > 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "Successfully Fetched Data",
+                    data: results
+                })
+            }
+        })
+    },
+
+    InsertPremTargets: (req, res) => {
+        const data = req.body;
+        checkTargetAlreadyExist(data, (err, result) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (result?.length > 0) {
+                return res.status(200).json({
+                    success: 3,
+                    message: "Already Present"
+                });
+            }
+            InsertPremTargets(data, (err, results) => {
+                if (err) {
+
+                    return res.status(400).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                return res.status(200).json({
+                    success: 2,
+                    message: "Successfully Inserted"
+                });
+            });
+        })
+    },
+    UpdatePremTargets: (req, res) => {
+        const data = req.body;
+        checkUpdateTargetAlreadyExist(data, (err, result) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (result?.length > 0) {
+                return res.status(200).json({
+                    success: 3,
+                    message: "Already Present and No Change Commited"
+                });
+            }
+            UpdatePremTargets(data, (err, results) => {
+                if (err) {
+
+                    return res.status(400).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                return res.status(200).json({
+                    success: 2,
+                    message: "Successfully Inserted"
+                });
+            });
+        })
 
 
+    },
 
 }
 

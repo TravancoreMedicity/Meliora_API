@@ -4,23 +4,66 @@ const { pool } = require('../../config/database')
 
 /* ===================== COMMON TERMS ===================== */
 
+// const insertCommonTerms = (conn, table, woMainSlno, data) => {
+//     if (!data?.terms || data.terms.length === 0) {
+//         return Promise.resolve();
+//     }
+
+
+//     //     terms
+//     // :
+//     // Array(2)
+//     // 0
+//     // :
+//     // {text: 'dfghdfghd', date: '2026-02-10'}
+//     // 1
+//     // :
+//     // {text: 'fghdgh', date: '2026-02-26'}
+
+//     // validUpto
+//     // :
+//     // "2026-02-10"
+
+//     const values = data.terms.map(term => [
+//         woMainSlno,
+//         data.validUpto,
+//         term,
+//         data.loginId
+//     ]);
+
+//     return new Promise((resolve, reject) => {
+//         conn.query(
+//             `INSERT INTO ${table}
+//         (wo_main_slno, wo_valid_date,term_desc, create_user)
+//        VALUES ?`,
+//             [values],
+//             (err) => {
+//                 if (err) return reject(err);
+//                 resolve();
+//             }
+//         );
+//     });
+//};
+
 const insertCommonTerms = (conn, table, woMainSlno, data) => {
-    if (!data?.terms || data.terms.length === 0) {
+    // console.log("data:::", data);
+    if (!Array.isArray(data?.terms) || data.terms.length === 0) {
         return Promise.resolve();
     }
 
+
     const values = data.terms.map(term => [
         woMainSlno,
-        data.validUpto,
-        term,
+        term.date,       //  use individual term date
+        term.text,       // use term text
         data.loginId
     ]);
 
     return new Promise((resolve, reject) => {
         conn.query(
             `INSERT INTO ${table}
-        (wo_main_slno, wo_valid_date,term_desc, create_user)
-       VALUES ?`,
+             (wo_main_slno, wo_valid_date, term_desc, create_user)
+             VALUES ?`,
             [values],
             (err) => {
                 if (err) return reject(err);
@@ -30,19 +73,22 @@ const insertCommonTerms = (conn, table, woMainSlno, data) => {
     });
 };
 
+
 /* ===================== MAIN SERVICES ===================== */
 
 const getCRFDatas = (callback) => {
     pool.query(
         `SELECT req_date,request_deptsec_slno,expected_date,req_slno,
-            work_order_status,crm_request_master.company_slno,
-            sec_name,company_name
-     FROM crm_request_master
-     LEFT JOIN co_deptsec_mast U 
+       work_order_status,crm_request_master.company_slno,
+       sec_name,company_name,E.em_no,E.em_name
+       FROM crm_request_master
+       LEFT JOIN co_deptsec_mast U 
        ON U.sec_id = crm_request_master.user_deptsec  
-     LEFT JOIN crm_company_master C 
+       LEFT JOIN crm_company_master C 
        ON crm_request_master.company_slno = C.company_slno
-     WHERE work_order_status = 1`,
+	   LEFT JOIN co_employee_master E
+       ON E.em_id =crm_request_master.create_user
+       WHERE work_order_status = 1`,
         [],
         (error, results) => {
             if (error) return callback(error);
@@ -56,21 +102,33 @@ const insertWorkOrderMain = (conn, vendor) => {
         conn.query(
             `INSERT INTO work_order_main_tbl
        (wo_type, wo_number, wo_date, wo_fromdate, wo_todate,
-        vendor_slno, vendor_desc,bom_regno,bom_req_date,
+        vendor_slno,bom_regno,bom_req_date,
          req_dept, create_user)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+       VALUES (?,?,?,?,?,?,?,?,?,?)`,
             [
-                vendor.contract_type,
+                vendor.contractType,
                 vendor.wo_number,
                 vendor.wod,
-                vendor.from_date,
-                vendor.to_date,
+                vendor.fromDate,
+                vendor.toDate,
                 vendor.vendor_slno,
-                vendor.vendor_desc,
+                // vendor.vendor_desc,
                 vendor.crf_no,
                 vendor.req_date,
-                vendor.sec_name,
+                vendor.sec_id,
                 vendor.loginId
+
+                // vendor.contract_type,
+                // vendor.wo_number,
+                // vendor.wod,
+                // vendor.from_date,
+                // vendor.to_date,
+                // vendor.vendor_slno,
+                // vendor.vendor_desc,
+                // vendor.crf_no,
+                // vendor.req_date,
+                // vendor.sec_id,
+                // vendor.loginId
             ],
             (err, result) => {
                 if (err) return reject(err);
@@ -80,56 +138,26 @@ const insertWorkOrderMain = (conn, vendor) => {
     });
 };
 
-// const insertWorkOrderMain = async (conn, vendor) => {
-//     const result = await new Promise((resolve, reject) => {
-//         conn.query(
-//             `INSERT INTO work_order_main_tbl
-//             (wo_type, wo_date, wo_fromdate, wo_todate,
-//              vendor_slno, vendor_desc, bom_regno, bom_req_date,
-//              req_dept, create_user)
-//             VALUES (?,?,?,?,?,?,?,?,?,?)`,
-//             [
-//                 vendor.contract_type,
-//                 vendor.wod,
-//                 vendor.from_date,
-//                 vendor.to_date,
-//                 vendor.vendor_slno,
-//                 vendor.vendor_desc,
-//                 vendor.crf_no,
-//                 vendor.req_date,
-//                 vendor.sec_name,
-//                 vendor.loginId
-//             ],
-//             (err, result) => {
-//                 if (err) reject(err);
-//                 resolve(result);
-//             }
-//         );
-//     });
-
-//     // const woSlno = result.insertId;
-//     // const year = new Date().getFullYear();
-//     // const woNumber = `WO-${year}-${String(woSlno).padStart(5, '0')}`;
-
-//     // await conn.query(
-//     //     `UPDATE work_order_main_tbl SET wo_number = ? WHERE wo_slno = ?`,
-//     //     [woNumber, woSlno]
-//     // );
-
-//     // return woNumber;
-// };
-
-
-
 const insertMaterialDetails = (conn, woMainSlno, materials) => {
     if (!materials?.length) return Promise.resolve();
 
     const values = materials.map(m => [
+        // woMainSlno,
+        // m.item_name,
+        // m.item_code,
+        // m.brand,
+        // m.qty,
+        // m.uom,
+        // m.unit_price,
+        // m.gst_amount,
+        // m.total_amount,
+        // m.gross_amount,
+        // m.loginId
         woMainSlno,
         m.item_name,
         m.item_code,
-        m.brand,
-        m.qty,
+        m.item_brand,
+        m.quantity,
         m.uom,
         m.unit_price,
         m.gst_amount,
@@ -218,45 +246,10 @@ module.exports = {
     insertPaymentTerms,
     insertBillingTerms,
 
-    // getWorkOrderDetails: (callBack) => {
-    //     const query = `
-    //    SELECT
-    //         w.wo_slno,
-    //         w.wo_type,
-    //         w.wo_number,
-    //         w.wo_date,
-    //         w.wo_fromdate,
-    //         w.wo_todate,
-    //         w.vendor_slno,
-    //         w.vendor_desc,
-    //         w.bom_regno,
-    //         w.bom_req_date,
-    //         w.req_dept,
-    //         w.create_user,
-    //         w.create_date,
-    //         w.edit_user,
-    //         w.edit_date,
-    //         w.wo_current_level,
-    //         w.wo_current_level_review_status,
-    //         v.it_supplier_name,
-    //         c.sec_name
-    //     FROM work_order_main_tbl w
-    //     LEFT JOIN it_bill_supplier_details_mast v ON v.it_supplier_slno = w.vendor_slno
-    // 	LEFT JOIN co_deptsec_mast c ON c.sec_id = w.req_dept
-    //     ORDER BY w.create_date DESC
-    // `;
-
-    //     pool.query(query, (error, results) => {
-    //         if (error) {
-    //             return callBack(error);
-    //         }
-    //         return callBack(null, results);
-    //     });
-    // },
-
     getWorkOrderDetails: (level_no, callBack) => {
         const query = `
         SELECT
+            ROW_NUMBER() OVER (ORDER BY w.create_date DESC) AS slno,
             w.wo_slno,
             w.wo_type,
             w.wo_number,
@@ -292,7 +285,6 @@ module.exports = {
             return callBack(null, results);
         });
     },
-
     getmaterialData: (id, callBack) => {
         const sql = `
   SELECT 
@@ -407,6 +399,9 @@ WHERE w.wo_slno = ?
         });
     },
     woLevelApproval: (data, callback) => {
+
+        // console.log("data:", data);
+
         pool.query(
             `INSERT INTO wo_approval_log_tbl
             ( wo_no,wo_approval_remark,wo_approval_level_name,wo_appproval_level_no,wo_level_review_state,wo_approval_user)
@@ -446,6 +441,76 @@ WHERE w.wo_slno = ?
                 return callback(null, results);
             }
         );
+    },
+
+
+    getApprovedWo: (empid, callBack) => {
+        const query = `
+                    SELECT 
+                      w.slno,
+                      w.wo_no,
+                      w.wo_approval_remark,
+                      w.wo_approval_level_name,
+                      w.wo_appproval_level_no,
+                      w.wo_level_review_state,
+                      w.wo_approval_user,
+                      w.wo_approval_date,
+                      e.em_name,
+                      m.vendor_slno,
+                      b.it_supplier_name,
+                      m.bom_regno,
+                      c.company_slno,
+                      k.company_name,
+                      m.wo_fromdate,
+                      m.wo_todate,
+                      m.req_dept,
+                      d.sec_name
+                      FROM wo_approval_log_tbl AS w
+                      LEFT JOIN co_employee_master AS e 
+                      ON e.em_id = w.wo_approval_user
+                      LEFT JOIN work_order_main_tbl AS m 
+                      ON m.wo_slno = w.wo_no
+                      LEFT JOIN it_bill_supplier_details_mast AS b 
+                      ON b.it_supplier_slno = m.vendor_slno
+                      LEFT JOIN crm_request_master AS c 
+                      ON c.req_slno = m.bom_regno
+                      LEFT JOIN crm_company_master AS k 
+                      ON k.company_slno = c.company_slno
+                      LEFT JOIN co_deptsec_mast AS d 
+                      ON d.sec_id = m.req_dept
+                      WHERE 
+                      w.wo_approval_user = ?
+                      AND w.wo_level_review_state = 'A'
+                      ORDER BY w.slno DESC
+`;
+
+        pool.query(query, [empid], (error, results) => {
+            if (error) {
+                return callBack(error);
+            }
+            return callBack(null, results);
+        });
+    },
+
+    getCrfItem: (id, callBack) => {
+        const query = `
+         SELECT
+         req_detl_slno, req_slno, item_slno, approve_item_desc, approve_item_brand, approve_item_unit,
+         item_qnty_approved,approve_item_unit_price, approve_aprox_cost, item_status_approved, approve_item_status,
+         I.uom_name as apprv_uom,approve_item_specification,po_item_status
+         FROM
+         crm_request_mast_detail
+         LEFT JOIN am_uom I ON I.uom_slno=crm_request_mast_detail.approve_item_unit
+         WHERE
+         req_slno=? and approve_item_status=1 and item_status_approved=1 and po_item_status is NULL;
+    `;
+
+        pool.query(query, [id], (error, results) => {
+            if (error) {
+                return callBack(error);
+            }
+            return callBack(null, results);
+        });
     },
 };
 

@@ -62,7 +62,7 @@ module.exports = {
         pool.query(
             ` SELECT slno, grn_no, grn_date, item_name, grn_rate, grn_selling_rate,po_mrp, grn_dis, rate, disc,supplier_name,po_margin, rate_variation, quo_margin, purchase_margin, ROUND(margin_diff, 0) AS margin_diff, grn_variation_qty, grn_variation_free,
             date_diff, disc_variation, create_date, update_date, create_user, edit_user,comments,variation_amount,cmt_description,
-            accounts_status,purchase_status,ed_md_status FROM rate_variation_report where resolved_status=0
+            accounts_status,purchase_status,ed_md_status,ed_approval_status FROM rate_variation_report where resolved_status=0
                    `, [],
             (error, results, feilds) => {
                 if (error) {
@@ -134,7 +134,8 @@ module.exports = {
             resolved_status=?,
             accounts_status=?,
             purchase_status=?,
-            ed_md_status=?
+            ed_md_status=?,
+            ed_approval_status=?
             WHERE
             slno = ?`,
             [
@@ -144,6 +145,7 @@ module.exports = {
                 data.accounts_status,
                 data.purchase_status,
                 data.ed_md_status,
+                data.ed_approval_status,
                 data.rate_variation_slno,
 
             ],

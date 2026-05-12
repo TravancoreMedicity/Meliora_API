@@ -195,7 +195,7 @@ router.post('/inserthkbeddetail', verifyToken, insertHkdetails)
 
 router.post('/nursestationinsert', verifyToken, nursestationinsert)
 router.post('/updatenursestation', verifyToken, updatenursestation)
-router.get('/getallnursestation', verifyToken, getallnursestation)
+router.get('/getallnursestation', getallnursestation)
 router.post('/getpatientfeedback', verifyToken, getpatientfeedback)
 
 router.post('/getbed', verifyToken, getNursingBed)

@@ -8,7 +8,7 @@ router.post("/byId", checkToken, ratelistGetDataById);
 
 router.get("/rmcatora", checkToken, roomcatSelect);
 router.get("/diet", checkToken, dietSelect)
-router.get("/diettype", checkToken, dietTypeSelect)
+router.get("/diettype", dietTypeSelect)// checktoken
 
 
 module.exports = router;

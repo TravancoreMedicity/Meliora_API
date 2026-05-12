@@ -45,7 +45,8 @@ module.exports = {
         pool.query(
             `SELECT 
             em_id,
-            em_name
+            em_name,
+            em_no
             FROM co_employee_master where em_status=1 and  em_no!=1`,
             [],
             (error, results, feilds) => {

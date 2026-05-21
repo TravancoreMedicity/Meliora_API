@@ -149,7 +149,7 @@ module.exports = {
         })
     },
 
-
+    // Need to change here
     getMenuName: (req, res) => {
         const body = req.body;
         const body_result = body;
@@ -160,85 +160,147 @@ module.exports = {
             });
         }
 
+        // Checking if Data already Present in the User Right Table
         validateGroupRights(body, (err, results) => {
-            const value = JSON.parse(JSON.stringify(results))
-            if (Object.keys(value).length === 0) {
-                // Insert the values
-                getMenuSlno(body, (err, results) => {
-                    const postData = {
-                        user_group_slno: body.user_group_slno,
-                        module_slno: body.module_slno,
-                        sub_module_slno: body.sub_module_slno
-                    }
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            };
 
-                    if (err) {
-                        logger.logwindow(res.err)
-                        return res.status(200).json({
-                            success: 0,
-                            message: err
-                        });
-                    }
-                    const menuSLno = JSON.parse(JSON.stringify(results))
-                    const menuDetl = menuSLno.map((val) => {
-                        const newArray = [body.user_group_slno, body.module_slno, body.sub_module_slno, val.menu_slno]
-                        return newArray;
-                    })
+            const SearchMenu = {
+                module_slno: body.module_slno,
+                sub_module_slno: body.sub_module_slno
+            }
 
-                    insertGroupRight(menuDetl, (err, results) => {
-
-                        if (err) {
-                            logger.logwindow(res.err)
-                            return res.status(200).json({
-                                success: 0,
-                                message: err
-                            });
-                        }
-
-                        if (results) {
-
-                            getGroupMenuRigths(postData, (err, results) => {
-                                if (err) {
-                                    logger.logwindow(res.err)
-                                    return res.status(200).json({
-                                        success: 0,
-                                        message: err
-                                    });
-                                }
-
-                                return res.status(200).json({
-                                    success: 1,
-                                    data: results
-                                });
-                            })
-                        }
+            getMenuSlno(SearchMenu, (err, TotalMenus) => {
+                if (err) {
+                    logger.logwindow(res.err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
                     });
+                }
+                if (TotalMenus && TotalMenus?.length === 0) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: "No Menus Under this Module"
+                    });
+                }
+                if (TotalMenus && TotalMenus?.length > 0) {
+                    const FinalResponseData = Array.isArray(TotalMenus)
+                        ? TotalMenus.map((item) => {
+                            const rights = results.find(
+                                (r) => Number(r.menu_slno) === Number(item.menu_slno)
+                            );
 
-                })
-
-            } else {
-                //Get The Selected Values
-                getGroupMenuRigths(body, (err, results) => {
-                    if (err) {
-                        logger.logwindow(res.err)
-                        return res.status(200).json({
-                            success: 0,
-                            message: err
-                        });
-                    }
-
-                    if (!results) {
-                        return res.status(200).json({
-                            success: 0,
-                            message: "No Data Found"
-                        });
-                    }
+                            return {
+                                menu_slno: item.menu_slno,
+                                menu_name: item.menu_name,
+                                menu_view: rights ? Number(rights?.menu_view) : 0, // default 0
+                                group_right_slno: rights ? rights?.group_right_slno : null,
+                                module_slno: body.module_slno,
+                                sub_module_slno: body.sub_module_slno,
+                                user_group_slno: body.user_group_slno
+                            };
+                        })
+                        : [];
 
                     return res.status(200).json({
                         success: 1,
-                        data: results
+                        message: "Successfully Fetched Data",
+                        data: FinalResponseData
                     });
-                })
-            }
+
+                }
+
+
+            })
+
+
+            // OLD VERSION OF DATA
+
+            // const value = JSON.parse(JSON.stringify(results))
+            // if (Object.keys(value).length === 0) {
+            //     // Insert the values
+            //     getMenuSlno(body, (err, results) => {
+            //         const postData = {
+            //             user_group_slno: body.user_group_slno,
+            //             module_slno: body.module_slno,
+            //             sub_module_slno: body.sub_module_slno
+            //         }
+
+            //         if (err) {
+            //             logger.logwindow(res.err)
+            //             return res.status(200).json({
+            //                 success: 0,
+            //                 message: err
+            //             });
+            //         }
+            //         const menuSLno = JSON.parse(JSON.stringify(results))
+            //         const menuDetl = menuSLno.map((val) => {
+            //             const newArray = [body.user_group_slno, body.module_slno, body.sub_module_slno, val.menu_slno]
+            //             return newArray;
+            //         })
+
+            //         insertGroupRight(menuDetl, (err, results) => {
+
+            //             if (err) {
+            //                 logger.logwindow(res.err)
+            //                 return res.status(200).json({
+            //                     success: 0,
+            //                     message: err
+            //                 });
+            //             }
+
+            //             if (results) {
+
+            //                 getGroupMenuRigths(postData, (err, results) => {
+            //                     if (err) {
+            //                         logger.logwindow(res.err)
+            //                         return res.status(200).json({
+            //                             success: 0,
+            //                             message: err
+            //                         });
+            //                     }
+
+            //                     return res.status(200).json({
+            //                         success: 1,
+            //                         data: results
+            //                     });
+            //                 })
+            //             }
+            //         });
+
+            //     })
+
+            // } else {
+            //     //Get The Selected Values
+            //     getGroupMenuRigths(body, (err, results) => {
+            //         if (err) {
+            //             logger.logwindow(res.err)
+            //             return res.status(200).json({
+            //                 success: 0,
+            //                 message: err
+            //             });
+            //         }
+
+            //         if (!results) {
+            //             return res.status(200).json({
+            //                 success: 0,
+            //                 message: "No Data Found"
+            //             });
+            //         }
+
+            //         return res.status(200).json({
+            //             success: 1,
+            //             data: results
+            //         });
+            //     })
+            // }
+
+
         })
     },
 
@@ -246,47 +308,85 @@ module.exports = {
 
     updateGroupMenuRits: (req, res) => {
         const body = req.body
-        updateGroupMenuRights(body, (err, results) => {
-            if (err) {
-                logger.logwindow(res.err)
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
+        const { group_right_slno, menu_view, user_group_slno, sub_module_slno, module_slno, menu_slno } = body;
+        const insertData = { user_group_slno, module_slno, sub_module_slno, menu_slno }
+        const updatedata = { group_right_slno, menu_view }
 
-            if (!results) {
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Data Found"
-                });
-            }
-            if (results) {
-                getGroupMenuRigths(body, (err, results) => {
-
-                    if (err) {
-                        logger.logwindow(res.err)
-                        return res.status(200).json({
-                            success: 0,
-                            message: err
-                        });
-                    }
-
-                    if (!results) {
-                        return res.status(200).json({
-                            success: 0,
-                            message: "No Data Found"
-                        });
-                    }
-
+        if (group_right_slno != null) {
+            updateGroupMenuRights(updatedata, (err, results) => {
+                if (err) {
+                    logger.logwindow(res.err)
                     return res.status(200).json({
-                        success: 1,
-                        message: "Data Updated Successfully",
-                        data: results
+                        success: 0,
+                        message: err
                     });
-                })
-            }
-        })
+                }
+                return res.status(200).json({
+                    success: 1,
+                    message: "Data Updated Successfully",
+                    // data: results
+                });
+            })
+        } else {
+            insertGroupRight(insertData, (err, results) => {
+                if (err) {
+                    logger.logwindow(res.err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                return res.status(200).json({
+                    success: 1,
+                    message: "Data Inserted Successfully",
+                    // data: results
+                });
+            })
+        }
+
+
+        // updateGroupMenuRights(body, (err, results) => {
+        //     if (err) {
+        //         logger.logwindow(res.err)
+        //         return res.status(200).json({
+        //             success: 0,
+        //             message: err
+        //         });
+        //     }
+
+        //     if (!results) {
+        //         return res.status(200).json({
+        //             success: 0,
+        //             message: "No Data Found"
+        //         });
+        //     }
+        //     if (results) {
+        //         getGroupMenuRigths(body, (err, results) => {
+
+        //             if (err) {
+        //                 logger.logwindow(res.err)
+        //                 return res.status(200).json({
+        //                     success: 0,
+        //                     message: err
+        //                 });
+        //             }
+
+        //             if (!results) {
+        //                 return res.status(200).json({
+        //                     success: 0,
+        //                     message: "No Data Found"
+        //                 });
+        //             }
+
+        //             return res.status(200).json({
+        //                 success: 1,
+        //                 message: "Data Updated Successfully",
+        //                 data: results
+        //             });
+        //         })
+        //     }
+        // })
+
     },
 
 

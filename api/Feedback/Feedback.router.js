@@ -125,6 +125,16 @@ const {
     getIpFeedbackReport,
     getAllPREMDetail,
     getNursingStationLastDate,
+    getPatientDetail,
+    InsertPatineDetail,
+    checkIpAlreadyExist,
+    getAllDischargedPatients,
+    getPremFeedbackReport,
+    getProFollowupReport,
+    getAllPremDashBoardDetail,
+    getAllPremTargets,
+    InsertPremTargets,
+    UpdatePremTargets,
     // getallscheduledate,
 } = require("./Feedback.controller");
 
@@ -261,7 +271,7 @@ router.get('/getprocheckcompletebed', verifyToken, getprocheckcompletebed)
 
 router.get('/getprochecklistdetail/:id', verifyToken, getprochecklistdetail)
 
-router.get('/getdischargeentrybed', verifyToken, getdischargeentrybed)
+router.get('/getdischargeentrybed', verifyToken, getdischargeentrybed) // NOT USING MODULE NOT UP YET
 router.get('/getdepassetonly/:id', verifyToken, getdepassetonly)
 router.get('/getroomassetdetail', verifyToken, getroomassetdetail)
 
@@ -300,10 +310,27 @@ router.post('/gethkbeddetail', verifyToken, gethkbedDetails)
 
 router.post('/commonfbreport', verifyToken, getCommonFeedbackReport);
 router.post('/ipfbreport', verifyToken, getIpFeedbackReport);
+router.post('/premreport', verifyToken, getPremFeedbackReport);
+router.post('/profollowupdtl', verifyToken, getProFollowupReport);
 
 
 router.get('/premdetail', verifyToken, getAllPREMDetail)
-router.get('/getlastnsupdate', verifyToken, getNursingStationLastDate)
+router.get('/getlastnsupdate', verifyToken, getNursingStationLastDate);
+
+router.post('/premdashdetial', verifyToken, getAllPremDashBoardDetail)
+
+
+router.post('/getpatientdetail', verifyToken, getPatientDetail)
+router.post('/insertpatientdetail', verifyToken, InsertPatineDetail)
+router.post('/checkipexist', verifyToken, checkIpAlreadyExist)
+
+
+router.get('/getallpremtarget', verifyToken, getAllPremTargets);
+router.post('/insertpremtarget', verifyToken, InsertPremTargets);
+router.post('/updatepremtarget', verifyToken, UpdatePremTargets);
+
+
+router.post('/dischargedpatient', verifyToken, getAllDischargedPatients)
 
 //edlider meliora table
 // router.post('/insertbddetail', insertbddetail)

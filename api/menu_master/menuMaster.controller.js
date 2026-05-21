@@ -150,5 +150,72 @@ module.exports = {
                 message: "Menu Master Deleted Successfully"
             });
         });
-    }
+    },
+    insertMenuMaster: (req, res) => {
+        const body = req.body;
+        checkInsertVal(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            };
+
+            if (results && results?.length > 0) {
+                return res.status(200).json({
+                    success: 7,
+                    message: "Menu master  Already Exist"
+                })
+            };
+
+            create(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                return res.status(200).json({
+                    success: 1,
+                    message: "Menu master Inserted Successfully"
+                });
+            });
+        })
+    },
+
+    updateMenuMaster: (req, res) => {
+        const body = req.body;
+        checkInsertVal(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            };
+
+            if (results && results?.length > 0) {
+                return res.status(200).json({
+                    success: 7,
+                    message: "Menu master  Already Exist"
+                })
+            };
+
+            update(body, (err, results) => {
+                if (err) {
+                    logger.logwindow(err)
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+                return res.status(200).json({
+                    success: 1,
+                    message: "Menu master Inserted Successfully"
+                });
+            });
+        })
+    },
+
+
 }

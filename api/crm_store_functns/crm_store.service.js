@@ -216,33 +216,57 @@ module.exports = {
         )
     },
 
-    updateGrnItemQnty: (body) => {
-        return Promise.all(body.map((val) => {
-            return new Promise((resolve, reject) => {
-                pool.query(
-                    `UPDATE
-                         crm_purchase_item_details
-                     SET
-                         grn_qnty = ?, received_qnty = ?, item_receive_status= ?
-                    where
-                         po_detail_slno = ? and item_code = ?`,
-                    [
-                        val.grn_qnty,
-                        val.received_qnty,
-                        val.item_receive_status,
-                        val.po_detail_slno,
-                        val.item_code
-                    ],
-                    (error, results, fields) => {
-                        if (error) {
-                            return reject(error)
-                        }
-                        return resolve(results)
-                    }
-                )
-            })
-        })
-        )
+    // updateGrnItemQnty: (body) => {
+    //     return Promise.all(body.map((val) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `UPDATE
+    //                      crm_purchase_item_details
+    //                  SET
+    //                      grn_qnty = ?, received_qnty = ?, item_receive_status= ?
+    //                 where
+    //                      po_detail_slno = ? and item_code = ?`,
+    //                 [
+    //                     val.grn_qnty,
+    //                     val.received_qnty,
+    //                     val.item_receive_status,
+    //                     val.po_detail_slno,
+    //                     val.item_code
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         return reject(error)
+    //                     }
+    //                     return resolve(results)
+    //                 }
+    //             )
+    //         })
+    //     })
+    //     )
+    // },
+
+    updateGrnItemQnty: async (body) => {
+        for (const val of body) {
+            const query = `
+            UPDATE crm_purchase_item_details
+            SET
+                grn_qnty = ?,
+                received_qnty = ?,
+                item_receive_status = ?
+            WHERE
+                po_detail_slno = ? AND item_code = ?
+        `;
+
+            const params = [
+                val.grn_qnty,
+                val.received_qnty,
+                val.item_receive_status,
+                val.po_detail_slno,
+                val.item_code
+            ];
+
+            await pool.query(query, params);
+        }
     },
     getPOItemDetails: (data, callBack) => {
         const poSlno = data?.map(d => d.poSlno);

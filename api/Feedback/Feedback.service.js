@@ -1215,11 +1215,7 @@ WHERE
             fb_ptc_sex,                     
             fb_ptd_dob,                                                           
             fb_ptc_loadd1,                   
-            fb_ptc_loadd2,                   
-            fb_ptc_loadd3,                   
-            fb_ptc_loadd4,
             fb_ptc_mobile,
-            fb_ptn_yearage,
             fb_ipc_curstatus,
             fb_doc_name   
         FROM
@@ -1246,7 +1242,6 @@ WHERE
                 fb_pt_no,
                 fb_ptc_name,
                 fb_ptc_loadd1,
-                fb_ptc_loadd2,
                 fb_brc_husband,
                 fb_brn_age,
                 fb_brn_total,
@@ -2964,11 +2959,7 @@ ORDER BY
                     fb_ptc_sex,                     
                     fb_ptd_dob,                                                           
                     fb_ptc_loadd1,                   
-                    fb_ptc_loadd2,                   
-                    fb_ptc_loadd3,                   
-                    fb_ptc_loadd4,
                     fb_ptc_mobile,
-                    fb_ptn_yearage,
                     fb_ipc_curstatus,
                     fb_doc_name                       
                 FROM 
@@ -4847,11 +4838,7 @@ select
                 fb_ptc_name,
                 fb_ptc_sex,
                 fb_ptd_dob,
-                fb_ptn_yearage,
                 fb_ptc_loadd1,
-                fb_ptc_loadd2,
-                fb_ptc_loadd3,
-                fb_ptc_loadd4,
                 fb_ipd_disc,
                 fb_ipc_status,
                 fb_dmd_date,
@@ -5320,6 +5307,130 @@ where fb_pro_check_bed.fb_bed_slno = ?;`,
         )
     },
 
+    getPatientDetail: (data, callBack) => {
+        const column = data.type === 1 ? "fb_ipd_date" : "fb_ipd_disc";
+        pool.query(
+            `  
+            select fb_ip_no from fb_ipadmiss  WHERE ${column} BETWEEN ? AND ?
+            `,
+            [
+                data.fromDate,
+                data.toDate
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    checkIpAlreadyExist: (data, callBack) => {
+        pool.query(
+            `  
+            select fb_ip_no from fb_ipadmiss  WHERE fb_ip_no =  ?
+            `,
+            [
+                data.fb_ip_no
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    getAllDischargedPatients: (data, callBack) => {
+        pool.query(
+            `  
+          SELECT 
+            ia.fb_ip_no,
+            ia.fb_ipd_date,
+            ia.fb_pt_no,
+            ia.fb_ptc_name,
+            ia.fb_ptc_sex,
+            ia.fb_ptd_dob,
+            ia.fb_ptc_loadd1,
+            ia.fb_ptc_mobile,
+            ia.fb_ipc_curstatus,
+            ia.fb_doc_name,
+            b.fb_bdc_no,
+            ftm.fb_transact_slno,
+            ftm.fdmast_slno
+        FROM fb_ipadmiss AS ia
+        INNER JOIN fb_bed AS b
+            ON b.fb_bd_code = ia.fb_bd_code
+        INNER JOIN fb_nurse_station_master AS ns
+            ON ns.fb_ns_code = b.fb_ns_code
+            AND ns.fb_ns_code = ?
+        LEFT JOIN fb_transaction_mast AS ftm
+            ON ftm.fb_ip_num = ia.fb_ip_no
+        WHERE ia.fb_dmd_date IS NOT NULL
+        AND ia.fb_dmd_date BETWEEN NOW() - INTERVAL 12 HOUR AND NOW()
+            `,
+            [
+                data.fb_ns_code
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+
+    checkExistingIPs: (ipList, callBack) => {
+        pool.query(
+            `SELECT fb_ip_no FROM fb_ipadmiss WHERE fb_ip_no IN (?)`,
+            [ipList],
+            (err, results) => {
+                if (err) return callBack(err);
+                callBack(null, results.map(r => r.fb_ip_no));
+            }
+        )
+    },
+
+    InsertPatineDetail: (data, callBack) => {
+        pool.query(
+            `
+            INSERT INTO fb_ipadmiss (
+                fb_ip_no, fb_ipd_date, fb_pt_no, fb_ptc_name, fb_ptc_sex,
+                fb_ptd_dob,  fb_ptc_loadd1,
+                fb_ptc_lopin, fb_bd_code, fb_do_code,
+                fb_ipc_curstatus, fb_ptc_mobile, fb_ipc_mhcode, fb_doc_name,
+                fb_dep_desc,fb_ipd_disc,fb_ipc_status,fb_dmc_slno,fb_dmd_date
+            ) VALUES ?
+            `,
+            [data],
+            (error, results) => {
+                if (error) return callBack(error);
+                return callBack(null, results);
+            }
+        );
+    },
+
+    UpdatePatientDetail: (data, callBack) => {
+
+        const query = `
+            UPDATE fb_ipadmiss SET
+                fb_ipd_date = ?, fb_pt_no = ?, fb_ptc_name = ?, fb_ptc_sex = ?,
+                fb_ptd_dob = ?,
+                fb_ptc_loadd1 = ?, fb_ptc_lopin = ?,  fb_bd_code = ?, fb_do_code = ?,
+                fb_ipc_curstatus = ?, fb_ptc_mobile = ?, fb_ipc_mhcode = ?, fb_doc_name = ?,
+                fb_dep_desc = ?, fb_ipd_disc = ?, fb_ipc_status = ?, fb_dmc_slno = ?, fb_dmd_date = ?
+            WHERE fb_ip_no = ?
+        `;
+
+        const values = [...data.slice(1), data[0]]; // IP_NO moved to last for WHERE
+
+        pool.query(query, values, (error, results) => {
+            if (error) return callBack(error);
+            callBack(null, results);
+        });
+    },
+
     gethkcomplaintdetails: (data, callBack) => {
         pool.query(
             `
@@ -5387,8 +5498,215 @@ where fb_pro_check_bed.fb_bed_slno = ?;`,
             }
         )
     },
+    getPremFeedbackReport: (data, callBack) => {
+        pool.query(`
+              SELECT 
+                fb_transaction_mast.fb_transact_slno,
+                fb_patient_name,
+                fb_patient_mob,
+                fd_mark,
+                fb_suggestion,
+                rating_name,
+                rating_value,
+                fd_qa_eng,
+                fb_ip_num,
+                fb_transaction_mast.create_date,
+                fb_transaction_mast.create_user,
+                em_name
+                FROM fb_transaction_mast  
+                LEFT JOIN fb_transaction_detl ON fb_transaction_detl.fb_transact_slno = fb_transaction_mast.fb_transact_slno
+                LEFT JOIN fb_mast_qakey ON fb_mast_qakey.fbqa_slno = fb_transaction_detl.fbqa_slno
+                LEFT JOIN fb_detl ON fb_detl.fddet_slno = fb_transaction_detl.fddet_slno
+                LEFT JOIN co_employee_master ON co_employee_master.em_id = fb_transaction_mast.create_user
+                WHERE fb_transaction_mast.fdmast_slno = ?
+                AND fb_transaction_mast.create_date between ? and ?;
+            `,
+            [
+                data.FEEDBACKID,
+                data.FROM_DATE,
+                data.TO_DATE
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getProFollowupReport: (data, callBack) => {
+        pool.query(`
+            SELECT 
+                fb_schedule_date,
+                fb_ip_no,
+                fb_pt_no,
+                fb_pro_remark,
+                co_employee_master.em_name,
+                fb_ip_date_schedule.create_date
+            FROM
+                fb_ip_date_schedule
+                    LEFT JOIN
+                co_employee ON co_employee.empdtl_slno = fb_ip_date_schedule.create_user
+                    LEFT JOIN
+                co_employee_master ON co_employee_master.em_no = co_employee.emp_username
+            WHERE
+                fb_ip_date_schedule.create_date BETWEEN ? AND ?`,
+            [
+                data.FROM_DATE,
+                data.TO_DATE
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getAllPremDashBoardDetail: (data, callBack) => {
+        const { fromdate, todate } = data;
+        pool.query(
+            `
+        SELECT 
+            fb_mast.fdmast_slno,
+            fb_mast.feedback_name,
+            COUNT(fb_transaction_mast.fdmast_slno) AS feedback_count,
+            fb_prem_targert_mast.prem_target
+        FROM fb_mast
+        LEFT JOIN fb_prem_targert_mast ON fb_mast.fdmast_slno = fb_prem_targert_mast.fdmast_slno
+        LEFT JOIN fb_transaction_mast
+            ON fb_transaction_mast.fdmast_slno = fb_mast.fdmast_slno
+            AND fb_transaction_mast.create_date BETWEEN ? AND ?
+        WHERE fb_mast.feedback_status = 1
+        AND fb_mast.fb_qr_status = 1
+        GROUP BY 
+            fb_mast.fdmast_slno,
+            fb_mast.feedback_name
+        `,
+            [fromdate, todate],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getAllPremTargets: (callBack) => {
+        pool.query(
+            `
+                    SELECT
+            pt.prem_target_slno,
+            pt.fdmast_slno,
+            fm.feedback_name,
+            pt.prem_target,
+            pt.prem_status,
+            pt.create_user,
+            pt.edit_user,
+            pt.create_date,
+            pt.edit_date
+        FROM fb_prem_targert_mast pt
+        LEFT JOIN fb_mast fm
+            ON fm.fdmast_slno = pt.fdmast_slno
+        ORDER BY pt.prem_target_slno
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    InsertPremTargets: (data, callBack) => {
 
 
+        pool.query(
+            `
+        INSERT INTO fb_prem_targert_mast (
+            fdmast_slno,
+            prem_target,
+            prem_status,
+            create_user
+        )
+        VALUES (?, ?, ?, ?)
+        `,
+            [
+                data.fdmast_slno,
+                data.prem_target,
+                data.prem_status,
+                data.create_user
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 
+    UpdatePremTargets: (data, callBack) => {
+        pool.query(
+            `
+        UPDATE fb_prem_targert_mast
+        SET
+            fdmast_slno = ?,
+            prem_target = ?,
+            prem_status = ?,
+            edit_user = ?
+        WHERE prem_target_slno = ?
+        `,
+            [
+                data.fdmast_slno,
+                data.prem_target,
+                data.prem_status,
+                data.edit_user,
+                data.prem_target_slno
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    checkTargetAlreadyExist: (data, callBack) => {
+        pool.query(
+            `
+                SELECT prem_target_slno
+                FROM fb_prem_targert_mast
+                WHERE fdmast_slno = ?
+        `,
+            [
+                data.fdmast_slno
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    checkUpdateTargetAlreadyExist: (data, callBack) => {
+        pool.query(
+            `
+                SELECT prem_target_slno
+                FROM fb_prem_targert_mast
+                WHERE fdmast_slno = ? AND  prem_target = ?
+        `,
+            [
+                data.fdmast_slno,
+                data.prem_target
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 
 }

@@ -493,4 +493,61 @@ module.exports = {
             })
         })
     },
+    getStaffDetail: (data, callback) => {
+        hrpool.query(
+            `
+        SELECT 
+            em_id,
+            em_no,
+            em_salutation,
+            em_name,
+            em_gender,
+            em_dob,
+            em_age_year,
+            em_age_month,
+            em_age_day,
+            em_doj,
+            em_mobile,
+            em_phone,
+            em_email,
+            em_branch,
+            em_department,
+            em_dept_section,
+            em_institution_type,
+            em_designation,
+            em_doc_type,
+            em_category,
+            em_prob_end_date,
+            em_conf_end_date,
+            em_retirement_date,
+            em_contract_end_date,
+            em_status,
+            hrm_emp_master.create_user,
+            addressPermnt1,
+            addressPermnt2, 
+            hrm_pin1,
+            em_region,
+            addressPresent1,
+            addressPresent2,
+            hrm_pin2, 
+            hrm_region2, 
+            blood_slno,
+            hrm_religion,
+            contract_status, dept_name  , sect_name  
+            FROM hrm_emp_master
+            inner join hrm_department on dept_id=em_department
+            inner join hrm_dept_section on sect_id=em_dept_section
+            WHERE em_no = ?
+            `,
+            [
+                data.em_no
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 }

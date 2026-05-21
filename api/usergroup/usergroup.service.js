@@ -20,10 +20,13 @@ module.exports = {
     },
     checkInsertVal: (data, callBack) => {
         pool.query(
-            `SELECT user_grp_name,
+            `SELECT
+                 user_grp_name,
             user_grp_status
-            FROM user_group_mast
-            WHERE user_grp_name=? `,
+            FROM 
+                user_group_mast
+            WHERE 
+                user_grp_name=? `,
             [
                 data.user_grp_name
             ],
@@ -37,10 +40,13 @@ module.exports = {
     },
     checkUpdateVal: (data, callBack) => {
         pool.query(
-            `SELECT user_grp_name,               
-            user_grp_slno 
-            FROM user_group_mast 
-            WHERE user_grp_name = ?  AND user_grp_slno != ?`,
+            `SELECT 
+                user_grp_name,               
+                user_grp_slno 
+            FROM 
+                user_group_mast 
+            WHERE 
+                user_grp_name = ?  AND user_grp_slno != ?`,
             [
                 data.user_grp_name,
                 data.user_grp_slno
@@ -55,11 +61,14 @@ module.exports = {
     },
     usergroupupdate: (data, callBack) => {
         pool.query(
-            `UPDATE user_group_mast 
-                SET user_grp_name = ?,
-                user_grp_status =?,
-                edit_user=?
-                WHERE user_grp_slno = ?`,
+            `UPDATE 
+                user_group_mast 
+                SET 
+                    user_grp_name = ?,
+                    user_grp_status =?,
+                    edit_user=?
+                WHERE 
+                    user_grp_slno = ?`,
             [
                 data.user_grp_name,
                 data.user_grp_status,
@@ -76,11 +85,13 @@ module.exports = {
     },
     getUsergroup: (callBack) => {
         pool.query(
-            `SELECT user_grp_slno,
-            user_grp_name,
-            user_grp_status,
+            `SELECT 
+                user_grp_slno,
+                user_grp_name,
+                user_grp_status,
                 if(user_grp_status = 1 ,'Yes','No') status
-            FROM user_group_mast`,
+            FROM 
+                user_group_mast`,
             [],
             (error, results, feilds) => {
 
@@ -93,11 +104,14 @@ module.exports = {
     },
     getUsergroupByid: (id, callBack) => {
         pool.query(
-            `SELECT user_grp_slno,
-            user_grp_name,
-            user_grp_status
-            FROM user_group_mast
-            WHERE  user_grp_slno=?`,
+            `SELECT 
+                user_grp_slno,
+                user_grp_name,
+                user_grp_status
+            FROM 
+                user_group_mast
+            WHERE  
+                user_grp_slno=?`,
             [
                 id
             ],
@@ -125,11 +139,14 @@ module.exports = {
     },
     getdataById: (data, callBack) => {
         pool.query(
-            `SELECT user_grp_slno,
-            user_grp_name,
-            user_grp_status
-            FROM user_group_mast
-            WHERE  user_grp_slno IN (?)`,
+            `SELECT 
+                user_grp_slno,
+                user_grp_name,
+                user_grp_status
+            FROM 
+                user_group_mast
+            WHERE 
+                user_grp_slno IN (?)`,
             [
                 data
             ],

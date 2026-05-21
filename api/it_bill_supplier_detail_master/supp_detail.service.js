@@ -41,10 +41,12 @@ module.exports = {
             it_supplier_saleperson_second_email_one,
             it_supplier_saleperson_second_email_two,
             supplier_status,
-            create_user
+            create_user,
+            it_supplier_regno,
+            it_supplier_gst
          
           )
-          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
             [
                 data.it_supplier_name,
                 data.it_supplier_land_one,
@@ -82,7 +84,9 @@ module.exports = {
                 data.it_supplier_saleperson_second_email_one,
                 data.it_supplier_saleperson_second_email_two,
                 data.supplier_status,
-                data.create_user
+                data.create_user,
+                data.it_supplier_regno,
+                data.it_supplier_gst
 
             ],
 
@@ -134,7 +138,8 @@ module.exports = {
             it_supplier_saleperson_second_mob_two,
             it_supplier_saleperson_second_email_one,
             it_supplier_saleperson_second_email_two,
-            supplier_status        
+            supplier_status,it_supplier_regno,
+            it_supplier_gst        
             FROM
             it_bill_supplier_details_mast`, [],
             (error, results, feilds) => {
@@ -186,7 +191,9 @@ module.exports = {
             it_supplier_saleperson_second_email_one=?,
             it_supplier_saleperson_second_email_two=?,
             supplier_status=?,
-            edit_user =?       
+            edit_user =?,
+            it_supplier_regno=?,
+            it_supplier_gst=?       
             WHERE 
             it_supplier_slno=?`,
             [
@@ -227,6 +234,8 @@ module.exports = {
                 data.it_supplier_saleperson_second_email_two,
                 data.supplier_status,
                 data.edit_user,
+                data.it_supplier_regno,
+                data.t_supplier_gst,
                 data.it_supplier_slno,
             ],
             (error, results, feilds) => {

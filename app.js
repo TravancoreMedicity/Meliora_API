@@ -13,8 +13,13 @@ const fs = require("fs");
 
 //sockect io configuration
 
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // remove this there is a duplicate rk
+
+// app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
 // app.use(lusca.csrf());
 
@@ -35,6 +40,9 @@ const allowedOrigins = [
   "http://192.168.22.5:3000",
   "http://192.168.22.8:3000",
   "http://192.168.22.8:3001",
+
+  "http://192.168.22.3:3000",
+  "http://192.168.22.3:7000",
 ];
 
 
@@ -42,6 +50,7 @@ const allowedOrigins = [
 // Dynamically allow based on Origin
 app.use(
   cors({
+
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
@@ -50,6 +59,7 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
+
     credentials: true,
   })
 );
@@ -286,6 +296,7 @@ const validateAuthentication = require("./api/validate_authentication/employeeDa
 const melioraDepMaster = require("./api/Meliora_department_master/meliora_dep_master.router");
 const ContractMaster = require("./api/contract_master/contract.router");
 const condemMasters = require('./api/am_condemnation_master/condem_master.router')
+
 const GeminiRouter = require('./api/Ai/gemini.router')
 const ItemCategoryMaster = require('./api/ItemCategoryMaster/ItemCategory.router');
 const OrderPartyType = require('./api/OrderPartyType/orderpartyType.router');
@@ -308,6 +319,12 @@ const canteenorder = require('./api/Canteen_Orders/canteenorder.router');
 const paitentextraorder = require('./api/PatientExtraOrder/patient_extra_order.router');
 const productionbatch = require('./api/DietProduction/diet_production.router');
 const deliveryassignment = require('./api/DietOrderAssignment/dietorderassign.router');
+
+
+const RateVariationReport = require('./api/RateVariationReport/RateVariationReport.router')
+const store_master = require('./api/store_master/store_master.router')
+const vendor_master = require('./api/vendor_master/vendor_master_.router')
+const workOrder = require('./api/workOrder/workOrder.router')
 
 
 app.use(express.json({ limit: "50mb" }));
@@ -464,7 +481,7 @@ app.use("/api/ItBillType", ItBillSupplierList);
 app.use("/api/qidepartment", qideptmast);
 app.use("/api/qiendoscopy", qiendoscopy);
 app.use("/api/newCRFStore", newCRFStore);
-app.use("/api/incidentMaster", incidentMast);
+app.use("/api/incidentMaster", socketIOMiddlewre, incidentMast);
 app.use("/api/qiTypeList", qitypeList);
 app.use("/api/qidialysis", dialysisqi);
 app.use("/api/CrmNewApprovals", CrmNewApprovals);
@@ -506,6 +523,7 @@ app.use("/api/melioraDepMaster", melioraDepMaster);
 app.use("/api/ContractMaster", ContractMaster);
 app.use('/api/condemApprovalLevel', condemApprovalLevel)
 app.use('/api/condemMasters', condemMasters)
+
 app.use('/api/ai', GeminiRouter)
 app.use('/api/itemcategory', ItemCategoryMaster)
 app.use('/api/orderparty', OrderPartyType)
@@ -528,6 +546,13 @@ app.use('/api/canteenorder', canteenorder)
 app.use('/api/patientExtraOrder', paitentextraorder)
 app.use('/api/productionbatch', productionbatch)
 app.use('/api/dietdelivery', socketIOMiddlewre, deliveryassignment)
+
+app.use('/api/RateVariationReport', RateVariationReport)
+app.use('/api/store_master', store_master)
+app.use('/api/vendor_master', vendor_master)
+app.use('/api/workOrder', workOrder)
+
+
 
 server.listen(
   process.env.APP_PORT,

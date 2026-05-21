@@ -4,7 +4,8 @@ const { getdepartment, createDept, getdepartmentMeli, getdepartmentSection, getd
     getemployeeuserPassHrm, getemployeeuserPassMeli, getauthorization, getauthorizationMeli, createAuthorization,
     updateEmpMaster, updateDepartment, updateDepartmentSec, getdesignation, getdesignationMeli,
     createdesignation, getbranch, getbranchMeli, createbranch, getSalutation, getSalutationMeli,
-    createSalutation, emploginUpdate
+    createSalutation, emploginUpdate,
+    getStaffDetail
 } = require("../hrm_data_get/data_get_insert_service")
 module.exports = {
 
@@ -603,6 +604,33 @@ module.exports = {
                     });
                  }
                
+            })
+        });
+    },
+
+
+    getStaffDetail: (req, res) => {
+        const data = req.body;
+        getStaffDetail(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No staff record Found",
+                    data: [],
+                })
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: "Fetched Sucessfully",
+                data: results,
             })
         });
     },

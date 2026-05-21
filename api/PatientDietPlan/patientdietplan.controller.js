@@ -10,7 +10,8 @@ const {
     FetchAllActivePatient,
     getAllActiveDietPatient,
     getCurrentTemplateFood,
-    fetchAllPatientMealType
+    fetchAllPatientMealType,
+    getTemplateFoodStatus
 } = require('./patientdietplan.service');
 
 module.exports = {
@@ -116,6 +117,41 @@ module.exports = {
 
         });
     },
+    getTemplateFoodStatus
+        : (req, res) => {
+            const { plan_id } = req.body;
+
+            if (!plan_id) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "Nurse Station Code Required"
+                });
+            }
+
+            getTemplateFoodStatus(plan_id, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (!results || results.length === 0) {
+                    return res.status(200).json({
+                        success: 1,
+                        message: "No Results Found",
+                        data: []
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 2,
+                    data: results,
+                    message: "Fetched Successfully"
+                });
+
+            });
+        },
 
 
     FetchAllActivePatient: (req, res) => {
@@ -223,11 +259,6 @@ module.exports = {
 
     getAllTemplateDetail: (req, res) => {
         const { template_id } = req.body;
-
-
-        console.log({
-            template_id
-        });
 
 
         if (!template_id) {

@@ -4,7 +4,8 @@ const {
     updateScheduleStatusService,
     cancelScheduleService,
     deactivateScheduleService,
-    getPatientProcesssedFood
+    getPatientProcesssedFood,
+    ServedSchedule
 } = require('./patientdietscheduled.service');
 
 
@@ -13,6 +14,7 @@ module.exports = {
     schedulePatientDietDetail: (req, res) => {
 
         const { itemDetail, status, process_date, created_by } = req.body;
+
 
         if (itemDetail.length === 0) {
             return res.status(200).json({
@@ -156,6 +158,37 @@ module.exports = {
             }
         );
     },
+    ServedSchedule: (req, res) => {
+        const { patient_diet_id, updated_by, status } = req.body;
+
+        if (!patient_diet_id) {
+            return res.status(400).json({
+                success: 0,
+                message: "patient_diet_id is required"
+            });
+        }
+
+        ServedSchedule(
+            status,
+            updated_by,
+            patient_diet_id,
+            (err, results) => {
+                if (err) {
+                    return res.status(500).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 2,
+                    data: results,
+                    message: "Schedule Cancelled Successfully"
+                });
+            }
+        );
+    },
+
     deactivateSchedule: (req, res) => {
         const { patient_diet_id, updated_by } = req.body;
 

@@ -527,7 +527,7 @@ app.use('/api/dietschedule', dietscheduled)
 app.use('/api/canteenorder', canteenorder)
 app.use('/api/patientExtraOrder', paitentextraorder)
 app.use('/api/productionbatch', productionbatch)
-app.use('/api/dietdelivery', deliveryassignment)
+app.use('/api/dietdelivery', socketIOMiddlewre, deliveryassignment)
 
 server.listen(
   process.env.APP_PORT,

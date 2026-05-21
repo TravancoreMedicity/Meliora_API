@@ -101,27 +101,30 @@ module.exports = {
         if (!data.item_id) {
             return res.status(200).json({
                 success: 0,
-                message: "Item ID Required"
+                message: "Item ID missing"
             });
         }
 
-        updateItemMaster(data, (err, results) => {
+        updateItemMaster(data, (err, result) => {
 
             if (err) {
+
+                console.log(err);
+
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    stage: err.stage,
+                    message: err.message
                 });
             }
 
             return res.status(200).json({
                 success: 2,
-                data: results,
                 message: "Item Updated Successfully"
             });
 
         });
 
-    }
+    },
 
 };

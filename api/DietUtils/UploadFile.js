@@ -124,5 +124,130 @@ module.exports = {
             // 6) Finalize
             archive.finalize();
         });
+    },
+    deleteItemMasterFile: (req, res) => {
+        try {
+            const { id, filename } = req.body;
+            if (!id || !filename) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "id and filename required"
+                });
+            }
+
+            const filePath = path.join(
+                itemMasterPath,
+                id.toString(),
+                filename
+            );
+            /* FILE NOT EXIST */
+
+            if (!fs.existsSync(filePath)) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "File not found"
+                });
+            }
+            /* DELETE FILE */
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err.message
+                    });
+                }
+                return res.status(200).json({
+                    success: 1,
+                    message: "File deleted successfully"
+                });
+            });
+
+        } catch (error) {
+
+            return res.status(200).json({
+                success: 0,
+                message: error.message
+            });
+        }
+    },
+
+    getAllItemMasterFilesZip: (req, res) => {
+
+        const basePath = itemMasterPath;
+
+        // 1) Check base folder exists
+        if (!fs.existsSync(basePath)) {
+            return res.status(200).json({
+                success: 1,
+                data: []
+            });
+        }
+
+        // 2) Read all item folders
+        fs.readdir(basePath, (err, folders) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+
+            if (!folders || folders.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    data: []
+                });
+            }
+
+            // 3) Set ZIP response headers
+            res.setHeader('Content-Type', 'application/zip');
+            res.setHeader(
+                'Content-Disposition',
+                `attachment; filename="all_item_files.zip"`
+            );
+
+            const archive = archiver('zip', {
+                zlib: { level: 9 }
+            });
+
+            archive.on('error', (archiveErr) => {
+                console.error("Archive error:", archiveErr);
+                if (!res.headersSent) {
+                    res.status(500).end();
+                }
+            });
+
+            archive.pipe(res);
+
+            // 4) Loop through all folders
+            folders.forEach((folder) => {
+
+                const folderPath = path.join(basePath, folder);
+
+                // only process directories
+                if (fs.existsSync(folderPath) && fs.lstatSync(folderPath).isDirectory()) {
+
+                    const files = fs.readdirSync(folderPath);
+
+                    files.forEach((file) => {
+
+                        const filePath = path.join(folderPath, file);
+
+                        if (fs.existsSync(filePath)) {
+
+                            // IMPORTANT:
+                            // keep folder structure inside zip
+                            archive.file(filePath, {
+                                name: `${folder}/${file}`
+                            });
+                        }
+                    });
+                }
+            });
+
+            // 5) finalize ZIP
+            archive.finalize();
+        });
     }
 };

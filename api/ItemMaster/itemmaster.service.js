@@ -97,11 +97,8 @@ module.exports = {
                         (err) => {
 
                             if (err) {
-
                                 return connection.rollback(() => {
-
                                     connection.release();
-
                                     callBack({
                                         stage: "INGREDIENT_INSERT",
                                         message: err
@@ -138,18 +135,13 @@ module.exports = {
                         (err) => {
 
                             if (err) {
-
                                 return connection.rollback(() => {
-
                                     connection.release();
-
                                     callBack({
                                         stage: "RATE_INSERT",
                                         message: err
                                     });
-
                                 });
-
                             }
                             next();
                         }
@@ -179,47 +171,79 @@ module.exports = {
     getAllItemMaster: (callBack) => {
         pool.query(
             `SELECT
-                im.item_id,
-                im.item_name,
+    im.item_id,
+    im.item_name,
+    im.description,
+    im.item_alias,
+    im.item_code,
 
-                ig.item_group_id,
-                ig.group_name,
+    ig.item_group_id,
+    ig.group_name,
 
-                ic.item_category_id,
-                ic.category_name,
+    itm.item_type_id,
+    itm.item_type_name,
 
-                ir.ingredient_item_id,
-                ing.item_name AS ingredient_name,
+    ic.item_category_id,
+    ic.category_name,
 
-                ir.quantity,
-                u.unit_name
+    (
+        SELECT JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'recipe_id', ir.recipe_id,
+                'ingredient_item_id', ir.ingredient_item_id,
+                'ingredient_name', ing.item_name,
+                'quantity', ir.quantity,
+                'unit_id', u.unit_id,
+                'unit_name', u.unit_name
+            )
+        )
+        FROM item_recipe ir
+        LEFT JOIN item_master ing
+            ON ing.item_id = ir.ingredient_item_id
+        LEFT JOIN unit_master u
+            ON u.unit_id = ir.unit_id
+        WHERE ir.item_id = im.item_id
+          AND ir.is_active = 1
+    ) AS ingredients,
 
-            FROM item_master im
+    (
+        SELECT JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'price_id', cip.price_id,
+                'party_type_id', cip.party_type_id,
+                'party_name', opt.party_name,
+                'price', cip.price,
+                'gst_rate', cip.gst_rate,
+                'discount', cip.discount,
+                'discount_rate', cip.discount_rate
+            )
+        )
+        FROM canteen_item_price cip
+        LEFT JOIN order_party_type opt
+            ON opt.party_type_id = cip.party_type_id
+        WHERE cip.item_id = im.item_id
+          AND cip.is_active = 1
+    ) AS item_prices
 
-            LEFT JOIN item_group_master ig
-                ON ig.item_group_id = im.item_group_id
-                AND ig.is_active = 1
+FROM item_master im
 
-            LEFT JOIN item_category_master ic
-                ON ic.item_category_id = im.item_category_id
-                AND ic.is_active = 1
+LEFT JOIN item_group_master ig
+    ON ig.item_group_id = im.item_group_id
+    AND ig.is_active = 1
 
-            LEFT JOIN item_recipe ir
-                ON ir.item_id = im.item_id
-                AND ir.is_active = 1
+LEFT JOIN item_category_master ic
+    ON ic.item_category_id = im.item_category_id
+    AND ic.is_active = 1
 
-            LEFT JOIN item_master ing
-                ON ing.item_id = ir.ingredient_item_id
+LEFT JOIN item_type itm
+    ON itm.item_type_id = im.item_type_id
 
-            LEFT JOIN unit_master u
-                ON u.unit_id = ir.unit_id
+WHERE im.is_active = 1
 
-            WHERE im.is_active = 1
-
-            ORDER BY 
-                ig.display_order,
-                ic.display_order,
-                im.item_name`,
+ORDER BY
+    ig.display_order,
+    ic.display_order,
+    im.item_name`,
             [],
             (error, results) => {
 
@@ -348,42 +372,465 @@ module.exports = {
 
     },
 
-
     updateItemMaster: (data, callBack) => {
 
-        pool.query(
-            `UPDATE item_master
-            SET
-                item_name = ?,
-                item_group_id = ?,
-                item_category_id = ?,
-                item_alias = ?,
-                item_code = ?,
-                description = ?,
-                updated_by = ?
-            WHERE item_id = ?`,
-            [
-                data.item_name,
-                data.item_group_id,
-                data.item_category_id,
-                data.item_alias,
-                data.item_code,
-                data.description,
-                data.updated_by,
-                data.item_id
-            ],
-            (error, results) => {
+        const {
+            item_id,
+            item_name,
+            item_group_id,
+            item_category_id,
+            item_alias,
+            item_code,
+            description,
+            created_by,
+            ingredients = [],
+            itemrate = [],
+            item_type_id
+        } = data;
 
-                if (error) {
-                    return callBack(error);
+        pool.getConnection((err, connection) => {
+            if (err) {
+                return callBack({
+                    stage: "DB_CONNECTION",
+                    message: err
+                });
+            }
+            connection.beginTransaction(err => {
+                if (err) {
+                    connection.release();
+                    return callBack({
+                        stage: "TRANSACTION_START",
+                        message: err
+                    });
                 }
 
-                return callBack(null, results);
+                /*UPDATE ITEM MASTER*/
 
-            }
-        );
+                connection.query(
+                    `
+                UPDATE item_master
+                SET
+                    item_name = ?,
+                    item_group_id = ?,
+                    item_category_id = ?,
+                    item_alias = ?,
+                    item_code = ?,
+                    description = ?,
+                    item_type_id = ?,
+                    updated_by = ?,
+                    updated_at = NOW()
+                WHERE item_id = ?
+                `,
+                    [
+                        item_name,
+                        item_group_id,
+                        item_category_id,
+                        item_alias,
+                        item_code,
+                        description,
+                        item_type_id,
+                        created_by,
+                        item_id
+                    ],
+                    (error) => {
 
-    }
+                        if (error) {
+
+                            let customMessage = error;
+
+                            if (error.code === "ER_DUP_ENTRY") {
+
+                                if (error.sqlMessage.includes("item_name")) {
+                                    customMessage = "Food item name already exists";
+                                }
+                                else if (error.sqlMessage.includes("item_alias")) {
+                                    customMessage = "Item alias already exists";
+                                }
+                                else if (error.sqlMessage.includes("item_code")) {
+                                    customMessage = "Item code already exists";
+                                }
+                                else {
+                                    customMessage = "Duplicate entry found";
+                                }
+                            }
+
+                            return connection.rollback(() => {
+
+                                connection.release();
+
+                                callBack({
+                                    stage: "ITEM_UPDATE",
+                                    message: customMessage
+                                });
+
+                            });
+                        }
+
+                        processIngredients();
+                    }
+                );
+
+
+                // INGREDIENTS
+
+
+                function processIngredients() {
+
+                    const existingRecipeIds = ingredients
+                        .filter(i => i.recipe_id)
+                        .map(i => i.recipe_id);
+
+                    /* DEACTIVATE REMOVED INGREDIENTS */
+
+                    let deactivateQuery = `
+                    UPDATE item_recipe
+                    SET
+                        is_active = 0,
+                        updated_by = ?,
+                        updated_at = NOW()
+                    WHERE item_id = ?
+                `;
+
+                    let deactivateParams = [
+                        created_by,
+                        item_id
+                    ];
+
+                    if (existingRecipeIds.length > 0) {
+
+                        deactivateQuery += `
+                        AND recipe_id NOT IN (?)
+                    `;
+
+                        deactivateParams.push(existingRecipeIds);
+                    }
+
+                    connection.query(
+                        deactivateQuery,
+                        deactivateParams,
+                        (err) => {
+
+                            if (err) {
+
+                                return connection.rollback(() => {
+
+                                    connection.release();
+
+                                    callBack({
+                                        stage: "DEACTIVATE_INGREDIENTS",
+                                        message: err
+                                    });
+
+                                });
+                            }
+
+                            updateIngredientLoop(0);
+                        }
+                    );
+                }
+
+                function updateIngredientLoop(index) {
+
+                    if (index >= ingredients.length) {
+                        return processRates();
+                    }
+
+                    const ingredient = ingredients[index];
+
+                    /* EXISTING INGREDIENT */
+
+                    if (ingredient.recipe_id) {
+
+                        connection.query(
+                            `
+                        UPDATE item_recipe
+                        SET
+                            ingredient_item_id = ?,
+                            quantity = ?,
+                            unit_id = ?,
+                            is_active = 1,
+                            updated_by = ?,
+                            updated_at = NOW()
+                        WHERE recipe_id = ?
+                        `,
+                            [
+                                ingredient.ingredient_item_id,
+                                ingredient.quantity,
+                                ingredient.unit_id,
+                                created_by,
+                                ingredient.recipe_id
+                            ],
+                            (err) => {
+
+                                if (err) {
+
+                                    return connection.rollback(() => {
+
+                                        connection.release();
+
+                                        callBack({
+                                            stage: "UPDATE_INGREDIENT",
+                                            message: err
+                                        });
+
+                                    });
+                                }
+
+                                updateIngredientLoop(index + 1);
+                            }
+                        );
+                    }
+
+                    /* NEW INGREDIENT */
+
+                    else {
+
+                        connection.query(
+                            `
+                        INSERT INTO item_recipe
+                        (
+                            item_id,
+                            ingredient_item_id,
+                            quantity,
+                            unit_id,
+                            is_active,
+                            created_by
+                        )
+                        VALUES (?,?,?,?,?,?)
+                        `,
+                            [
+                                item_id,
+                                ingredient.ingredient_item_id,
+                                ingredient.quantity,
+                                ingredient.unit_id,
+                                1,
+                                created_by
+                            ],
+                            (err) => {
+
+                                if (err) {
+
+                                    return connection.rollback(() => {
+
+                                        connection.release();
+
+                                        callBack({
+                                            stage: "INSERT_INGREDIENT",
+                                            message: err
+                                        });
+
+                                    });
+                                }
+
+                                updateIngredientLoop(index + 1);
+                            }
+                        );
+                    }
+                }
+
+
+                // RATES
+
+
+                function processRates() {
+
+                    const existingPriceIds = itemrate
+                        .filter(r => r.price_id)
+                        .map(r => r.price_id);
+
+                    /* DEACTIVATE REMOVED RATES */
+
+                    let deactivateQuery = `
+                    UPDATE canteen_item_price
+                    SET
+                        is_active = 0,
+                        updated_by = ?,
+                        updated_at = NOW()
+                    WHERE item_id = ?
+                `;
+
+                    let deactivateParams = [
+                        created_by,
+                        item_id
+                    ];
+
+                    if (existingPriceIds.length > 0) {
+
+                        deactivateQuery += `
+                        AND price_id NOT IN (?)
+                    `;
+
+                        deactivateParams.push(existingPriceIds);
+                    }
+
+                    connection.query(
+                        deactivateQuery,
+                        deactivateParams,
+                        (err) => {
+
+                            if (err) {
+
+                                return connection.rollback(() => {
+
+                                    connection.release();
+
+                                    callBack({
+                                        stage: "DEACTIVATE_RATES",
+                                        message: err
+                                    });
+
+                                });
+                            }
+
+                            updateRateLoop(0);
+                        }
+                    );
+                }
+
+                function updateRateLoop(index) {
+
+                    if (index >= itemrate.length) {
+                        return commit();
+                    }
+
+                    const rate = itemrate[index];
+
+                    /* EXISTING RATE */
+
+                    if (rate.price_id) {
+
+                        connection.query(
+                            `
+                        UPDATE canteen_item_price
+                        SET
+                            party_type_id = ?,
+                            price = ?,
+                            gst_rate = ?,
+                            discount = ?,
+                            discount_rate = ?,
+                            is_active = 1,
+                            updated_by = ?,
+                            updated_at = NOW()
+                        WHERE price_id = ?
+                        `,
+                            [
+                                rate.party_type_id,
+                                rate.price,
+                                rate.gst_rate,
+                                rate.discount,
+                                rate.discount_rate,
+                                created_by,
+                                rate.price_id
+                            ],
+                            (err) => {
+
+                                if (err) {
+
+                                    return connection.rollback(() => {
+
+                                        connection.release();
+
+                                        callBack({
+                                            stage: "UPDATE_RATE",
+                                            message: err
+                                        });
+
+                                    });
+                                }
+
+                                updateRateLoop(index + 1);
+                            }
+                        );
+                    }
+
+                    /* NEW RATE */
+
+                    else {
+
+                        connection.query(
+                            `
+                        INSERT INTO canteen_item_price
+                        (
+                            item_id,
+                            party_type_id,
+                            price,
+                            gst_rate,
+                            discount,
+                            discount_rate,
+                            is_active,
+                            created_by
+                        )
+                        VALUES (?,?,?,?,?,?,?,?)
+                        `,
+                            [
+                                item_id,
+                                rate.party_type_id,
+                                rate.price,
+                                rate.gst_rate,
+                                rate.discount,
+                                rate.discount_rate,
+                                1,
+                                created_by
+                            ],
+                            (err) => {
+
+                                if (err) {
+
+                                    return connection.rollback(() => {
+
+                                        connection.release();
+
+                                        callBack({
+                                            stage: "INSERT_RATE",
+                                            message: err
+                                        });
+
+                                    });
+                                }
+
+                                updateRateLoop(index + 1);
+                            }
+                        );
+                    }
+                }
+
+                /* =====================================================
+                   COMMIT
+                ====================================================== */
+
+                function commit() {
+
+                    connection.commit(err => {
+
+                        if (err) {
+
+                            return connection.rollback(() => {
+
+                                connection.release();
+
+                                callBack({
+                                    stage: "COMMIT",
+                                    message: err
+                                });
+
+                            });
+                        }
+
+                        connection.release();
+
+                        callBack(null, {
+                            success: 1,
+                            item_id
+                        });
+
+                    });
+                }
+
+            });
+
+        });
+
+    },
 
 };
 

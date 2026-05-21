@@ -7,9 +7,106 @@ const multer = require('multer');
  * @param {Function} uploadMiddleware - multer upload middleware
  * @param {String} baseFolder - destination base path
  */
+// const handleDietFileUpload = (uploadMiddleware, baseFolder) => {
+//     return (req, res) => {
+//         uploadMiddleware(req, res, async (err) => {
+//             if (err instanceof multer.MulterError) {
+//                 return res.status(200).json({
+//                     success: 0,
+//                     message: "Max file size 2MB allowed!",
+//                 });
+//             }
+
+//             if (err) {
+//                 return res.status(200).json({
+//                     success: 0,
+//                     message: err.message,
+//                 });
+//             }
+
+//             try {
+
+//                 const files = req.files || [];
+//                 const { id } = req.body;
+
+//                 if (!id) {
+//                     return res.status(200).json({
+//                         success: 0,
+//                         message: "Invalid item id"
+//                     });
+//                 }
+
+//                 const keptFiles = req.body.keptFiles
+//                     ? JSON.parse(req.body.keptFiles)
+//                     : [];
+
+//                 // Create item folder
+//                 const targetFolder = path.join(baseFolder, `${id}`);
+
+//                 if (!fs.existsSync(targetFolder)) {
+//                     fs.mkdirSync(targetFolder, { recursive: true });
+//                 }
+
+//                 // 1 Move uploaded files first
+//                 const uploadedNames = [];
+
+//                 for (const file of files) {
+
+//                     if (!fs.existsSync(file.path)) {
+//                         console.warn("Temp file missing:", file.path);
+//                         continue;
+//                     }
+
+//                     const cleanName = file.originalname;
+//                     const destinationPath = path.join(targetFolder, cleanName);
+
+//                     fs.renameSync(file.path, destinationPath);
+
+//                     uploadedNames.push(cleanName);
+//                 }
+
+//                 // 2Final keep list
+//                 const finalKeepList = [
+//                     ...keptFiles,
+//                     ...uploadedNames
+//                 ];
+
+//                 // 3 Delete files not in keep list
+//                 const existingFiles = fs.existsSync(targetFolder)
+//                     ? fs.readdirSync(targetFolder)
+//                     : [];
+
+//                 for (const file of existingFiles) {
+
+//                     if (!finalKeepList.includes(file)) {
+//                         const filePath = path.join(targetFolder, file);
+//                         if (fs.existsSync(filePath)) {
+//                             console.log("Deleting:", file);
+//                             fs.unlinkSync(filePath);
+//                         }
+//                     }
+//                 }
+//                 return res.status(200).json({
+//                     success: 1,
+//                     message: "Files updated successfully"
+//                 });
+
+//             } catch (error) {
+//                 console.error("Upload error:", error);
+//                 return res.status(200).json({
+//                     success: 0,
+//                     message: "An error occurred during file upload."
+//                 });
+//             }
+//         });
+//     };
+// };
+
+
 const handleDietFileUpload = (uploadMiddleware, baseFolder) => {
     return (req, res) => {
         uploadMiddleware(req, res, async (err) => {
+
             if (err instanceof multer.MulterError) {
                 return res.status(200).json({
                     success: 0,
@@ -36,18 +133,23 @@ const handleDietFileUpload = (uploadMiddleware, baseFolder) => {
                     });
                 }
 
+                // files user wants to keep
                 const keptFiles = req.body.keptFiles
                     ? JSON.parse(req.body.keptFiles)
                     : [];
 
-                // Create item folder
+                // OPTIONAL: only delete when explicitly allowed
+                const allowReplace = req.body.replace === "true";
+
                 const targetFolder = path.join(baseFolder, `${id}`);
 
                 if (!fs.existsSync(targetFolder)) {
                     fs.mkdirSync(targetFolder, { recursive: true });
                 }
 
-                // 1 Move uploaded files first
+                /* ----------------------------
+                   1. MOVE NEW UPLOADED FILES
+                -----------------------------*/
                 const uploadedNames = [];
 
                 for (const file of files) {
@@ -57,38 +159,52 @@ const handleDietFileUpload = (uploadMiddleware, baseFolder) => {
                         continue;
                     }
 
-                    const cleanName = file.originalname;
-                    const destinationPath = path.join(targetFolder, cleanName);
+                    // prevent duplicate overwrite
+                    const uniqueName = `${Date.now()}-${file.originalname}`;
+                    const destinationPath = path.join(targetFolder, uniqueName);
 
                     fs.renameSync(file.path, destinationPath);
 
-                    uploadedNames.push(cleanName);
+                    uploadedNames.push(uniqueName);
                 }
 
-                // 2Final keep list
+                /* ----------------------------
+                   2. FINAL KEEP LIST
+                -----------------------------*/
                 const finalKeepList = [
                     ...keptFiles,
                     ...uploadedNames
                 ];
 
-                // 3 Delete files not in keep list
-                const existingFiles = fs.existsSync(targetFolder)
-                    ? fs.readdirSync(targetFolder)
-                    : [];
+                /* ----------------------------
+                   3. DELETE ONLY IF ALLOWED
+                -----------------------------*/
+                if (allowReplace) {
 
-                for (const file of existingFiles) {
+                    const existingFiles = fs.existsSync(targetFolder)
+                        ? fs.readdirSync(targetFolder)
+                        : [];
 
-                    if (!finalKeepList.includes(file)) {
-                        const filePath = path.join(targetFolder, file);
-                        if (fs.existsSync(filePath)) {
-                            console.log("Deleting:", file);
-                            fs.unlinkSync(filePath);
+                    for (const file of existingFiles) {
+
+                        if (!finalKeepList.includes(file)) {
+
+                            const filePath = path.join(targetFolder, file);
+
+                            if (fs.existsSync(filePath)) {
+                                console.log("Deleting:", file);
+                                fs.unlinkSync(filePath);
+                            }
                         }
                     }
                 }
+
                 return res.status(200).json({
                     success: 1,
-                    message: "Files updated successfully"
+                    message: "Files uploaded successfully",
+                    data: {
+                        uploaded: uploadedNames
+                    }
                 });
 
             } catch (error) {

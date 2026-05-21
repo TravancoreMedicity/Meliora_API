@@ -11,7 +11,8 @@ const {
     FetchAllActivePatient,
     getAllActiveDietPatient,
     getCurrentTemplateFood,
-    fetchAllPatientMealType
+    fetchAllPatientMealType,
+    getTemplateFoodStatus
 } = require('./patientdietplan.controller');
 
 const router = require('express').Router();
@@ -31,7 +32,9 @@ router.post("/ptmeal-type", checkToken, fetchAllPatientMealType); // maybe not r
 router.post("/gettemplatedtl", checkToken, getAllTemplateDetail);
 router.post("/gettodaytemplatedtl", checkToken, getCurrentTemplateFood);
 
-router.post("/activepatient", checkToken, getAllActiveDietPatient)
+router.post("/activepatient", checkToken, getAllActiveDietPatient);
+
+router.post('/gettemplatefoodstatus',checkToken,getTemplateFoodStatus)
 
 
 module.exports = router;

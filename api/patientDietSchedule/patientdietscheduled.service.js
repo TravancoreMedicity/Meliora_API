@@ -221,6 +221,33 @@ module.exports = {
     },
 
 
+    ServedSchedule: (
+        status,
+        updated_by,
+        patient_diet_id,
+        callBack
+    ) => {
+
+        const query = `
+        UPDATE patient_diet_schedule
+        SET 
+            status = ?,
+            updated_by = ?
+        WHERE patient_diet_id = ?
+    `;
+
+        pool.query(
+            query,
+            [status, updated_by, patient_diet_id],
+            (err, results) => {
+                if (err) return callBack(err);
+                return callBack(null, results);
+            }
+        );
+    },
+
+
+
     deactivateScheduleService: (patient_diet_id, updated_by, callBack) => {
 
         const query = `

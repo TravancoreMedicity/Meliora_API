@@ -13,11 +13,12 @@ module.exports = {
                 start_date,
                 end_date,
                 doctor_id,
+                is_consultation,
                 dietitian_id,
                 diet_status,
                 created_by
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)`,
             [
                 data.patient_id,
                 data.admission_id,
@@ -25,6 +26,7 @@ module.exports = {
                 data.start_date,
                 data.end_date,
                 data.doctor_id,
+                data.is_consultation,
                 data.dietitian_id,
                 data.diet_status,
                 data.created_by
@@ -40,7 +42,6 @@ module.exports = {
 
 
     getAllPatientDietPlan: (ns_code, callBack) => {
-
         pool.query(
             `
 SELECT 
@@ -53,6 +54,7 @@ SELECT
     dp.fb_ipc_status       AS ipd_status,
     dp.fb_do_code          AS do_code,
     dp.fb_doc_name         AS doc_name,
+    dp.fb_ipd_disc,
 
     rc.fb_rcc_desc,
     fb.fb_bdc_no,
@@ -63,10 +65,9 @@ SELECT
 
     pdp.plan_id,
     pdp.diet_status,
-    pdp.start_date,
-    pdp.end_date,
     pdp.diet_id,
     pdp.dietitian_id,
+    pdp.is_consultation,
 
     pdm.diet_name,
     pdm.calories_per_day,
@@ -105,7 +106,7 @@ LEFT JOIN fb_room_category rc
 LEFT JOIN patient_diet_plan pdp 
     ON dp.fb_pt_no = pdp.patient_id
     AND dp.fb_ip_no = pdp.admission_id
-    AND pdp.is_active = 1
+    
 
 LEFT JOIN patient_diet_master pdm 
     ON pdp.diet_id = pdm.diet_id
@@ -118,7 +119,7 @@ LEFT JOIN diet_template dt
     AND dt.is_active = 1
     AND DATE(NOW()) BETWEEN DATE(dt.effective_from) AND DATE(dt.effective_to)
 
-WHERE ns.fb_ns_code = 'W009'
+WHERE ns.fb_ns_code = 'W005'
 AND (dp.fb_ipc_curstatus IS NULL OR dp.fb_ipc_curstatus <> 'PCO')  
 
 ORDER BY dp.fb_ip_no DESC;
@@ -277,8 +278,7 @@ ORDER BY dp.fb_ip_no DESC
                 ON dtf.unit_id = um.unit_id
 
             WHERE pdp.is_active = 1
-            AND DATE(?) BETWEEN DATE(pdp.start_date) AND DATE(pdp.end_date)
-
+           
             ORDER BY pdp.plan_id DESC
             `,
             [date, date, date, date],
@@ -324,7 +324,6 @@ ORDER BY dp.fb_ip_no DESC
                 AND dtf.week_day = WEEKDAY(?) + 1
 
             WHERE pdp.is_active = 1
-            AND DATE(?) BETWEEN DATE(pdp.start_date) AND DATE(pdp.end_date)
 
             ORDER BY pdp.plan_id DESC
             `,
@@ -353,6 +352,7 @@ ORDER BY dp.fb_ip_no DESC
                 dietitian_id = ?,
                 diet_status = ?,
                 is_active = ?,
+                is_consultation=?,
                 updated_by = ?
             WHERE plan_id = ?`,
             [
@@ -363,6 +363,7 @@ ORDER BY dp.fb_ip_no DESC
                 data.dietitian_id,
                 data.diet_status,
                 data.is_active,
+                data.is_consultation,
                 data.updated_by,
                 data.plan_id
             ],
@@ -374,6 +375,57 @@ ORDER BY dp.fb_ip_no DESC
             }
         );
     },
+
+    getTemplateFoodStatus: (plan_id, callBack) => {
+
+        pool.query(
+            `SELECT 
+                pdp.plan_id,
+                pdp.patient_id,
+                pdp.admission_id,
+
+                do.order_id,
+                do.order_date,
+                do.order_status,
+
+                dt.type_desc,
+                dt.type_slno,
+
+                im.item_name,
+                dod.quantity,
+                um.unit_name
+
+            FROM patient_diet_plan pdp
+
+            INNER JOIN diet_order do
+                ON pdp.plan_id = do.plan_id
+
+            INNER JOIN diet_order_detail dod
+                ON do.order_id = dod.order_id
+
+            LEFT JOIN diet_type dt
+                ON dod.diet_type_id = dt.type_slno
+
+            LEFT JOIN item_master im
+                ON dod.item_id = im.item_id
+
+            LEFT JOIN unit_master um
+                ON dod.unit_id = um.unit_id
+
+            WHERE pdp.plan_id = ?`,
+            [
+                plan_id
+            ],
+            (error, results) => {
+
+                if (error) return callBack(error);
+
+                return callBack(null, results);
+            }
+        );
+    },
+
+
 
 
     getDieticians: (callBack) => {

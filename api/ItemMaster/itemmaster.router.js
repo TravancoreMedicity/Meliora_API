@@ -1,5 +1,5 @@
 const { checkToken } = require('../../authentication/token_validation');
-const { uploadItemMasterFiles, getItemMasterFilesZip } = require('../DietUtils/UploadFile');
+const { uploadItemMasterFiles, getItemMasterFilesZip, deleteItemMasterFile, getAllItemMasterFilesZip } = require('../DietUtils/UploadFile');
 
 const {
     insertItemMaster,
@@ -17,6 +17,8 @@ router.post("/uploadItemFiles", checkToken, uploadItemMasterFiles);
 
 
 router.get("/files/:id", checkToken, getItemMasterFilesZip);
+router.get("/allfiles", checkToken, getAllItemMasterFilesZip);
+router.post("/files/delete", checkToken, deleteItemMasterFile);
 
 router.get("/item-full-detail", checkToken, getItemFullDetail)
 

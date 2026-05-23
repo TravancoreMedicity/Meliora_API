@@ -160,6 +160,8 @@ module.exports = {
                     remarks: data.remarks,
                     updated_by: data.updated_by,
                     updated_time: new Date(),
+                    meal: data.meal,
+                    item_name: data.item_name,
                     type: "DELIVERY_STATUS_UPDATED"
                 }
             );

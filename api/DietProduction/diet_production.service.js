@@ -102,7 +102,7 @@ module.exports = {
                         }
 
                         // 3 MAP ORDERS
-                        for (const orderId of SelectedOrders) {
+                        for (const orderId of batch.order_ids) {
                             await runQuery(
                                 ` INSERT INTO diet_production_order_map
                                 (

@@ -17,7 +17,8 @@ const {
     GetAllActiveBedDetail,
     PatientLastWeekOrders,
     UpdateAllQuantities,
-    getBatchItemDetail
+    getBatchItemDetail,
+    UpdateItemQuantity
 } = require('./canteeorder.controller');
 
 /* CREATE */
@@ -57,5 +58,7 @@ router.patch("/update/quantity", checkToken, UpdateAllQuantities);
 
 
 router.post('/getbatchitemdetail', checkToken, getBatchItemDetail);
+
+router.post('/update-qty', checkToken, UpdateItemQuantity);
 
 module.exports = router;

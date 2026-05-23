@@ -394,6 +394,7 @@ ORDER BY
         const query = `
         SELECT
             coi.type_slno,
+            coi.canteen_order_id,
             coi.item_id,
             im.item_name,
             dt.type_desc,
@@ -432,6 +433,17 @@ ORDER BY
 
         executeQuery(query, [id], callback);
     },
+    UpdateItemQuantity: (canteen_order_item_id, updatedQty, callback) => {
+        const query = `
+            UPDATE canteen_order_item
+            SET quantity = ?
+            WHERE canteen_order_item_id = ?
+        `;
+
+        executeQuery(query, [updatedQty, canteen_order_item_id], callback);
+    },
+
+
 
     CancelCanteenOrders: (is_active, canteen_order_item_id, callback) => {
         const query = `

@@ -10,7 +10,7 @@ const pool = createPool({
     dateStrings: true
 });
 
-const hrpool = createPool({
+const hrpool = createPool({ 
     port: process.env.DB_PORT,
     host: process.env.HR_HOST,
     user: process.env.HR_DB_USER,

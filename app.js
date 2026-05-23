@@ -326,6 +326,9 @@ const store_master = require('./api/store_master/store_master.router')
 const vendor_master = require('./api/vendor_master/vendor_master_.router')
 const workOrder = require('./api/workOrder/workOrder.router')
 
+const CanteenHighlight = require('./api/canteenHighlights/highlight.router')
+const CanteenHighlightMapping = require('./api/canteenHighlightsMapping/highlightmapping.router')
+
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -551,6 +554,9 @@ app.use('/api/RateVariationReport', RateVariationReport)
 app.use('/api/store_master', store_master)
 app.use('/api/vendor_master', vendor_master)
 app.use('/api/workOrder', workOrder)
+
+app.use('/api/highlightmaping', CanteenHighlightMapping)
+app.use('/api/highlight', CanteenHighlight)
 
 
 

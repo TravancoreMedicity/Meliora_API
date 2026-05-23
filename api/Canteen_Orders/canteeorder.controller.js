@@ -15,7 +15,8 @@ const {
     GetAllActiveBedDetail,
     PatientLastWeekOrders,
     UpdateAllQuantitiesService,
-    getBatchItemDetail
+    getBatchItemDetail,
+    UpdateItemQuantity
 } = require('./canteenorder.service');
 
 module.exports = {
@@ -398,6 +399,38 @@ module.exports = {
                 success: 1,
                 message: "Items Added Successfully",
                 data: results
+            });
+        });
+    },
+
+    UpdateItemQuantity: (req, res) => {
+
+        const { canteen_order_item_id, updatedQty } = req.body;
+
+        if (!canteen_order_item_id) {
+            return res.status(200).json({
+                success: 0,
+                message: "Order Item Detail Id is Missing!"
+            });
+        }
+
+        if (!updatedQty || updatedQty < 1) {
+            return res.status(200).json({
+                success: 0,
+                message: "Enter a Valid Quantity"
+            });
+        }
+
+        UpdateItemQuantity(canteen_order_item_id, updatedQty, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Quantity Updated Successfully!"
             });
         });
     },

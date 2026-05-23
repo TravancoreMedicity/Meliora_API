@@ -160,6 +160,7 @@ module.exports = {
         WHERE 
             pds.is_active = 1
             AND pds.plan_id = ?
+            AND DATE(pds.process_date) = CURDATE();
     `;
 
         pool.query(query, [plan_id], (error, results) => {

@@ -104,6 +104,9 @@ const {
     insertIncidentNature,
     updateIncidentNature,
     getIncidentFromDashboard,
+    getIncidentInitiator,
+    InsertIncCommonDetail,
+    getAllPgHsStaffDetail,
 
 } = require('./incident.service');
 
@@ -1960,9 +1963,34 @@ module.exports = {
             });
         });
     },
+    getAllPgHsStaffDetail: (req, res) => {
+        getAllPgHsStaffDetail((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Record Found',
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Data Fetched Successfully',
+                data: results
+            });
+        });
+    },
+
+
     getHsPgStaffDetail: (req, res) => {
         const data = req.body;
-        getHsPgStaffDetail(data, (err, results) => {
+        getProfessionalStaff(data, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -2156,6 +2184,8 @@ module.exports = {
                             irm.dep_slno,
                             irm.sec_slno,
                             cd.desg_name,
+                            icd.inc_common_description,
+                            icd.inc_common_dtl_slno,
                             irm.inc_data_collection_req,
                             JSON_ARRAYAGG(
                                 JSON_OBJECT(
@@ -2176,6 +2206,7 @@ module.exports = {
                         LEFT JOIN inc_staff_dtl isd ON irm.inc_register_slno = isd.inc_register_slno AND irm.inc_initiator_slno = 2
                         LEFT JOIN inc_visitor_dtl ivd ON irm.inc_register_slno = ivd.inc_register_slno AND irm.inc_initiator_slno = 3
                         LEFT JOIN inc_asset_dtl iad ON irm.inc_register_slno = iad.inc_register_slno AND irm.inc_initiator_slno = 4
+                        LEFT JOIN inc_common_dtl icd ON irm.inc_register_slno = icd.inc_register_slno AND irm.inc_initiator_slno = 5
                         LEFT JOIN co_employee_master cm ON irm.create_user = cm.em_id
                         LEFT JOIN co_department_mast dp ON cm.em_department = dp.dept_id
                         LEFT JOIN co_deptsec_mast ds ON cm.em_dept_section = ds.sec_id
@@ -2210,8 +2241,6 @@ module.exports = {
             });
 
         } catch (error) {
-
-            console.log({ error });
 
             return res.status(500).json({
                 success: 0,
@@ -2638,7 +2667,6 @@ module.exports = {
 
             InsertLevelReviewDetail(reviewdetail, (err, results) => {
                 if (err) {
-                    console.log("erorro in Insering Level Review", err);
                     return res.status(200).json({
                         success: 0,
                         message: err
@@ -3298,7 +3326,7 @@ module.exports = {
         };
 
 
-
+        
         // common code for sending error mesg and suceess mesg  for reducing code repeatetion
         const sendError = (err) => res.status(200).json({ success: 0, message: err });
         const sendSuccess = (id) => res.status(200).json({
@@ -3461,8 +3489,22 @@ module.exports = {
                     });
             }
 
+            if (inc_initiator_slno === 5) {
+                const commonData = {
+                    inc_register_slno: insertId,
+                    inc_common_description: inc_initiator_dtl || "",
+                    create_user
+                };
 
-
+                InsertIncCommonDetail(commonData, (err) => {
+                    if (err) {
+                        return ChangeIncidentStatus({ incident_slno: insertId }, () => {
+                            return sendError(err);
+                        });
+                    }
+                    return sendSuccess(insertId);
+                });
+            }
         });
     },
 
@@ -3561,6 +3603,31 @@ module.exports = {
             return res.status(200).json({
                 success: 2,
                 message: 'Data Updated Successfully',
+                data: results
+            });
+        });
+    },
+
+
+
+    getIncidentInitiator: (req, res) => {
+        getIncidentInitiator((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: 'No Data Found',
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: 'Fetched  Successfully',
                 data: results
             });
         });

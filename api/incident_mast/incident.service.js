@@ -1427,6 +1427,65 @@ WHERE
             }
         );
     },
+
+    getAllPgHsStaffDetail: (callback) => {
+        hspgspool.query(
+            `
+        SELECT 
+            em_id,
+            em_no,
+            em_salutation,
+            em_name,
+            em_gender,
+            em_dob,
+            em_age_year,
+            em_age_month,
+            em_age_day,
+            em_doj,
+            em_mobile,
+            em_phone,
+            em_email,
+            em_branch,
+            em_department,
+            em_dept_section,
+            em_institution_type,
+            em_designation,
+            em_doc_type,
+            em_category,
+            em_prob_end_date,
+            em_conf_end_date,
+            em_retirement_date,
+            em_contract_end_date,
+            em_status,
+            hrm_emp_master.create_user,
+            addressPermnt1,
+            addressPermnt2, 
+            hrm_pin1,
+            em_region,
+            addressPresent1,
+            addressPresent2,
+            hrm_pin2, 
+            hrm_region2, 
+            blood_slno,
+            hrm_religion,
+            contract_status, dept_name  , sect_name  
+            FROM hrm_emp_master
+            inner join hrm_department on dept_id=em_department
+            inner join hrm_dept_section on sect_id=em_dept_section
+            where em_status =1 
+            `,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+
+
     getAllassetDtl: (data, callback) => {
         pool.query(
             `
@@ -1658,6 +1717,26 @@ WHERE
             }
         );
     },
+    InsertIncCommonDetail: (data, callback) => {
+        pool.query(
+            `INSERT INTO inc_common_dtl (
+            inc_register_slno,
+            inc_common_description,
+            create_user
+        ) VALUES (?, ?, ?)`,
+            [
+                data.inc_register_slno,
+                data.inc_common_description,
+                data.create_user
+            ],
+            (error, results) => {
+                if (error) return callback(error);
+                callback(null, results);
+            }
+        );
+    },
+
+
     // rohith
     getAllIncidentDetail: (data, callback) => {
         pool.query(
@@ -1717,6 +1796,8 @@ WHERE
                 level_review_state,
                 cld.level_name,
                 cd.desg_name,
+                icd.inc_common_description,
+                icd.inc_common_dtl_slno,
                 irm.inc_data_collection_req,
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
@@ -1739,6 +1820,9 @@ WHERE
                     LEFT JOIN
                 inc_asset_dtl iad ON irm.inc_register_slno = iad.inc_register_slno
                     AND irm.inc_initiator_slno = 4
+                    LEFT JOIN
+                inc_common_dtl icd ON irm.inc_register_slno = icd.inc_register_slno
+                    AND irm.inc_initiator_slno = 5
                     LEFT JOIN
                 co_employee_master cm ON irm.create_user = cm.em_id
                     LEFT JOIN
@@ -1875,8 +1959,10 @@ SELECT
     irm.inc_rca_hod_approve,
     irm.inc_corrective_hod_approval,
     irm.inc_preventive_qad_approval,
-    cd.desg_name,
+    cd.desg_name,   
     irm.inc_data_collection_req,
+    icd.inc_common_description,
+    icd.inc_common_dtl_slno,
     JSON_ARRAYAGG(
                     JSON_OBJECT(
                         'section', cds.sec_name,
@@ -1898,6 +1984,9 @@ FROM
         LEFT JOIN
     inc_asset_dtl iad ON irm.inc_register_slno = iad.inc_register_slno
         AND irm.inc_initiator_slno = 4
+        LEFT JOIN
+    inc_common_dtl icd ON irm.inc_register_slno = icd.inc_register_slno
+        AND irm.inc_initiator_slno = 5
         LEFT JOIN
     co_employee_master cm ON irm.create_user = cm.em_id
         LEFT JOIN
@@ -1998,6 +2087,8 @@ FROM
     ist.inc_staff_type_name,
     cd.desg_name,
     irm.inc_data_collection_req,
+    icd.inc_common_description,
+    icd.inc_common_dtl_slno,
     irm.dep_slno,
     irm.sec_slno,
     JSON_ARRAYAGG(
@@ -2021,6 +2112,9 @@ FROM
         LEFT JOIN
     inc_asset_dtl iad ON irm.inc_register_slno = iad.inc_register_slno
         AND irm.inc_initiator_slno = 4
+        LEFT JOIN
+    inc_common_dtl icd ON irm.inc_register_slno = icd.inc_register_slno
+        AND irm.inc_initiator_slno = 5
         LEFT JOIN
     co_employee_master cm ON irm.create_user = cm.em_id
         LEFT JOIN
@@ -3364,6 +3458,8 @@ SELECT
     level_review_state,
     cld.level_name,
     idc.inc_dep_status,
+    icd.inc_common_description,
+    icd.inc_common_dtl_slno,
     cdd.sec_name AS requested_user_dep,
     JSON_ARRAYAGG(
         JSON_OBJECT(
@@ -3391,7 +3487,9 @@ FROM inc_register_master irm
     LEFT JOIN inc_asset_dtl iad 
         ON irm.inc_register_slno = iad.inc_register_slno 
        AND irm.inc_initiator_slno = 4
-
+        LEFT JOIN
+    inc_common_dtl icd ON irm.inc_register_slno = icd.inc_register_slno
+        AND irm.inc_initiator_slno = 5
     LEFT JOIN co_employee_master cm ON irm.create_user = cm.em_id
     LEFT JOIN co_department_mast dp ON cm.em_department = dp.dept_id
     LEFT JOIN co_deptsec_mast ds ON cm.em_dept_section = ds.sec_id
@@ -3490,6 +3588,8 @@ GROUP BY irm.inc_register_slno`,
                 level_slno,
                 level_review_state,
                 cld.level_name,
+                            icd.inc_common_description,
+                icd.inc_common_dtl_slno,
                 cdd.sec_name AS requested_user_dep,
                 idad.inc_dep_action_status,
 
@@ -3518,6 +3618,9 @@ GROUP BY irm.inc_register_slno`,
                 LEFT JOIN inc_asset_dtl iad 
                     ON irm.inc_register_slno = iad.inc_register_slno 
                 AND irm.inc_initiator_slno = 4
+                    LEFT JOIN
+                inc_common_dtl icd ON irm.inc_register_slno = icd.inc_register_slno
+                    AND irm.inc_initiator_slno = 5
                 LEFT JOIN co_employee_master cm ON irm.create_user = cm.em_id
                 LEFT JOIN co_department_mast dp ON cm.em_department = dp.dept_id
                 LEFT JOIN co_deptsec_mast ds ON cm.em_dept_section = ds.sec_id
@@ -3809,6 +3912,8 @@ WHERE
             ist.inc_staff_type_name,
             irm.dep_slno,
             irm.sec_slno,
+            icd.inc_common_description,
+            icd.inc_common_dtl_slno,
             cd.desg_name,
             irm.inc_data_collection_req,
             JSON_ARRAYAGG(
@@ -3831,6 +3936,7 @@ WHERE
         LEFT JOIN inc_staff_dtl isd ON irm.inc_register_slno = isd.inc_register_slno AND irm.inc_initiator_slno = 2
         LEFT JOIN inc_visitor_dtl ivd ON irm.inc_register_slno = ivd.inc_register_slno AND irm.inc_initiator_slno = 3
         LEFT JOIN inc_asset_dtl iad ON irm.inc_register_slno = iad.inc_register_slno AND irm.inc_initiator_slno = 4
+        LEFT JOIN inc_common_dtl icd ON irm.inc_register_slno = icd.inc_register_slno AND irm.inc_initiator_slno = 5
         LEFT JOIN co_employee_master cm ON irm.create_user = cm.em_id
         LEFT JOIN co_department_mast dp ON cm.em_department = dp.dept_id
         LEFT JOIN co_deptsec_mast ds ON cm.em_dept_section = ds.sec_id
@@ -3873,7 +3979,8 @@ WHERE
                 inc_nature_name ,
                 inc_nature_status
             FROM
-                inc_nature`,
+                inc_nature
+            WHERE inc_nature_status = 1`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -3883,6 +3990,19 @@ WHERE
             }
         )
     },
+    getIncidentInitiator: (callback) => {
+        pool.query(
+            `Select inc_initiator_slno,inc_initiator_name,inc_initiator_status,inc_initiator_alias from inc_initiator where inc_initiator_status = 1`,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        )
+    },
+
 
     SingleDepartmentActionDetail: (data, callback) => {
         pool.query(
@@ -3986,6 +4106,8 @@ WHERE
                 irm.dep_slno,
                 irm.sec_slno,
                 cd.desg_name,
+                icd.inc_common_description,
+                icd.inc_common_dtl_slno,
                 irm.inc_data_collection_req,
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
@@ -4006,6 +4128,7 @@ WHERE
                 LEFT JOIN inc_staff_dtl isd ON irm.inc_register_slno = isd.inc_register_slno AND irm.inc_initiator_slno = 2
                 LEFT JOIN inc_visitor_dtl ivd ON irm.inc_register_slno = ivd.inc_register_slno AND irm.inc_initiator_slno = 3
                 LEFT JOIN inc_asset_dtl iad ON irm.inc_register_slno = iad.inc_register_slno AND irm.inc_initiator_slno = 4
+                LEFT JOIN inc_common_dtl icd ON irm.inc_register_slno = icd.inc_register_slno AND irm.inc_initiator_slno = 5
                 LEFT JOIN co_employee_master cm ON irm.create_user = cm.em_id
                 LEFT JOIN co_department_mast dp ON cm.em_department = dp.dept_id
                 LEFT JOIN co_deptsec_mast ds ON cm.em_dept_section = ds.sec_id

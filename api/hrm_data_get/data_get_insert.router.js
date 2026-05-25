@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
+const { normalRateLimiter } = require("../../middleware/rateLimiter");
 const { getdepartment, getdepartmentSection, getemployeemaster, getemployeeuserPass,
     getauthorization, empMasterUpdate, departmentUpdate, departmentSecUpdate, getdesignation,
     getbranch, getSalutation, emploginUpdate,
@@ -22,7 +23,7 @@ router.get("/emploginUpdate", checkToken, emploginUpdate)
 
 
 // rohith 
-router.post('/getStaffdetail', checkToken, getStaffDetail)
-router.get('/getStaffdetail', checkToken, getAllProfessionalEmployeeDetail)
+router.post('/getStaffdetail',normalRateLimiter, checkToken, getStaffDetail)
+router.get('/getStaffdetail',normalRateLimiter, checkToken, getAllProfessionalEmployeeDetail)
 
 module.exports = router;

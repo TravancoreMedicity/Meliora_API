@@ -90,6 +90,8 @@ const { IncidetDetailInsert, IncidentDetailsUpdate, UpdateMarkedIncidentDetails,
     insertIncidentNature,
     updateIncidentNature,
     getIncidentFromDashboard,
+    getIncidentInitiator,
+    getAllPgHsStaffDetail,
 } = require('./incident.controller');
 const { uploadFileIncidentService,
     getIncidentFiles,
@@ -103,17 +105,24 @@ const { uploadFileIncidentService,
 
 //incident category and subcategory master
 router.post('/incidentcategoryinsert', checkToken, normalRateLimiter, IncidentCategoryMaster);
-router.get('/allcategory', checkToken, normalRateLimiter, getAllIncidentCategory)
-router.patch('/incidentcategoryupdate', checkToken, normalRateLimiter, IncidentCategoryUpdate)
+router.get('/allcategory', checkToken, normalRateLimiter, getAllIncidentCategory);
+router.patch('/incidentcategoryupdate', checkToken, normalRateLimiter, IncidentCategoryUpdate);
 
 router.post('/insertsubcatmast', checkToken, normalRateLimiter, IncidentSubCategoryInsert);
-router.get('/getallsubcatmast', checkToken, normalRateLimiter, getAllIncidentSubCategory)
-router.patch('/updatesubcatmast', checkToken, normalRateLimiter, IncidentSubCategoryUpdate)
+router.get('/getallsubcatmast', checkToken, normalRateLimiter, getAllIncidentSubCategory);
+router.patch('/updatesubcatmast', checkToken, normalRateLimiter, IncidentSubCategoryUpdate);
+
+
 //incident Registartion 
 router.post('/getptdetail', checkToken, normalRateLimiter, getPatientDetail);
+router.post('/getassetdtl', checkToken, normalRateLimiter, getAllassetDtl);
+
+
 router.post('/getpssstaff', checkToken, normalRateLimiter, getProfessionalStaff);
 router.post('/gethspgstaff', checkToken, normalRateLimiter, getHsPgStaffDetail);
-router.post('/getassetdtl', checkToken, normalRateLimiter, getAllassetDtl);
+//fetch all pghs 
+router.get("/fetchallpghs", checkToken, normalRateLimiter, getAllPgHsStaffDetail);
+
 
 router.post('/incregistration', checkToken, normalRateLimiter, IncidentRegistration);
 router.post('/incidentupdation', checkToken, normalRateLimiter, IncidentUpdation);
@@ -198,10 +207,9 @@ router.post('/insertNature', checkToken, normalRateLimiter, insertIncidentNature
 router.patch('/updateNature', checkToken, normalRateLimiter, updateIncidentNature)
 
 
-router.post('/getincidentcommon',checkToken,normalRateLimiter,getIncidentFromDashboard)
+router.post('/getincidentcommon', checkToken, normalRateLimiter, getIncidentFromDashboard)
 
-
-
+router.post('/initiator', checkToken, normalRateLimiter, getIncidentInitiator)
 
 /**
  * 

@@ -5498,8 +5498,215 @@ where fb_pro_check_bed.fb_bed_slno = ?;`,
             }
         )
     },
+    getPremFeedbackReport: (data, callBack) => {
+        pool.query(`
+              SELECT 
+                fb_transaction_mast.fb_transact_slno,
+                fb_patient_name,
+                fb_patient_mob,
+                fd_mark,
+                fb_suggestion,
+                rating_name,
+                rating_value,
+                fd_qa_eng,
+                fb_ip_num,
+                fb_transaction_mast.create_date,
+                fb_transaction_mast.create_user,
+                em_name
+                FROM fb_transaction_mast  
+                LEFT JOIN fb_transaction_detl ON fb_transaction_detl.fb_transact_slno = fb_transaction_mast.fb_transact_slno
+                LEFT JOIN fb_mast_qakey ON fb_mast_qakey.fbqa_slno = fb_transaction_detl.fbqa_slno
+                LEFT JOIN fb_detl ON fb_detl.fddet_slno = fb_transaction_detl.fddet_slno
+                LEFT JOIN co_employee_master ON co_employee_master.em_id = fb_transaction_mast.create_user
+                WHERE fb_transaction_mast.fdmast_slno = ?
+                AND fb_transaction_mast.create_date between ? and ?;
+            `,
+            [
+                data.FEEDBACKID,
+                data.FROM_DATE,
+                data.TO_DATE
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getProFollowupReport: (data, callBack) => {
+        pool.query(`
+            SELECT 
+                fb_schedule_date,
+                fb_ip_no,
+                fb_pt_no,
+                fb_pro_remark,
+                co_employee_master.em_name,
+                fb_ip_date_schedule.create_date
+            FROM
+                fb_ip_date_schedule
+                    LEFT JOIN
+                co_employee ON co_employee.empdtl_slno = fb_ip_date_schedule.create_user
+                    LEFT JOIN
+                co_employee_master ON co_employee_master.em_no = co_employee.emp_username
+            WHERE
+                fb_ip_date_schedule.create_date BETWEEN ? AND ?`,
+            [
+                data.FROM_DATE,
+                data.TO_DATE
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    getAllPremDashBoardDetail: (data, callBack) => {
+        const { fromdate, todate } = data;
+        pool.query(
+            `
+        SELECT 
+            fb_mast.fdmast_slno,
+            fb_mast.feedback_name,
+            COUNT(fb_transaction_mast.fdmast_slno) AS feedback_count,
+            fb_prem_targert_mast.prem_target
+        FROM fb_mast
+        LEFT JOIN fb_prem_targert_mast ON fb_mast.fdmast_slno = fb_prem_targert_mast.fdmast_slno
+        LEFT JOIN fb_transaction_mast
+            ON fb_transaction_mast.fdmast_slno = fb_mast.fdmast_slno
+            AND fb_transaction_mast.create_date BETWEEN ? AND ?
+        WHERE fb_mast.feedback_status = 1
+        AND fb_mast.fb_qr_status = 1
+        GROUP BY 
+            fb_mast.fdmast_slno,
+            fb_mast.feedback_name
+        `,
+            [fromdate, todate],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    getAllPremTargets: (callBack) => {
+        pool.query(
+            `
+                    SELECT
+            pt.prem_target_slno,
+            pt.fdmast_slno,
+            fm.feedback_name,
+            pt.prem_target,
+            pt.prem_status,
+            pt.create_user,
+            pt.edit_user,
+            pt.create_date,
+            pt.edit_date
+        FROM fb_prem_targert_mast pt
+        LEFT JOIN fb_mast fm
+            ON fm.fdmast_slno = pt.fdmast_slno
+        ORDER BY pt.prem_target_slno
+            `,
+            []
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    InsertPremTargets: (data, callBack) => {
 
 
+        pool.query(
+            `
+        INSERT INTO fb_prem_targert_mast (
+            fdmast_slno,
+            prem_target,
+            prem_status,
+            create_user
+        )
+        VALUES (?, ?, ?, ?)
+        `,
+            [
+                data.fdmast_slno,
+                data.prem_target,
+                data.prem_status,
+                data.create_user
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 
+    UpdatePremTargets: (data, callBack) => {
+        pool.query(
+            `
+        UPDATE fb_prem_targert_mast
+        SET
+            fdmast_slno = ?,
+            prem_target = ?,
+            prem_status = ?,
+            edit_user = ?
+        WHERE prem_target_slno = ?
+        `,
+            [
+                data.fdmast_slno,
+                data.prem_target,
+                data.prem_status,
+                data.edit_user,
+                data.prem_target_slno
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    checkTargetAlreadyExist: (data, callBack) => {
+        pool.query(
+            `
+                SELECT prem_target_slno
+                FROM fb_prem_targert_mast
+                WHERE fdmast_slno = ?
+        `,
+            [
+                data.fdmast_slno
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    checkUpdateTargetAlreadyExist: (data, callBack) => {
+        pool.query(
+            `
+                SELECT prem_target_slno
+                FROM fb_prem_targert_mast
+                WHERE fdmast_slno = ? AND  prem_target = ?
+        `,
+            [
+                data.fdmast_slno,
+                data.prem_target
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
 
 }

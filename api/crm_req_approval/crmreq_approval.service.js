@@ -162,18 +162,18 @@ module.exports = {
     },
 
     updateReqMstApproved: (data, callback) => {
-
         pool.query(
             `UPDATE
                    crm_request_master
              SET
-                   req_status = 'A',reject_status = ?,onhold_status = ?,internally_arranged_status=?
+                   req_status = 'A',reject_status = ?,onhold_status = ?,internally_arranged_status=?,crm_current_level=?,crm_current_level_review_state='A'
              WHERE
                    req_slno =?`,
             [
                 data.reject_status,
                 data.onhold_status,
                 data.internally_arranged_status,
+                data.currLevel,
                 data.req_slno
             ],
             (error, results, feilds) => {
@@ -184,11 +184,53 @@ module.exports = {
             }
         );
     },
-    updateApprovedInchargeItemStatus: (body) => {
-        return Promise.all(body.map((val) => {
-            return new Promise((resolve, reject) => {
+
+
+    // updateApprovedInchargeItemStatus: (body) => {
+    //     return Promise.all(body.map((val) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `UPDATE
+    //                        crm_reqitems_approval_details
+    //                  SET
+    //                        item_incharge_approve = ? ,
+    //                        item_incharge_remarks = ?  ,
+    //                        item_incharge_apprv_date = ?,
+    //                        item_incharge_user = ?
+    //                  WHERE
+    //                        req_detl_slno = ? and req_slno = ?`,
+    //                 [
+    //                     val.itemStatus,
+    //                     val.remarks,
+    //                     val.statusDate,
+    //                     val.user,
+    //                     val.req_detl_slno,
+    //                     val.req_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         return reject(error)
+    //                     }
+    //                     return resolve(results)
+    //                 }
+    //             )
+    //         })
+    //     })
+    //     )
+    // },
+
+
+    updateApprovedInchargeItemStatus: async (body) => {
+        const data = body;
+        const sortedBody = [...data].sort(
+            (a, b) => a.req_detl_slno - b.req_detl_slno
+        );
+
+        for (const val of sortedBody) {
+            await new Promise((resolve, reject) => {
                 pool.query(
-                    `UPDATE
+                    `
+              UPDATE
                            crm_reqitems_approval_details
                      SET
                            item_incharge_approve = ? ,
@@ -196,7 +238,8 @@ module.exports = {
                            item_incharge_apprv_date = ?,
                            item_incharge_user = ?
                      WHERE
-                           req_detl_slno = ? and req_slno = ?`,
+                           req_detl_slno = ? and req_slno = ?
+                `,
                     [
                         val.itemStatus,
                         val.remarks,
@@ -205,31 +248,74 @@ module.exports = {
                         val.req_detl_slno,
                         val.req_slno
                     ],
-                    (error, results, fields) => {
+                    (error, results) => {
                         if (error) {
-                            return reject(error)
+                            return reject(error);
                         }
-                        return resolve(results)
+                        resolve(results);
                     }
-                )
-            })
-        })
-        )
+                );
+            });
+        }
+
+        return { success: 1, message: "Incharge item status updated successfully" };
     },
 
-    updateApprovedHODItemStatus: (body) => {
-        return Promise.all(body.map((val) => {
-            return new Promise((resolve, reject) => {
+
+    // updateApprovedHODItemStatus: (body) => {
+    //     console.log(body, "approval items");
+
+    //     return Promise.all(body.map((val) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `UPDATE
+    //                        crm_reqitems_approval_details
+    //                  SET
+    //                        item_hod_approve = ? ,
+    //                        item_hod_remarks = ?  ,
+    //                        item_hod_apprv_date = ?,
+    //                        item_hod_user = ?
+    //                  WHERE
+    //                        req_detl_slno = ? and req_slno = ?`,
+    //                 [
+    //                     val.itemStatus,
+    //                     val.remarks,
+    //                     val.statusDate,
+    //                     val.user,
+    //                     val.req_detl_slno,
+    //                     val.req_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         return reject(error)
+    //                     }
+    //                     return resolve(results)
+    //                 }
+    //             )
+    //         })
+    //     })
+    //     )
+    // },
+    updateApprovedHODItemStatus: async (body) => {
+        const data = body;
+        const sortedBody = [...data].sort(
+            (a, b) => a.req_detl_slno - b.req_detl_slno
+        );
+
+        for (const val of sortedBody) {
+            await new Promise((resolve, reject) => {
                 pool.query(
-                    `UPDATE
-                           crm_reqitems_approval_details
-                     SET
-                           item_hod_approve = ? ,
-                           item_hod_remarks = ?  ,
-                           item_hod_apprv_date = ?,
-                           item_hod_user = ?
-                     WHERE
-                           req_detl_slno = ? and req_slno = ?`,
+                    `
+                UPDATE crm_reqitems_approval_details
+                SET
+                    item_hod_approve     = ?,
+                    item_hod_remarks     = ?,
+                    item_hod_apprv_date  = ?,
+                    item_hod_user        = ?
+                WHERE
+                    req_detl_slno = ?
+                    AND req_slno = ?
+                `,
                     [
                         val.itemStatus,
                         val.remarks,
@@ -238,23 +324,63 @@ module.exports = {
                         val.req_detl_slno,
                         val.req_slno
                     ],
-                    (error, results, fields) => {
+                    (error, results) => {
                         if (error) {
-                            return reject(error)
+                            return reject(error);
                         }
-                        return resolve(results)
+                        resolve(results);
                     }
-                )
-            })
-        })
-        )
+                );
+            });
+        }
+
+        return { success: 1, message: "HOD item status updated successfully" };
     },
 
-    updateApprovedDMSItemStatus: (body) => {
-        return Promise.all(body.map((val) => {
-            return new Promise((resolve, reject) => {
+    // updateApprovedDMSItemStatus: (body) => {
+    //     return Promise.all(body.map((val) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `UPDATE
+    //                        crm_reqitems_approval_details
+    //                  SET
+    //                        item_dms_approve = ? ,
+    //                        item_dms_remarks = ?  ,
+    //                        item_dms_apprv_date = ?,
+    //                        item_dms_user = ?
+    //                  WHERE
+    //                        req_detl_slno = ? and req_slno = ?`,
+    //                 [
+    //                     val.itemStatus,
+    //                     val.remarks,
+    //                     val.statusDate,
+    //                     val.user,
+    //                     val.req_detl_slno,
+    //                     val.req_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         return reject(error)
+    //                     }
+    //                     return resolve(results)
+    //                 }
+    //             )
+    //         })
+    //     })
+    //     )
+    // },
+
+    updateApprovedDMSItemStatus: async (body) => {
+        const data = body;
+        const sortedBody = [...data].sort(
+            (a, b) => a.req_detl_slno - b.req_detl_slno
+        );
+
+        for (const val of sortedBody) {
+            await new Promise((resolve, reject) => {
                 pool.query(
-                    `UPDATE
+                    `
+            UPDATE
                            crm_reqitems_approval_details
                      SET
                            item_dms_approve = ? ,
@@ -262,7 +388,8 @@ module.exports = {
                            item_dms_apprv_date = ?,
                            item_dms_user = ?
                      WHERE
-                           req_detl_slno = ? and req_slno = ?`,
+                           req_detl_slno = ? and req_slno = ?
+                `,
                     [
                         val.itemStatus,
                         val.remarks,
@@ -271,23 +398,65 @@ module.exports = {
                         val.req_detl_slno,
                         val.req_slno
                     ],
-                    (error, results, fields) => {
+                    (error, results) => {
                         if (error) {
-                            return reject(error)
+                            return reject(error);
                         }
-                        return resolve(results)
+                        resolve(results);
                     }
-                )
-            })
-        })
-        )
+                );
+            });
+        }
+
+        return { success: 1, message: "DMS item status updated successfully" };
     },
 
-    updateApprovedMSItemStatus: (body) => {
-        return Promise.all(body.map((val) => {
-            return new Promise((resolve, reject) => {
+
+    // updateApprovedMSItemStatus: (body) => {
+    //     return Promise.all(body.map((val) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `UPDATE
+    //                        crm_reqitems_approval_details
+    //                  SET
+    //                        item_ms_approve = ? ,
+    //                        item_ms_remarks = ?  ,
+    //                        item_ms_apprv_date = ?,
+    //                        item_ms_user = ?
+    //                  WHERE
+    //                        req_detl_slno = ? and req_slno = ?`,
+    //                 [
+    //                     val.itemStatus,
+    //                     val.remarks,
+    //                     val.statusDate,
+    //                     val.user,
+    //                     val.req_detl_slno,
+    //                     val.req_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         return reject(error)
+    //                     }
+    //                     return resolve(results)
+    //                 }
+    //             )
+    //         })
+    //     })
+    //     )
+    // },
+
+
+    updateApprovedMSItemStatus: async (body) => {
+        const data = body;
+        const sortedBody = [...data].sort(
+            (a, b) => a.req_detl_slno - b.req_detl_slno
+        );
+
+        for (const val of sortedBody) {
+            await new Promise((resolve, reject) => {
                 pool.query(
-                    `UPDATE
+                    `
+                    UPDATE
                            crm_reqitems_approval_details
                      SET
                            item_ms_approve = ? ,
@@ -295,7 +464,8 @@ module.exports = {
                            item_ms_apprv_date = ?,
                            item_ms_user = ?
                      WHERE
-                           req_detl_slno = ? and req_slno = ?`,
+                           req_detl_slno = ? and req_slno = ?
+                `,
                     [
                         val.itemStatus,
                         val.remarks,
@@ -304,17 +474,19 @@ module.exports = {
                         val.req_detl_slno,
                         val.req_slno
                     ],
-                    (error, results, fields) => {
+                    (error, results) => {
                         if (error) {
-                            return reject(error)
+                            return reject(error);
                         }
-                        return resolve(results)
+                        resolve(results);
                     }
-                )
-            })
-        })
-        )
+                );
+            });
+        }
+
+        return { success: 1, message: "MS item status updated successfully" };
     },
+
     // updateApprovedMOItemStatus: (body) => {
     //     return Promise.all(body.map((val) => {
     //         return new Promise((resolve, reject) => {
@@ -349,11 +521,52 @@ module.exports = {
     //     })
     //     )
     // },
+    // updateApprovedMOItemStatus: async (body) => {
+    //     for (const val of body) {
+    //         await new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `UPDATE
+    //                 crm_reqitems_approval_details
+    //             SET
+    //                 item_mo_approve = ?,
+    //                 item_mo_remarks = ?,
+    //                 item_mo_apprv_date = ?,
+    //                 item_mo_user = ?
+    //             WHERE
+    //                 req_detl_slno = ? AND req_slno = ?`,
+    //                 [
+    //                     val.itemStatus,
+    //                     val.remarks,
+    //                     val.statusDate,
+    //                     val.user,
+    //                     val.req_detl_slno,
+    //                     val.req_slno
+    //                 ],
+    //                 (error, results) => {
+    //                     if (error) {
+    //                         console.error("Deadlock or SQL error:", error);
+    //                         return reject(error);
+    //                     }
+    //                     resolve(results);
+    //                 }
+    //             );
+    //         });
+    //     }
+    // },
+
+
+
     updateApprovedMOItemStatus: async (body) => {
-        for (const val of body) {
+        const data = body;
+        const sortedBody = [...data].sort(
+            (a, b) => a.req_detl_slno - b.req_detl_slno
+        );
+
+        for (const val of sortedBody) {
             await new Promise((resolve, reject) => {
                 pool.query(
-                    `UPDATE
+                    `
+             UPDATE
                     crm_reqitems_approval_details
                 SET
                     item_mo_approve = ?,
@@ -361,7 +574,8 @@ module.exports = {
                     item_mo_apprv_date = ?,
                     item_mo_user = ?
                 WHERE
-                    req_detl_slno = ? AND req_slno = ?`,
+                    req_detl_slno = ? AND req_slno = ?
+                `,
                     [
                         val.itemStatus,
                         val.remarks,
@@ -372,7 +586,6 @@ module.exports = {
                     ],
                     (error, results) => {
                         if (error) {
-                            console.error("Deadlock or SQL error:", error);
                             return reject(error);
                         }
                         resolve(results);
@@ -380,13 +593,58 @@ module.exports = {
                 );
             });
         }
+
+        return { success: 1, message: "MO item status updated successfully" };
     },
 
-    updateApprovedSMOItemStatus: (body) => {
-        return Promise.all(body.map((val) => {
-            return new Promise((resolve, reject) => {
+
+
+
+    // updateApprovedSMOItemStatus: (body) => {
+    //     return Promise.all(body.map((val) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `UPDATE
+    //                        crm_reqitems_approval_details
+    //                  SET
+    //                        item_smo_approve = ? ,
+    //                        item_smo_remarks = ?  ,
+    //                        item_smo_apprv_date = ?,
+    //                        item_smo_user = ?
+    //                  WHERE
+    //                        req_detl_slno = ? and req_slno = ?`,
+    //                 [
+    //                     val.itemStatus,
+    //                     val.remarks,
+    //                     val.statusDate,
+    //                     val.user,
+    //                     val.req_detl_slno,
+    //                     val.req_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         return reject(error)
+    //                     }
+    //                     return resolve(results)
+    //                 }
+    //             )
+    //         })
+    //     })
+    //     )
+    // },
+
+
+    updateApprovedSMOItemStatus: async (body) => {
+        const data = body;
+        const sortedBody = [...data].sort(
+            (a, b) => a.req_detl_slno - b.req_detl_slno
+        );
+
+        for (const val of sortedBody) {
+            await new Promise((resolve, reject) => {
                 pool.query(
-                    `UPDATE
+                    `
+           UPDATE
                            crm_reqitems_approval_details
                      SET
                            item_smo_approve = ? ,
@@ -394,7 +652,8 @@ module.exports = {
                            item_smo_apprv_date = ?,
                            item_smo_user = ?
                      WHERE
-                           req_detl_slno = ? and req_slno = ?`,
+                           req_detl_slno = ? and req_slno = ?
+                `,
                     [
                         val.itemStatus,
                         val.remarks,
@@ -403,23 +662,65 @@ module.exports = {
                         val.req_detl_slno,
                         val.req_slno
                     ],
-                    (error, results, fields) => {
+                    (error, results) => {
                         if (error) {
-                            return reject(error)
+                            return reject(error);
                         }
-                        return resolve(results)
+                        resolve(results);
                     }
-                )
-            })
-        })
-        )
+                );
+            });
+        }
+
+        return { success: 1, message: "SMO item status updated successfully" };
     },
 
-    updateApprovedGMItemStatus: (body) => {
-        return Promise.all(body.map((val) => {
-            return new Promise((resolve, reject) => {
+
+
+    // updateApprovedGMItemStatus: (body) => {
+    //     return Promise.all(body.map((val) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `UPDATE
+    //                        crm_reqitems_approval_details
+    //                  SET
+    //                        item_gm_approve = ? ,
+    //                        item_gm_remarks = ?  ,
+    //                        item_gm_apprv_date = ?,
+    //                        item_gm_user = ?
+    //                  WHERE
+    //                        req_detl_slno = ? and req_slno = ?`,
+    //                 [
+    //                     val.itemStatus,
+    //                     val.remarks,
+    //                     val.statusDate,
+    //                     val.user,
+    //                     val.req_detl_slno,
+    //                     val.req_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         return reject(error)
+    //                     }
+    //                     return resolve(results)
+    //                 }
+    //             )
+    //         })
+    //     })
+    //     )
+    // },
+
+    updateApprovedGMItemStatus: async (body) => {
+        const data = body;
+        const sortedBody = [...data].sort(
+            (a, b) => a.req_detl_slno - b.req_detl_slno
+        );
+
+        for (const val of sortedBody) {
+            await new Promise((resolve, reject) => {
                 pool.query(
-                    `UPDATE
+                    `
+                       UPDATE
                            crm_reqitems_approval_details
                      SET
                            item_gm_approve = ? ,
@@ -427,7 +728,8 @@ module.exports = {
                            item_gm_apprv_date = ?,
                            item_gm_user = ?
                      WHERE
-                           req_detl_slno = ? and req_slno = ?`,
+                           req_detl_slno = ? and req_slno = ?
+                `,
                     [
                         val.itemStatus,
                         val.remarks,
@@ -436,24 +738,66 @@ module.exports = {
                         val.req_detl_slno,
                         val.req_slno
                     ],
-                    (error, results, fields) => {
+                    (error, results) => {
                         if (error) {
-                            return reject(error)
+                            return reject(error);
                         }
-                        return resolve(results)
+                        resolve(results);
                     }
-                )
-            })
-        })
-        )
+                );
+            });
+        }
+
+        return { success: 1, message: "GM item status updated successfully" };
     },
 
 
-    updateApprovedMDItemStatus: (body) => {
-        return Promise.all(body.map((val) => {
-            return new Promise((resolve, reject) => {
+
+    // updateApprovedMDItemStatus: (body) => {
+    //     return Promise.all(body.map((val) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `UPDATE
+    //                        crm_reqitems_approval_details
+    //                  SET
+    //                        item_md_approve = ? ,
+    //                        item_md_remarks = ?  ,
+    //                        item_md_apprv_date = ?,
+    //                        item_md_user = ?
+    //                  WHERE
+    //                        req_detl_slno = ? and req_slno = ?`,
+    //                 [
+    //                     val.itemStatus,
+    //                     val.remarks,
+    //                     val.statusDate,
+    //                     val.user,
+    //                     val.req_detl_slno,
+    //                     val.req_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         return reject(error)
+    //                     }
+    //                     return resolve(results)
+    //                 }
+    //             )
+    //         })
+    //     })
+    //     )
+    // },
+
+
+    updateApprovedMDItemStatus: async (body) => {
+        const data = body;
+        const sortedBody = [...data].sort(
+            (a, b) => a.req_detl_slno - b.req_detl_slno
+        );
+
+        for (const val of sortedBody) {
+            await new Promise((resolve, reject) => {
                 pool.query(
-                    `UPDATE
+                    `
+                           UPDATE
                            crm_reqitems_approval_details
                      SET
                            item_md_approve = ? ,
@@ -461,7 +805,8 @@ module.exports = {
                            item_md_apprv_date = ?,
                            item_md_user = ?
                      WHERE
-                           req_detl_slno = ? and req_slno = ?`,
+                           req_detl_slno = ? and req_slno = ?
+                `,
                     [
                         val.itemStatus,
                         val.remarks,
@@ -470,23 +815,65 @@ module.exports = {
                         val.req_detl_slno,
                         val.req_slno
                     ],
-                    (error, results, fields) => {
+                    (error, results) => {
                         if (error) {
-                            return reject(error)
+                            return reject(error);
                         }
-                        return resolve(results)
+                        resolve(results);
                     }
-                )
-            })
-        })
-        )
+                );
+            });
+        }
+
+        return { success: 1, message: "MD item status updated successfully" };
     },
 
-    updateApprovedEDItemStatus: (body) => {
-        return Promise.all(body.map((val) => {
-            return new Promise((resolve, reject) => {
+
+    // updateApprovedEDItemStatus: (body) => {
+    //     return Promise.all(body.map((val) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `UPDATE
+    //                        crm_reqitems_approval_details
+    //                  SET
+    //                        item_ed_approve = ? ,
+    //                        item_ed_remarks = ?  ,
+    //                        item_ed_apprv_date = ?,
+    //                        item_ed_user = ?
+    //                  WHERE
+    //                        req_detl_slno = ? and req_slno = ?`,
+    //                 [
+    //                     val.itemStatus,
+    //                     val.remarks,
+    //                     val.statusDate,
+    //                     val.user,
+    //                     val.req_detl_slno,
+    //                     val.req_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         return reject(error)
+    //                     }
+    //                     return resolve(results)
+    //                 }
+    //             )
+    //         })
+    //     })
+    //     )
+    // },
+
+
+    updateApprovedEDItemStatus: async (body) => {
+        const data = body;
+        const sortedBody = [...data].sort(
+            (a, b) => a.req_detl_slno - b.req_detl_slno
+        );
+
+        for (const val of sortedBody) {
+            await new Promise((resolve, reject) => {
                 pool.query(
-                    `UPDATE
+                    `
+                      UPDATE
                            crm_reqitems_approval_details
                      SET
                            item_ed_approve = ? ,
@@ -494,7 +881,8 @@ module.exports = {
                            item_ed_apprv_date = ?,
                            item_ed_user = ?
                      WHERE
-                           req_detl_slno = ? and req_slno = ?`,
+                           req_detl_slno = ? and req_slno = ?
+                `,
                     [
                         val.itemStatus,
                         val.remarks,
@@ -503,23 +891,66 @@ module.exports = {
                         val.req_detl_slno,
                         val.req_slno
                     ],
-                    (error, results, fields) => {
+                    (error, results) => {
                         if (error) {
-                            return reject(error)
+                            return reject(error);
                         }
-                        return resolve(results)
+                        resolve(results);
                     }
-                )
-            })
-        })
-        )
+                );
+            });
+        }
+
+        return { success: 1, message: "ED item status updated successfully" };
     },
 
-    updateApprovedManageItemStatus: (body) => {
-        return Promise.all(body.map((val) => {
-            return new Promise((resolve, reject) => {
+
+
+    // updateApprovedManageItemStatus: (body) => {
+    //     return Promise.all(body.map((val) => {
+    //         return new Promise((resolve, reject) => {
+    //             pool.query(
+    //                 `UPDATE
+    //                        crm_reqitems_approval_details
+    //                  SET
+    //                        item_manage_approve = ? ,
+    //                        item_manage_remarks = ?  ,
+    //                        item_manage_apprv_date = ?,
+    //                        item_manage_user = ?
+    //                  WHERE
+    //                        req_detl_slno = ? and req_slno = ?`,
+    //                 [
+    //                     val.itemStatus,
+    //                     val.remarks,
+    //                     val.statusDate,
+    //                     val.user,
+    //                     val.req_detl_slno,
+    //                     val.req_slno
+    //                 ],
+    //                 (error, results, fields) => {
+    //                     if (error) {
+    //                         return reject(error)
+    //                     }
+    //                     return resolve(results)
+    //                 }
+    //             )
+    //         })
+    //     })
+    //     )
+    // },
+
+
+    updateApprovedManageItemStatus: async (body) => {
+        const data = body;
+        const sortedBody = [...data].sort(
+            (a, b) => a.req_detl_slno - b.req_detl_slno
+        );
+
+        for (const val of sortedBody) {
+            await new Promise((resolve, reject) => {
                 pool.query(
-                    `UPDATE
+                    `
+                   UPDATE
                            crm_reqitems_approval_details
                      SET
                            item_manage_approve = ? ,
@@ -527,7 +958,8 @@ module.exports = {
                            item_manage_apprv_date = ?,
                            item_manage_user = ?
                      WHERE
-                           req_detl_slno = ? and req_slno = ?`,
+                           req_detl_slno = ? and req_slno = ?
+                `,
                     [
                         val.itemStatus,
                         val.remarks,
@@ -536,16 +968,17 @@ module.exports = {
                         val.req_detl_slno,
                         val.req_slno
                     ],
-                    (error, results, fields) => {
+                    (error, results) => {
                         if (error) {
-                            return reject(error)
+                            return reject(error);
                         }
-                        return resolve(results)
+                        resolve(results);
                     }
-                )
-            })
-        })
-        )
+                );
+            });
+        }
+
+        return { success: 1, message: "GM item status updated successfully" };
     },
 
     updateReqMstReject: (data, callback) => {
@@ -1915,6 +2348,43 @@ module.exports = {
                     return callBack(error);
                 }
                 return callBack(null, results);
+            }
+        );
+    },
+
+
+
+    updateCrfApproval: (data, callback) => {
+        pool.query(
+            `INSERT INTO crm_level_review (
+             crm_register_slno,
+             level_slno,
+             level_review_state,
+             level_review,
+             level_employee,
+             level_review_date,
+             level_review_status,
+             level_name,
+             level_review_details
+             )
+             VALUES (?, ?, ?, ?, ?, ?, ?,?,?);`,
+            [
+                data.req_slno,
+                data.LevelSlno,
+                data.approve_status,
+                data.remarks,
+                data.user_id,
+                data.approve_date,
+                data.level_review_status,
+                data.LevelName,
+                data.detial_analysis
+
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
             }
         );
     },

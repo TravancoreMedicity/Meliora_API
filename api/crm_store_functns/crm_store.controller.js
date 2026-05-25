@@ -179,20 +179,51 @@ module.exports = {
         })
     },
 
+    // updateGrnItemQnty: async (req, res) => {
+    //     const body = req.body;
+    //     updateGrnItemQnty(body).then(results => {
+    //         return res.status(200).json({
+    //             success: 1,
+    //             message: "Updated"
+    //         });
+    //     }).catch(err => {
+    //         return res.status(200).json({
+    //             success: 0,
+    //             message: "Error Occured"
+    //         });
+    //     })
+    // },
     updateGrnItemQnty: async (req, res) => {
-        const body = req.body;
-        updateGrnItemQnty(body).then(results => {
+        try {
+            const body = req.body;
+            const BATCH_SIZE = 500;
+
+            if (!Array.isArray(body) || body.length === 0) {
+                return res.status(400).json({
+                    success: 0,
+                    message: "Invalid payload"
+                });
+            }
+
+            for (let i = 0; i < body.length; i += BATCH_SIZE) {
+                const batch = body.slice(i, i + BATCH_SIZE);
+                await updateGrnItemQnty(batch);
+            }
+
             return res.status(200).json({
                 success: 1,
-                message: "Updated"
+                message: "Updated Successfully"
             });
-        }).catch(err => {
-            return res.status(200).json({
+
+        } catch (err) {
+            console.error("GRN Update Error:", err);
+            return res.status(500).json({
                 success: 0,
-                message: "Error Occured"
+                message: "Error Occurred"
             });
-        })
+        }
     },
+
 
     getPOItemDetails: (req, res) => {
         const body = req.body;
@@ -222,7 +253,7 @@ module.exports = {
         UpdateStoreReceive(body).then(results => {
             const { store_receive_user, store_receive_date } = body[0]
             if (results) {
- 
+
                 const groupedData = {};
 
                 body.forEach(item => {

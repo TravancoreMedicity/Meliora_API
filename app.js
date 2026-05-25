@@ -13,8 +13,9 @@ const fs = require("fs");
 
 //sockect io configuration
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+// app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '50mb' }));
 app.use(cookieParser());
 // app.use(lusca.csrf());
 
@@ -35,6 +36,7 @@ const allowedOrigins = [
   "http://192.168.22.5:3000",
   "http://192.168.22.8:3000",
   "http://192.168.22.3:3000",
+  "http://192.168.22.3:7000",
 
 ];
 
@@ -289,6 +291,8 @@ const ContractMaster = require("./api/contract_master/contract.router");
 const condemMasters = require('./api/am_condemnation_master/condem_master.router')
 const RateVariationReport = require('./api/RateVariationReport/RateVariationReport.router')
 const store_master = require('./api/store_master/store_master.router')
+const vendor_master = require('./api/vendor_master/vendor_master_.router')
+const workOrder = require('./api/workOrder/workOrder.router')
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -444,7 +448,7 @@ app.use("/api/ItBillType", ItBillSupplierList);
 app.use("/api/qidepartment", qideptmast);
 app.use("/api/qiendoscopy", qiendoscopy);
 app.use("/api/newCRFStore", newCRFStore);
-app.use("/api/incidentMaster",socketIOMiddlewre, incidentMast);
+app.use("/api/incidentMaster", socketIOMiddlewre, incidentMast);
 app.use("/api/qiTypeList", qitypeList);
 app.use("/api/qidialysis", dialysisqi);
 app.use("/api/CrmNewApprovals", CrmNewApprovals);
@@ -488,6 +492,9 @@ app.use('/api/condemApprovalLevel', condemApprovalLevel)
 app.use('/api/condemMasters', condemMasters)
 app.use('/api/RateVariationReport', RateVariationReport)
 app.use('/api/store_master', store_master)
+app.use('/api/vendor_master', vendor_master)
+app.use('/api/workOrder', workOrder)
+
 
 server.listen(
   process.env.APP_PORT,

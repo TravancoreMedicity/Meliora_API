@@ -90,6 +90,8 @@ const { IncidetDetailInsert, IncidentDetailsUpdate, UpdateMarkedIncidentDetails,
     insertIncidentNature,
     updateIncidentNature,
     getIncidentFromDashboard,
+    getIncidentInitiator,
+    getAllPgHsStaffDetail,
 } = require('./incident.controller');
 const { uploadFileIncidentService,
     getIncidentFiles,
@@ -102,106 +104,112 @@ const { uploadFileIncidentService,
 
 
 //incident category and subcategory master
-router.post('/incidentcategoryinsert', checkToken, normalRateLimiter, IncidentCategoryMaster);
-router.get('/allcategory', checkToken, normalRateLimiter, getAllIncidentCategory)
-router.patch('/incidentcategoryupdate', checkToken, normalRateLimiter, IncidentCategoryUpdate)
+router.post('/incidentcategoryinsert', normalRateLimiter, checkToken, IncidentCategoryMaster);
+router.get('/allcategory', normalRateLimiter, checkToken, getAllIncidentCategory);
+router.patch('/incidentcategoryupdate',normalRateLimiter, checkToken,  IncidentCategoryUpdate);
 
-router.post('/insertsubcatmast', checkToken, normalRateLimiter, IncidentSubCategoryInsert);
-router.get('/getallsubcatmast', checkToken, normalRateLimiter, getAllIncidentSubCategory)
-router.patch('/updatesubcatmast', checkToken, normalRateLimiter, IncidentSubCategoryUpdate)
+router.post('/insertsubcatmast', normalRateLimiter, checkToken, IncidentSubCategoryInsert);
+router.get('/getallsubcatmast', normalRateLimiter, checkToken, getAllIncidentSubCategory);
+router.patch('/updatesubcatmast', normalRateLimiter, checkToken, IncidentSubCategoryUpdate);
+
+
 //incident Registartion 
-router.post('/getptdetail', checkToken, normalRateLimiter, getPatientDetail);
-router.post('/getpssstaff', checkToken, normalRateLimiter, getProfessionalStaff);
-router.post('/gethspgstaff', checkToken, normalRateLimiter, getHsPgStaffDetail);
-router.post('/getassetdtl', checkToken, normalRateLimiter, getAllassetDtl);
+router.post('/getptdetail', normalRateLimiter, checkToken, getPatientDetail);
+router.post('/getassetdtl', normalRateLimiter, checkToken, getAllassetDtl);
 
-router.post('/incregistration', checkToken, normalRateLimiter, IncidentRegistration);
-router.post('/incidentupdation', checkToken, normalRateLimiter, IncidentUpdation);
-router.post('/uploadFiles', checkToken, normalRateLimiter, uploadFileIncidentService); //uploading file 
-router.post('/uploadActionFiles', checkToken, normalRateLimiter, uploadFileIncidentActionFiles); //uploading file 
-router.post('/uploaddatacollectionFiles', checkToken, normalRateLimiter, uploadFileIncidentDataCollectionFiles); //uploading file 
 
-router.post('/getallincident', checkToken, normalRateLimiter, getAllIncidentDetail)
-router.get('/getincidentfile/:id', checkToken, normalRateLimiter, getIncidentFiles)// fetch files
-router.get('/getincidentactionfile/:id', checkToken, normalRateLimiter, getIncidenActiontFiles)// fetch files
-router.get('/getdatacollectionfiles/:id', checkToken, normalRateLimiter, getDataCollectionFiles)// fetch files
+router.post('/getpssstaff', normalRateLimiter, checkToken, getProfessionalStaff);
+router.post('/gethspgstaff', normalRateLimiter, checkToken, getHsPgStaffDetail);
+//fetch all pghs 
+router.get("/fetchallpghs", normalRateLimiter, checkToken, getAllPgHsStaffDetail);
 
-router.post('/fetchcurrentlevelapprvl', checkToken, normalRateLimiter, getAllCurrentLevelApproval);
-router.post('/levelapproval', checkToken, normalRateLimiter, highLevelApprovals);
-router.post('/reqdatacollection', checkToken, normalRateLimiter, requestDataCollection);
-router.post('/getallinvolveddep', checkToken, normalRateLimiter, getAllInvolvedDepartment);
-router.post('/getallinvolveddepemp', checkToken, normalRateLimiter, fetchAllInvolvedEmployeeDep);
-router.post('/getemptype', checkToken, normalRateLimiter, getCurrentEmployeeType);
-router.post('/getdepdatacollection', checkToken, normalRateLimiter, getDepartmentDataCollection);
-router.post('/departmentactionsubmit', checkToken, normalRateLimiter, departmentRcaPreventiveSubmission);
 
-router.post('/insertdcmm', checkToken, normalRateLimiter, insertDataCollectionMap);
-router.get('/fetchalldcmm', checkToken, normalRateLimiter, FetchAllCollectionMap);
-router.patch('/updatedcmm', checkToken, normalRateLimiter, updateDataCollectionMap);
+router.post('/incregistration', normalRateLimiter, checkToken, IncidentRegistration);
+router.post('/incidentupdation', normalRateLimiter, checkToken, IncidentUpdation);
+router.post('/uploadFiles', normalRateLimiter, checkToken, uploadFileIncidentService); //uploading file 
+router.post('/uploadActionFiles', normalRateLimiter, checkToken, uploadFileIncidentActionFiles); //uploading file 
+router.post('/uploaddatacollectionFiles', normalRateLimiter, checkToken, uploadFileIncidentDataCollectionFiles); //uploading file 
 
-router.get('/getalldeptype', checkToken, normalRateLimiter, FetchAllDepartmentType);
-router.get('/getactivesettings', checkToken, normalRateLimiter, getAllSettings);
+router.post('/getallincident', normalRateLimiter, checkToken, getAllIncidentDetail)
+router.get('/getincidentfile/:id', normalRateLimiter, checkToken, getIncidentFiles)// fetch files
+router.get('/getincidentactionfile/:id', normalRateLimiter, checkToken, getIncidenActiontFiles)// fetch files
+router.get('/getdatacollectionfiles/:id', normalRateLimiter, checkToken, getDataCollectionFiles)// fetch files
 
-router.get('/commonsetting', checkToken, normalRateLimiter, getAllCommonSetting);
-router.post('/insertcommonsetting', checkToken, normalRateLimiter, insertCommonSetting);
-router.patch('/updatecommonsetting', checkToken, normalRateLimiter, updateCommonSetting);
+router.post('/fetchcurrentlevelapprvl', normalRateLimiter, checkToken, getAllCurrentLevelApproval);
+router.post('/levelapproval', normalRateLimiter, checkToken, highLevelApprovals);
+router.post('/reqdatacollection', normalRateLimiter, checkToken, requestDataCollection);
+router.post('/getallinvolveddep', normalRateLimiter, checkToken, getAllInvolvedDepartment);
+router.post('/getallinvolveddepemp', normalRateLimiter, checkToken, fetchAllInvolvedEmployeeDep);
+router.post('/getemptype', normalRateLimiter, checkToken, getCurrentEmployeeType);
+router.post('/getdepdatacollection', normalRateLimiter, checkToken, getDepartmentDataCollection);
+router.post('/departmentactionsubmit', normalRateLimiter, checkToken, departmentRcaPreventiveSubmission);
 
-router.get('/getallcsmapmaster', checkToken, normalRateLimiter, getAllCommonSettingMapMaster);
-router.post('/insertcsmapmaster', checkToken, normalRateLimiter, insertCommonSettingMapMaster);
-router.patch('/updatecsmapmaster', checkToken, normalRateLimiter, updateCommonSettingMapMaster);
+router.post('/insertdcmm', normalRateLimiter, checkToken, insertDataCollectionMap);
+router.get('/fetchalldcmm', normalRateLimiter, checkToken, FetchAllCollectionMap);
+router.patch('/updatedcmm', normalRateLimiter, checkToken, updateDataCollectionMap);
 
-router.get('/getdatacollectioncs', checkToken, normalRateLimiter, getAllDataCollectionCommonSetting);
-router.post('/insertfishbone', checkToken, normalRateLimiter, insertFishBoneQuestion);
-router.post('/getfishbonedetail', checkToken, normalRateLimiter, getFishboneDetails);
+router.get('/getalldeptype', normalRateLimiter, checkToken, FetchAllDepartmentType);
+router.get('/getactivesettings', normalRateLimiter, checkToken, getAllSettings);
 
-router.post('/getallfbadetail', checkToken, normalRateLimiter, getAllFishBoneAnalysisDetail);
-router.get('/getallactivedepartment', checkToken, normalRateLimiter, getAllActiveDeparments);
-router.post('/gethighlevelreview', checkToken, normalRateLimiter, getAllHighLevelReview);
-router.post('/insertdepaction', checkToken, normalRateLimiter, InsertDepartmentAction);
-router.post('/getalldepartmentaction', checkToken, normalRateLimiter, getAllDepartmentActions)
-router.post('/getactiondetails', checkToken, normalRateLimiter, getAllActionDetails);
-router.post('/getdepactions', checkToken, normalRateLimiter, getDepActions);
-router.post('/depactionack', checkToken, normalRateLimiter, getDeparmentAcknowledge);
+router.get('/commonsetting', normalRateLimiter, checkToken, getAllCommonSetting);
+router.post('/insertcommonsetting', normalRateLimiter, checkToken, insertCommonSetting);
+router.patch('/updatecommonsetting', normalRateLimiter, checkToken, updateCommonSetting);
 
-router.post('/updateFileStatus', checkToken, normalRateLimiter, UpdateFileStatus)
-router.post('/updateddcfilestatus', checkToken, normalRateLimiter, UpdateDepartMentDataCollectionFileStatus)
-router.post('/getlevelitems', checkToken, normalRateLimiter, getAllLevelItems)
+router.get('/getallcsmapmaster', normalRateLimiter, checkToken, getAllCommonSettingMapMaster);
+router.post('/insertcsmapmaster', normalRateLimiter, checkToken, insertCommonSettingMapMaster);
+router.patch('/updatecsmapmaster', normalRateLimiter, checkToken, updateCommonSettingMapMaster);
+
+router.get('/getdatacollectioncs', normalRateLimiter, checkToken, getAllDataCollectionCommonSetting);
+router.post('/insertfishbone', normalRateLimiter, checkToken, insertFishBoneQuestion);
+router.post('/getfishbonedetail', normalRateLimiter, checkToken, getFishboneDetails);
+
+router.post('/getallfbadetail', normalRateLimiter, checkToken, getAllFishBoneAnalysisDetail);
+router.get('/getallactivedepartment', normalRateLimiter, checkToken, getAllActiveDeparments);
+router.post('/gethighlevelreview', normalRateLimiter, checkToken, getAllHighLevelReview);
+router.post('/insertdepaction', normalRateLimiter, checkToken, InsertDepartmentAction);
+router.post('/getalldepartmentaction', normalRateLimiter, checkToken, getAllDepartmentActions)
+router.post('/getactiondetails', normalRateLimiter, checkToken, getAllActionDetails);
+router.post('/getdepactions', normalRateLimiter, checkToken, getDepActions);
+router.post('/depactionack', normalRateLimiter, checkToken, getDeparmentAcknowledge);
+
+router.post('/updateFileStatus', normalRateLimiter, checkToken, UpdateFileStatus)
+router.post('/updateddcfilestatus', normalRateLimiter, checkToken, UpdateDepartMentDataCollectionFileStatus)
+router.post('/getlevelitems', normalRateLimiter, checkToken, getAllLevelItems)
 
 // NEW
-router.post('/getallincactionreview', checkToken, normalRateLimiter, FetchAllIncidentActionDetail);
+router.post('/getallincactionreview', normalRateLimiter, checkToken, FetchAllIncidentActionDetail);
 // level master
-router.post('/insertincactionmast', checkToken, normalRateLimiter, IncidentActionMaster);
-router.patch('/updateinctactionmast', checkToken, normalRateLimiter, IndidentActionMasterUpdate)
-router.get('/getallactiodetail', checkToken, normalRateLimiter, getallMasterActionDetail)
+router.post('/insertincactionmast', normalRateLimiter, checkToken, IncidentActionMaster);
+router.patch('/updateinctactionmast', normalRateLimiter, checkToken, IndidentActionMasterUpdate)
+router.get('/getallactiodetail', normalRateLimiter, checkToken, getallMasterActionDetail)
 
 // level map master
-router.get('/getinclevelitemmap', checkToken, normalRateLimiter, getAllLevelItemMapDetail)
-router.post('/insertinclevelitemmap', checkToken, normalRateLimiter, InsertLevelItemMapDetail);
-router.patch('/updateinclevelitemmap', checkToken, normalRateLimiter, UpdateLevelItemMapDetail)
+router.get('/getinclevelitemmap', normalRateLimiter, checkToken, getAllLevelItemMapDetail)
+router.post('/insertinclevelitemmap', normalRateLimiter, checkToken, InsertLevelItemMapDetail);
+router.patch('/updateinclevelitemmap', normalRateLimiter, checkToken, UpdateLevelItemMapDetail)
 
 // Fetching Level Master Detail Common Api for all Modules 
-router.post('/common/leveldetail', checkToken, normalRateLimiter, getAllCommonLevelDetail)
-router.post('/leveldetailmaster', checkToken, normalRateLimiter, getAllCommonLevelDetailMaster)
-router.post('/updatelevelreview', checkToken, normalRateLimiter, UpdateLevelDetiails);
+router.post('/common/leveldetail', normalRateLimiter, checkToken, getAllCommonLevelDetail)
+router.post('/leveldetailmaster', normalRateLimiter, checkToken, getAllCommonLevelDetailMaster)
+router.post('/updatelevelreview', normalRateLimiter, checkToken, UpdateLevelDetiails);
 
 //new 
-router.get('/dashboarddata', checkToken, normalRateLimiter, getAllDashboardIncident)
-router.get('/getcompany', checkToken, normalRateLimiter, getCompanyDetail)
-router.post('/approvaldeps', checkToken, normalRateLimiter, getAllEmployeeApprovalDepartments)
-router.post('/insertDcEmpMap', checkToken, normalRateLimiter, insertDataCollectionEmployeeDetail)
-router.get('/getalldatacollectionemp', checkToken, normalRateLimiter, getAllDataCollectionEmployeeDetail)
-router.post('/getallactiveDcEmp', checkToken, normalRateLimiter, getAllActiveDataCollectionEmployeeDetail)
-router.patch('/updateDcEmpMap', checkToken, normalRateLimiter, updateDataCollectionEmployeeDetail)
+router.get('/dashboarddata', normalRateLimiter, checkToken, getAllDashboardIncident)
+router.get('/getcompany', normalRateLimiter, checkToken, getCompanyDetail)
+router.post('/approvaldeps', normalRateLimiter, checkToken, getAllEmployeeApprovalDepartments)
+router.post('/insertDcEmpMap', normalRateLimiter, checkToken, insertDataCollectionEmployeeDetail)
+router.get('/getalldatacollectionemp', normalRateLimiter, checkToken, getAllDataCollectionEmployeeDetail)
+router.post('/getallactiveDcEmp', normalRateLimiter, checkToken, getAllActiveDataCollectionEmployeeDetail)
+router.patch('/updateDcEmpMap', normalRateLimiter, checkToken, updateDataCollectionEmployeeDetail)
 
-router.get('/getallincnature', checkToken, normalRateLimiter, getAllIncidentNature)
-router.post('/insertNature', checkToken, normalRateLimiter, insertIncidentNature)
-router.patch('/updateNature', checkToken, normalRateLimiter, updateIncidentNature)
-
-
-router.post('/getincidentcommon',checkToken,normalRateLimiter,getIncidentFromDashboard)
+router.get('/getallincnature', normalRateLimiter, checkToken, getAllIncidentNature)
+router.post('/insertNature', normalRateLimiter, checkToken, insertIncidentNature)
+router.patch('/updateNature', normalRateLimiter, checkToken, updateIncidentNature)
 
 
+router.post('/getincidentcommon', normalRateLimiter, checkToken, getIncidentFromDashboard)
 
+router.post('/initiator', normalRateLimiter, checkToken, getIncidentInitiator)
 
 /**
  * 

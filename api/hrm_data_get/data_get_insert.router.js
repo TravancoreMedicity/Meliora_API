@@ -1,9 +1,11 @@
 const router = require("express").Router();
 const { checkToken } = require("../../authentication/token_validation");
+const { normalRateLimiter } = require("../../middleware/rateLimiter");
 const { getdepartment, getdepartmentSection, getemployeemaster, getemployeeuserPass,
     getauthorization, empMasterUpdate, departmentUpdate, departmentSecUpdate, getdesignation,
     getbranch, getSalutation, emploginUpdate,
-    getStaffDetail
+    getStaffDetail,
+    getAllProfessionalEmployeeDetail
 } = require("../hrm_data_get/data_get_insert.controller")
 
 router.get("/dept", checkToken, getdepartment)
@@ -21,6 +23,7 @@ router.get("/emploginUpdate", checkToken, emploginUpdate)
 
 
 // rohith 
-router.post('/getStaffdetail', checkToken, getStaffDetail)
+router.post('/getStaffdetail',normalRateLimiter, checkToken, getStaffDetail)
+router.get('/getStaffdetail',normalRateLimiter, checkToken, getAllProfessionalEmployeeDetail)
 
 module.exports = router;

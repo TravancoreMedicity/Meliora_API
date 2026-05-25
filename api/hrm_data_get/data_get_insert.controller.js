@@ -5,7 +5,8 @@ const { getdepartment, createDept, getdepartmentMeli, getdepartmentSection, getd
     updateEmpMaster, updateDepartment, updateDepartmentSec, getdesignation, getdesignationMeli,
     createdesignation, getbranch, getbranchMeli, createbranch, getSalutation, getSalutationMeli,
     createSalutation, emploginUpdate,
-    getStaffDetail
+    getStaffDetail,
+    getAllProfessionalEmployeeDetail
 } = require("../hrm_data_get/data_get_insert_service")
 module.exports = {
 
@@ -202,7 +203,7 @@ module.exports = {
                     value.emp_status, value.emp_id, value.emp_no, value.emp_created, value.emp_updated
                     ]
                 })
-                     
+
                 if (a1.length !== 0) {
                     creategetemployeeuserPass(a1, (err, results) => {
                         if (err) {
@@ -583,27 +584,27 @@ module.exports = {
                     })
                 })
 
-                 if (newmeli.length !== 0) {
-                     const result = emploginUpdate(newmeli)
-                    .then((r) => {
+                if (newmeli.length !== 0) {
+                    const result = emploginUpdate(newmeli)
+                        .then((r) => {
 
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Update Successfully"
-                        });
-                    }).catch((e) => {
-                        return res.status(200).json({
-                            success: 0,
-                            message: e.sqlMessage
-                        });
-                    })
-                 }else{
-                        return res.status(200).json({
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Update Successfully"
+                            });
+                        }).catch((e) => {
+                            return res.status(200).json({
+                                success: 0,
+                                message: e.sqlMessage
+                            });
+                        })
+                } else {
+                    return res.status(200).json({
                         success: 2,
                         message: "Noting to insert, already uptodate"
                     });
-                 }
-               
+                }
+
             })
         });
     },
@@ -634,5 +635,31 @@ module.exports = {
             })
         });
     },
+
+    getAllProfessionalEmployeeDetail: (req, res) => {
+        getAllProfessionalEmployeeDetail((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results?.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No staff record Found",
+                    data: [],
+                })
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: "Fetched Sucessfully",
+                data: results,
+            })
+        });
+    },
+
 
 }

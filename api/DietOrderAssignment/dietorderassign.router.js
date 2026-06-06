@@ -3,7 +3,7 @@
 const router = require('express').Router();
 
 const { checkToken } = require('../../authentication/token_validation');
-const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail } = require('./dietorderassign.controller');
+const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail } = require('./dietorderassign.controller');
 
 
 router.post(
@@ -57,6 +57,12 @@ router.post(
     '/fetch-delivery-log',
     checkToken,
     fetchDeliveryLogDetail
+);
+
+router.post(
+    '/update-order-status',
+    checkToken,
+    UpdateAssignOrderDetail
 );
 
 module.exports = router;

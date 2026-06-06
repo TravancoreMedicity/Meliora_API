@@ -31,7 +31,7 @@ module.exports = {
                 connection.query(
                     `INSERT INTO item_master
                 (item_name,item_group_id,item_category_id,item_alias,item_code,description,item_type_id,is_active,created_by)
-                VALUES (?,?,?,?,?,?,?,?)`,
+                VALUES (?,?,?,?,?,?,?,?,?)`,
                     [
                         item_name,
                         item_group_id,
@@ -417,6 +417,148 @@ ORDER BY
         );
 
     },
+    getFoodandBeverage: (callBack) => {
+        pool.query(
+            `
+                SELECT
+                    im.item_id,
+                    im.item_name,
+                    im.item_code,
+                    im.item_alias,
+                    im.description,
+                    im.item_type_id,
+                    im.is_active,
+
+                    -- GROUP DETAILS
+
+                    ig.item_group_id,
+                    ig.group_name,
+
+                    -- CATEGORY DETAILS
+
+                    ic.item_category_id,
+                    ic.category_name,
+
+                    -- NUTRITION DETAILS
+
+                    nut.calories_kcal,
+                    nut.protein_g,
+                    nut.carbohydrates_g,
+                    nut.fat_g,
+                    nut.fiber_g,
+                    nut.sodium_mg,
+
+                    -- HIGHLIGHT DETAILS
+
+                    hm.mapping_id,
+                    hm.highlight_type_id,
+                    hm.title AS highlight_title,
+                    hm.display_priority,
+                    hm.start_date,
+                    hm.end_date,
+
+                    htm.highlight_name,
+                    htm.highlight_code,
+                    htm.description AS highlight_description,
+                    htm.icon AS highlight_icon,
+                    htm.color_code,
+
+                    -- PRICE DETAILS
+
+                    price_data.price_details
+
+                FROM item_master im
+
+                -- GROUP
+
+                LEFT JOIN item_group_master ig
+                    ON ig.item_group_id = im.item_group_id
+                    AND ig.is_active = 1
+
+                -- CATEGORY
+
+                LEFT JOIN item_category_master ic
+                    ON ic.item_category_id = im.item_category_id
+                    AND ic.is_active = 1
+
+                -- NUTRITION
+
+                LEFT JOIN item_nutrition nut
+                    ON nut.item_id = im.item_id
+                    AND nut.is_active = 1
+
+                -- HIGHLIGHT MAPPING
+
+                LEFT JOIN canteen_item_highlight_mapping hm
+                    ON hm.item_id = im.item_id
+                    AND hm.active_status = 1
+                    AND (
+                        hm.start_date IS NULL
+                        OR hm.start_date <= NOW()
+                    )
+                    AND (
+                        hm.end_date IS NULL
+                        OR hm.end_date >= NOW()
+                    )
+
+                -- HIGHLIGHT MASTER
+
+                LEFT JOIN canteen_highlight_type_master htm
+                    ON htm.highlight_type_id = hm.highlight_type_id
+                    AND htm.active_status = 1
+
+                -- PRICE DETAILS
+
+                LEFT JOIN (
+                    SELECT
+                        cip.item_id,
+
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'party_type_id', opt.party_type_id,
+                                'party_name', opt.party_name,
+                                'price', cip.price,
+                                'gst_rate', cip.gst_rate,
+                                'discount', cip.discount,
+                                'discount_rate', cip.discount_rate
+                            )
+                        ) AS price_details
+
+                    FROM canteen_item_price cip
+
+                    LEFT JOIN order_party_type opt
+                        ON opt.party_type_id = cip.party_type_id
+                        AND opt.is_active = 1
+
+                    WHERE cip.is_active = 1
+
+                    GROUP BY cip.item_id
+
+                ) AS price_data
+                    ON price_data.item_id = im.item_id
+
+                WHERE im.is_active = 1
+
+                ORDER BY
+                    ig.display_order,
+                    ic.display_order,
+                    hm.display_priority,
+                    im.item_name
+                `,
+            [],
+            (error, results) => {
+
+                if (error) {
+                    return callBack(error);
+                }
+
+                return callBack(null, results);
+
+            }
+        );
+
+    },
+
 
     updateItemMaster: (data, callBack) => {
 
@@ -879,6 +1021,32 @@ ORDER BY
 
         });
 
+    },
+    checkAliasAndCodeExists: (item_alias, item_code, callback) => {
+        pool.query(
+            `SELECT item_alias, item_code
+         FROM item_master
+         WHERE item_alias = ? OR item_code = ?`,
+            [item_alias, item_code],
+            (err, results) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                const aliasExists = results.some(
+                    row => row.item_alias === item_alias
+                );
+
+                const codeExists = results.some(
+                    row => row.item_code === item_code
+                );
+
+                callback(null, {
+                    aliasExists,
+                    codeExists
+                });
+            }
+        );
     },
 
 };

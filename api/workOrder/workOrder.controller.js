@@ -42,7 +42,7 @@ module.exports = {
 
     insertWorkOrderDetails: (req, res) => {
         const data = req.body;
-        // console.log("data:", data);
+
 
         pool.getConnection((err, connection) => {
             if (err) {

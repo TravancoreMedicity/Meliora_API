@@ -14,11 +14,10 @@ module.exports = {
                 end_date,
                 doctor_id,
                 is_consultation,
-                dietitian_id,
                 diet_status,
                 created_by
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 data.patient_id,
                 data.admission_id,
@@ -27,7 +26,6 @@ module.exports = {
                 data.end_date,
                 data.doctor_id,
                 data.is_consultation,
-                data.dietitian_id,
                 data.diet_status,
                 data.created_by
             ],
@@ -119,7 +117,7 @@ LEFT JOIN diet_template dt
     AND dt.is_active = 1
     AND DATE(NOW()) BETWEEN DATE(dt.effective_from) AND DATE(dt.effective_to)
 
-WHERE ns.fb_ns_code = 'W005'
+WHERE ns.fb_ns_code = ?
 AND (dp.fb_ipc_curstatus IS NULL OR dp.fb_ipc_curstatus <> 'PCO')  
 
 ORDER BY dp.fb_ip_no DESC;
@@ -349,7 +347,6 @@ ORDER BY dp.fb_ip_no DESC
                 start_date = ?,
                 end_date = ?,
                 doctor_id = ?,
-                dietitian_id = ?,
                 diet_status = ?,
                 is_active = ?,
                 is_consultation=?,
@@ -360,7 +357,6 @@ ORDER BY dp.fb_ip_no DESC
                 data.start_date,
                 data.end_date,
                 data.doctor_id,
-                data.dietitian_id,
                 data.diet_status,
                 data.is_active,
                 data.is_consultation,
@@ -447,6 +443,99 @@ WHERE
             }
         );
     },
+    getConsultationRequired: (callBack) => {
+        pool.query(
+            `SELECT
+    pdp.plan_id,
+    pdp.patient_id,
+    pdp.admission_id,
+    pdp.diet_id,
+    pdp.dietitian_id,
+    pdp.diet_status,
+    pdp.start_date,
+    pdp.end_date,
+    pdp.is_consultation,
+
+    pda.assignment_id,
+    pda.assigned_to,
+    pda.assigned_by,
+    pda.status AS assignment_status,
+    pda.is_current,
+
+    dp.fb_ipad_slno AS dietpt_slno,
+    dp.fb_ptc_name AS patient_name,
+    dp.fb_ptc_sex AS patient_gender,
+    dp.fb_ipd_date AS admission_date,
+    dp.fb_doc_name AS doctor_name,
+    dp.fb_do_code AS doctor_code,
+    dp.fb_bd_code AS bed_code,
+    bd.fb_bdc_no,
+    pdm.diet_name,
+    pdm.calories_per_day,
+    pdm.protein_per_day,
+    pdm.description,
+    ns.fb_ns_name,
+
+    cm.em_name AS dietitian_name,
+
+    dt.template_id
+
+FROM patient_diet_plan pdp
+
+LEFT JOIN patient_diet_assignment pda
+    ON pda.plan_id = pdp.plan_id
+    AND pda.is_current = 1
+
+LEFT JOIN fb_ipadmiss dp
+    ON dp.fb_pt_no = pdp.patient_id
+    AND dp.fb_ip_no = pdp.admission_id
+
+LEFT JOIN patient_diet_master pdm
+    ON pdm.diet_id = pdp.diet_id
+
+LEFT JOIN fb_bed bd
+    ON dp.fb_bd_code = bd.fb_bd_code
+
+LEFT JOIN fb_nurse_station_master ns
+    ON bd.fb_ns_code = ns.fb_ns_code
+    
+
+LEFT JOIN co_employee_master cm
+    ON cm.em_id = COALESCE(
+        pda.assigned_to,
+        pdp.dietitian_id
+    )
+
+LEFT JOIN diet_template dt
+    ON dt.diet_id = pdp.diet_id
+    AND dt.is_active = 1
+    AND DATE(NOW()) >= DATE(dt.effective_from)
+    AND (
+        dt.effective_to IS NULL
+        OR DATE(NOW()) <= DATE(dt.effective_to)
+    )
+
+WHERE
+    pdp.is_active = 1
+    AND pdp.is_consultation = 1
+    AND pdp.diet_status = 'ACTIVE'
+    AND (
+        dp.fb_ipc_curstatus IS NULL
+        OR dp.fb_ipc_curstatus <> 'PCO'
+    )
+
+ORDER BY pdp.plan_id DESC`,
+            [],
+            (error, results) => {
+
+                if (error) return callBack(error);
+
+                return callBack(null, results);
+            }
+        );
+    },
+
+
     StopCurrentPlan: (data, callBack) => {
 
         pool.query(
@@ -660,5 +749,109 @@ ORDER BY dty.start_time;
             }
         );
     },
+    getEmployeeNsStation: (empsecid, callBack) => {
+        pool.query(
+            `
+            SELECT 
+                fb_ns_code
+            FROM
+                fb_nurse_station_master
+            WHERE
+                dep_sec_id = ?
+            `,
+            [empsecid],
+            (error, results) => {
+
+                if (error) return callBack(error);
+
+                return callBack(null, results);
+            }
+        );
+    },
+
+    AssingDieticain: (payload, callback) => {
+        const {
+            plan_id,
+            assigned_to,
+            assigned_by,
+            status
+        } = payload;
+
+        // STEP 1: mark old as not current
+        const updateOldQuery = `
+        UPDATE patient_diet_assignment
+        SET is_current = 0
+        WHERE plan_id = ? AND is_current = 1
+    `;
+
+        pool.query(updateOldQuery, [plan_id], (err1) => {
+            if (err1) return callback(err1);
+
+            // STEP 2: insert new assignment
+            const insertAssignmentQuery = `
+            INSERT INTO patient_diet_assignment
+            (plan_id, assigned_to, assigned_by, status, is_current)
+            VALUES (?, ?, ?, ?, 1)
+        `;
+
+            pool.query(
+                insertAssignmentQuery,
+                [plan_id, assigned_to, assigned_by, status],
+                (err2, result) => {
+                    if (err2) return callback(err2);
+
+                    const assignmentId = result.insertId;
+
+                    // STEP 3: update main plan
+                    const updatePlanQuery = `
+                    UPDATE patient_diet_plan
+                    SET dietitian_id = ?,
+                        diet_status = 'ACTIVE'
+                    WHERE plan_id = ?
+                `;
+
+                    pool.query(
+                        updatePlanQuery,
+                        [assigned_to, plan_id],
+                        (err3) => {
+                            if (err3) return callback(err3);
+
+                            return callback(null, {
+                                assignment_id: assignmentId,
+                                plan_id,
+                                assigned_to,
+                                status: "ASSIGNED"
+                            });
+                        }
+                    );
+                }
+            );
+        });
+    },
+
+
+    DieticanStatus: (payload, callback) => {
+        const {
+            status,
+            assignment_id
+        } = payload;
+
+        // STEP 1: mark old as not current
+        const updateOldQuery = `
+        UPDATE patient_diet_assignment
+        SET status = ?
+        WHERE assignment_id = ? 
+    `;
+
+        pool.query(
+            updateOldQuery,
+            [status, assignment_id],
+            (err, results) => {
+                if (err) return callback(err);
+                return callback(null, results);
+            }
+        );
+    },
+
 
 };

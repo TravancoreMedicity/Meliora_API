@@ -5,7 +5,8 @@ const {
     insertItemMaster,
     getAllItemMaster,
     updateItemMaster,
-    getItemFullDetail
+    getItemFullDetail,
+    getFoodandBeverage
 } = require('./itemmaster.controller');
 
 const router = require('express').Router();
@@ -21,5 +22,7 @@ router.get("/allfiles", checkToken, getAllItemMasterFilesZip);
 router.post("/files/delete", checkToken, deleteItemMasterFile);
 
 router.get("/item-full-detail", checkToken, getItemFullDetail)
+router.get("/get-food-bev", checkToken, getFoodandBeverage)
+
 
 module.exports = router;

@@ -12,7 +12,11 @@ const {
     getAllActiveDietPatient,
     getCurrentTemplateFood,
     fetchAllPatientMealType,
-    getTemplateFoodStatus
+    getTemplateFoodStatus,
+    getEmployeeNsStation,
+    getConsultationRequired,
+    AssingDieticain,
+    DieticanStatus
 } = require('./patientdietplan.controller');
 
 const router = require('express').Router();
@@ -34,7 +38,21 @@ router.post("/gettodaytemplatedtl", checkToken, getCurrentTemplateFood);
 
 router.post("/activepatient", checkToken, getAllActiveDietPatient);
 
-router.post('/gettemplatefoodstatus',checkToken,getTemplateFoodStatus)
+router.post('/gettemplatefoodstatus', checkToken, getTemplateFoodStatus)
+router.post('/get-emp-nsstation', checkToken, getEmployeeNsStation)
+
+
+router.get('/get-consultation', checkToken, getConsultationRequired);
+
+router.post(
+    "/assign-dietician",
+    AssingDieticain
+);
+
+router.post(
+    "/diet-status",
+    DieticanStatus
+);
 
 
 module.exports = router;

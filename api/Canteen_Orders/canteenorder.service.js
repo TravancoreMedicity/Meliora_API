@@ -729,6 +729,7 @@ ORDER BY
                 i.price,
                 i.gst,
                 i.gst_amount,
+                i.type_slno,
                 canteen_order_item_id
 
             FROM canteen_order o

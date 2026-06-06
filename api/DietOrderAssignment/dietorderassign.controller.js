@@ -1,6 +1,6 @@
 // dietdeliveryassign.controller.js
 
-const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail } = require("./dietorderassign.service");
+const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail } = require("./dietorderassign.service");
 
 
 module.exports = {
@@ -172,6 +172,64 @@ module.exports = {
             });
         });
     },
+
+    UpdateAssignOrderDetail: (req, res) => {
+
+        const data = req.body;
+
+        if (!data.assignment_id) {
+            return res.status(200).json({
+                success: 0,
+                message: "assignment_id required"
+            });
+        }
+
+        if (!data.canteen_order_id) {
+            return res.status(200).json({
+                success: 0,
+                message: "canteen_order_id required"
+            });
+        }
+
+        if (!data.delivery_status) {
+            return res.status(200).json({
+                success: 0,
+                message: "delivery_status required"
+            });
+        }
+
+        UpdateAssignOrderDetail(data, (err, result) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    stage: err.stage || "UNKNOWN",
+                    message: err.message || err
+                });
+            }
+
+            req.io.emit(
+                "dietDeliveryStatusUpdated",
+                {
+                    assignment_id: data.assignment_id,
+                    canteen_order_id: data.canteen_order_id,
+                    delivery_status: data.delivery_status,
+                    remarks: data.remarks,
+                    updated_by: data.updated_by,
+                    updated_time: new Date(),
+                    meal: data.meal,
+                    item_name: data.item_name,
+                    type: "DELIVERY_STATUS_UPDATED"
+                }
+            );
+
+            return res.status(200).json({
+                success: 1,
+                message: " Status Updated Successfully"
+            });
+        });
+    },
+
 
     UpdateDeliveryLogDetail: (req, res) => {
 

@@ -11,7 +11,11 @@ const {
     getAllActiveDietPatient,
     getCurrentTemplateFood,
     fetchAllPatientMealType,
-    getTemplateFoodStatus
+    getTemplateFoodStatus,
+    getEmployeeNsStation,
+    getConsultationRequired,
+    AssingDieticain,
+    DieticanStatus
 } = require('./patientdietplan.service');
 
 module.exports = {
@@ -152,6 +156,93 @@ module.exports = {
 
             });
         },
+    getEmployeeNsStation: (req, res) => {
+        const { empsecid } = req.body;
+
+        if (!empsecid) {
+            return res.status(200).json({
+                success: 0,
+                message: "Section Id is Missing"
+            });
+        }
+
+        getEmployeeNsStation(empsecid, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: "Fetched Successfully"
+            });
+
+        });
+    },
+
+    AssingDieticain: (req, res) => {
+        const {
+            plan_id,
+            assigned_to,
+            assigned_by,
+            status
+        } = req.body;
+
+        if (!plan_id || !assigned_to || !assigned_by) {
+            return res.status(400).json({
+                success: 0,
+                message: "Missing required fields",
+            });
+        }
+
+        AssingDieticain({ plan_id, assigned_to, assigned_by, status }, (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    success: 0,
+                    message: "Assignment failed",
+                    error: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                message: "Dietician assigned successfully",
+                data: result
+            });
+        }
+        );
+    },
+
+
+    DieticanStatus: (req, res) => {
+        const { assignment_id, status } = req.body;
+
+        if (!assignment_id || !status) {
+            return res.status(400).json({
+                success: 0,
+                message: "Missing required fields",
+            });
+        }
+
+        DieticanStatus({ status, assignment_id }, (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    success: 0,
+                    message: "Failed To Change Status",
+                    error: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                message: `${status} SuccessFully`
+            });
+        }
+        );
+    },
 
 
     FetchAllActivePatient: (req, res) => {
@@ -387,6 +478,33 @@ module.exports = {
 
         });
     },
+    getConsultationRequired: (req, res) => {
+        getConsultationRequired((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results || results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Results Found",
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: "Fetched Successfully"
+            });
+
+        });
+    },
+
+
     StopCurrentPlan: (req, res) => {
         const data = req.body;
 

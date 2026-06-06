@@ -627,6 +627,516 @@ module.exports = {
         });
     },
 
+    // UpdateDeliveryLogDetail: (data, callback) => {
+
+    //     const {
+    //         assignment_id,
+    //         canteen_order_id,
+    //         patient_diet_id,
+    //         item_id,
+    //         delivered_qty,
+    //         delivery_status,
+    //         remarks,
+    //         updated_by,
+    //         develivered_by,
+    //         delivered_time,
+    //         delivery_remarks,
+    //         type_slno
+    //     } = data;
+
+    //     pool.getConnection((err, connection) => {
+
+    //         if (err) {
+    //             return callback({
+    //                 stage: "CONNECTION",
+    //                 message: err
+    //             });
+    //         }
+
+    //         connection.beginTransaction((err) => {
+
+    //             if (err) {
+
+    //                 connection.release();
+
+    //                 return callback({
+    //                     stage: "TRANSACTION",
+    //                     message: err
+    //                 });
+    //             }
+
+
+
+    //             const checkExistingLogQuery = `
+    //             SELECT delivery_id
+    //             FROM diet_delivery_log
+    //             WHERE canteen_order_id = ?
+    //             AND type_slno = ?
+    //             AND item_id = ?
+    //             LIMIT 1
+    //         `;
+
+    //             connection.query(
+    //                 checkExistingLogQuery,
+    //                 [
+    //                     canteen_order_id,
+    //                     type_slno,
+    //                     item_id
+    //                 ],
+    //                 (checkError, checkResult) => {
+
+    //                     if (checkError) {
+
+    //                         return connection.rollback(() => {
+
+    //                             connection.release();
+
+    //                             return callback({
+    //                                 stage: "CHECK_DELIVERY_LOG",
+    //                                 message: checkError
+    //                             });
+    //                         });
+    //                     }
+
+    //                     const hasExistingLog =
+    //                         checkResult.length > 0;
+
+    //                     // =====================================================
+    //                     // 2. INSERT / UPDATE DELIVERY LOG
+    //                     // =====================================================
+
+    //                     const saveDeliveryLog = (cb) => {
+
+    //                         // UPDATE
+
+    //                         if (hasExistingLog) {
+
+    //                             let updateLogQuery = `
+    //                             UPDATE diet_delivery_log
+    //                             SET
+    //                                 patient_diet_id = ?,
+    //                                 delivered_qty = ?,
+    //                                 delivery_status = ?,
+    //                                 updated_by = ?,
+    //                                 updated_remarks = ?
+    //                         `;
+
+    //                             const updateLogParams = [
+    //                                 patient_diet_id,
+    //                                 delivered_qty,
+    //                                 delivery_status,
+    //                                 updated_by,
+    //                                 remarks || null
+    //                             ];
+
+    //                             // ONLY WHEN DELIVERED
+
+    //                             if (delivery_status === "DELIVERED") {
+
+    //                                 updateLogQuery += `,
+    //                                 develivered_by = ?,
+    //                                 delivered_time = ?,
+    //                                 delivery_remarks = ?
+    //                             `;
+
+    //                                 updateLogParams.push(
+    //                                     develivered_by || updated_by,
+    //                                     delivered_time || new Date(),
+    //                                     delivery_remarks || remarks || null
+    //                                 );
+    //                             }
+
+    //                             updateLogQuery += `
+    //                             WHERE canteen_order_id = ?
+    //                             AND type_slno = ?
+    //                             AND item_id = ?
+    //                         `;
+
+    //                             updateLogParams.push(
+    //                                 canteen_order_id,
+    //                                 type_slno,
+    //                                 item_id
+    //                             );
+
+    //                             connection.query(
+    //                                 updateLogQuery,
+    //                                 updateLogParams,
+    //                                 cb
+    //                             );
+    //                         }
+
+    //                         // INSERT
+
+    //                         else {
+
+    //                             const insertColumns = [
+    //                                 'patient_diet_id',
+    //                                 'item_id',
+    //                                 'canteen_order_id',
+    //                                 'type_slno',
+    //                                 'delivered_qty',
+    //                                 'delivery_status',
+    //                                 'updated_by',
+    //                                 'updated_remarks'
+    //                             ];
+
+    //                             const insertValues = [
+    //                                 patient_diet_id,
+    //                                 item_id,
+    //                                 canteen_order_id,
+    //                                 type_slno,
+    //                                 delivered_qty,
+    //                                 delivery_status,
+    //                                 updated_by,
+    //                                 remarks || null
+    //                             ];
+
+    //                             // ONLY WHEN DELIVERED
+
+    //                             if (delivery_status === "DELIVERED") {
+
+    //                                 insertColumns.push(
+    //                                     'develivered_by',
+    //                                     'delivered_time',
+    //                                     'delivery_remarks'
+    //                                 );
+
+    //                                 insertValues.push(
+    //                                     develivered_by || updated_by,
+    //                                     delivered_time || new Date(),
+    //                                     delivery_remarks || remarks || null
+    //                                 );
+    //                             }
+
+    //                             const placeholders =
+    //                                 insertColumns
+    //                                     .map(() => '?')
+    //                                     .join(',');
+
+    //                             const insertLogQuery = `
+    //                             INSERT INTO diet_delivery_log
+    //                             (
+    //                                 ${insertColumns.join(',')}
+    //                             )
+    //                             VALUES
+    //                             (
+    //                                 ${placeholders}
+    //                             )
+    //                         `;
+
+    //                             connection.query(
+    //                                 insertLogQuery,
+    //                                 insertValues,
+    //                                 cb
+    //                             );
+    //                         }
+    //                     };
+
+    //                     saveDeliveryLog((logError) => {
+
+    //                         if (logError) {
+
+    //                             return connection.rollback(() => {
+
+    //                                 connection.release();
+
+    //                                 return callback({
+    //                                     stage: hasExistingLog
+    //                                         ? "UPDATE_DELIVERY_LOG"
+    //                                         : "INSERT_DELIVERY_LOG",
+    //                                     message: logError
+    //                                 });
+    //                             });
+    //                         }
+
+    //                         // =====================================================
+    //                         // 3. CALCULATE MEAL STATUS
+    //                         // =====================================================
+
+    //                         const mealStatusQuery = `
+    //                         SELECT
+    //                             delivery_status
+    //                         FROM diet_delivery_log
+    //                         WHERE canteen_order_id = ?
+    //                         AND type_slno = ?
+    //                     `;
+
+    //                         connection.query(
+    //                             mealStatusQuery,
+    //                             [
+    //                                 canteen_order_id,
+    //                                 type_slno
+    //                             ],
+    //                             (mealError, mealResult) => {
+
+    //                                 if (mealError) {
+
+    //                                     return connection.rollback(() => {
+
+    //                                         connection.release();
+
+    //                                         return callback({
+    //                                             stage: "MEAL_STATUS_CHECK",
+    //                                             message: mealError
+    //                                         });
+    //                                     });
+    //                                 }
+
+    //                                 const mealStatuses =
+    //                                     mealResult.map(
+    //                                         i => i.delivery_status
+    //                                     );
+
+    //                                 const mealStatus =
+    //                                     getMealStatus(mealStatuses);
+
+    //                                 // =====================================================
+    //                                 // 4. UPDATE MEAL LEVEL STATUS
+    //                                 // =====================================================
+
+    //                                 let updateMealQuery = `
+    //                                 UPDATE diet_delivery_assignment_detail
+    //                                 SET
+    //                                     delivery_status = ?,
+    //                                     remarks = ?
+    //                             `;
+
+    //                                 const mealParams = [
+    //                                     mealStatus,
+    //                                     remarks || null
+    //                                 ];
+
+    //                                 if (mealStatus === "DELIVERED") {
+
+    //                                     updateMealQuery += `,
+    //                                     delivered_at = NOW(),
+    //                                     delivered_by = ?
+    //                                 `;
+
+    //                                     mealParams.push(
+    //                                         updated_by
+    //                                     );
+    //                                 }
+
+    //                                 updateMealQuery += `
+    //                                 WHERE assignment_id = ?
+    //                                 AND canteen_order_id = ?
+    //                                 AND type_slno = ?
+    //                             `;
+
+    //                                 mealParams.push(
+    //                                     assignment_id,
+    //                                     canteen_order_id,
+    //                                     type_slno
+    //                                 );
+
+    //                                 connection.query(
+    //                                     updateMealQuery,
+    //                                     mealParams,
+    //                                     (mealUpdateError) => {
+
+    //                                         if (mealUpdateError) {
+
+    //                                             return connection.rollback(() => {
+
+    //                                                 connection.release();
+
+    //                                                 return callback({
+    //                                                     stage: "UPDATE_MEAL_STATUS",
+    //                                                     message: mealUpdateError
+    //                                                 });
+    //                                             });
+    //                                         }
+
+    //                                         // =====================================================
+    //                                         // 5. CHECK ALL MEAL STATUS
+    //                                         // =====================================================
+
+    //                                         const checkStatusQuery = `
+    //                                         SELECT
+    //                                             delivery_status
+    //                                         FROM diet_delivery_assignment_detail
+    //                                         WHERE assignment_id = ?
+    //                                     `;
+
+    //                                         connection.query(
+    //                                             checkStatusQuery,
+    //                                             [assignment_id],
+    //                                             (statusError, statusResult) => {
+
+    //                                                 if (statusError) {
+
+    //                                                     return connection.rollback(() => {
+
+    //                                                         connection.release();
+
+    //                                                         return callback({
+    //                                                             stage: "CHECK_STATUS",
+    //                                                             message: statusError
+    //                                                         });
+    //                                                     });
+    //                                                 }
+
+
+    //                                                 const statuses =
+    //                                                     statusResult?.map(
+    //                                                         item => item.delivery_status
+    //                                                     );
+
+    //                                                 const mainAssignmentStatus =
+    //                                                     getAssignmentStatus(statuses);
+
+    //                                                 // =====================================================
+    //                                                 // 6. UPDATE MAIN ASSIGNMENT
+    //                                                 // =====================================================
+
+    //                                                 let updateMainQuery = `
+    //                                                 UPDATE diet_delivery_assignment
+    //                                                 SET
+    //                                                     delivery_status = ?
+    //                                             `;
+
+    //                                                 const mainParams = [
+    //                                                     mainAssignmentStatus
+    //                                                 ];
+
+    //                                                 if (
+    //                                                     mainAssignmentStatus ===
+    //                                                     "COMPLETED"
+    //                                                 ) {
+
+    //                                                     updateMainQuery += `,
+    //                                                     completed_time = NOW()
+    //                                                 `;
+    //                                                 }
+
+    //                                                 if (
+    //                                                     mainAssignmentStatus ===
+    //                                                     "INPROGRESS"
+    //                                                 ) {
+
+    //                                                     updateMainQuery += `,
+    //                                                     pickup_time = NOW()
+    //                                                 `;
+    //                                                 }
+
+    //                                                 updateMainQuery += `
+    //                                                 WHERE assignment_id = ?
+    //                                             `;
+
+    //                                                 mainParams.push(
+    //                                                     assignment_id
+    //                                                 );
+
+    //                                                 connection.query(
+    //                                                     updateMainQuery,
+    //                                                     mainParams,
+    //                                                     (mainError) => {
+
+    //                                                         if (mainError) {
+
+    //                                                             return connection.rollback(() => {
+
+    //                                                                 connection.release();
+
+    //                                                                 return callback({
+    //                                                                     stage: "UPDATE_MAIN_ASSIGNMENT",
+    //                                                                     message: mainError
+    //                                                                 });
+    //                                                             });
+    //                                                         }
+
+    //                                                         // =====================================================
+    //                                                         // COMMIT
+    //                                                         // =====================================================
+
+    //                                                         connection.commit((commitError) => {
+
+    //                                                             if (commitError) {
+
+    //                                                                 return connection.rollback(() => {
+
+    //                                                                     connection.release();
+
+    //                                                                     return callback({
+    //                                                                         stage: "COMMIT",
+    //                                                                         message: commitError
+    //                                                                     });
+    //                                                                 });
+    //                                                             }
+
+    //                                                             connection.release();
+
+    //                                                             return callback(null, {
+    //                                                                 success: 1,
+    //                                                                 assignment_status:
+    //                                                                     mainAssignmentStatus,
+    //                                                                 meal_status:
+    //                                                                     mealStatus
+    //                                                             });
+    //                                                         });
+    //                                                     }
+    //                                                 );
+    //                                             }
+    //                                         );
+    //                                     }
+    //                                 );
+    //                             }
+    //                         );
+    //                     });
+    //                 }
+    //             );
+    //         });
+    //     });
+    // },
+
+    UpdateAssignOrderDetail: (data, callback) => {
+
+        const {
+            assignment_id,
+            canteen_order_id,
+            delivery_status,
+            remarks,
+            updated_by,
+            type_slno
+        } = data;
+
+        let query = `
+        UPDATE diet_delivery_assignment_detail
+        SET
+            delivery_status = ?,
+            remarks = ?
+    `;
+
+        const params = [
+            delivery_status,
+            remarks || null
+        ];
+
+        //  only when DELIVERED
+        if (delivery_status === "DELIVERED") {
+            query += `,
+            delivered_at = NOW(),
+            delivered_by = ?
+        `;
+
+            params.push(updated_by);
+        }
+
+        query += `
+        WHERE assignment_id = ?
+        AND canteen_order_id = ?
+        AND type_slno = ?
+    `;
+
+        params.push(assignment_id);
+        params.push(canteen_order_id);
+        params.push(type_slno);
+
+        executeQuery(query, params, callback);
+    },
+
+
     UpdateDeliveryLogDetail: (data, callback) => {
 
         const {
@@ -653,597 +1163,162 @@ module.exports = {
                 });
             }
 
-            connection.beginTransaction((err) => {
-
-                if (err) {
-
-                    connection.release();
-
-                    return callback({
-                        stage: "TRANSACTION",
-                        message: err
-                    });
-                }
-
-                // =====================================================
-                // 1. CHECK DELIVERY LOG EXIST
-                // =====================================================
-
-                const checkExistingLogQuery = `
-                SELECT delivery_id
-                FROM diet_delivery_log
-                WHERE canteen_order_id = ?
-                AND type_slno = ?
-                AND item_id = ?
-                LIMIT 1
-            `;
-
-                connection.query(
-                    checkExistingLogQuery,
-                    [
-                        canteen_order_id,
-                        type_slno,
-                        item_id
-                    ],
-                    (checkError, checkResult) => {
-
-                        if (checkError) {
-
-                            return connection.rollback(() => {
-
-                                connection.release();
-
-                                return callback({
-                                    stage: "CHECK_DELIVERY_LOG",
-                                    message: checkError
-                                });
-                            });
-                        }
-
-                        const hasExistingLog =
-                            checkResult.length > 0;
-
-                        // =====================================================
-                        // 2. INSERT / UPDATE DELIVERY LOG
-                        // =====================================================
-
-                        const saveDeliveryLog = (cb) => {
-
-                            // UPDATE
-
-                            if (hasExistingLog) {
-
-                                let updateLogQuery = `
-                                UPDATE diet_delivery_log
-                                SET
-                                    patient_diet_id = ?,
-                                    delivered_qty = ?,
-                                    delivery_status = ?,
-                                    updated_by = ?,
-                                    updated_remarks = ?
-                            `;
-
-                                const updateLogParams = [
-                                    patient_diet_id,
-                                    delivered_qty,
-                                    delivery_status,
-                                    updated_by,
-                                    remarks || null
-                                ];
-
-                                // ONLY WHEN DELIVERED
-
-                                if (delivery_status === "DELIVERED") {
-
-                                    updateLogQuery += `,
-                                    develivered_by = ?,
-                                    delivered_time = ?,
-                                    delivery_remarks = ?
-                                `;
-
-                                    updateLogParams.push(
-                                        develivered_by || updated_by,
-                                        delivered_time || new Date(),
-                                        delivery_remarks || remarks || null
-                                    );
-                                }
-
-                                updateLogQuery += `
-                                WHERE canteen_order_id = ?
-                                AND type_slno = ?
-                                AND item_id = ?
-                            `;
-
-                                updateLogParams.push(
-                                    canteen_order_id,
-                                    type_slno,
-                                    item_id
-                                );
-
-                                connection.query(
-                                    updateLogQuery,
-                                    updateLogParams,
-                                    cb
-                                );
-                            }
-
-                            // INSERT
-
-                            else {
-
-                                const insertColumns = [
-                                    'patient_diet_id',
-                                    'item_id',
-                                    'canteen_order_id',
-                                    'type_slno',
-                                    'delivered_qty',
-                                    'delivery_status',
-                                    'updated_by',
-                                    'updated_remarks'
-                                ];
-
-                                const insertValues = [
-                                    patient_diet_id,
-                                    item_id,
-                                    canteen_order_id,
-                                    type_slno,
-                                    delivered_qty,
-                                    delivery_status,
-                                    updated_by,
-                                    remarks || null
-                                ];
-
-                                // ONLY WHEN DELIVERED
-
-                                if (delivery_status === "DELIVERED") {
-
-                                    insertColumns.push(
-                                        'develivered_by',
-                                        'delivered_time',
-                                        'delivery_remarks'
-                                    );
-
-                                    insertValues.push(
-                                        develivered_by || updated_by,
-                                        delivered_time || new Date(),
-                                        delivery_remarks || remarks || null
-                                    );
-                                }
-
-                                const placeholders =
-                                    insertColumns
-                                        .map(() => '?')
-                                        .join(',');
-
-                                const insertLogQuery = `
-                                INSERT INTO diet_delivery_log
-                                (
-                                    ${insertColumns.join(',')}
-                                )
-                                VALUES
-                                (
-                                    ${placeholders}
-                                )
-                            `;
-
-                                connection.query(
-                                    insertLogQuery,
-                                    insertValues,
-                                    cb
-                                );
-                            }
-                        };
-
-                        saveDeliveryLog((logError) => {
-
-                            if (logError) {
-
-                                return connection.rollback(() => {
-
-                                    connection.release();
-
-                                    return callback({
-                                        stage: hasExistingLog
-                                            ? "UPDATE_DELIVERY_LOG"
-                                            : "INSERT_DELIVERY_LOG",
-                                        message: logError
-                                    });
-                                });
-                            }
-
-                            // =====================================================
-                            // 3. CALCULATE MEAL STATUS
-                            // =====================================================
-
-                            const mealStatusQuery = `
-                            SELECT
-                                delivery_status
-                            FROM diet_delivery_log
-                            WHERE canteen_order_id = ?
-                            AND type_slno = ?
-                        `;
-
-                            connection.query(
-                                mealStatusQuery,
-                                [
-                                    canteen_order_id,
-                                    type_slno
-                                ],
-                                (mealError, mealResult) => {
-
-                                    if (mealError) {
-
-                                        return connection.rollback(() => {
-
-                                            connection.release();
-
-                                            return callback({
-                                                stage: "MEAL_STATUS_CHECK",
-                                                message: mealError
-                                            });
-                                        });
-                                    }
-
-                                    const mealStatuses =
-                                        mealResult.map(
-                                            i => i.delivery_status
-                                        );
-
-                                    let mealStatus =
-                                        "PENDING";
-
-                                    const allDelivered =
-                                        mealStatuses.length > 0 &&
-                                        mealStatuses.every(
-                                            s => s === "DELIVERED"
-                                        );
-
-                                    const allCancelled =
-                                        mealStatuses.length > 0 &&
-                                        mealStatuses.every(
-                                            s => s === "CANCELLED"
-                                        );
-
-                                    const hasDelivered =
-                                        mealStatuses.some(
-                                            s => s === "DELIVERED"
-                                        );
-
-                                    const hasPickedup =
-                                        mealStatuses.some(
-                                            s => s === "PICKEDUP"
-                                        );
-
-                                    const hasCancelled =
-                                        mealStatuses.some(
-                                            s => s === "CANCELLED"
-                                        );
-
-                                    const hasPending =
-                                        mealStatuses.some(
-                                            s => s === "PENDING"
-                                        );
-
-                                    const hasPartial =
-                                        mealStatuses.some(
-                                            s =>
-                                                s === "RETURNED" ||
-                                                s === "UNDELIVERED"
-                                        );
-
-                                    // =====================================================
-                                    // MEAL STATUS LOGIC
-                                    // =====================================================
-
-                                    if (allDelivered) {
-
-                                        mealStatus =
-                                            "DELIVERED";
-                                    }
-                                    else if (allCancelled) {
-
-                                        mealStatus =
-                                            "CANCELLED";
-                                    }
-                                    else if (hasPartial) {
-
-                                        mealStatus =
-                                            "RETURNED";
-                                    }
-                                    else if (
-                                        hasDelivered ||
-                                        hasPickedup ||
-                                        hasCancelled
-                                    ) {
-
-                                        // IMPORTANT
-                                        // DO NOT GO BACK TO PENDING
-
-                                        mealStatus =
-                                            "PICKEDUP";
-                                    }
-                                    else if (hasPending) {
-
-                                        mealStatus =
-                                            "PENDING";
-                                    }
-
-                                    // =====================================================
-                                    // 4. UPDATE MEAL LEVEL STATUS
-                                    // =====================================================
-
-                                    let updateMealQuery = `
-                                    UPDATE diet_delivery_assignment_detail
-                                    SET
-                                        delivery_status = ?,
-                                        remarks = ?
-                                `;
-
-                                    const mealParams = [
-                                        mealStatus,
-                                        remarks || null
-                                    ];
-
-                                    if (mealStatus === "DELIVERED") {
-
-                                        updateMealQuery += `,
-                                        delivered_at = NOW(),
-                                        delivered_by = ?
-                                    `;
-
-                                        mealParams.push(
-                                            updated_by
-                                        );
-                                    }
-
-                                    updateMealQuery += `
-                                    WHERE assignment_id = ?
-                                    AND canteen_order_id = ?
-                                    AND type_slno = ?
-                                `;
-
-                                    mealParams.push(
-                                        assignment_id,
-                                        canteen_order_id,
-                                        type_slno
-                                    );
-
-                                    connection.query(
-                                        updateMealQuery,
-                                        mealParams,
-                                        (mealUpdateError) => {
-
-                                            if (mealUpdateError) {
-
-                                                return connection.rollback(() => {
-
-                                                    connection.release();
-
-                                                    return callback({
-                                                        stage: "UPDATE_MEAL_STATUS",
-                                                        message: mealUpdateError
-                                                    });
-                                                });
-                                            }
-
-                                            // =====================================================
-                                            // 5. CHECK ALL MEAL STATUS
-                                            // =====================================================
-
-                                            const checkStatusQuery = `
-                                            SELECT
-                                                delivery_status
-                                            FROM diet_delivery_assignment_detail
-                                            WHERE assignment_id = ?
-                                        `;
-
-                                            connection.query(
-                                                checkStatusQuery,
-                                                [assignment_id],
-                                                (statusError, statusResult) => {
-
-                                                    if (statusError) {
-
-                                                        return connection.rollback(() => {
-
-                                                            connection.release();
-
-                                                            return callback({
-                                                                stage: "CHECK_STATUS",
-                                                                message: statusError
-                                                            });
-                                                        });
-                                                    }
-
-                                                    const statuses =
-                                                        statusResult.map(
-                                                            item => item.delivery_status
-                                                        );
-
-                                                    let mainAssignmentStatus =
-                                                        "ASSIGNED";
-
-                                                    const allDelivered =
-                                                        statuses.length > 0 &&
-                                                        statuses.every(
-                                                            status =>
-                                                                status === "DELIVERED"
-                                                        );
-
-                                                    const allCancelled =
-                                                        statuses.length > 0 &&
-                                                        statuses.every(
-                                                            status =>
-                                                                status === "CANCELLED"
-                                                        );
-
-                                                    const hasPending =
-                                                        statuses.some(
-                                                            status =>
-                                                                status === "PENDING"
-                                                        );
-
-                                                    const hasPickedUp =
-                                                        statuses.some(
-                                                            status =>
-                                                                status === "PICKEDUP"
-                                                        );
-
-                                                    const hasDelivered =
-                                                        statuses.some(
-                                                            status =>
-                                                                status === "DELIVERED"
-                                                        );
-
-                                                    const hasCancelled =
-                                                        statuses.some(
-                                                            status =>
-                                                                status === "CANCELLED"
-                                                        );
-
-                                                    const hasPartialIssue =
-                                                        statuses.some(
-                                                            status =>
-                                                                status === "RETURNED" ||
-                                                                status === "UNDELIVERED"
-                                                        );
-
-                                                    // =====================================================
-                                                    // MAIN ASSIGNMENT STATUS
-                                                    // =====================================================
-
-                                                    if (allDelivered) {
-
-                                                        mainAssignmentStatus =
-                                                            "COMPLETED";
-                                                    }
-                                                    else if (allCancelled) {
-
-                                                        mainAssignmentStatus =
-                                                            "CANCELLED";
-                                                    }
-                                                    else if (hasPartialIssue) {
-
-                                                        mainAssignmentStatus =
-                                                            "PARTIAL";
-                                                    }
-                                                    else if (
-                                                        hasDelivered ||
-                                                        hasPickedUp ||
-                                                        hasCancelled
-                                                    ) {
-
-                                                        mainAssignmentStatus =
-                                                            "INPROGRESS";
-                                                    }
-                                                    else if (hasPending) {
-
-                                                        mainAssignmentStatus =
-                                                            "ASSIGNED";
-                                                    }
-
-                                                    // =====================================================
-                                                    // 6. UPDATE MAIN ASSIGNMENT
-                                                    // =====================================================
-
-                                                    let updateMainQuery = `
-                                                    UPDATE diet_delivery_assignment
-                                                    SET
-                                                        delivery_status = ?
-                                                `;
-
-                                                    const mainParams = [
-                                                        mainAssignmentStatus
-                                                    ];
-
-                                                    if (
-                                                        mainAssignmentStatus ===
-                                                        "COMPLETED"
-                                                    ) {
-
-                                                        updateMainQuery += `,
-                                                        completed_time = NOW()
-                                                    `;
-                                                    }
-
-                                                    if (
-                                                        mainAssignmentStatus ===
-                                                        "INPROGRESS"
-                                                    ) {
-
-                                                        updateMainQuery += `,
-                                                        pickup_time = NOW()
-                                                    `;
-                                                    }
-
-                                                    updateMainQuery += `
-                                                    WHERE assignment_id = ?
-                                                `;
-
-                                                    mainParams.push(
-                                                        assignment_id
-                                                    );
-
-                                                    connection.query(
-                                                        updateMainQuery,
-                                                        mainParams,
-                                                        (mainError) => {
-
-                                                            if (mainError) {
-
-                                                                return connection.rollback(() => {
-
-                                                                    connection.release();
-
-                                                                    return callback({
-                                                                        stage: "UPDATE_MAIN_ASSIGNMENT",
-                                                                        message: mainError
-                                                                    });
-                                                                });
-                                                            }
-
-                                                            // =====================================================
-                                                            // COMMIT
-                                                            // =====================================================
-
-                                                            connection.commit((commitError) => {
-
-                                                                if (commitError) {
-
-                                                                    return connection.rollback(() => {
-
-                                                                        connection.release();
-
-                                                                        return callback({
-                                                                            stage: "COMMIT",
-                                                                            message: commitError
-                                                                        });
-                                                                    });
-                                                                }
-
-                                                                connection.release();
-
-                                                                return callback(null, {
-                                                                    success: 1,
-                                                                    assignment_status:
-                                                                        mainAssignmentStatus,
-                                                                    meal_status:
-                                                                        mealStatus
-                                                                });
-                                                            });
-                                                        }
-                                                    );
-                                                }
-                                            );
-                                        }
-                                    );
-                                }
-                            );
+            // 1. CHECK EXISTING
+            const checkQuery = `
+            SELECT delivery_id
+            FROM diet_delivery_log
+            WHERE canteen_order_id = ?
+            AND type_slno = ?
+            AND item_id = ?
+            LIMIT 1
+        `;
+
+            connection.query(
+                checkQuery,
+                [canteen_order_id, type_slno, item_id],
+                (checkError, checkResult) => {
+
+                    if (checkError) {
+                        connection.release();
+                        return callback({
+                            stage: "CHECK_LOG",
+                            message: checkError
                         });
                     }
-                );
-            });
-        });
-    },
 
+                    const exists = checkResult.length > 0;
+
+                    // =====================================================
+                    // 2. UPDATE
+                    // =====================================================
+                    if (exists) {
+
+                        let updateQuery = `
+                        UPDATE diet_delivery_log
+                        SET
+                            patient_diet_id = ?,
+                            delivered_qty = ?,
+                            delivery_status = ?,
+                            updated_by = ?,
+                            updated_remarks = ?
+                    `;
+
+                        const params = [
+                            patient_diet_id,
+                            delivered_qty,
+                            delivery_status,
+                            updated_by,
+                            remarks || null
+                        ];
+
+                        // only when delivered
+                        if (delivery_status === "DELIVERED") {
+
+                            updateQuery += `,
+                            develivered_by = ?,
+                            delivered_time = ?,
+                            delivery_remarks = ?
+                        `;
+
+                            params.push(
+                                develivered_by || updated_by,
+                                delivered_time || new Date(),
+                                delivery_remarks || remarks || null
+                            );
+                        }
+
+                        updateQuery += `
+                        WHERE canteen_order_id = ?
+                        AND type_slno = ?
+                        AND item_id = ?
+                    `;
+
+                        params.push(canteen_order_id, type_slno, item_id);
+
+                        connection.query(updateQuery, params, (err2) => {
+                            connection.release();
+
+                            if (err2) {
+                                return callback({
+                                    stage: "UPDATE_LOG",
+                                    message: err2
+                                });
+                            }
+
+                            return callback(null, {
+                                success: 1,
+                                message: "Updated successfully"
+                            });
+                        });
+                    }
+
+                    // =====================================================
+                    // 3. INSERT
+                    // =====================================================
+                    else {
+
+                        const columns = [
+                            "patient_diet_id",
+                            "item_id",
+                            "canteen_order_id",
+                            "type_slno",
+                            "delivered_qty",
+                            "delivery_status",
+                            "updated_by",
+                            "updated_remarks"
+                        ];
+
+                        const values = [
+                            patient_diet_id,
+                            item_id,
+                            canteen_order_id,
+                            type_slno,
+                            delivered_qty,
+                            delivery_status,
+                            updated_by,
+                            remarks || null
+                        ];
+
+                        if (delivery_status === "DELIVERED") {
+
+                            columns.push(
+                                "develivered_by",
+                                "delivered_time",
+                                "delivery_remarks"
+                            );
+
+                            values.push(
+                                develivered_by || updated_by,
+                                delivered_time || new Date(),
+                                delivery_remarks || remarks || null
+                            );
+                        }
+
+                        const placeholders = columns.map(() => "?").join(",");
+
+                        const insertQuery = `
+                        INSERT INTO diet_delivery_log (${columns.join(",")})
+                        VALUES (${placeholders})
+                    `;
+
+                        connection.query(insertQuery, values, (err3) => {
+                            connection.release();
+
+                            if (err3) {
+                                return callback({
+                                    stage: "INSERT_LOG",
+                                    message: err3
+                                });
+                            }
+
+                            return callback(null, {
+                                success: 1,
+                                message: "Inserted successfully"
+                            });
+                        });
+                    }
+                }
+            );
+        });
+    }
 };

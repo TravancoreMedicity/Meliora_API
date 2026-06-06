@@ -34,6 +34,10 @@ module.exports = {
         createOrder(order, items, (err, result) => {
             if (err) return res.status(200).json({ success: 0, message: err });
 
+            req.io.emit("newCanteenOrder", {
+                orderId: result?.orderId
+            });
+
             return res.status(200).json({
                 success: 1,
                 message: "Order Created",
@@ -103,6 +107,10 @@ module.exports = {
 
         cancelOrder(canteen_order_id, (err) => {
             if (err) return res.status(200).json({ success: 0, message: err });
+            req.io.emit("cancelCanteenOrder", {
+                orderId: canteen_order_id,
+                status: 'CANCELLED'
+            });
 
             return res.status(200).json({
                 success: 1,

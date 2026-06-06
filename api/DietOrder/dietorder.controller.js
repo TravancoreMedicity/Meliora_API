@@ -43,6 +43,11 @@ module.exports = {
                 });
             }
 
+            req.io.emit("newDietOrder", {
+                message: "New Diet Order",
+                status: 'Order'
+            });
+
             return res.status(200).json({
                 success: 1,
                 message: "Order Created Successfully",

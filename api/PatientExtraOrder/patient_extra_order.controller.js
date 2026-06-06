@@ -13,9 +13,7 @@ module.exports = {
 
     createExtraOrder: (req, res) => {
         const { order, order_status, created_by, patient_id } = req.body;
-        console.log({
-            order
-        });
+    
 
         if (!Array.isArray(order) || order.length === 0) {
             return res.status(200).json({
@@ -108,10 +106,6 @@ module.exports = {
     },
     cancelExtraOrder: (req, res) => {
         const { extra_order_id, updated_by, FoodName, is_active, canteen_order_item_id } = req.body;
-
-        console.log({
-            canteen_order_item_id
-        });
 
 
         cancelOrder(extra_order_id, updated_by, (err) => {

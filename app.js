@@ -293,6 +293,7 @@ const RateVariationReport = require('./api/RateVariationReport/RateVariationRepo
 const store_master = require('./api/store_master/store_master.router')
 const vendor_master = require('./api/vendor_master/vendor_master_.router')
 const workOrder = require('./api/workOrder/workOrder.router')
+const ElliderUpdation = require('./api/elliderUpdation/elliderUpdation.router')
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -494,7 +495,7 @@ app.use('/api/RateVariationReport', RateVariationReport)
 app.use('/api/store_master', store_master)
 app.use('/api/vendor_master', vendor_master)
 app.use('/api/workOrder', workOrder)
-
+app.use('/api/ElliderUpdation', ElliderUpdation)
 
 server.listen(
   process.env.APP_PORT,

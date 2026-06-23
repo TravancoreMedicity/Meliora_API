@@ -2,6 +2,8 @@ const { pool } = require('../../config/database');
 
 module.exports = {
     create: (data, callBack) => {
+        console.log(data);
+
         pool.query(
             `INSERT INTO module_group_mast (
                 mod_grp_name,
@@ -55,6 +57,8 @@ module.exports = {
         )
     },
     update: (data, callBack) => {
+        console.log(data, "update");
+
         pool.query(
             `UPDATE module_group_mast 
                 SET mod_grp_name = ?,

@@ -18,6 +18,7 @@ module.exports = {
                 //     message: "OTP sent successfully",
                 //     otp: otp
                 // });
+
                 axios
                     .get(
                         `https://sapteleservices.com/SMS_API/sendsms.php?username=Tmc_medicity&password=c9e780&sendername=TMDCTY&mobile=${mobileNumber}&template_id=1407162012178109509&message=Your+Medicity+App+OTP+code:+${otp}+DuHTEah22dE.Travancore+Medicity+.&routetype=1`

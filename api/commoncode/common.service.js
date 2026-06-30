@@ -45,8 +45,18 @@ module.exports = {
         pool.query(
             `SELECT 
             em_id,
-            em_name
-            FROM co_employee_master where em_status=1 and  em_no!=1`,
+            em_name,
+            em_department,
+            em_dept_section,
+            cdm.dept_name,
+            em_designation,
+            cds.sec_name,
+            cd.desg_name
+            FROM co_employee_master cem
+            left join co_department_mast cdm on cdm.dept_id = cem.em_department
+            left join co_deptsec_mast cds on cds.sec_id = cem.em_dept_section
+            left join co_designation cd on cd.desg_slno = cem.em_designation
+            where em_status=1 and  em_no!=1`,
             [],
             (error, results, feilds) => {
                 if (error) {

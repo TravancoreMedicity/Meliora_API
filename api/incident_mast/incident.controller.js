@@ -1,3 +1,4 @@
+const { date } = require('joi');
 const {
     IncidetDetailInsert, IncidentDetailsUpdate, UpdateMarkedIncidentDetails, deleteIncident, ErrorIncidentUpdate,
     RedosIncidentUpdate, IdentifErrorIncidentUpdate, FallsIncidentUpdate, SentinelIncidentUpdate, NearMissessIncidentUpdate,
@@ -107,8 +108,47 @@ const {
     getIncidentInitiator,
     InsertIncCommonDetail,
     getAllPgHsStaffDetail,
+    createConversation,
+    addConversationUsers,
+    getConversation,
+    addMessageAttachments,
+    createConversationMessage,
+    fetchConversationMessages,
+    getExternalEmployeeConversations,
+    fetchMergedConversationMessages,
+    DeletemessageDetail,
+    EditMessageDetail,
+    deleteMessageAttachment,
+    getConversationEmployees,
+    removeConversationMember,
+    AddNewMemberToGroup,
+    getLastMessageId,
+    ReactivateConversationMembers,
+    FindConversationMembers,
+    getConversationParticipants,
+    createNotificationsForMessage,
+    markAsRead,
+    getUnreadCountsByConversation,
+    markConversationAsRead,
+    getUnreadCount,
+    getWhatsappRequestDetails,
+    insertWhatsapp,
+    updateWhatsapp,
+    getAllWhatsapp,
+    getApprovalRequestDetail,
+    getCurrentEmployeeLevelOne,
+    insertEvent,
+    updateEvent,
+    getAllEvent,
+    getAllNotificationConfig,
+    updateNotificationConfig,
+    insertNotificationConfig,
+    getRegistrationEmployee,
+
 
 } = require('./incident.service');
+const { sendIncidentRequestWhatsapp } = require('./whatsappService');
+
 
 
 module.exports = {
@@ -1446,6 +1486,53 @@ module.exports = {
             ])
         );
 
+        const RequestSentEmployee = data?.flatMap(item =>
+            item.inc_collect_emp_id?.map((empId, index) => ({
+                inc_register_slno: item.inc_register_slno,
+                inc_action_req_user: item.inc_action_req_user,
+                inc_dep_sec: item.inc_colled_dep_sec[index],
+                inc_emp_id: empId
+            }))
+        );
+
+
+        if (RequestSentEmployee.length > 0 && Array.isArray(RequestSentEmployee)) {
+            RequestSentEmployee?.forEach(item => {
+                getApprovalRequestDetail(
+                    item.inc_emp_id,
+                    item.inc_action_req_user,
+                    item.inc_register_slno
+                    , (err, WhatsUpNumbers) => {
+                        if (err) {
+                            console.error(err);
+                            return;
+                        }
+
+                        const person = WhatsUpNumbers[0];
+                        const currentYear = new Date().getFullYear();
+                        const IncidentNo = item.inc_register_slno || ""
+
+
+                        sendIncidentRequestWhatsapp({
+                            mobile: person.whatsapp_number || person.requested_employee_mobile,
+                            employeeName: person.requested_employee_name,
+                            incidentNo: `IRN/TMCH/${currentYear}/${IncidentNo}`,
+                            creatorName: person.creator_name,
+                            creatorDepartment: person.creator_department,
+                            type: 'Data Action'
+                        }).catch((error) => {
+                            console.error("WhatsApp send failed",
+                                error?.response?.data || error.message
+                            );
+                        });
+                    }
+                );
+            })
+        }
+
+
+
+
         if (!Array.isArray(values) || values.length === 0) {
             return res.status(400).json({
                 success: 0,
@@ -1495,43 +1582,6 @@ module.exports = {
                 data: results,
                 message: 'Action Request Sent Successfully!'
             })
-
-            // if (insertId) {
-            //     SingleDepartmentActionDetail(fetchActionDetail, (err, actionResult) => {
-            //         if (err) {
-            //             return res.status(200).json({
-            //                 success: 0,
-            //                 message: err
-            //             });
-            //         }
-
-            //         // ?? SOCKET EVENT
-            //         req.io.emit("new_action_requested", {
-            //             actionDetail: actionResult,
-            //             inc_register_slno: fetchActionDetail.inc_register_slno,
-            //             requestedBy: fetchActionDetail.inc_action_req_user,
-            //             createdAt: new Date()
-            //         });
-
-            //         // Optional broadcast
-            //         req.io.emit(
-            //             "message",
-            //             "New department action request received"
-            //         );
-
-            //         return res.status(200).json({
-            //             success: 2,
-            //             data: results,
-            //             message: 'Action Request Sent Successfully!'
-            //         });
-            //     });
-            // } else {
-            //     return res.status(200).json({
-            //         success: 2,
-            //         data: results,
-            //         message: 'Action Request Sent Successfully!'
-            //     });
-            // }
 
         })
     },
@@ -2186,6 +2236,8 @@ module.exports = {
                             cd.desg_name,
                             icd.inc_common_description,
                             icd.inc_common_dtl_slno,
+                            isc.inc_sub_category_name,
+                            ircm.inc_category_name,
                             irm.inc_data_collection_req,
                             JSON_ARRAYAGG(
                                 JSON_OBJECT(
@@ -2216,6 +2268,8 @@ module.exports = {
                         LEFT JOIN inc_data_collection idc ON idc.inc_register_slno = irm.inc_register_slno
                         LEFT JOIN inc_dep_action_detail idad ON idad.inc_register_slno = irm.inc_register_slno AND idad.inc_dep_action_detail_status = 1
                         LEFT JOIN co_department_mast cds ON cds.dept_id = idc.inc_req_collect_dep
+                        LEFT JOIN incident_sub_category_master isc ON irm.inc_subcategory = isc.inc_sub_cat_slno
+                        LEFT JOIN incident_category_master ircm ON irm.inc_category = ircm.inc_category_slno
                         LEFT JOIN co_employee_master cem ON cem.em_id = idc.inc_req_user
                         LEFT JOIN co_employee_master mc ON mc.em_id = idc.inc_req_ack_user
                         WHERE ${whereCondition}
@@ -2439,6 +2493,26 @@ module.exports = {
         });
     },
 
+    getCurrentEmployeeLevelOne: (req, res) => {
+        const data = req.body;
+        getCurrentEmployeeLevelOne(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Departments Fetched Successfully',
+                data: results
+            });
+        });
+    },
+
+
+
     insertIncidentNature: (req, res) => {
         const data = req.body;
         insertIncidentNature(data, (err, results) => {
@@ -2625,8 +2699,10 @@ module.exports = {
             inc_subcategory,
             inc_sacmatrix_detail,
             inc_all_approved,
-            file_status
+            file_status,
+            nextLevelEmployees
         } = data;
+
 
         const highleveldata = {
             inc_current_level,
@@ -2672,6 +2748,46 @@ module.exports = {
                         message: err
                     });
                 }
+                if (Array.isArray(nextLevelEmployees) && nextLevelEmployees.length > 0) {
+                    const currentYear = new Date().getFullYear();
+
+                    nextLevelEmployees.forEach((item) => {
+                        getApprovalRequestDetail(
+                            item?.level_emp_id,
+                            level_employee,
+                            inc_register_slno,
+                            (err, result) => {
+                                if (err) {
+                                    console.error(err);
+                                    return;
+                                }
+
+                                if (!result?.length) return;
+
+                                const whatsappData = result[0];
+
+                                sendIncidentRequestWhatsapp({
+                                    mobile: whatsappData.requested_employee_mobile,
+                                    employeeName: whatsappData.requested_employee_name,
+                                    incidentNo: `IRN/TMCH/${currentYear}/${inc_register_slno}`,
+                                    creatorName: whatsappData.creator_name,
+                                    creatorDepartment: whatsappData.creator_department,
+                                    type: 'Approval Pending'
+                                })
+                                    .then(() => {
+                                        console.log("Sent");
+                                    })
+                                    .catch((error) => {
+                                        console.error(
+                                            "WhatsApp send failed",
+                                            error?.response?.data || error.message
+                                        );
+                                    });
+                            }
+                        );
+                    });
+                }
+
                 const level_review_slno = results.insertId;
                 const hasActions = actionReviews && Object.keys(actionReviews).length > 0;
 
@@ -2725,7 +2841,10 @@ module.exports = {
             createUser,
             requested_department,
             requested_employee,
-            level_no
+            level_no,
+            is_rca_needed,
+            is_fishbone_needed,
+            is_preventive_needed
         } = req.body;
 
         const value = {
@@ -2736,10 +2855,11 @@ module.exports = {
             remark,
             requested_department,
             requested_employee,
-            level_no
+            level_no,
+            is_rca_needed,
+            is_fishbone_needed,
+            is_preventive_needed
         };
-
-
 
         // Step 1: Check if data collection already exists for this slno
         checkDataCollectionAlreadyExist(slno, (err, checkresult) => {
@@ -2773,6 +2893,41 @@ module.exports = {
                                 message: err
                             });
                         }
+                        getWhatsappRequestDetails(
+                            requested_employee,
+                            createUser,
+                            slno, (err, result) => {
+                                if (err) {
+                                    return res.status(200).json({
+                                        success: 0,
+                                        message: err
+                                    });
+                                }
+                                if (!result?.length) {
+                                    return;
+                                }
+                                const whatsappData = result[0];
+
+                                const currentYear = new Date().getFullYear();
+
+                                sendIncidentRequestWhatsapp({
+                                    mobile: whatsappData.requested_employee_mobile,
+                                    employeeName: whatsappData.requested_employee_name,
+                                    incidentNo: `IRN/TMCH/${currentYear}/${slno}`,
+                                    creatorName: whatsappData.creator_name,
+                                    creatorDepartment: whatsappData.creator_department
+                                })
+                                    .then((response) => {
+                                        // console.log('WhatsApp sent successfully');
+                                        // console.log(response.data);
+                                    })
+                                    .catch((error) => {
+                                        console.error(
+                                            'WhatsApp send failed',
+                                            error?.response?.data || error.message
+                                        );
+                                    });
+                            })
                         // Step 5: Emit WebSocket event to all connected systems
                         req.io.emit("new_data_collection_request", {
                             RequestedEmplyee: requested_employee,
@@ -2780,6 +2935,8 @@ module.exports = {
                             Incident_slno: slno,
                             createdAt: new Date(),
                         });
+
+
                         // Optional older broadcast (you can remove if not used)
                         req.io.emit("message", "new_data_collection_request! Please Check");
 
@@ -3070,7 +3227,7 @@ module.exports = {
 
             return res.status(200).json({
                 success: 2,
-                message: 'Data Fetched Successfully',
+                message: 'Action Approved Successfully',
                 data: results
             });
         });
@@ -3126,6 +3283,12 @@ module.exports = {
 
     departmentRcaPreventiveSubmission: (req, res) => {
         const data = req.body;
+        if (!data?.inc_data_collection_slno) {
+            return res.status(200).json({
+                success: 0,
+                message: "Data Collection Id is Missing!"
+            });
+        }
         departmentRcaPreventiveSubmission(data, (err, results) => {
             if (err) {
                 return res.status(200).json({
@@ -3306,7 +3469,8 @@ module.exports = {
             inc_incharge_approval,
             inc_hod_approval,
             inc_data_collection_req,
-            inc_reg_corrective
+            inc_reg_corrective,
+            EmployeeFirstLevelDetail
         } = req.body;
 
         const postDate = {
@@ -3326,7 +3490,7 @@ module.exports = {
         };
 
 
-        
+
         // common code for sending error mesg and suceess mesg  for reducing code repeatetion
         const sendError = (err) => res.status(200).json({ success: 0, message: err });
         const sendSuccess = (id) => res.status(200).json({
@@ -3339,27 +3503,82 @@ module.exports = {
         IncidentRegistration(postDate, (err, results) => {
             if (err) return sendError(err);
             const insertId = results.insertId;
-            // const value = departments?.map((item) => [
-            //     insertId,
-            //     // item.inc_category_dep,
-            //     item.dept_id,
-            //     createUser,
-            //     status,
-            //     remark,
-            //     requested_department
-            // ]);
+            const currentYear = new Date().getFullYear();
 
+            const recipeintsMap = new Map();
 
-            // if (insertId) {
-            //     requestDataCollection(value, (err, results) => {
-            //         if (err) {
-            //             return res.status(200).json({
-            //                 success: 0,
-            //                 message: err
-            //             });
-            //         }
-            //     });
-            // }
+            const addRecipient = (item) => {
+                if (!item.whatsapp_number) return;
+                const key = String(item.whatsapp_number || item.requested_employee_mobile)?.trim();
+
+                if (!recipeintsMap.has(key)) {
+                    recipeintsMap.set(key, {
+                        mobile: key,
+                        employeeName: item.requested_employee_name || item.employee_name || '',
+                        incidentNo: `IRN/TMCH/${currentYear}/${insertId}`,
+                        creatorName: item.creator_name || "",
+                        creatorDepartment: item.creator_department || "",
+                        type: 'New Incident'
+                    })
+                }
+            }
+
+            getRegistrationEmployee(
+                create_user,
+                sec_slno,
+                'IRN_REG',
+                (err, WhatsUpNumbers) => {
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+
+                    WhatsUpNumbers.forEach(addRecipient);
+
+                    const approvalPromises = EmployeeFirstLevelDetail?.map((item) => {
+                        return new Promise((resolve) => {
+                            getApprovalRequestDetail(
+                                item?.level_emp_id,
+                                create_user,
+                                insertId,
+                                (err, result) => {
+                                    if (err || !result?.length) return resolve();
+                                    const row = result[0];
+                                    addRecipient({
+                                        whatsapp_number: row.whatsapp_number || row.requested_employee_mobile,
+                                        employee_name: row.requested_employee_name,
+                                        incidentNo: `IRN/TMCH/${currentYear}/${insertId}`,
+                                        creator_name: row.creator_name,
+                                        creator_department: row.creator_department,
+                                        creator_section: row.creator_section
+                                    });
+
+                                    resolve();
+                                }
+                            );
+                        })
+                    })
+
+                    Promise.all(approvalPromises).then(() => {
+                        const uniqueRecipients = [...recipeintsMap.values()];
+                        uniqueRecipients.forEach((person) => {
+                            sendIncidentRequestWhatsapp({
+                                mobile: person.mobile,
+                                employeeName: person.employeeName,
+                                incidentNo: person.incidentNo,
+                                creatorName: person.creatorName,
+                                creatorDepartment: person.creatorDepartment,
+                                type: 'New Incident'
+                            }).catch((error) => {
+                                console.error("WhatsApp send failed",
+                                    error?.response?.data || error.message
+                                );
+                            });
+                        });
+                    });
+                }
+            );
+
 
             if (inc_initiator_slno === 1) {
                 const insertPromises = inc_initiator_dtl?.map(patient => {
@@ -3631,8 +3850,1007 @@ module.exports = {
                 data: results
             });
         });
-    }
+    },
+
+
+    getStartNewConverstion: (req, res) => {
+
+        const { conversation, users } = req.body;
+        // STEP 1 : CREATE CONVERSATION
+        createConversation(conversation, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            const conversation_id = results.insertId;
+
+            // STEP 2 : PREPARE USERS ARRAY
+
+            const usersArray = users.map(user => [
+                conversation_id,
+                user.emp_id,
+                user.department_id,
+                user.section_id,
+                user.is_admin
+            ]);
+
+            // STEP 3 : INSERT USERS
+
+            addConversationUsers(usersArray, (userErr, userResults) => {
+                if (userErr) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: userErr
+                    });
+                }
+                return res.status(200).json({
+                    success: 1,
+                    message: 'Conversation Created',
+                    conversation_id
+                });
+            });
+        });
+    },
+    getConversation: (req, res) => {
+        const data = req.body;
+        getConversation(data, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+    getExternalEmployeeConversations: (req, res) => {
+        const data = req.body;
+
+        const { emp_id } = data;
+
+        if (!emp_id) {
+            return res.status(200).json({
+                success: 0,
+                message: "Employee Id is Missing!"
+            });
+        }
+
+        getExternalEmployeeConversations(emp_id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    sendConversationMessage: (req, res) => {
+        const data = req.body;
+        const senderEmpId = data.sender_emp_id;
+
+        createConversationMessage(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            const messageId = results.insertId;
+
+            getConversationParticipants(data.conversation_id, senderEmpId, (partErr, participants) => {
+                if (partErr) {
+                    console.error('Error getting participants:', partErr);
+                    return res.status(200).json({
+                        success: 0,
+                        message: partErr
+                    });
+                }
+
+                const afterNotifications = (finalParticipants) => {
+                    emitMessagesAndNotifications(messageId, data, finalParticipants || []);
+                };
+
+                if (participants && participants.length > 0) {
+                    createNotificationsForMessage(
+                        messageId,
+                        data.conversation_id,
+                        participants,
+                        data.message,
+                        (notifErr, notifResults) => {
+                            if (notifErr) {
+                                console.error('Error creating notifications:', notifErr);
+                                return afterNotifications(participants);
+                            }
+                            afterNotifications(notifResults || participants);
+                        }
+                    );
+                } else {
+                    afterNotifications([]);
+                }
+            });
+        });
+
+        function emitMessagesAndNotifications(messageId, data, participants) {
+            const emitToUsers = async () => {
+                if (!participants || participants.length === 0) return;
+                const conversationRoom = `conv_${data.conversation_id}`;
+
+                const sockets = await req.io
+                    .in(conversationRoom)
+                    .fetchSockets();
+                const activeUsers = new Set(
+                    sockets.map(s => String(s.data.emp_id))
+                );
+
+                participants?.forEach(part => {
+                    const roomName = `emp_${part.emp_id}`;
+
+                    const isParticipantViewingConversation =
+                        activeUsers.has(String(part.emp_id));
+
+                    if (!isParticipantViewingConversation) {
+                        req.io.to(roomName).emit("new-notification", {
+                            notification_id: part.notification_id,
+                            emp_id: part.emp_id,
+                            conversation_id: data.conversation_id,
+                            message_id: messageId,
+                            title: `${data.sender_name}`,
+                            message_preview: data.message.length > 50
+                                ? data.message.substring(0, 50) + '...'
+                                : data.message,
+                            created_at: new Date()
+                        });
+                    } else {
+                        markAsRead(part.notification_id, part.emp_id);
+                    }
+
+                    req.io.to(roomName).emit("new-message", {
+                        message_id: messageId,
+                        conversation_id: data.conversation_id,
+                        sender_emp_id: data.sender_emp_id,
+                        sender_name: data.sender_name,
+                        message_type: data.message_type || 'TEXT',
+                        message: data.message,
+                        created_at: new Date()
+                    });
+                });
+            };
+
+            if (Array.isArray(data.attachments) && data.attachments.length > 0) {
+                const attachmentArray = data.attachments.map(file => ([
+                    messageId,
+                    file.file_name,
+                    file.original_name,
+                    file.file_url,
+                    file.file_size,
+                    file.mime_type,
+                    data.sender_emp_id
+                ]));
+
+                addMessageAttachments(attachmentArray, (attachErr) => {
+                    if (attachErr) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: attachErr
+                        });
+                    }
+
+                    emitToUsers();
+                    return res.status(200).json({
+                        success: 1,
+                        message: 'Message Sent Successfully',
+                        message_id: messageId
+                    });
+                });
+            } else {
+                emitToUsers();
+                return res.status(200).json({
+                    success: 1,
+                    message: 'Message Sent Successfully',
+                    message_id: messageId
+                });
+            }
+        }
+    },
+
+    getConversationMessages: (req, res) => {
+
+        const { conversation_id, empid, cursor = null } = req.body;
+
+
+        if (!conversation_id) {
+            return res.status(200).json({
+                success: 0,
+                message: "conversation_id is required"
+            });
+        }
+        fetchConversationMessages(conversation_id, empid, cursor, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (!results || results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Data found",
+                    data: []
+                });
+            }
+
+            const formattedResults = results.map(row => {
+                let attachments = [];
+                try {
+                    attachments = row.attachments
+                        ? JSON.parse(`[${row.attachments}]`)
+                        : [];
+
+                    // remove null records
+                    attachments = attachments.filter(
+                        a => a.file_url !== null
+                    );
+
+                    //  IMPORTANT FIX: convert file path → HTTP URL
+                    attachments = attachments.map(file => {
+                        if (!file.file_url) return file;
+                        const cleanPath = file.file_url.replace(/\\/g, '/');
+                        // extract path after base folder
+                        const relativePath = cleanPath.split(
+                            'ChatConversationFiles'
+                        )[1];
+                        return {
+                            ...file,
+                            file_url: `${relativePath}`
+                        };
+                    });
+                } catch (e) {
+                    attachments = [];
+                }
+
+                return {
+                    ...row,
+                    attachments
+                };
+            });
+
+
+            return res.status(200).json({
+                success: 1,
+                data: formattedResults
+            });
+        }
+        );
+    },
+    // fetchMergedConversationMessages: (req, res) => {
+    //     const { conversation_ids, empid } = req.body;
+    //     // VALIDATION
+    //     if (
+    //         !Array.isArray(conversation_ids) ||
+    //         conversation_ids.length === 0
+    //     ) {
+    //         return res.status(200).json({
+    //             success: 0,
+    //             message:
+    //                 "conversation_ids array is required"
+    //         });
+    //     }
+
+    //     fetchMergedConversationMessages(
+    //         conversation_ids,
+    //         empid,
+    //         (err, results) => {
+    //             if (err) {
+    //                 return res.status(200).json({
+    //                     success: 0,
+    //                     message: err
+    //                 });
+    //             }
+    //             if (!results || results.length === 0) {
+    //                 return res.status(200).json({
+    //                     success: 1,
+    //                     message: "No Data found",
+    //                     date: []
+    //                 });
+    //             }
+
+    //             const formattedResults =
+    //                 results?.map(row => {
+    //                     let attachments = [];
+    //                     try {
+    //                         attachments =
+    //                             row.attachments
+    //                                 ? JSON.parse(
+    //                                     `[${row.attachments}]`
+    //                                 )
+    //                                 : [];
+    //                         // REMOVE NULL FILES
+    //                         attachments =
+    //                             attachments.filter(
+    //                                 a => a.file_url !== null
+    //                             );
+    //                         // FORMAT FILE URL
+    //                         attachments =
+    //                             attachments.map(file => {
+    //                                 if (!file?.file_url) {
+    //                                     return file;
+    //                                 }
+    //                                 const cleanPath = file.file_url.replace(/\\/g, '/');
+    //                                 const relativePath = cleanPath.split('ChatConversationFiles')[1];
+    //                                 return {
+    //                                     ...file,
+    //                                     file_url: relativePath
+    //                                 };
+    //                             });
+    //                     } catch (e) {
+    //                         attachments = [];
+    //                     }
+    //                     return {
+    //                         ...row,
+    //                         attachments
+    //                     };
+    //                 });
+
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 data: formattedResults
+    //             });
+    //         }
+    //     );
+    // },
+
+
+    fetchMergedConversationMessages: (req, res) => {
+
+        const { conversation_ids, empid, cursor = null } = req.body;
+
+        // VALIDATION
+        if (
+            !Array.isArray(conversation_ids) ||
+            conversation_ids.length === 0
+        ) {
+            return res.status(200).json({
+                success: 0,
+                message: "conversation_ids array is required"
+            });
+        }
+
+        fetchMergedConversationMessages(
+            conversation_ids,
+            empid,
+            cursor,
+            (err, results) => {
+
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                if (!results || results.length === 0) {
+                    return res.status(200).json({
+                        success: 1,
+                        message: "No Data found",
+                        data: []
+                    });
+                }
+
+                const formattedResults = results.map(row => {
+
+                    let attachments = [];
+
+                    try {
+                        attachments = row.attachments
+                            ? JSON.parse(`[${row.attachments}]`)
+                            : [];
+
+                        // remove null files
+                        attachments = attachments.filter(
+                            a => a.file_url !== null
+                        );
+
+                        // format file URL
+                        attachments = attachments.map(file => {
+                            if (!file?.file_url) return file;
+
+                            const cleanPath = file.file_url.replace(/\\/g, '/');
+                            const relativePath =
+                                cleanPath.split('ChatConversationFiles')[1];
+
+                            return {
+                                ...file,
+                                file_url: relativePath
+                            };
+                        });
+
+                    } catch (e) {
+                        attachments = [];
+                    }
+
+                    return {
+                        ...row,
+                        attachments
+                    };
+                });
+
+                return res.status(200).json({
+                    success: 1,
+                    data: formattedResults
+                });
+            }
+        );
+    },
+    DeletemessageDetail: (req, res) => {
+        const { id } = req.params;
+        // VALIDATION
+        if (!id) {
+            return res.status(200).json({
+                success: 0,
+                message: "Message Id is Missing !"
+            });
+        }
+
+        DeletemessageDetail(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                message: "Delected"
+            });
+        }
+        );
+    },
+    EditMessageDetail: (req, res) => {
+        const { message, message_id } = req.body;
+        // VALIDATION
+        if (!message_id) {
+            return res.status(200).json({
+                success: 0,
+                message: "Invalid Payload!"
+            });
+        }
+
+        EditMessageDetail(message, message_id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                message: "Edited"
+            });
+        }
+        );
+    },
+
+
+    deleteConversationAttachment: (req, res) => {
+
+        const { attachment_id } = req.params;
+
+        deleteMessageAttachment(
+            attachment_id,
+            (err, results) => {
+
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    message: 'Attachment deleted successfully'
+                });
+            }
+        );
+    },
+
+    getConversationEmployees: (req, res) => {
+
+        const { conversation_id } = req.params;
+
+        getConversationEmployees(
+            conversation_id,
+            (err, results) => {
+
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: results
+                });
+            }
+        );
+    },
+
+
+    RemoveConversationMember: (req, res) => {
+        const {
+            conversation_id,
+            emp_id
+        } = req.params;
+        removeConversationMember(conversation_id, emp_id, (err, results) => {
+
+            if (err) {
+                return res.status(500).json({
+                    success: 0,
+                    message: 'Database Error'
+                });
+            }
+
+            req.io.emit("ParticipantRemoved", {
+                ConvesationId: conversation_id,
+                EmployeeId: emp_id,
+                createdAt: new Date()
+            });
+
+            return res.status(200).json({
+                success: 1,
+                message: 'Member removed successfully'
+            });
+        }
+        );
+
+    },
+
+    AddNewMembertoGroup: (req, res) => {
+
+        const {
+            coverstation_id,
+            Employee,
+            JoinMessageId
+        } = req.body;
+
+        if (!coverstation_id) {
+            return res.status(200).json({
+                success: 0,
+                message: "Conversation Id is Missing!"
+            });
+        }
+
+        if (!Employee || Employee.length === 0) {
+            return res.status(200).json({
+                success: 0,
+                message: "Employee is Missing"
+            });
+        }
+
+        const empIds = Employee.map(item => item.em_id);
+
+        FindConversationMembers(
+            coverstation_id,
+            empIds,
+            (err, existingMembers) => {
+
+                if (err) {
+                    return res.status(500).json({
+                        success: 0,
+                        message: "Database Error"
+                    });
+                }
+
+                const existingMap = new Map(
+                    existingMembers.map(item => [
+                        item.emp_id,
+                        item.user_status
+                    ])
+                );
+
+                const newMembers = [];
+                const reactivateMembers = [];
+
+                Employee.forEach(emp => {
+                    const status = existingMap.get(emp.em_id);
+                    if (status === undefined) {
+                        // Never added before
+                        newMembers.push(emp);
+                    } else if (status === 0) {
+                        // Removed member
+                        reactivateMembers.push(emp);
+                    }
+                    // status === 1
+                    // Already active member -> Ignore
+                });
+
+                const insertValues = newMembers.map(item => [
+                    coverstation_id,
+                    item.em_id,
+                    item.em_department,
+                    item.em_dept_section,
+                    JoinMessageId
+                ]);
+
+                const reactivateIds = reactivateMembers.map(
+                    item => item.em_id
+                );
+
+                const handleSuccess = () => {
+                    return res.status(200).json({
+                        success: 1,
+                        message: 'Member(s) Added Successfully'
+                    });
+                };
+
+                const EmitSocketMessage = (employeeIds = []) => {
+
+                    req.io.emit("new-member", {
+                        ConvesationId: coverstation_id,
+                        EmployeeIds: employeeIds,
+                        createdAt: new Date()
+                    });
+
+                };
+                // Only Reactivate
+                if (insertValues.length === 0 && reactivateIds.length > 0) {
+                    return ReactivateConversationMembers(
+                        coverstation_id,
+                        reactivateIds,
+                        JoinMessageId,
+                        (err) => {
+
+                            if (err) {
+                                return res.status(500).json({
+                                    success: 0,
+                                    message: "Database Error"
+                                });
+                            }
+                            EmitSocketMessage(reactivateIds);
+                            return handleSuccess();
+                        }
+                    );
+                }
+
+                // Only Insert
+                if (insertValues.length > 0 && reactivateIds.length === 0) {
+                    return AddNewMemberToGroup(
+                        insertValues,
+                        (err) => {
+                            if (err) {
+                                return res.status(500).json({
+                                    success: 0,
+                                    message: "Database Error"
+                                });
+                            }
+                            EmitSocketMessage(newMembers.map(item => item.em_id));
+                            return handleSuccess();
+                        }
+                    );
+                }
+
+                // Both Insert + Reactivate
+                if (insertValues.length > 0 && reactivateIds.length > 0) {
+                    ReactivateConversationMembers(
+                        coverstation_id,
+                        reactivateIds,
+                        JoinMessageId,
+                        (err) => {
+
+                            if (err) {
+                                return res.status(500).json({
+                                    success: 0,
+                                    message: "Database Error"
+                                });
+                            }
+
+                            AddNewMemberToGroup(
+                                insertValues,
+                                (err) => {
+
+                                    if (err) {
+                                        return res.status(500).json({
+                                            success: 0,
+                                            message: "Database Error"
+                                        });
+                                    }
+
+                                    const allAddedMembers = [
+                                        ...reactivateIds,
+                                        ...newMembers?.map(item => item.em_id)
+                                    ];
+
+                                    EmitSocketMessage(allAddedMembers);
+                                    return handleSuccess();
+                                }
+                            );
+                        }
+                    );
+
+                    return;
+                }
+
+                // All selected users already active
+                return res.status(200).json({
+                    success: 1,
+                    message: 'All selected users are already members'
+                });
+
+            }
+        );
+    },
+
+    GetLastMessageId: (req, res) => {
+        const { conversation_id } = req.params;
+
+        getLastMessageId(
+            conversation_id,
+            (err, result) => {
+
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: 'Failed to fetch last message id',
+                        error: err.message
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: result
+                });
+            }
+        );
+    },
+
+    GetConverstaionUnreadCount: (req, res) => {
+        const { empId } = req.params;
+
+        getUnreadCountsByConversation(
+            empId,
+            (err, result) => {
+
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: 'Failed to get the Unread Message',
+                        error: err.message
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: result
+                });
+            }
+        );
+    },
+    MarkConverSationAsRead: (req, res) => {
+        const { conversationId, empId } = req.body;
+
+        markConversationAsRead(
+            conversationId, empId,
+            (err, result) => {
+
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: 'Failed to get the Unread Message',
+                        error: err.message
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: result
+                });
+            }
+        );
+    },
+
+    getAllUnreadCount: (req, res) => {
+        const { empId } = req.params;
+
+        getUnreadCount(empId,
+            (err, result) => {
+
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: 'Failed to get the All Unread Message',
+                        error: err.message
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    data: result
+                });
+            }
+        );
+    },
+    insertWhatsappController: (req, res) => {
+        const data = req.body;
+        insertWhatsapp(data, (err, result) => {
+            if (err) {
+                return res.json({
+                    success: 0,
+                    message: 'Insert error',
+                    error: err
+                });
+            }
+
+            return res.json({
+                success: 2,
+                message: 'Inserted successfully',
+                result
+            });
+        });
+    },
+    updateWhatsappController: (req, res) => {
+
+        const data = req.body;
+
+        updateWhatsapp(data, (err, result) => {
+            if (err) {
+                return res.json({
+                    success: 0,
+                    message: 'Update error',
+                    error: err
+                });
+            }
+
+            return res.json({
+                success: 2,
+                message: 'Updated successfully',
+                result
+            });
+        });
+    },
+    getWhatsappController: (req, res) => {
+        getAllWhatsapp((err, result) => {
+            if (err) {
+                return res.json({
+                    success: 0,
+                    message: 'Fetch error',
+                    error: err
+                });
+            }
+
+            return res.json({
+                success: 1,
+                data: result
+            });
+        });
+    },
 
 
 
+    insertEventController: (req, res) => {
+        const data = req.body;
+        insertEvent(data, (err, result) => {
+            if (err) {
+                return res.json({
+                    success: 0,
+                    message: 'Insert error',
+                    error: err
+                });
+            }
+
+            return res.json({
+                success: 2,
+                message: 'Inserted successfully',
+                result
+            });
+        });
+    },
+
+    updateEventController: (req, res) => {
+        const data = req.body;
+        updateEvent(data, (err, result) => {
+            if (err) {
+                return res.json({
+                    success: 0,
+                    message: 'Update error',
+                    error: err
+                });
+            }
+
+            return res.json({
+                success: 2,
+                message: 'Updated successfully',
+                result
+            });
+        });
+    },
+
+    getEventController: (req, res) => {
+        getAllEvent((err, result) => {
+            if (err) {
+                return res.json({
+                    success: 0,
+                    message: 'Fetch error',
+                    error: err
+                });
+            }
+
+            return res.json({
+                success: 1,
+                data: result
+            });
+        });
+    },
+    insertNotificationConfigController: (req, res) => {
+        const data = req.body;
+        insertNotificationConfig(data, (err, result) => {
+            if (err) {
+                return res.json({
+                    success: 0,
+                    message: 'Insert error',
+                    error: err
+                });
+            }
+
+            return res.json({
+                success: 2,
+                message: 'Inserted successfully',
+                result
+            });
+        });
+    },
+
+    updateNotificationConfigController: (req, res) => {
+        const data = req.body;
+        updateNotificationConfig(data, (err, result) => {
+            if (err) {
+                return res.json({
+                    success: 0,
+                    message: 'Update error',
+                    error: err
+                });
+            }
+
+            return res.json({
+                success: 2,
+                message: 'Updated successfully',
+                result
+            });
+        });
+    },
+
+    getNotificationConfigController: (req, res) => {
+        getAllNotificationConfig((err, result) => {
+            if (err) {
+                return res.json({
+                    success: 0,
+                    message: 'Fetch error',
+                    error: err
+                });
+            }
+
+            return res.json({
+                success: 1,
+                data: result
+            });
+        });
+    },
 }

@@ -92,13 +92,40 @@ const { IncidetDetailInsert, IncidentDetailsUpdate, UpdateMarkedIncidentDetails,
     getIncidentFromDashboard,
     getIncidentInitiator,
     getAllPgHsStaffDetail,
+    getStartNewConverstion,
+    getConversation,
+    sendConversationMessage,
+    getConversationMessages,
+    getExternalEmployeeConversations,
+    fetchMergedConversationMessages,
+    DeletemessageDetail,
+    EditMessageDetail,
+    deleteConversationAttachment,
+    getConversationEmployees,
+    RemoveConversationMember,
+    AddNewMembertoGroup,
+    GetLastMessageId,
+    GetConverstaionUnreadCount,
+    MarkConverSationAsRead,
+    getAllUnreadCount,
+    insertWhatsappController,
+    getWhatsappController,
+    updateWhatsappController,
+    getCurrentEmployeeLevelOne,
+    insertEventController,
+    getEventController,
+    updateEventController,
+    insertNotificationConfigController,
+    getNotificationConfigController,
+    updateNotificationConfigController,
 } = require('./incident.controller');
 const { uploadFileIncidentService,
     getIncidentFiles,
     getIncidenActiontFiles,
     uploadFileIncidentActionFiles,
     uploadFileIncidentDataCollectionFiles,
-    getDataCollectionFiles
+    getDataCollectionFiles,
+    uploadChatConversationFiles
 } = require("./UploadFile");
 
 
@@ -106,7 +133,7 @@ const { uploadFileIncidentService,
 //incident category and subcategory master
 router.post('/incidentcategoryinsert', normalRateLimiter, checkToken, IncidentCategoryMaster);
 router.get('/allcategory', normalRateLimiter, checkToken, getAllIncidentCategory);
-router.patch('/incidentcategoryupdate',normalRateLimiter, checkToken,  IncidentCategoryUpdate);
+router.patch('/incidentcategoryupdate', normalRateLimiter, checkToken, IncidentCategoryUpdate);
 
 router.post('/insertsubcatmast', normalRateLimiter, checkToken, IncidentSubCategoryInsert);
 router.get('/getallsubcatmast', normalRateLimiter, checkToken, getAllIncidentSubCategory);
@@ -129,6 +156,7 @@ router.post('/incidentupdation', normalRateLimiter, checkToken, IncidentUpdation
 router.post('/uploadFiles', normalRateLimiter, checkToken, uploadFileIncidentService); //uploading file 
 router.post('/uploadActionFiles', normalRateLimiter, checkToken, uploadFileIncidentActionFiles); //uploading file 
 router.post('/uploaddatacollectionFiles', normalRateLimiter, checkToken, uploadFileIncidentDataCollectionFiles); //uploading file 
+router.post('/uploadchatconv', normalRateLimiter, checkToken, uploadChatConversationFiles); //uploading file 
 
 router.post('/getallincident', normalRateLimiter, checkToken, getAllIncidentDetail)
 router.get('/getincidentfile/:id', normalRateLimiter, checkToken, getIncidentFiles)// fetch files
@@ -210,6 +238,179 @@ router.patch('/updateNature', normalRateLimiter, checkToken, updateIncidentNatur
 router.post('/getincidentcommon', normalRateLimiter, checkToken, getIncidentFromDashboard)
 
 router.post('/initiator', normalRateLimiter, checkToken, getIncidentInitiator)
+
+router.post('/firstlevel', normalRateLimiter, checkToken, getCurrentEmployeeLevelOne)
+
+
+
+// chat starts here
+router.post('/start-conversation', normalRateLimiter, checkToken, getStartNewConverstion)
+
+router.post(
+    '/get-conversation',
+    normalRateLimiter,
+    checkToken,
+    getConversation
+);
+
+router.post(
+    '/send-message',
+    checkToken,
+    sendConversationMessage
+);
+
+router.post(
+    '/get-conversation-messages',
+    checkToken,
+    getConversationMessages
+);
+
+router.post(
+    '/exteranl-get-conversation',
+    normalRateLimiter,
+    checkToken,
+    getExternalEmployeeConversations
+);
+
+
+router.post(
+    '/merged-conversation-messages',
+    checkToken,
+    fetchMergedConversationMessages
+);
+
+
+
+router.get(
+    '/delete-messages/:id',
+    normalRateLimiter,
+    checkToken,
+    DeletemessageDetail
+);
+router.post(
+    '/edit-messages',
+    normalRateLimiter,
+    checkToken,
+    EditMessageDetail
+);
+
+
+router.post(
+    '/delete-message-attachment/:attachment_id',
+    normalRateLimiter,
+    checkToken,
+    deleteConversationAttachment
+);
+
+router.get(
+    '/conversation-employees/:conversation_id',
+    normalRateLimiter,
+    checkToken,
+    getConversationEmployees
+);
+
+router.patch(
+    '/conversation-member/remove/:conversation_id/:emp_id',
+    normalRateLimiter,
+    checkToken,
+    RemoveConversationMember
+);
+
+
+router.post(
+    '/conversation-member/addmember',
+    normalRateLimiter,
+    checkToken,
+    AddNewMembertoGroup
+);
+
+router.get(
+    '/last-message/:conversation_id',
+    checkToken,
+    GetLastMessageId
+);
+
+
+router.get(
+    '/unread-message/:empId',
+    checkToken,
+    GetConverstaionUnreadCount
+);
+
+router.post(
+    '/mark-message-read',
+    checkToken,
+    MarkConverSationAsRead
+);
+
+
+router.get(
+    '/all-unread-message/:empId',
+    checkToken,
+    getAllUnreadCount
+);
+
+
+router.post('/insert-inc-whatsapp',
+    normalRateLimiter,
+    checkToken,
+    insertWhatsappController)
+
+
+router.get('/getall-inc-whatsapp',
+    normalRateLimiter,
+    checkToken,
+    getWhatsappController)
+
+
+
+router.patch('/update-inc-whatsapp',
+    normalRateLimiter,
+    checkToken,
+    updateWhatsappController)
+
+
+router.post(
+    '/insert-inc-event',
+    normalRateLimiter,
+    checkToken,
+    insertEventController
+);
+
+router.get(
+    '/getall-inc-event',
+    normalRateLimiter,
+    checkToken,
+    getEventController
+);
+
+router.patch(
+    '/update-inc-event',
+    normalRateLimiter,
+    checkToken,
+    updateEventController
+);
+
+router.post(
+    '/insert-inc-notification-config',
+    normalRateLimiter,
+    checkToken,
+    insertNotificationConfigController
+);
+
+router.get(
+    '/getall-inc-notification-config',
+    normalRateLimiter,
+    checkToken,
+    getNotificationConfigController
+);
+
+router.patch(
+    '/update-inc-notification-config',
+    normalRateLimiter,
+    checkToken,
+    updateNotificationConfigController
+);
 
 /**
  * 

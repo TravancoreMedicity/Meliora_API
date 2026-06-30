@@ -2,7 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require("fs");
 const archiver = require('archiver');
-const { handleFileUpload, handleGetIncidentFiles } = require('./utils');
+const { handleFileUpload, handleGetIncidentFiles, handleChatFileUpload } = require('./utils');
 
 // ---------- Multer Storage ----------
 const incidentservicefileStorage = multer.diskStorage({
@@ -17,6 +17,39 @@ const incidentservicefileStorage = multer.diskStorage({
     },
     filename: (req, file, cb) => {
         cb(null, file.originalname);
+    }
+});
+
+const chatAttachmentStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const {
+            incident_id,
+            entity_id,
+            conversation_id,
+            emp_id
+        } = req.body;
+
+        const filepath = path.join(
+            'D:/DocMeliora/Meliora/IncidentManagement/ChatConversationFiles',
+            `${incident_id}`,
+            `${entity_id}`,
+            `${conversation_id}`,
+            `${emp_id}`
+        );
+
+        if (!fs.existsSync(filepath)) {
+            fs.mkdirSync(
+                filepath,
+                { recursive: true }
+            );
+        }
+        cb(null, filepath);
+    },
+    filename: (req, file, cb) => {
+        cb(
+            null,
+            `${Date.now()}-${file.originalname}`
+        );
     }
 });
 
@@ -41,6 +74,65 @@ const uploadFileIncidentService = multer({
     limits: { fileSize: maxSize }
 }).array('files', 10);
 
+
+
+const uploadChatAttachmentService = multer({
+    storage: chatAttachmentStorage,
+
+    fileFilter: (req, file, cb) => {
+
+        const allowedMimeTypes = [
+
+            // Images
+            'image/png',
+            'image/jpeg',
+            'image/jpg',
+            'image/webp',
+
+            // Videos
+            'video/mp4',
+            'video/mpeg',
+            'video/quicktime',
+
+            // Audio
+            'audio/mpeg',
+            'audio/mp3',
+            'audio/wav',
+
+            // PDF
+            'application/pdf',
+
+            // Word
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+
+            // Excel
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+
+            // Text
+            'text/plain',
+
+            // Zip
+            'application/zip',
+            'application/x-zip-compressed'
+        ];
+
+        if (allowedMimeTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(
+                new Error('File type not supported'),
+                false
+            );
+        }
+    },
+
+    limits: {
+        fileSize: 20 * 1024 * 1024 // 20 MB
+    }
+}).array('files', 5);
+
 // ---------- Controllers ----------
 module.exports = {
 
@@ -59,6 +151,11 @@ module.exports = {
         'D:/DocMeliora/Meliora/IncidentManagement/IncidentDataCollectionFiles'
     ),
 
+
+    uploadChatConversationFiles: handleChatFileUpload(
+        uploadChatAttachmentService,
+        'D:/DocMeliora/Meliora/IncidentManagement/ChatConversationFiles'
+    ),
 
     // getDataCollectionFiles: handleGetIncidentFiles(
     //     'D:/DocMeliora/Meliora/IncidentManagement/IncidentDataCollectionFiles'

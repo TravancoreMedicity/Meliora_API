@@ -1007,11 +1007,21 @@ module.exports = {
     inc_dep_map_status,
     cdm.dept_name,
     inc_setting_key,
-    inc_setting_label
+    inc_setting_label,
+    icdm.inc_emp_id,
+    icdm.inc_dep_sec,
+    cem.em_name,
+    sec.sec_name,
+    icdm.inc_dep_sec,
+    icdm.inc_emp_id
 FROM
     inc_common_setting_dep_map_master icdm
         LEFT JOIN
     inc_common_settings ics ON ics.inc_cs_slno = icdm.inc_cs_slno
+   LEFT JOIN
+    co_employee_master cem on cem.em_id = icdm.inc_emp_id
+    LEFT JOIN
+    co_deptsec_mast sec ON sec.sec_id = icdm.inc_dep_sec
 		LEFT JOIN 
 	co_department_mast cdm on cdm.dept_id = icdm.inc_dep_id`,
             [],
@@ -1034,7 +1044,9 @@ FROM
                 inc_dep_map_status,
                 cdm.dept_name,
                 inc_setting_key,
-                inc_setting_label
+                inc_setting_label,
+                icdm.inc_dep_sec,
+                icdm.inc_emp_id
             FROM inc_common_settings ics
             INNER JOIN inc_common_setting_dep_map_master icdm 
                 ON ics.inc_cs_slno = icdm.inc_cs_slno 
@@ -2446,13 +2458,17 @@ FROM
             `INSERT INTO inc_common_setting_dep_map_master 
             (   inc_cs_slno, 
                 inc_dep_id,
+                inc_dep_sec,
+                inc_emp_id,
                 inc_dep_map_status,
                 create_user
             ) 
-            VALUES (?,?,?,?)`,
+            VALUES (?,?,?,?,?,?)`,
             [
                 data.inc_cs_slno,
                 data.inc_dep_id,
+                data.inc_dep_sec,
+                data.inc_emp_id,
                 data.inc_dep_map_status,
                 data.create_user
             ],
@@ -2549,7 +2565,6 @@ FROM
         });
     },
     getAllEmployeeApprovalDepartments: (data, callback) => {
-
         pool.query(
             `SELECT 
                 dep_id,
@@ -2563,10 +2578,36 @@ FROM
                     LEFT JOIN
                 co_level_master clm ON clm.level_master_id = cld.level_master_slno
             WHERE
-                cld.level_emp_id = ? and clm.module_slno = ?`,
+                cld.level_emp_id = ? and clm.module_slno = 20`,
             [
                 data.emp_id,
                 data.level_no
+            ],
+            (error, results, fields) => {
+                if (error) return callback(error);
+                callback(null, results);
+            }
+        );
+    },
+    getCurrentEmployeeLevelOne: (data, callback) => {
+        pool.query(
+            `SELECT 
+                dep_id,
+                sec_id,
+                level_count as level_no,
+                level_name,
+                priority_status as level_priority,
+                detail_slno,
+                cld.level_emp_id,
+                cem.em_name
+            FROM co_level_details cld
+                    LEFT JOIN co_level_master clm ON clm.level_master_id = cld.level_master_slno
+                    LEFT JOIN co_employee_master cem ON cem.em_id = cld.level_emp_id
+            WHERE
+                clm.sec_id = ? and clm.module_slno = ? and cld.level_count = 1`,
+            [
+                data.sec_id,
+                data.module_slno
             ],
             (error, results, fields) => {
                 if (error) return callback(error);
@@ -2745,9 +2786,12 @@ FROM
                 inc_req_remark,
                 inc_data_req_dep,
                 inc_req_collect_emp,
-                level_no
+                level_no,
+                is_rca_needed,
+                is_fishbone_needed,
+                is_preventive_needed
             ) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 data.slno,
                 data.departments,
@@ -2756,7 +2800,10 @@ FROM
                 data.remark,
                 data.requested_department,
                 data.requested_employee,
-                data.level_no
+                data.level_no,
+                data.is_rca_needed,
+                data.is_fishbone_needed,
+                data.is_preventive_needed
             ],
             (error, results, fields) => {
                 if (error) return callback(error);
@@ -3154,6 +3201,8 @@ FROM
              SET
                   inc_cs_slno = ?,
                   inc_dep_id = ?,
+                  inc_dep_sec = ?,
+                  inc_emp_id = ?,
                   inc_dep_map_status = ?,
                   edit_user = ?
             WHERE 
@@ -3161,6 +3210,8 @@ FROM
             [
                 data.inc_cs_slno,
                 data.inc_dep_id,
+                data.inc_dep_sec,
+                data.inc_emp_id,
                 data.inc_dep_map_status,
                 data.edit_user,
                 data.inc_cs_dep_map_slno
@@ -3248,7 +3299,8 @@ FROM
             inc_data_collection_slno,
             inc_req_remark,
             rmc.em_name as Requested_to,
-            idc.inc_req_collect_emp
+            idc.inc_req_collect_emp,
+            idc.inc_common_review
         FROM
             inc_data_collection idc
             LEFT JOIN
@@ -3293,7 +3345,11 @@ FROM
             inc_data_collection_slno,
             inc_req_remark,
             rmc.em_name as Requested_to,
-            idc.inc_req_collect_emp
+            idc.inc_req_collect_emp,
+            idc.is_rca_needed,
+            idc.is_fishbone_needed,
+            idc.is_preventive_needed,
+            idc.inc_common_review
         FROM
             inc_data_collection idc
             LEFT JOIN
@@ -3460,6 +3516,8 @@ SELECT
     idc.inc_dep_status,
     icd.inc_common_description,
     icd.inc_common_dtl_slno,
+    isc.inc_sub_category_name,
+    ircm.inc_category_name,
     cdd.sec_name AS requested_user_dep,
     JSON_ARRAYAGG(
         JSON_OBJECT(
@@ -3502,6 +3560,8 @@ FROM inc_register_master irm
     LEFT JOIN co_employee_master cem ON cem.em_id = idc.inc_req_user
     LEFT JOIN co_employee_master mc ON mc.em_id = idc.inc_req_ack_user
     LEFT JOIN inc_levels_review ilr ON ilr.inc_register_slno = irm.inc_register_slno
+    LEFT JOIN incident_sub_category_master isc ON irm.inc_subcategory = isc.inc_sub_cat_slno
+    LEFT JOIN incident_category_master ircm ON irm.inc_category = ircm.inc_category_slno
     LEFT JOIN co_level_details cld ON cld.detail_slno = ilr.level_slno        
 WHERE irm.inc_status = 1 
   AND idc.inc_req_collect_dep = ?
@@ -3584,6 +3644,8 @@ GROUP BY irm.inc_register_slno`,
                 idc.create_date AS Requested_date,
                 cds.sec_name AS acknowledge_user_dep,
                 idc.inc_data_collection_slno,
+                isc.inc_sub_category_name,
+                ircm.inc_category_name,
                 idc.inc_dep_status,
                 level_slno,
                 level_review_state,
@@ -3634,6 +3696,8 @@ GROUP BY irm.inc_register_slno`,
                 LEFT JOIN co_employee_master mc ON mc.em_id = idc.inc_req_ack_user
                 LEFT JOIN inc_dep_action_detail idad ON idad.inc_register_slno = irm.inc_register_slno
                 LEFT JOIN inc_levels_review ilr ON ilr.inc_register_slno = irm.inc_register_slno
+                LEFT JOIN incident_sub_category_master isc ON irm.inc_subcategory = isc.inc_sub_cat_slno
+                LEFT JOIN incident_category_master ircm ON irm.inc_category = ircm.inc_category_slno
                 LEFT JOIN co_level_details cld ON cld.detail_slno = ilr.level_slno 
             WHERE irm.inc_status = 1 
             AND idad.inc_action_collect_dep = ?
@@ -3837,7 +3901,8 @@ WHERE
                   inc_req_ack_date = NOW(),
                   inc_req_ack_user=?,
                   inc_dep_fba_status=?,
-                  inc_ddc_file_status = ?
+                  inc_ddc_file_status = ?,
+                  inc_common_review = ?
             WHERE 
                   inc_data_collection_slno=?`,
             [
@@ -3847,6 +3912,7 @@ WHERE
                 data.inc_req_ack_user,
                 data.inc_dep_fba_status,
                 data.inc_ddc_file_status,
+                data.inc_common_review,
                 data.inc_data_collection_slno,
             ],
             (error, results, feilds) => {
@@ -3915,6 +3981,8 @@ WHERE
             icd.inc_common_description,
             icd.inc_common_dtl_slno,
             cd.desg_name,
+            isc.inc_sub_category_name,
+            ircm.inc_category_name,
             irm.inc_data_collection_req,
             JSON_ARRAYAGG(
                 JSON_OBJECT(
@@ -3947,6 +4015,8 @@ WHERE
         LEFT JOIN inc_dep_action_detail idad ON idad.inc_register_slno = irm.inc_register_slno AND idad.inc_dep_action_detail_status = 1
         LEFT JOIN co_deptsec_mast cds ON cds.sec_id = idc.inc_req_collect_dep
         LEFT JOIN co_employee_master cem ON cem.em_id = idc.inc_req_user
+        LEFT JOIN incident_sub_category_master isc ON irm.inc_subcategory = isc.inc_sub_cat_slno
+        LEFT JOIN incident_category_master ircm ON irm.inc_category = ircm.inc_category_slno
         LEFT JOIN co_employee_master mc ON mc.em_id = idc.inc_req_ack_user
         WHERE irm.inc_status = 1
         GROUP BY irm.inc_register_slno`,
@@ -4108,6 +4178,8 @@ WHERE
                 cd.desg_name,
                 icd.inc_common_description,
                 icd.inc_common_dtl_slno,
+                isc.inc_sub_category_name,
+                ircm.inc_category_name,
                 irm.inc_data_collection_req,
                 JSON_ARRAYAGG(
                     JSON_OBJECT(
@@ -4140,6 +4212,8 @@ WHERE
                 LEFT JOIN co_department_mast cds ON cds.dept_id = idc.inc_req_collect_dep
                 LEFT JOIN co_employee_master cem ON cem.em_id = idc.inc_req_user
                 LEFT JOIN co_employee_master mc ON mc.em_id = idc.inc_req_ack_user
+                LEFT JOIN incident_sub_category_master isc ON irm.inc_subcategory = isc.inc_sub_cat_slno
+                LEFT JOIN incident_category_master ircm ON irm.inc_category = ircm.inc_category_slno
                 WHERE irm.inc_register_slno = ?
                 GROUP BY irm.inc_register_slno`,
             [
@@ -4154,5 +4228,1298 @@ WHERE
         )
     },
 
+
+    createConversation: (data, callback) => {
+
+        pool.query(
+            `
+        INSERT INTO app_conversations
+        (
+            module_name,
+            entity_type,
+            entity_id,
+            parent_entity_id,
+            incident_id,
+            department_id,
+            section_id,
+            created_by,
+            title,
+            is_group_chat
+        )
+        VALUES (?,?,?,?,?,?,?,?,?,?)
+        `,
+            [
+                data.module_name,
+                data.entity_type,
+                data.entity_id,
+                data.parent_entity_id,
+                data.incident_id,
+                data.department_id,
+                data.section_id,
+                data.created_by,
+                data.title,
+                data.is_group_chat
+            ],
+            (error, results) => {
+
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
+    addConversationUsers: (data, callback) => {
+
+        pool.query(
+            `
+        INSERT INTO app_conversation_users
+        (
+            conversation_id,
+            emp_id,
+            department_id,
+            section_id,
+            is_admin
+        )
+        VALUES ?
+        `,
+            [data],
+            (error, results) => {
+
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
+
+
+    getConversation: (data, callback) => {
+
+        pool.query(
+            `
+        SELECT
+            c.conversation_id,
+            c.module_name,
+            c.entity_type,
+            c.entity_id,
+            c.incident_id,
+            c.title,
+            c.is_group_chat,
+            c.created_by,
+            c.created_at,
+
+            c.last_message_id,
+            c.last_message,
+            c.last_message_time,
+
+            GROUP_CONCAT(
+                e.em_name
+                SEPARATOR ', '
+            ) AS participants,
+             GROUP_CONCAT(cpu.emp_id SEPARATOR ',') AS participant_ids
+
+
+        FROM app_conversations c
+
+        INNER JOIN app_conversation_users cu
+            ON cu.conversation_id = c.conversation_id
+            AND cu.emp_id = ? AND cu.user_status = 1
+
+        LEFT JOIN app_conversation_users cpu
+            ON cpu.conversation_id = c.conversation_id
+            AND cpu.emp_id <> ? AND cpu.user_status = 1
+
+        LEFT JOIN co_employee_master e
+            ON e.em_id = cpu.emp_id
+
+        WHERE c.incident_id = ?
+            AND c.entity_id = ?
+            AND c.entity_type = ?
+            AND c.module_name = ?
+            AND c.is_active = 1
+
+        GROUP BY c.conversation_id
+
+        ORDER BY
+            COALESCE(c.last_message_time, c.created_at) DESC
+        `,
+            [
+                data.emp_id,       // cu.emp_id = ?
+                data.emp_id,       // cpu.emp_id <> ?
+                data.incident_id,
+                data.entity_id,
+                data.entity_type,
+                data.module_name
+            ],
+            (error, results, fields) => {
+
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
+
+    createConversationMessage: (data, callback) => {
+
+        pool.query(
+            `
+        INSERT INTO app_messages
+        (
+            conversation_id,
+            sender_emp_id,
+            sender_name,
+            message_type,
+            message,
+            reply_to_message_id
+        )
+        VALUES
+        (
+            ?, ?, ?, ?, ?, ?
+        )
+               `,
+            [
+                data.conversation_id,
+                data.sender_emp_id,
+                data.sender_name,
+                data.message_type || 'TEXT',
+                data.message,
+                data.reply_to_message_id || null
+            ],
+            (error, results) => {
+
+                if (error) {
+                    return callback(error);
+                }
+
+                // UPDATE LAST MESSAGE IN CONVERSATION
+
+                pool.query(
+                    `
+                UPDATE app_conversations
+                SET
+                    last_message_id = ?,
+                    last_message = ?,
+                    last_message_time = NOW()
+                WHERE conversation_id = ?
+                `,
+                    [
+                        results.insertId,
+                        data.message,
+                        data.conversation_id
+                    ]
+                );
+
+                return callback(null, results);
+            }
+        );
+    },
+
+    addMessageAttachments: (
+        data,
+        callback
+    ) => {
+
+        pool.query(
+            `
+        INSERT INTO app_message_attachments
+        (
+            message_id,
+            file_name,
+            original_name,
+            file_url,
+            file_size,
+            mime_type,
+            uploaded_by
+        )
+        VALUES ?
+        `,
+            [data],
+            (error, results) => {
+
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
+    //     fetchConversationMessages: (
+    //         conversation_id,
+    //         empid,
+    //         cursor,
+    //         callback
+    //     ) => {
+    //         pool.query(
+    //             `
+    //         SELECT
+    //     m.message_id,
+    //     m.conversation_id,
+    //     m.sender_emp_id,
+    //     m.sender_name,
+    //     m.message_type,
+    //     m.message,
+    //     m.reply_to_message_id,
+    //     m.is_edited,
+    //     m.is_deleted,
+    //     m.created_at,
+
+    //     JSON_OBJECT(
+    //         'message_id', rm.message_id,
+    //         'sender_name', rm.sender_name,
+    //         'sender_emp_id', rm.sender_emp_id,
+    //         'message', rm.message
+    //     ) AS reply_message_detail,
+
+    //     GROUP_CONCAT(
+    //         JSON_OBJECT(
+    //             'attachment_id', a.attachment_id,
+    //             'file_name', a.file_name,
+    //             'original_name', a.original_name,
+    //             'file_url', a.file_url,
+    //             'file_size', a.file_size,
+    //             'mime_type', a.mime_type
+    //         )
+    //     ) AS attachments
+
+    // FROM app_messages m
+
+    // LEFT JOIN app_messages rm
+    //     ON rm.message_id = m.reply_to_message_id
+
+    // INNER JOIN app_conversation_users cu
+    //     ON cu.conversation_id = m.conversation_id
+    //     AND cu.emp_id = ?  
+
+    // LEFT JOIN app_message_attachments a
+    //     ON a.message_id = m.message_id
+
+    // WHERE m.conversation_id = ?
+    //  AND m.is_deleted = 0  
+    //   AND m.message_id > COALESCE(cu.join_message_id, 0)
+
+    // AND (
+    //     ? IS NULL
+    //     OR m.message_id > ?
+    // )
+
+
+    // GROUP BY m.message_id
+
+    // ORDER BY m.created_at ASC
+    //         `,
+    //             [
+    //                 empid, conversation_id, cursor, cursor
+    //             ],
+    //             (error, results) => {
+
+    //                 if (error) {
+    //                     return callback(error);
+    //                 }
+
+    //                 return callback(null, results);
+    //             }
+    //         );
+    //     },
+    fetchConversationMessages: (
+        conversation_id,
+        empid,
+        cursor,
+        callback
+    ) => {
+        pool.query(
+            `
+            SELECT
+            m.message_id,
+            m.conversation_id,
+            m.sender_emp_id,
+            m.sender_name,
+            m.message_type,
+            m.message,
+            m.reply_to_message_id,
+            m.is_edited,
+            m.is_deleted,
+            m.created_at,
+
+            JSON_OBJECT(
+                'message_id', rm.message_id,
+                'sender_name', rm.sender_name,
+                'sender_emp_id', rm.sender_emp_id,
+                'message', rm.message
+            ) AS reply_message_detail,
+
+             JSON_OBJECT(
+                    'attachment_id', a.attachment_id,
+                    'file_name', a.file_name,
+                    'original_name', a.original_name,
+                    'file_url', a.file_url,
+                    'file_size', a.file_size,
+                    'mime_type', a.mime_type
+            ) AS attachments
+
+        FROM app_messages m
+
+        LEFT JOIN app_messages rm
+            ON rm.message_id = m.reply_to_message_id
+
+        INNER JOIN app_conversation_users cu
+            ON cu.conversation_id = m.conversation_id
+            AND cu.emp_id = ?
+
+        LEFT JOIN app_message_attachments a
+            ON a.message_id = m.message_id
+
+        WHERE m.conversation_id = ?
+        AND m.is_deleted = 0
+        AND m.message_id > COALESCE(cu.join_message_id, 0)
+
+        AND (
+        ? IS NULL OR m.message_id < ?
+        )
+
+        GROUP BY m.message_id
+        ORDER BY m.message_id DESC
+        LIMIT 50
+        `,
+            [empid, conversation_id, cursor, cursor],
+            (error, results) => {
+                if (error) return callback(error);
+                return callback(null, results);
+            }
+        );
+    },
+
+
+    getExternalEmployeeConversations: (
+        emp_id,
+        callback
+    ) => {
+
+        pool.query(
+            `
+        SELECT
+            c.conversation_id,
+            c.module_name,
+            c.entity_type,
+            c.entity_id,
+            c.incident_id,
+            c.title,
+            c.is_group_chat,
+            c.created_by,
+            c.created_at,
+
+            c.last_message_id,
+            c.last_message,
+            c.last_message_time,
+
+            GROUP_CONCAT(
+                DISTINCT e.em_name
+                SEPARATOR ', '
+            ) AS participants,
+
+            GROUP_CONCAT(
+                DISTINCT cpu.emp_id
+                SEPARATOR ','
+            ) AS participant_ids
+
+        FROM app_conversations c
+
+        INNER JOIN app_conversation_users cu
+            ON cu.conversation_id = c.conversation_id
+            AND cu.emp_id = ? AND cu.user_status = 1
+
+        LEFT JOIN app_conversation_users cpu
+            ON cpu.conversation_id = c.conversation_id
+            AND cpu.emp_id <> ? AND cpu.user_status = 1
+
+
+        LEFT JOIN co_employee_master e
+            ON e.em_id = cpu.emp_id
+
+        WHERE c.is_active = 1
+
+        GROUP BY c.conversation_id
+
+        ORDER BY
+            COALESCE(
+                c.last_message_time,
+                c.created_at
+            ) DESC
+        `,
+            [emp_id, emp_id],
+            (error, results) => {
+
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
+
+    fetchMergedConversationMessages: (
+        conversation_ids = [],
+        empid,
+        cursor = null,
+        callback
+    ) => {
+
+        // SAFETY CHECK
+        if (!Array.isArray(conversation_ids) || conversation_ids.length === 0) {
+            return callback(null, []);
+        }
+        pool.query(
+            `
+        SELECT
+    m.message_id,
+    m.conversation_id,
+    m.sender_emp_id,
+    m.sender_name,
+    m.message,
+    m.created_at,
+
+    JSON_OBJECT(
+        'message_id', rm.message_id,
+        'sender_name', rm.sender_name,
+        'sender_emp_id', rm.sender_emp_id,
+        'message', rm.message
+    ) AS reply_message_detail,
+
+
+     GROUP_CONCAT(
+        JSON_OBJECT(
+            'attachment_id', a.attachment_id,
+            'file_name', a.file_name,
+            'original_name', a.original_name,
+            'file_url', a.file_url,
+            'file_size', a.file_size,
+            'mime_type', a.mime_type
+        )
+     ) AS attachments
+
+FROM app_messages m
+
+LEFT JOIN app_messages rm
+    ON rm.message_id = m.reply_to_message_id
+
+LEFT JOIN app_message_attachments a
+    ON a.message_id = m.message_id
+
+INNER JOIN app_conversation_users cu
+    ON cu.conversation_id = m.conversation_id
+    AND cu.emp_id = ?
+
+WHERE m.conversation_id IN (?)
+AND m.is_deleted = 0
+AND m.message_id > COALESCE(cu.join_message_id, 0)
+
+AND (
+    ? IS NULL
+    OR m.message_id < ?
+)
+
+GROUP BY m.message_id
+
+ORDER BY m.message_id DESC
+LIMIT 50;
+        `,
+            [
+                empid,
+                conversation_ids,
+                cursor,
+                cursor
+            ],
+            (error, results) => {
+                if (error) return callback(error);
+                return callback(null, results);
+            }
+        );
+    },
+
+    DeletemessageDetail: (id, callback) => {
+        console.log(
+            id
+        );
+        if (!id) return callback(null, []);
+
+        pool.query(
+            `UPDATE app_messages
+                SET
+                   is_deleted= 1
+                WHERE message_id = ?`,
+            [id],
+            (error, results) => {
+
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
+
+    EditMessageDetail: (message, message_id, callback) => {
+
+        if (!message || !message_id) {
+            return callback(null, []);
+        }
+        pool.query(
+            `UPDATE app_messages
+                SET
+                    message = ?,
+                   is_edited= 1
+                WHERE message_id = ?`,
+            [message, message_id],
+            (error, results) => {
+
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateAttachmentStatus: (
+        attachmentId,
+        callback
+    ) => {
+
+        pool.query(
+            `
+        UPDATE app_message_attachments
+        SET file_status = 0
+        WHERE attachment_id = ?
+        `,
+            [attachmentId],
+            (error, results) => {
+
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
+    getConversationEmployees: (
+        conversationId,
+        callback
+    ) => {
+
+        pool.query(
+            `
+        SELECT
+            cu.id,
+            cu.conversation_id,
+            cu.emp_id,
+            cu.is_admin,
+            cu.joined_at,
+            cu.user_status,
+
+            e.em_no,
+            e.em_name,
+            e.em_mobile,
+            e.em_email,
+            e.em_doj,
+            e.em_status,
+            e.em_status,
+            e.em_id,
+
+            d.dept_id,
+            d.dept_name,
+            d.dept_alias,
+
+            s.sec_id,
+            s.sec_name,
+
+            des.desg_slno,
+            des.desg_name
+
+        FROM app_conversation_users cu
+
+        INNER JOIN co_employee_master e
+            ON e.em_id = cu.emp_id
+
+        LEFT JOIN co_department_mast d
+            ON d.dept_id = e.em_department
+
+        LEFT JOIN co_deptsec_mast s
+            ON s.sec_id = e.em_dept_section
+
+        LEFT JOIN co_designation des
+            ON des.desg_slno = e.em_designation
+
+        WHERE cu.conversation_id = ? and cu.user_status = 1
+
+        ORDER BY
+            cu.is_admin DESC,
+            e.em_name ASC
+        `,
+            [conversationId],
+            (error, results) => {
+
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
+
+
+    removeConversationMember: (
+        conversation_id, emp_id,
+        callback
+    ) => {
+
+        pool.query(
+            `
+         UPDATE app_conversation_users
+        SET user_status = 0
+        WHERE conversation_id = ?
+        AND emp_id = ?
+        AND user_status = 1
+        `,
+            [conversation_id, emp_id],
+            (error, results) => {
+
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
+
+    AddNewMemberToGroup: (value, callback) => {
+        pool.query(
+            `
+         INSERT INTO app_conversation_users
+        (
+            conversation_id,
+            emp_id,
+            department_id,
+            section_id,
+            join_message_id
+        )
+        VALUES ?
+        `,
+            [value],
+            (error, results) => {
+
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
+
+    getLastMessageId: (conversationId, callback) => {
+        const query = `
+        SELECT COALESCE(MAX(message_id), 0) AS last_message_id
+        FROM app_messages
+        WHERE conversation_id = ?
+    `;
+
+        pool.query(query, [conversationId], (err, results) => {
+
+            if (err) {
+                return callback(err, null);
+            }
+
+            callback(null, results[0]);
+        });
+    },
+
+    FindConversationMembers: (
+        conversation_id,
+        empIds,
+        callback
+    ) => {
+        pool.query(
+            `
+        SELECT
+            emp_id,
+            user_status
+        FROM app_conversation_users
+        WHERE conversation_id = ?
+        AND emp_id IN (?)
+        `,
+            [
+                conversation_id,
+                empIds
+            ],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
+
+    ReactivateConversationMembers: (
+        conversation_id,
+        empIds,
+        joinMessageId,
+        callback
+    ) => {
+        pool.query(
+            `
+        UPDATE app_conversation_users
+        SET
+            user_status = 1,
+            join_message_id = ?,
+            joined_at = NOW()
+        WHERE conversation_id = ?
+        AND emp_id IN (?)
+        `,
+            [
+                joinMessageId,
+                conversation_id,
+                empIds
+            ],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
+
+    getConversationParticipants: (conversationId, senderEmpId, callback) => {
+        pool.query(
+            `
+        SELECT 
+            emp_id,
+            is_admin,
+            department_id,
+            section_id
+        FROM app_conversation_users
+        WHERE conversation_id = ? AND emp_id != ?
+        `,
+            [conversationId, senderEmpId],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results.rows || results);
+            }
+        );
+    },
+
+    createNotificationsForMessage: (
+        messageId,
+        conversationId,
+        participants,
+        messagePreview,
+        callback
+    ) => {
+
+
+        if (!participants || participants.length === 0) {
+            return callback(null, []);
+        }
+        const notificationValues = participants.map(part => ([
+            part.emp_id,
+            conversationId,
+            messageId,
+            `New message from ${messagePreview.sender_name || 'User'}`,  // Title
+            messagePreview ? messagePreview.substring(0, 50) : '',  // Preview
+            0,  // is_read = 0
+            new Date()
+        ]));
+
+        pool.query(
+            `
+        INSERT INTO app_notifications
+        (emp_id, conversation_id, message_id, title,notify_preview, is_read, created_at)
+        VALUES ?
+        `,
+            [notificationValues],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+
+                // Return participants with notification_ids
+                const updatedParticipants = participants.map((part, index) => ({
+                    ...part,
+                    notification_id: results.insertId + index
+                }));
+
+                return callback(null, updatedParticipants);
+            }
+        );
+    },
+
+    /**
+    * Mark a single notification as read
+    */
+    markAsRead: (notificationId, empId) => {
+        return pool.query(
+            `UPDATE app_notifications 
+             SET is_read = 1 
+             WHERE notification_id = ? AND emp_id = ?`,
+            [notificationId, empId]
+        );
+    },
+
+    /**
+     * Mark all unread notifications for a conversation as read
+     */
+    markConversationAsRead: (conversationId, empId, callback) => {
+        return pool.query(
+            `UPDATE app_notifications 
+             SET is_read = 1 
+             WHERE conversation_id = ? AND emp_id = ? AND is_read = 0`,
+            [conversationId, empId],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    /**
+     * Mark all unread notifications for a user as read
+     */
+    markAllAsRead: (empId) => {
+        return pool.query(
+            `UPDATE app_notifications 
+             SET is_read = 1 
+             WHERE emp_id = ? AND is_read = 0`,
+            [empId]
+        );
+    },
+
+    /**
+     * Get unread notifications count for a user
+     */
+    getUnreadCount: (empId, callback) => {
+        return pool.query(
+            `SELECT
+                conversation_id,
+                1 AS unread
+            FROM app_notifications
+            WHERE emp_id = ?
+            AND is_read = 0
+            GROUP BY conversation_id`,
+            [empId],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    /**
+     * Get unread notifications for a user
+     */
+    getUnreadNotifications: (empId, limit = 50) => {
+        return pool.query(
+            `SELECT n.*, c.title as conversation_title 
+             FROM app_notifications n
+             JOIN app_conversations c ON n.conversation_id = c.conversation_id
+             WHERE n.emp_id = ? AND n.is_read = 0
+             ORDER BY n.created_at DESC
+             LIMIT ?`,
+            [empId, limit]
+        );
+    },
+
+    getUnreadCountsByConversation: (empId, callback) => {
+        return pool.query(
+            `
+        SELECT
+            conversation_id,
+            COUNT(*) AS unread_count
+        FROM app_notifications
+        WHERE emp_id = ?
+          AND is_read = 0
+        GROUP BY conversation_id
+        `,
+            [empId],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getWhatsappRequestDetails: (
+        requestedEmployee,
+        createUser,
+        slno,
+        callback
+    ) => {
+
+        const sql = `
+        SELECT
+            emp.em_name AS requested_employee_name,
+            emp.em_mobile AS requested_employee_mobile,
+
+            creator.em_name AS creator_name,
+            dept.dept_name AS creator_department,
+            sec.sec_name AS creator_section,
+
+            inc.inc_req_remark
+
+        FROM inc_data_collection inc
+
+        LEFT JOIN co_employee_master emp
+            ON emp.em_id = ?
+
+        LEFT JOIN co_employee_master creator
+            ON creator.em_id = ?
+
+        LEFT JOIN co_department_mast dept
+            ON dept.dept_id = creator.em_department
+
+        LEFT JOIN co_deptsec_mast sec
+            ON sec.sec_id = creator.em_dept_section
+
+        WHERE inc.inc_register_slno = ?
+    `;
+
+        pool.query(
+            sql,
+            [
+                requestedEmployee,
+                createUser,
+                slno
+            ],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getApprovalRequestDetail: (
+        requestedEmployee,
+        createUser,
+        slno,
+        callback
+    ) => {
+        const sql = `
+SELECT 
+    emp.em_name AS requested_employee_name,
+    emp.em_mobile AS requested_employee_mobile,
+    creator.em_name AS creator_name,
+    dept.dept_name AS creator_department,
+    sec.sec_name AS creator_section,
+    inc.inc_describtion,
+    ewd.whatsapp_number
+FROM
+    inc_register_master inc
+        LEFT JOIN
+    co_employee_master emp ON emp.em_id = ?
+        LEFT JOIN
+    co_employee_master creator ON creator.em_id = ?
+        LEFT JOIN
+    employee_whatsapp_details ewd ON ewd.emp_id = emp.em_id
+        AND ewd.status = 1
+        LEFT JOIN
+    co_department_mast dept ON dept.dept_id = creator.em_department
+        LEFT JOIN
+    co_deptsec_mast sec ON sec.sec_id = creator.em_dept_section
+WHERE
+    inc.inc_register_slno = ?;
+    `;
+
+        pool.query(sql, [requestedEmployee, createUser, slno], (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
+
+    getRegistrationEmployee: (
+        create_user,
+        section_id,
+        event_name,
+        callback
+    ) => {
+
+        const sql = `
+        SELECT 
+            invm.event_slno,
+            invm.event_name,
+            invm.event_code,
+            creator.em_name AS creator_name,
+            emp.em_mobile AS requested_employee_mobile,
+            emp.em_name AS employee_name,
+            dept.dept_name AS creator_department,
+            sec.sec_name AS creator_section,
+            ewd.whatsapp_number
+        FROM incident_notification_event_master invm
+        LEFT JOIN co_employee_master creator 
+            ON creator.em_id = ?
+        LEFT JOIN incident_notification_config inc 
+            ON inc.event_slno = invm.event_slno
+        AND inc.section_id = ?
+        LEFT JOIN co_employee_master emp 
+            ON emp.em_id = inc.emp_id
+        LEFT JOIN employee_whatsapp_details ewd 
+            ON ewd.emp_id = emp.em_id
+        AND ewd.status = 1
+        LEFT JOIN co_department_mast dept 
+            ON dept.dept_id = emp.em_department
+        LEFT JOIN co_deptsec_mast sec 
+            ON sec.sec_id = emp.em_dept_section
+        WHERE invm.event_code = ?
+        AND invm.status = 1
+    `;
+
+        pool.query(sql, [create_user, section_id, event_name,], (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
+
+    insertWhatsapp: (data, callback) => {
+        const sql = `
+        INSERT INTO employee_whatsapp_details 
+        (emp_id, sect_id, whatsapp_number, create_user)
+        VALUES (?, ?, ?, ?)
+    `;
+
+        pool.query(
+            sql,
+            [data.emp_id, data.sect_id, data.whatsapp_number, data.create_user],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateWhatsapp: (data, callback) => {
+        const sql = `
+        UPDATE employee_whatsapp_details
+        SET emp_id = ?,
+            sect_id = ?,
+            whatsapp_number = ?,
+            status = ?,
+            edit_user = ?,
+            edit_date = NOW()
+        WHERE slno = ?
+    `;
+
+        pool.query(
+            sql,
+            [
+                data.emp_id,
+                data.sect_id,
+                data.whatsapp_number,
+                data.whatsapp_status,
+                data.edit_user,
+                data.whatsapp_slno
+            ],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+    getAllWhatsapp: (callback) => {
+        const sql = `
+        SELECT 
+            w.slno as whatsapp_slno,
+            w.emp_id,
+            e.em_name,
+            w.sect_id,
+            s.sec_name as sect_name,
+            w.whatsapp_number,
+            w.status as whatsapp_status
+        FROM employee_whatsapp_details w
+        LEFT JOIN co_employee_master e ON e.em_id = w.emp_id
+        LEFT JOIN co_deptsec_mast s ON s.sec_id = w.sect_id
+        WHERE w.status = 1
+    `;
+
+        pool.query(sql, [], (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
+
+
+    insertEvent: (data, callback) => {
+        const sql = `
+        INSERT INTO incident_notification_event_master
+        (event_code, event_name, status)
+        VALUES (?, ?, ?)
+    `;
+
+        pool.query(
+            sql,
+            [data.event_code, data.event_name, data.status],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateEvent: (data, callback) => {
+        const sql = `
+        UPDATE incident_notification_event_master
+        SET event_code = ?,
+            event_name = ?,
+            status = ?
+        WHERE event_slno = ?
+    `;
+
+        pool.query(
+            sql,
+            [data.event_code, data.event_name, data.status, data.event_slno],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getAllEvent: (callback) => {
+        const sql = `
+        SELECT
+            event_slno,
+            event_code,
+            event_name,
+            status
+        FROM incident_notification_event_master
+        WHERE status = 1
+    `;
+
+        pool.query(sql, [], (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
+
+    insertNotificationConfig: (data, callback) => {
+        const sql = `
+        INSERT INTO incident_notification_config
+        (section_id, event_slno, emp_id, status, create_user)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+
+        pool.query(
+            sql,
+            [
+                data.section_id,
+                data.event_slno,
+                data.emp_id,
+                data.status,
+                data.create_user
+            ],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    updateNotificationConfig: (data, callback) => {
+        const sql = `
+        UPDATE incident_notification_config
+        SET section_id = ?,
+            event_slno = ?,
+            emp_id = ?,
+            status = ?,
+            create_user = ?,
+            create_date = NOW()
+        WHERE config_slno = ?
+    `;
+
+        pool.query(
+            sql,
+            [
+                data.section_id,
+                data.event_slno,
+                data.emp_id,
+                data.status,
+                data.edit_user ?? data.create_user,
+                data.config_slno
+            ],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getAllNotificationConfig: (callback) => {
+        const sql = `
+        SELECT
+            c.config_slno,
+            c.section_id,
+            s.sec_name,
+            c.event_slno,
+            e.event_name,
+            c.emp_id,
+            emp.em_name,
+            c.status
+        FROM incident_notification_config c
+        LEFT JOIN co_deptsec_mast s ON s.sec_id = c.section_id
+        LEFT JOIN incident_notification_event_master e ON e.event_slno = c.event_slno
+        LEFT JOIN co_employee_master emp ON emp.em_id = c.emp_id
+        WHERE c.status = 1
+    `;
+
+        pool.query(sql, [], (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
 
 }

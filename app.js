@@ -35,6 +35,7 @@ const allowedOrigins = [
   "http://192.168.22.170:3000",
   "http://192.168.22.5:3000",
   "http://192.168.22.8:3000",
+  "http://192.168.22.8:3001",
   "http://192.168.22.3:3000",
   "http://192.168.22.3:7000",
 
@@ -58,6 +59,8 @@ app.use(
     credentials: true,
   })
 );
+
+
 
 
 // ----- logger display For Info ----
@@ -97,6 +100,22 @@ app.get("/warn", (req, res) => {
     res.end();
   });
 });
+
+
+app.use(
+  '/chat-files',
+  express.static('D:/DocMeliora/Meliora/IncidentManagement/ChatConversationFiles')
+);
+
+// https code 
+
+// const https = require("https");
+
+// const server = https.createServer({
+//   key: fs.readFileSync(process.env.SSL_KEY_PATH),
+//   cert: fs.readFileSync(process.env.SSL_CERT_PATH)
+// }, app);
+
 
 const server = http.createServer(app);
 const io = socketUtils.WSIO(server);

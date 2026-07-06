@@ -144,6 +144,7 @@ const {
     updateNotificationConfig,
     insertNotificationConfig,
     getRegistrationEmployee,
+    getCurrentLevelStatus,
 
 
 } = require('./incident.service');
@@ -2496,6 +2497,24 @@ module.exports = {
     getCurrentEmployeeLevelOne: (req, res) => {
         const data = req.body;
         getCurrentEmployeeLevelOne(data, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: 'Departments Fetched Successfully',
+                data: results
+            });
+        });
+    },
+
+    getCurrentLevelStatus: (req, res) => {
+        const { incidentNo } = req.params;
+        getCurrentLevelStatus(incidentNo, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,

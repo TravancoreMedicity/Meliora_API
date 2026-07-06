@@ -118,6 +118,7 @@ const { IncidetDetailInsert, IncidentDetailsUpdate, UpdateMarkedIncidentDetails,
     insertNotificationConfigController,
     getNotificationConfigController,
     updateNotificationConfigController,
+    getCurrentLevelStatus,
 } = require('./incident.controller');
 const { uploadFileIncidentService,
     getIncidentFiles,
@@ -240,6 +241,8 @@ router.post('/getincidentcommon', normalRateLimiter, checkToken, getIncidentFrom
 router.post('/initiator', normalRateLimiter, checkToken, getIncidentInitiator)
 
 router.post('/firstlevel', normalRateLimiter, checkToken, getCurrentEmployeeLevelOne)
+
+router.get('/getlevelstatus/:incidentNo',normalRateLimiter,checkToken,getCurrentLevelStatus)
 
 
 

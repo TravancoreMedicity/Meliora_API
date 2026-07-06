@@ -5369,7 +5369,6 @@ WHERE
         FROM employee_whatsapp_details w
         LEFT JOIN co_employee_master e ON e.em_id = w.emp_id
         LEFT JOIN co_deptsec_mast s ON s.sec_id = w.sect_id
-        WHERE w.status = 1
     `;
 
         pool.query(sql, [], (error, results) => {
@@ -5510,8 +5509,7 @@ WHERE
         FROM incident_notification_config c
         LEFT JOIN co_deptsec_mast s ON s.sec_id = c.section_id
         LEFT JOIN incident_notification_event_master e ON e.event_slno = c.event_slno
-        LEFT JOIN co_employee_master emp ON emp.em_id = c.emp_id
-        WHERE c.status = 1
+        LEFT JOIN co_employee_master emp ON emp.em_id = c.emp_id  
     `;
 
         pool.query(sql, [], (error, results) => {
@@ -5521,5 +5519,71 @@ WHERE
             return callback(null, results);
         });
     },
+
+    getCurrentLevelStatus: (incidentNo, callback) => {
+        const sql = `
+        SELECT
+    irm.inc_register_slno,
+    irm.inc_current_level,
+    irm.inc_current_level_review_state,
+    irm.inc_all_approved,
+
+    lm.level_master_id,
+    lm.dep_id,
+    lm.sec_id,
+    lm.module_slno,
+
+    ld.detail_slno,
+    ld.level_count,
+    ld.level,
+    ld.level_name,
+    ld.level_emp_id,
+
+    cem.em_name,
+    cem.em_no,
+    cem.em_department,
+    cem.em_designation,
+
+    ilr.level_review_slno,
+    ilr.level_review,
+    ilr.level_review_state,
+    ilr.level_review_date,
+
+    CASE
+        WHEN ilr.level_review_slno IS NULL THEN 0
+        ELSE 1
+    END AS is_approved
+
+FROM inc_register_master irm
+
+INNER JOIN co_level_master lm
+    ON lm.dep_id = irm.dep_slno
+   AND lm.sec_id = irm.sec_slno
+   AND lm.module_slno = 20
+
+INNER JOIN co_level_details ld
+    ON ld.level_master_slno = lm.level_master_id
+   AND ld.status = 1
+
+LEFT JOIN co_employee_master cem
+    ON cem.em_id = ld.level_emp_id
+
+LEFT JOIN inc_levels_review ilr
+    ON ilr.inc_register_slno = irm.inc_register_slno
+   AND ilr.level_slno = ld.detail_slno
+   AND ilr.level_review_status = 1
+
+WHERE irm.inc_register_slno = ?
+
+ORDER BY ld.level_count`;
+
+        pool.query(sql, [incidentNo], (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+            return callback(null, results);
+        });
+    },
+
 
 }

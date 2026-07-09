@@ -87,6 +87,63 @@ const handleFileUpload = (uploadMiddleware, baseFolder) => {
 };
 
 
+
+const handleChatFileUpload = (
+    uploadMiddleware,
+    baseFolder
+) => {
+
+    return (req, res) => {
+
+        uploadMiddleware(req, res, async (err) => {
+
+            if (err instanceof multer.MulterError) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+
+            if (err) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+
+            try {
+
+                const files = req.files || [];
+
+                const uploadedFiles = files.map(file => ({
+                    file_name: file.filename,
+                    original_name: file.originalname,
+                    file_url: file.path,
+                    mime_type: file.mimetype,
+                    file_size: file.size
+                }));
+
+                return res.status(200).json({
+                    success: 1,
+                    message: 'Files uploaded successfully',
+                    files: uploadedFiles
+                });
+
+            } catch (error) {
+
+                console.log(error);
+
+                return res.status(200).json({
+                    success: 0,
+                    message: 'File upload failed'
+                });
+            }
+        });
+    };
+};
+
 /**
  * Generic file ZIP download handler
  * @param {String} baseFolder - Base directory for file storage
@@ -146,4 +203,4 @@ const handleGetIncidentFiles = (baseFolder) => {
 };
 
 
-module.exports = { handleFileUpload, handleGetIncidentFiles };
+module.exports = { handleFileUpload, handleGetIncidentFiles, handleChatFileUpload };

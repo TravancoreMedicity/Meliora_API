@@ -426,4 +426,23 @@ module.exports = {
       });
     });
   },
+  // getting accesstoken
+  getMelioraAccessToken: (req, res) => {
+    const accessToken = req.cookies.accessToken;
+
+    if (!accessToken) {
+      return res.status(401).json({
+        success: 0,
+        message: "No access token found"
+      });
+    }
+
+    res.json({
+      success: 1,
+      accessToken: accessToken,
+      message: "Token retrieved successfully"
+    });
+  },
+
+
 };

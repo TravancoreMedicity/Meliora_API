@@ -852,6 +852,155 @@ ORDER BY dty.start_time;
             }
         );
     },
+    getAllActiveNursingStation: (selectedStations, callback) => {
+        const sql = `
+        
+SELECT
+    ipa.fb_ip_no,
+    ipa.fb_pt_no,
+    ipa.fb_ptc_name,
+    bed.fb_bdc_no,
+    bed.fb_rm_code,
+    ns.fb_ns_name,
+    ipa.fb_ipc_curstatus,
+    ipa.fb_bd_code
+FROM fb_ipadmiss ipa
+INNER JOIN fb_bed bed
+    ON bed.fb_bd_code = ipa.fb_bd_code
+INNER JOIN fb_nurse_station_master ns
+    ON ns.fb_ns_code = bed.fb_ns_code
+WHERE bed.fb_ns_code IN (?)
+  AND (
+      ipa.fb_ipc_curstatus IS NULL
+      OR ipa.fb_ipc_curstatus <> 'PCO'
+  );
+        `;
+        pool.query(
+            sql,
+            [selectedStations],
+            (err, results) => {
+                if (err) return callback(err);
+                return callback(null, results);
+            }
+        );
+    },
+
+
+    getPatientActiveDietHistory: (ptno, ipno, callback) => {
+        const sql = `
+            SELECT
+                ipa.fb_ip_no,
+                ipa.fb_pt_no,
+                ipa.fb_ptc_name,
+                ipa.fb_ipd_date AS admission_date,
+                ipa.fb_ipd_disc AS discharge_date,
+                ipa.fb_doc_name,
+
+                pdp.plan_id,
+                pdp.patient_id,
+                pdp.admission_id,
+                pdp.diet_id,
+                pdm.diet_name,
+                pdp.diet_status,
+                pdp.is_active,
+                pdp.is_consultation,
+                pdp.start_date,
+                pdp.end_date,
+                pdp.created_at,
+
+                dietitian.em_name AS dietitian_name
+
+            FROM patient_diet_plan pdp
+
+            INNER JOIN patient_diet_master pdm
+                ON pdm.diet_id = pdp.diet_id
+
+            INNER JOIN fb_ipadmiss ipa
+                ON ipa.fb_pt_no = pdp.patient_id
+                AND ipa.fb_ip_no = pdp.admission_id
+
+            LEFT JOIN co_employee_master dietitian
+                ON dietitian.em_id = pdp.dietitian_id
+
+            WHERE
+                pdp.patient_id = ?
+                AND pdp.admission_id = ?
+
+            ORDER BY
+                pdp.start_date ASC,
+                pdp.plan_id ASC
+        `;
+        pool.query(
+            sql,
+            [ptno, ipno],
+            (err, results) => {
+                if (err) return callback(err);
+                return callback(null, results);
+            }
+        );
+    },
+
+  getPatientFullDetail: (ptno, ipno, callback) => {
+        const sql = `
+            SELECT
+                ipa.fb_ip_no AS admission_id,
+                ipa.fb_pt_no AS patient_id,
+                ipa.fb_ptc_name AS patient_name,
+                ipa.fb_ptc_sex AS gender,
+                ipa.fb_ptd_dob AS dob,
+                ipa.fb_ptn_yearage AS age_year,
+                ipa.fb_ptn_monthage AS age_month,
+                ipa.fb_ptn_dayage AS age_day,
+
+                ipa.fb_ipd_date AS admission_date,
+                ipa.fb_ipd_disc AS discharge_date,
+                ipa.fb_ipc_status,
+                ipa.fb_ipc_curstatus,
+
+                ipa.fb_doc_name AS doctor_name,
+                ipa.fb_do_code AS doctor_code,
+
+                ipa.fb_ptc_mobile AS mobile,
+
+                ipa.fb_ptc_loadd1,
+                ipa.fb_ptc_loadd2,
+                ipa.fb_ptc_loadd3,
+                ipa.fb_ptc_loadd4,
+                ipa.fb_ptc_lopin,
+
+                ipa.fb_dep_desc AS department,
+
+                bed.fb_bd_code,
+                bed.fb_bdc_no AS bed_no,
+                bed.fb_rm_code AS room_no,
+
+                ns.fb_ns_code,
+                ns.fb_ns_name AS nursing_station
+
+            FROM fb_ipadmiss ipa
+
+            LEFT JOIN fb_bed bed
+                ON bed.fb_bd_code = ipa.fb_bd_code
+
+            LEFT JOIN fb_nurse_station_master ns
+                ON ns.fb_ns_code = bed.fb_ns_code
+
+            WHERE
+            ipa.fb_pt_no = ?
+                AND ipa.fb_ip_no = ?`;
+        pool.query(
+            sql,
+            [ptno, ipno],
+            (err, results) => {
+                if (err) return callback(err);
+                return callback(null, results);
+            }
+        );
+    },
+
+    
+
+
 
 
 };

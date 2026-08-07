@@ -279,14 +279,14 @@ module.exports = {
                 success: 0,
                 message: "Order ID Missing"
             });
-        }
+        };
 
         if (!Array.isArray(itemDetail) || !itemDetail?.length) {
             return res.status(200).json({
                 success: 0,
                 message: "No Items to Add"
             });
-        }
+        };
 
         const values = itemDetail.map(item => ([
             canteen_order_id,
@@ -295,7 +295,8 @@ module.exports = {
             item.price,
             item.gst,
             item.type_slno,
-            item.gst_amount
+            item.gst_amount,
+            item.patient_diet_id
         ]));
 
         //  MAP VALUES HERE

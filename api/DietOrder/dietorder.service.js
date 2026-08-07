@@ -175,7 +175,7 @@ module.exports = {
                     // Step 2: Insert diet_order_detail
                     const dietDetailQuery = `
                     INSERT INTO diet_order_detail
-                    (order_id, diet_type_id, item_id, quantity, unit_id, is_substitute)
+                    (order_id, diet_type_id, item_id, quantity, unit_id, is_substitute,patient_diet_id)
                     VALUES ?
                 `;
 
@@ -185,7 +185,9 @@ module.exports = {
                         item.item_id,
                         item.quantity,
                         item.unit_id,
-                        item.is_substitute
+                        item.is_substitute,
+                        item.patient_diet_id,
+
                     ]);
 
                     conn.query(dietDetailQuery, [dietDetailValues], (err2) => {
@@ -227,7 +229,7 @@ module.exports = {
                                 // Step 4: Insert canteen items
                                 const canteenItemQuery = `
                                 INSERT INTO canteen_order_item
-                                (canteen_order_id, item_id, quantity, price, gst,type_slno, gst_amount)
+                                (canteen_order_id, item_id, quantity, price, gst,type_slno, gst_amount,patient_diet_id)
                                 VALUES ?
                             `;
 
@@ -238,7 +240,8 @@ module.exports = {
                                     item.price,
                                     item.gst,
                                     item.type_slno,
-                                    item.gst_amount
+                                    item.gst_amount,
+                                    item.patient_diet_id
                                 ]);
 
                                 conn.query(canteenItemQuery, [canteenItemValues], (err4) => {
@@ -727,7 +730,7 @@ module.exports = {
     AddDietItem: (values, callback) => {
         const query = `
             INSERT INTO diet_order_detail
-                    (order_id, diet_type_id, item_id, quantity, unit_id, is_substitute)
+                    (order_id, diet_type_id, item_id, quantity, unit_id, is_substitute,patient_diet_id)
                     VALUES ?
         `;
 

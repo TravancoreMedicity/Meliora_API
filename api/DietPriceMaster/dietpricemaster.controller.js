@@ -1,7 +1,11 @@
+const { replyQuery } = require('../complaint_assign/complaintAssign.service');
 const {
     insertDietPrice,
     getDietPrice,
-    updateDietPrice
+    updateDietPrice,
+    getDietPriceDetailService,
+    insertDietMealPriceService,
+    updateDietMealPriceService
 } = require('./dietpricemaster.service');
 
 module.exports = {
@@ -122,6 +126,33 @@ module.exports = {
         });
     },
 
+    getDietPriceDetail: (req, res) => {
+        const data = req.body;
+        getDietPriceDetailService(data, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results || results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    data: [],
+                    message: "No Data Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
+
 
     // UPDATE
     updateDietPrice: (req, res) => {
@@ -194,6 +225,54 @@ module.exports = {
                 message: "Updated Successfully"
             });
         });
-    }
+    },
+
+    updateDietMealPrice: (req, res) => {
+        const data = req.body;
+        updateDietMealPriceService(data, (err, result) => {
+
+            if (err) {
+                return res.status(500).json({
+                    success: 0,
+                    message: err.sqlMessage || err.message,
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                message: "Meal prices updated successfully",
+            });
+        });
+    },
+
+
+    insertDietMealPrice: (req, res) => {
+
+        const data = req.body;
+
+        insertDietMealPriceService(data, (err, result) => {
+
+            if (err) {
+
+                if (err.code === "ER_DUP_ENTRY") {
+                    return res.status(200).json({
+                        success: 2,
+                        message: "Meal price already exists for the selected meal type."
+                    });
+                }
+
+                return res.status(500).json({
+                    success: 0,
+                    message: err.sqlMessage || err.message,
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                message: "Meal price added successfully.",
+            });
+        });
+    },
+
 
 };

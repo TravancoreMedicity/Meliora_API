@@ -15,7 +15,10 @@ const {
     getEmployeeNsStation,
     getConsultationRequired,
     AssingDieticain,
-    DieticanStatus
+    DieticanStatus,
+    getAllActiveNursingStation,
+    getPatientActiveDietHistory,
+    getPatientFullDetail
 } = require('./patientdietplan.service');
 
 module.exports = {
@@ -504,7 +507,6 @@ module.exports = {
         });
     },
 
-
     StopCurrentPlan: (req, res) => {
         const data = req.body;
 
@@ -532,6 +534,92 @@ module.exports = {
 
         });
     },
+
+    getAllActiveNursingStation: (req, res) => {
+        const { selectedStations } = req.body;
+
+        if (!selectedStations) {
+            return res.status(200).json({
+                success: 0,
+                message: "Ns Station Id Missing!"
+            });
+        }
+
+        getAllActiveNursingStation(selectedStations, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: "Nursing Station Detail Missing!"
+            });
+
+        });
+    },
+
+    getPatientActiveDietHistory: (req, res) => {
+        const { ipno, ptno } = req.body;
+
+        if (!ipno || !ptno) {
+            return res.status(200).json({
+                success: 0,
+                message: "Reqiure Data is Missing!"
+            });
+        }
+
+        getPatientActiveDietHistory(ptno, ipno, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: "Nursing Station Detail Missing!"
+            });
+
+        });
+    },
+
+
+    getPatientFullDetail: (req, res) => {
+        const { ipno, ptno } = req.body;
+
+        if (!ipno || !ptno) {
+            return res.status(200).json({
+                success: 0,
+                message: "Reqiure Data is Missing!"
+            });
+        }
+
+        getPatientFullDetail(ptno, ipno, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: "Nursing Station Detail Missing!"
+            });
+
+        });
+    },
+
+
+
+
 
 
 };

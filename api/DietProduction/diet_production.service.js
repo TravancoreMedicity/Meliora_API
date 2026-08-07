@@ -220,6 +220,8 @@ module.exports = {
         executeQuery(query, callback);
     },
     getAllOrderStatusDetail: (callback) => {
+
+        
         const query = `
                     
 SELECT 

@@ -16,7 +16,10 @@ const {
     getEmployeeNsStation,
     getConsultationRequired,
     AssingDieticain,
-    DieticanStatus
+    DieticanStatus,
+    getAllActiveNursingStation,
+    getPatientActiveDietHistory,
+    getPatientFullDetail
 } = require('./patientdietplan.controller');
 
 const router = require('express').Router();
@@ -46,13 +49,20 @@ router.get('/get-consultation', checkToken, getConsultationRequired);
 
 router.post(
     "/assign-dietician",
+    checkToken,
     AssingDieticain
 );
 
 router.post(
     "/diet-status",
+    checkToken,
     DieticanStatus
 );
 
+router.post("/activenspatient", checkToken, getAllActiveNursingStation);
+
+router.post("/diethistory", checkToken, getPatientActiveDietHistory);
+
+router.post("/patientdtl", checkToken, getPatientFullDetail);
 
 module.exports = router;

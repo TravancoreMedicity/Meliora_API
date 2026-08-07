@@ -73,7 +73,8 @@ module.exports = {
             item.item_id,
             item.quantity,
             item.unit_id,
-            item.is_substitute
+            item.is_substitute,
+            item.patient_diet_id
         ]);
 
         AddDietItem(dietDetailValues, (err, result) => {

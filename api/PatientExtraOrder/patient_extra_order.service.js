@@ -82,6 +82,11 @@ module.exports = {
 
     /* GET SINGLE */
     getExtraOrderSingle: (id, status, callback) => {
+
+        console.log({
+            id,status
+        });
+        
         const query = `
             SELECT 
                 peo.*,

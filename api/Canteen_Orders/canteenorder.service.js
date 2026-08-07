@@ -126,7 +126,7 @@ module.exports = {
 
                     const itemQuery = `
                     INSERT INTO canteen_order_item
-                    (canteen_order_id, item_id, quantity, price, gst,type_slno, gst_amount, is_active)
+                    (canteen_order_id, item_id, quantity, price, gst,type_slno, gst_amount,patient_diet_id, is_active)
                     VALUES ?
                 `;
 
@@ -138,6 +138,7 @@ module.exports = {
                         item.gst,
                         item.type_slno,
                         item.gst_amount,
+                        item.patient_diet_id,
                         1
                     ]);
 
@@ -391,33 +392,55 @@ ORDER BY
 
         const placeholders = canteenIds.map(() => '?').join(',');
 
+        //     const query = `
+        //     SELECT
+        //         coi.type_slno,
+        //         coi.canteen_order_id,
+        //         coi.item_id,
+        //         im.item_name,
+        //         dt.type_desc,
+        //         SUM(coi.quantity) AS total_qty
+
+        //     FROM canteen_order_item coi
+
+        //     INNER JOIN canteen_order co
+        //         ON co.canteen_order_id = coi.canteen_order_id
+
+        //     LEFT JOIN diet_type dt
+        //     ON dt.type_slno=coi.type_slno
+
+        //      LEFT JOIN item_master im
+        //             ON coi.item_id = im.item_id
+
+        //     WHERE coi.canteen_order_id IN (${placeholders})
+        //     AND co.order_status = 'CONFIRMED'
+
+        //     GROUP BY
+        //         coi.type_slno,
+        //         coi.item_id
+        // `;
         const query = `
-        SELECT
-            coi.type_slno,
-            coi.canteen_order_id,
-            coi.item_id,
-            im.item_name,
-            dt.type_desc,
-            SUM(coi.quantity) AS total_qty
-
-        FROM canteen_order_item coi
-
-        INNER JOIN canteen_order co
-            ON co.canteen_order_id = coi.canteen_order_id
-
-        LEFT JOIN diet_type dt
-        ON dt.type_slno=coi.type_slno
-
-         LEFT JOIN item_master im
-                ON coi.item_id = im.item_id
-
-        WHERE coi.canteen_order_id IN (${placeholders})
-        AND co.order_status = 'CONFIRMED'
-
-        GROUP BY
-            coi.type_slno,
-            coi.item_id
-    `;
+    SELECT
+    coi.type_slno,
+    coi.item_id,
+    im.item_name,
+    dt.type_desc,
+    SUM(coi.quantity) AS total_qty,
+    GROUP_CONCAT(DISTINCT coi.canteen_order_id) AS order_ids
+FROM canteen_order_item coi
+INNER JOIN canteen_order co
+    ON co.canteen_order_id = coi.canteen_order_id
+LEFT JOIN diet_type dt
+    ON dt.type_slno = coi.type_slno
+LEFT JOIN item_master im
+    ON im.item_id = coi.item_id
+WHERE coi.canteen_order_id IN (${placeholders})
+AND co.order_status = 'CONFIRMED'
+GROUP BY
+    coi.type_slno,
+    coi.item_id,
+    im.item_name,
+    dt.type_desc`
 
         executeQuery(query, canteenIds, callback);
     },
@@ -569,7 +592,8 @@ ORDER BY
                 price,
                 gst,
                 type_slno,
-                gst_amount
+                gst_amount,
+                patient_diet_id
             )
             VALUES ?
         `;
@@ -622,6 +646,10 @@ ORDER BY
 
 
     getAllActivePatients: (ns_code, callback) => {
+        console.log({
+            ns_code
+        });
+
         const query = `
                SELECT 
                 ip.fb_ip_no,

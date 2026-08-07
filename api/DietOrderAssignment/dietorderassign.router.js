@@ -3,7 +3,7 @@
 const router = require('express').Router();
 
 const { checkToken } = require('../../authentication/token_validation');
-const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail } = require('./dietorderassign.controller');
+const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientExtraOrder, getPatientDietBill, createPatientBilling, updateBulkPickingUp, getDeliveryBillDetails } = require('./dietorderassign.controller');
 
 
 router.post(
@@ -63,6 +63,68 @@ router.post(
     '/update-order-status',
     checkToken,
     UpdateAssignOrderDetail
+);
+
+router.get(
+    '/billing/summary/:ptNo/:ipNo',
+    checkToken,
+    getBillingSummary
+);
+
+router.get(
+    '/billing/delivery-detail/:ptNo/:ipNo',
+    checkToken,
+    getBillingDeliveryDetail
+);
+
+
+router.get(
+    '/billing/transactions/:ptNo/:ipNo/:status',
+    checkToken,
+    getBillingTransactions
+);
+
+
+router.get(
+    '/billing/patient/diet/:ptNo/:ipNo/:status',
+    checkToken,
+    getPatientDietBill
+);
+
+
+router.get(
+    '/billing/extra/:ptNo/:ipNo/:status',
+    checkToken,
+    getPatientExtraOrder
+);
+
+
+router.get(
+    '/billing/bystander/:ptNo/:ipNo/:status',
+    checkToken,
+    getBystanderBill
+);
+
+
+
+router.post(
+    "/billing/create",
+    checkToken,
+    createPatientBilling
+);
+
+router.post(
+    '/update-bulk-pickup',
+    checkToken,
+    updateBulkPickingUp
+);
+
+
+
+router.post(
+    "/get-bill-details",
+    checkToken,
+    getDeliveryBillDetails
 );
 
 module.exports = router;

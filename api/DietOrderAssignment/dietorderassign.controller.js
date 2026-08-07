@@ -1,6 +1,6 @@
 // dietdeliveryassign.controller.js
 
-const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail } = require("./dietorderassign.service");
+const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientDietBill, getPatientExtraOrder, createPatientBillingService, updateBulkPickingUpService, getDeliveryBillDetailsService } = require("./dietorderassign.service");
 
 
 module.exports = {
@@ -303,6 +303,236 @@ module.exports = {
     },
 
 
+
+    getBillingSummary: (req, res) => {
+
+        const { ptNo, ipNo } = req.params;
+
+        getBillingSummary(ptNo, ipNo, (err, result) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    stage: err.stage || "UNKNOWN",
+                    message: err.message || err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Fetched SuccessFully",
+                data: result
+            });
+
+        });
+    },
+
+    getBillingDeliveryDetail: (req, res) => {
+
+        const { ptNo, ipNo } = req.params;
+
+        getBillingDeliveryDetail(ptNo, ipNo, (err, result) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    stage: err.stage || "UNKNOWN",
+                    message: err.message || err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Fetched SuccessFully",
+                data: result
+            });
+
+        });
+    },
+
+    getBillingTransactions: (req, res) => {
+
+        const { ptNo, ipNo, status } = req.params;
+
+        getBillingTransactions(ptNo, ipNo, status, (err, result) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    stage: err.stage || "UNKNOWN",
+                    message: err.message || err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Fetched SuccessFully",
+                data: result
+            });
+
+        });
+    },
+
+
+    getBystanderBill: (req, res) => {
+
+        const { ptNo, ipNo, status } = req.params;
+
+        getBystanderBill(ipNo, ptNo, status, (err, result) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    stage: err.stage || "UNKNOWN",
+                    message: err.message || err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Fetched SuccessFully",
+                data: result
+            });
+
+        });
+    },
+
+
+    getPatientExtraOrder: (req, res) => {
+
+        const { ptNo, ipNo, status } = req.params;
+
+        getPatientExtraOrder(ipNo, ptNo, status, (err, result) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    stage: err.stage || "UNKNOWN",
+                    message: err.message || err
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Fetched SuccessFully",
+                data: result
+            });
+
+        });
+    },
+
+    getPatientDietBill: (req, res) => {
+
+        const { ptNo, ipNo, status } = req.params;
+
+        getPatientDietBill(ptNo, ipNo, status, (err, result) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    stage: err.stage || "UNKNOWN",
+                    message: err.message || err
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                message: "Fetched SuccessFully",
+                data: result
+            });
+
+        });
+    },
+
+    createPatientBilling: (req, res) => {
+        const data = req.body;
+        const {
+            patient_id,
+            admission_id,
+            created_by,
+            items = []
+        } = data;
+
+        if (!patient_id || !admission_id || !created_by) {
+            return res.status(200).json({
+                success: 0,
+                message: "Patient Id is Missing",
+            });
+        }
+
+        if (!Array.isArray(items) || items.length === 0) {
+            return res.status(200).json({
+                success: 0,
+                message: "Item is Missings",
+            });
+        }
+        createPatientBillingService(data, (err, result) => {
+            if (err) {
+                console.error("createPatientBilling:", err);
+                return res.status(500).json({
+                    success: 0,
+                    message: err.message || "Failed to create billing.",
+                });
+            }
+            return res.status(201).json({
+                success: 1,
+                message: "Billing created successfully.",
+                data: result,
+            });
+
+        });
+
+    },
+    updateBulkPickingUp: (req, res) => {
+        const { Items } = req.body;
+
+        if (!Array.isArray(Items) || Items.length === 0) {
+            return res.status(200).json({
+                success: 0,
+                message: "Items are missing",
+            });
+        }
+
+        updateBulkPickingUpService(Items, (err, result) => {
+            if (err) {
+                console.error("updateBulkPickingUp:", err);
+                return res.status(500).json({
+                    success: 0,
+                    message: err.message || "Failed to update pickup status.",
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                message: "Orders picked up successfully.",
+                data: result,
+            });
+        });
+    },
+
+    getDeliveryBillDetails: (req, res) => {
+
+        const body = req.body;
+
+        getDeliveryBillDetailsService(body, (err, results) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({
+                    success: 0,
+                    message: "Database connection error"
+                });
+            };
+
+            if (!results || results?.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Delivery For this Order",
+                    data: []
+                });
+            };
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+
+        });
+    },
 
 };
 

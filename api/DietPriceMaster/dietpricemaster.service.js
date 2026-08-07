@@ -91,6 +91,34 @@ module.exports = {
         );
     },
 
+    getDietPriceDetailService: (data, callBack) => {
+        pool.query(
+            `SELECT
+                dpd.detail_id,
+                dpd.price_id,
+                dpd.type_slno,
+                dt.type_desc,
+                dpd.meal_rate,
+                dpd.is_active,
+                dpd.created_by,
+                dpd.created_at,
+                dpd.updated_by,
+                dpd.updated_at
+            FROM diet_price_detail dpd
+            INNER JOIN diet_type dt
+                ON dpd.type_slno = dt.type_slno
+            WHERE dpd.price_id = ?
+            ORDER BY dt.start_time `,
+            [data.price_id],
+            (error, results) => {
+                if (error) return callBack(error);
+                return callBack(null, results);
+            }
+        );
+    },
+
+
+
     // UPDATE
     updateDietPrice: (data, callBack) => {
 
@@ -141,5 +169,54 @@ module.exports = {
                 return callBack(null, results);
             }
         );
-    }
+    },
+    insertDietMealPriceService: (data, callBack) => {
+        pool.query(
+            ` INSERT INTO diet_price_detail
+        (
+            price_id,
+            type_slno,
+            meal_rate,
+            is_active,
+            created_by
+        )
+        VALUES (?,?,?,?,?)
+    `,
+            [
+                data.price_id,
+                data.type_slno,
+                data.meal_rate,
+                data.is_active,
+                data.created_by
+            ],
+            (error, results) => {
+                if (error) return callBack(error);
+                return callBack(null, results);
+            }
+        );
+    },
+
+    updateDietMealPriceService: (data, callBack) => {
+        pool.query(
+            `UPDATE diet_price_detail
+            SET
+                meal_rate = ?,
+                is_active = ?,
+                updated_by = ?
+            WHERE detail_id = ?
+    `,
+            [
+                data.meal_rate,
+                data.is_active,
+                data.updated_by,
+                data.detail_id
+            ],
+            (error, results) => {
+                if (error) return callBack(error);
+                return callBack(null, results);
+            }
+        );
+    },
+
+
 };

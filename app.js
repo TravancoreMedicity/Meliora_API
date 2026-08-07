@@ -42,6 +42,7 @@ const allowedOrigins = [
   "http://192.168.22.8:3001",
   "http://192.168.22.3:3000",
   "http://192.168.22.3:7000",
+  "http://192.168.22.3:3001"
 ];
 
 
@@ -62,6 +63,8 @@ app.use(
     credentials: true,
   })
 );
+
+
 
 
 // ----- logger display For Info ----
@@ -103,6 +106,20 @@ app.get("/warn", (req, res) => {
 });
 
 
+
+app.use(
+  '/chat-files',
+  express.static('D:/DocMeliora/Meliora/IncidentManagement/ChatConversationFiles')
+);
+
+// https code 
+
+// const https = require("https");
+
+// const server = https.createServer({
+//   key: fs.readFileSync(process.env.SSL_KEY_PATH),
+//   cert: fs.readFileSync(process.env.SSL_CERT_PATH)
+// }, app);
 
 const server = http.createServer(app);
 const io = socketUtils.WSIO(server);
@@ -324,6 +341,7 @@ const RateVariationReport = require('./api/RateVariationReport/RateVariationRepo
 const store_master = require('./api/store_master/store_master.router')
 const vendor_master = require('./api/vendor_master/vendor_master_.router')
 const workOrder = require('./api/workOrder/workOrder.router')
+const ElliderUpdation = require('./api/elliderUpdation/elliderUpdation.router')
 
 const CanteenHighlight = require('./api/canteenHighlights/highlight.router')
 const CanteenHighlightMapping = require('./api/canteenHighlightsMapping/highlightmapping.router')
@@ -557,6 +575,9 @@ app.use('/api/workOrder', workOrder)
 app.use('/api/highlightmaping', CanteenHighlightMapping)
 app.use('/api/highlight', CanteenHighlight)
 
+
+
+app.use('/api/ElliderUpdation', ElliderUpdation)
 
 
 server.listen(

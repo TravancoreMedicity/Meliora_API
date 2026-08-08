@@ -1,6 +1,6 @@
 // dietdeliveryassign.controller.js
 
-const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientDietBill, getPatientExtraOrder, createPatientBillingService, updateBulkPickingUpService, getDeliveryBillDetailsService } = require("./dietorderassign.service");
+const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientDietBill, getPatientExtraOrder, createPatientBillingService, updateBulkPickingUpService, getDeliveryBillDetailsService, CreateBystanderBilling, getBystanderBillingDetails, createBillingPaymentService } = require("./dietorderassign.service");
 
 
 module.exports = {
@@ -533,6 +533,122 @@ module.exports = {
 
         });
     },
+
+    CreateBystanderBilling: (req, res) => {
+        const data = req.body;
+        CreateBystanderBilling(data, (err, result) => {
+            if (err) {
+                console.error(
+                    "Create Bystander Billing Error:",
+                    err
+                );
+                return res.status(500).json({
+                    success: 0,
+                    message: "Failed to generate bill"
+                });
+            }
+            // Service response
+            return res.status(200).json(result);
+
+        });
+
+    },
+
+    GetBystanderBillingDetails: (req, res) => {
+        const data = req.body;
+        getBystanderBillingDetails(data, (err, result) => {
+            if (err) {
+                console.error(
+                    "Get Bystander Billing Error:",
+                    err
+                );
+                return res.status(500).json({
+                    success: 0,
+                    message: "Failed to fetch billing details"
+                });
+            }
+            return res.status(200).json(
+                result
+            );
+
+        });
+
+    },
+    createBillingPayment: (req, res) => {
+
+        const {
+            amount,
+            payment_mode,
+            collected_by,
+            collected_location,
+            transaction_id,
+            payments
+        } = req.body;
+
+        if (!Array.isArray(payments) || !payments.length) {
+            return res.status(200).json({
+                success: 0,
+                message: "Payment details are missing"
+            });
+        }
+
+        if (!amount || Number(amount) <= 0) {
+            return res.status(200).json({
+                success: 0,
+                message: "Invalid payment amount"
+            });
+        }
+
+        if (!payment_mode) {
+            return res.status(200).json({
+                success: 0,
+                message: "Payment mode is required"
+            });
+        }
+
+        if (!collected_by) {
+            return res.status(200).json({
+                success: 0,
+                message: "Collected by is required"
+            });
+        }
+
+        if (!collected_location) {
+            return res.status(200).json({
+                success: 0,
+                message: "Collected location is required"
+            });
+        }
+
+        createBillingPaymentService(
+            {
+                amount,
+                payment_mode,
+                collected_by,
+                collected_location,
+                transaction_id,
+                payments
+            },
+            (err, result) => {
+                if (err) {
+                    console.error("createBillingPayment error:", err);
+                    return res.status(200).json({
+                        success: 0,
+                        message: err.message ||
+                            "Payment failed"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    message: "Payment completed successfully",
+                    data: result
+                });
+            }
+        );
+    },
+
+
 
 };
 

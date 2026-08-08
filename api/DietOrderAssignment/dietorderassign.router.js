@@ -3,7 +3,7 @@
 const router = require('express').Router();
 
 const { checkToken } = require('../../authentication/token_validation');
-const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientExtraOrder, getPatientDietBill, createPatientBilling, updateBulkPickingUp, getDeliveryBillDetails } = require('./dietorderassign.controller');
+const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientExtraOrder, getPatientDietBill, createPatientBilling, updateBulkPickingUp, getDeliveryBillDetails, CreateBystanderBilling, GetBystanderBillingDetails, createBillingPayment } = require('./dietorderassign.controller');
 
 
 router.post(
@@ -125,6 +125,28 @@ router.post(
     "/get-bill-details",
     checkToken,
     getDeliveryBillDetails
+);
+
+
+
+router.post(
+    "/create-bystander-billing",
+    checkToken,
+    CreateBystanderBilling
+);
+
+
+router.post(
+    "/get-bystander-billing-details",
+    checkToken,
+    GetBystanderBillingDetails
+);
+
+
+router.post(
+    "/billing/payment",
+    checkToken,
+    createBillingPayment
 );
 
 module.exports = router;

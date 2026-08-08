@@ -156,6 +156,7 @@ module.exports = {
         const query = `
            SELECT 
                 ddsd.canteen_order_id,
+                ddsd.assignment_detail_id,
                 ddsd.delivery_priority AS ItemPriority,
                 ddsd.delivery_status AS ItemStatus,
                 dds.assignment_id,
@@ -766,7 +767,7 @@ module.exports = {
             source_type
         } = data;
 
-  
+
         pool.getConnection((err, connection) => {
             if (err) {
                 return callback({
@@ -809,9 +810,7 @@ module.exports = {
                         }
                         const exists = checkResult.length > 0;
 
-                        // =====================================================
                         // 2. UPDATE
-                        // =====================================================
                         if (exists) {
 
                             let updateQuery = `
@@ -1849,7 +1848,7 @@ ORDER BY dmc.created_at
                 dsl.ledger_id,
                 dsl.delivery_id,
                 'SERVICE' AS bill_source,
-
+                im.item_id,
                 im.item_name,
                 dsl.quantity,
                 dsl.unit_rate,
@@ -1952,4 +1951,1711 @@ ORDER BY dmc.created_at
         });
 
     },
+
+    CreateBystanderBilling: async (data, callback) => {
+        const {
+            billing = {},
+            items = []
+        } = data;
+
+        const {
+            patient_id,
+            admission_id,
+            billing_party_type,
+            billing_date,
+            assignment_detail_id,
+            bill_type,
+            bill_generated_by,
+            bill_generated_location,
+            total_amount,
+            paid_amount = 0,
+            balance_amount,
+            billing_status = "OPEN",
+            created_by,
+            updated_by = null
+        } = billing;
+
+
+        /*
+        **********************************************
+        VALIDATION
+        **********************************************
+        */
+
+        if (!patient_id) {
+            return callback(null, {
+                success: 0,
+                message: "Patient ID is required"
+            });
+        }
+
+        if (!admission_id) {
+            return callback(null, {
+                success: 0,
+                message: "Admission ID is required"
+            });
+        }
+
+        if (Number(billing_party_type) !== 2) {
+            return callback(null, {
+                success: 0,
+                message: "This billing service is only for BYSTANDER"
+            });
+        }
+
+        if (!created_by) {
+            return callback(null, {
+                success: 0,
+                message: "Created by employee is required"
+            });
+        }
+
+        if (!Array.isArray(items) || items.length === 0) {
+            return callback(null, {
+                success: 0,
+                message: "Billing items are missing"
+            });
+        }
+
+
+        /*
+        **********************************************
+        GET CONNECTION
+        **********************************************
+        */
+
+        pool.getConnection(async (err, connection) => {
+
+            if (err) {
+                return callback(err);
+            }
+            /*
+            **********************************************
+            QUERY HELPER
+            **********************************************
+            */
+
+            const query = (sql, params = []) => {
+                return new Promise((resolve, reject) => {
+                    connection.query(
+                        sql,
+                        params,
+                        (err, result) => {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve(result);
+                            }
+                        }
+                    );
+                });
+            };
+
+            try {
+                /*
+                **********************************************
+                BEGIN TRANSACTION
+                **********************************************
+                */
+                await new Promise((resolve, reject) => {
+                    connection.beginTransaction(err => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
+                    });
+                });
+                /*
+                **********************************************
+                VALIDATE BILLING ITEMS
+                **********************************************
+                */
+                for (const item of items) {
+                    if (Number(item.category_id) !== 3) {
+                        throw new Error(
+                            "Invalid billing category for bystander"
+                        );
+                    }
+                    if (item.reference_table !== "diet_service_ledger") {
+                        throw new Error("Invalid billing reference table");
+                    }
+
+                    if (!item.reference_id) {
+                        throw new Error("Billing reference ID is missing");
+                    }
+                }
+                /*
+                **********************************************
+                GET REFERENCE IDS
+                **********************************************
+                */
+                const referenceIds = items.map(
+                    item => Number(item.reference_id)
+                );
+                const placeholders = referenceIds
+                    .map(() => "?")
+                    .join(",");
+                /*
+                **********************************************
+                LOCK LEDGER ROWS
+                **********************************************
+                */
+                const ledgerCheckQuery = `
+                SELECT
+                    ledger_id,
+                    ledger_status
+                FROM diet_service_ledger
+                WHERE ledger_id IN (${placeholders})
+                FOR UPDATE
+            `;
+                const ledgerRows = await query(
+                    ledgerCheckQuery,
+                    referenceIds
+                );
+                /*
+                **********************************************
+                CHECK ALL REFERENCES EXIST
+                **********************************************
+                */
+                if (!ledgerRows || ledgerRows.length !== referenceIds.length) {
+                    throw new Error("One or more billing items were not found");
+                }
+                /*
+                **********************************************
+                CHECK ALREADY BILLED
+                **********************************************
+                */
+                const alreadyBilled =
+                    ledgerRows?.filter(
+                        item =>
+                            item.ledger_status === "BILLED"
+                    );
+
+                if (alreadyBilled.length > 0) {
+                    throw new Error("One or more selected items are already billed");
+                }
+                /*
+                **********************************************
+                CALCULATE TOTAL
+                **********************************************
+                */
+                const calculatedTotal = items?.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+                /*
+                **********************************************
+                CREATE BILL HEADER
+                **********************************************
+                */
+                const headerQuery = `
+                INSERT INTO patient_billing
+                (
+                    patient_id,
+                    admission_id,
+                    assignment_detail_id,
+                    billing_party_type,
+                    billing_date,
+                    bill_type,
+                    bill_generated_by,
+                    bill_generated_location,
+                    total_amount,
+                    paid_amount,
+                    balance_amount,
+                    billing_status,
+                    created_by,
+                    updated_by
+                )
+                VALUES
+                (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                )
+            `;
+
+                const headerResult = await query(
+                    headerQuery,
+                    [
+                        patient_id,
+                        admission_id,
+                        assignment_detail_id,
+                        billing_party_type,
+                        billing_date,
+                        bill_type ||
+                        "DELIVERY_GENERATED",
+                        bill_generated_by ||
+                        created_by,
+                        bill_generated_location ||
+                        "DELIVERY",
+                        calculatedTotal,
+                        Number(paid_amount || 0),
+                        balance_amount ??
+                        calculatedTotal,
+                        billing_status,
+                        created_by,
+                        updated_by
+                    ]
+                );
+
+                const billingId = headerResult.insertId;
+                /*
+                **********************************************
+                GENERATE BILL NUMBER
+                **********************************************
+                */
+                const today = new Date()
+                    .toISOString()
+                    .slice(0, 10)
+                    .replace(/-/g, "");
+
+                const billNo =
+                    `BYS-${today}-${String(billingId).padStart(6, "0")}`;
+                /*
+                **********************************************
+                UPDATE BILL NUMBER
+                **********************************************
+                */
+                await query(
+                    `
+                    UPDATE patient_billing
+                    SET bill_no = ?
+                    WHERE billing_id = ?
+                `,
+                    [
+                        billNo,
+                        billingId
+                    ]
+                );
+                /*
+                **********************************************
+                INSERT BILL DETAILS
+                **********************************************
+                */
+
+                const detailQuery = `
+                INSERT INTO patient_billing_detail
+                (
+                    billing_id,
+                    category_id,
+                    description,
+                    item_id,
+                    quantity,
+                    rate,
+                    gst,
+                    gst_amount,
+                    discount,
+                    amount,
+                    reference_table,
+                    reference_id,
+                    service_date,
+                    bill_item_status
+                )
+                VALUES
+                (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                )
+            `;
+
+                for (const item of items) {
+                    await query(
+                        detailQuery,
+                        [
+                            billingId,
+                            3,
+                            item.description,
+                            item.item_id || null,
+                            Number(item.quantity || 0),
+                            Number(item.rate || 0),
+                            Number(item.gst || 0),
+                            Number(item.gst_amount || 0),
+                            Number(item.discount || 0),
+                            Number(item.amount || 0),
+                            "diet_service_ledger",
+                            Number(item.reference_id),
+                            item.service_date || null,
+                            item.bill_item_status ||
+                            "OPEN"
+                        ]
+                    );
+                    /*
+                    **********************************************
+                    UPDATE LEDGER
+                    **********************************************
+                    */
+                    const updateLedgerResult =
+                        await query(
+                            `
+                            UPDATE diet_service_ledger
+                            SET ledger_status = 'BILLED'
+                            WHERE ledger_id = ?
+                              AND ledger_status = 'PENDING'
+                        `,
+                            [
+                                Number(item.reference_id)
+                            ]
+                        );
+
+                    if (updateLedgerResult.affectedRows === 0) {
+                        throw new Error(`Ledger ${item.reference_id} was already billed`);
+                    }
+                }
+                /*
+                **********************************************
+                COMMIT
+                **********************************************
+                */
+
+                await new Promise((resolve, reject) => {
+                    connection.commit(err => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
+                    });
+                });
+                /*
+                **********************************************
+                RELEASE
+                **********************************************
+                */
+                connection.release();
+                /*
+                **********************************************
+                RESPONSE
+                **********************************************
+                */
+                return callback(null, {
+                    success: 1,
+                    message: "Bystander bill generated successfully",
+                    data: {
+                        billing_id: billingId,
+                        bill_no: billNo,
+                        patient_id,
+                        admission_id,
+                        billing_party_type,
+                        total_amount: calculatedTotal,
+                        paid_amount: Number(paid_amount || 0),
+                        balance_amount:
+                            balance_amount ??
+                            calculatedTotal,
+                        billing_status,
+                        total_items: items?.length
+                    }
+                });
+            } catch (error) {
+                /*
+                **********************************************
+                ROLLBACK
+                **********************************************
+                */
+                connection.rollback(() => {
+                    connection.release();
+                    callback(null, {
+                        success: 0,
+                        message: error?.message || "Failed to generate bystander bill"
+                    });
+                });
+            }
+        });
+    },
+
+    getBystanderBillingDetails: (data, callback) => {
+
+        const {
+            assignment_detail_id
+        } = data;
+
+        /*
+        ==================================================
+        VALIDATION
+        ==================================================
+        */
+
+        if (!assignment_detail_id) {
+            return callback(null, {
+                success: 0,
+                message: "Assignment detail ID is required"
+            });
+        }
+        /*
+        ==================================================
+        GET CONNECTION
+        ==================================================
+        */
+
+        pool.getConnection((err, connection) => {
+            if (err) {
+                return callback(err);
+            }
+
+            /*
+            ==================================================
+            QUERY HELPER
+            ==================================================
+            */
+
+            const query = (sql, params = []) => {
+                return new Promise((resolve, reject) => {
+                    connection.query(
+                        sql,
+                        params,
+                        (err, result) => {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve(result);
+                            }
+                        }
+                    );
+                });
+            };
+            /*
+            ==================================================
+            MAIN LOGIC
+            ==================================================
+            */
+
+            const execute = async () => {
+
+                try {
+
+                    /*
+                    ==================================================
+                    1. GET ALL BILL HEADERS
+                    ==================================================
+                    */
+
+                    const billQuery = `
+                    SELECT
+
+                        pb.billing_id,
+                        pb.bill_no,
+
+                        pb.patient_id,
+                        pb.admission_id,
+
+                        pb.assignment_detail_id,
+                        pb.billing_party_type,
+
+                        pb.billing_date,
+                        pb.bill_type,
+
+                        pb.bill_generated_by,
+                        pb.bill_generated_location,
+
+                        pb.total_amount,
+                        pb.paid_amount,
+                        pb.balance_amount,
+
+                        pb.billing_status,
+
+                        pb.created_at,
+                        pb.created_by,
+
+                        pb.updated_at,
+                        pb.updated_by,
+
+                        dad.assignment_detail_id,
+
+                        dad.assignment_id,
+                        dad.canteen_order_id,
+                        dad.type_slno,
+
+                        dad.delivery_priority,
+                        dad.delivery_status,
+
+                        dad.delivered_at,
+                        dad.delivered_by,
+
+                        dad.remarks
+
+                    FROM patient_billing pb
+
+                    LEFT JOIN diet_delivery_assignment_detail dad
+                        ON dad.assignment_detail_id =
+                           pb.assignment_detail_id
+
+                    WHERE pb.assignment_detail_id = ?
+                      AND pb.billing_party_type = 2
+
+                    ORDER BY
+                        pb.billing_id DESC
+                `;
+
+
+                    const bills = await query(
+                        billQuery,
+                        [assignment_detail_id]
+                    );
+
+
+                    /*
+                    ==================================================
+                    2. NO BILL FOUND
+                    ==================================================
+                    */
+
+                    if (!bills || bills.length === 0) {
+
+                        connection.release();
+
+                        return callback(null, {
+                            success: 2,
+                            message: "No bystander bills found",
+                            data: {
+                                bills: [],
+                                bill_items: []
+                            }
+                        });
+
+                    }
+
+
+                    /*
+                    ==================================================
+                    3. GET BILL IDS
+                    ==================================================
+                    */
+
+                    const billIds = bills.map(
+                        bill => bill.billing_id
+                    );
+
+
+                    const placeholders = billIds
+                        .map(() => "?")
+                        .join(",");
+
+
+                    /*
+                    ==================================================
+                    4. GET ALL BILL ITEMS
+                    ==================================================
+                    */
+
+                    const billItemQuery = `
+
+                    SELECT
+                        pbd.billing_detail_id,
+                        pbd.billing_id,
+
+                        pbd.category_id,
+
+                        pbd.description,
+
+                        pbd.item_id,
+
+                        pbd.quantity,
+                        pbd.rate,
+
+                        pbd.gst,
+                        pbd.gst_amount,
+
+                        pbd.discount,
+
+                        pbd.amount,
+
+                        pbd.reference_table,
+                        pbd.reference_id,
+
+                        pbd.service_date,
+
+                        pbd.bill_item_status,
+
+
+                        dsl.ledger_id,
+
+                        dsl.delivery_id,
+
+                        dsl.ledger_status
+
+                    FROM patient_billing_detail pbd
+
+                    LEFT JOIN diet_service_ledger dsl
+                        ON dsl.ledger_id = pbd.reference_id
+                       AND pbd.reference_table =
+                           'diet_service_ledger'
+
+                    LEFT JOIN diet_delivery_log ddl
+                        ON ddl.delivery_id = dsl.delivery_id
+
+                    WHERE pbd.billing_id IN (${placeholders})
+
+                    ORDER BY
+                        pbd.billing_id DESC,
+                        pbd.billing_detail_id ASC
+
+                `;
+                    const bill_items = await query(
+                        billItemQuery,
+                        billIds
+                    );
+                    /*
+                    ==================================================
+                    5. RELEASE CONNECTION
+                    ==================================================
+                    */
+                    connection.release();
+                    /*
+                    ==================================================
+                    6. SUCCESS RESPONSE
+                    ==================================================
+                    */
+
+                    return callback(null, {
+                        success: 1,
+                        message: "Bystander billing details fetched successfully",
+                        data: {
+                            bills,
+                            bill_items
+                        }
+                    });
+                } catch (error) {
+                    /*
+                    ==================================================
+                    ERROR
+                    ==================================================
+                    */
+                    connection.release();
+                    console.error(
+                        "Get Bystander Billing Error:",
+                        error
+                    );
+                    return callback(null, {
+                        success: 0,
+                        message:
+                            error?.message ||
+                            "Failed to fetch bystander billing details"
+                    });
+                }
+            };
+            execute();
+        });
+    },
+    // createBillingPaymentService: (
+    //     data,
+    //     callback
+    // ) => {
+
+    //     const {
+    //         amount,
+    //         payment_mode,
+    //         collected_by,
+    //         collected_location,
+    //         transaction_id,
+    //         payments
+    //     } = data;
+
+    //     pool.getConnection((err, connection) => {
+    //         if (err) {
+    //             return callback(err);
+    //         }
+    //         connection.beginTransaction(async err => {
+    //             if (err) {
+    //                 connection.release();
+    //                 return callback(err);
+    //             }
+    //             try {
+    //                 /* 1. VALIDATE TOP LEVEL AMOUNT  */
+    //                 const calculatedTotal = payments.reduce(
+    //                     (sum, payment) => sum + Number(payment.amount || 0),
+    //                     0
+    //                 );
+    //                 if (Number(calculatedTotal.toFixed(2)) !== Number(Number(amount).toFixed(2))) {
+    //                     throw new Error(`Payment amount mismatch. Expected ${amount}, received ${calculatedTotal}`);
+    //                 }
+
+    //                 /*2. PROCESS EACH BILLING  */
+
+    //                 const paymentResults = [];
+    //                 for (const payment of payments) {
+    //                     const billingId = Number(payment.billing_id);
+    //                     const paymentAmount = Number(payment.amount || 0);
+    //                     const items =
+    //                         Array.isArray(payment.items)
+    //                             ? payment.items
+    //                             : [];
+
+    //                     if (!billingId) {
+    //                         throw new Error("Invalid billing_id");
+    //                     }
+    //                     if (paymentAmount <= 0) {
+    //                         throw new Error(`Invalid payment amount for billing ${billingId}`);
+    //                     }
+    //                     if (!items.length) {
+    //                         throw new Error(`Payment items missing for billing ${billingId}`);
+    //                     }
+
+    //                     /* 3. LOCK BILLING ROW */
+
+    //                     const [billingRows] =
+    //                         await connection.promise().query(
+    //                             `
+    //                         SELECT
+    //                             billing_id,
+    //                             total_amount,
+    //                             paid_amount,
+    //                             balance_amount,
+    //                             billing_status
+    //                         FROM patient_billing
+    //                         WHERE billing_id = ?
+    //                         FOR UPDATE
+    //                         `,
+    //                             [billingId]
+    //                         );
+
+    //                     if (!billingRows.length) {
+    //                         throw new Error(`Billing ${billingId} not found`);
+    //                     }
+    //                     const billing = billingRows[0];
+
+    //                     if (billing.billing_status === "CANCELLED") {
+    //                         throw new Error(`Billing ${billingId} is cancelled`);
+    //                     }
+
+    //                     /*4. VALIDATE BILL PAYMENT AMOUNT */
+    //                     const currentBalance = Number(billing?.balance_amount || 0);
+
+    //                     if (paymentAmount > currentBalance) {
+    //                         throw new Error(`Payment amount exceeds balance for billing ${billingId}`);
+    //                     }
+    //                     /* 5. VALIDATE PAYMENT ITEMS */
+
+    //                     const detailIds =
+    //                         items?.map(item =>
+    //                             Number(
+    //                                 item?.billing_detail_id
+    //                             )
+    //                         );
+
+    //                     const placeholders =
+    //                         detailIds
+    //                             .map(() => "?")
+    //                             .join(",");
+
+
+    //                     const [details] =
+    //                         await connection.promise().query(
+    //                             `
+    //                         SELECT
+    //                             billing_detail_id,
+    //                             billing_id,
+    //                             amount,
+    //                             bill_item_status
+    //                         FROM patient_billing_detail
+    //                         WHERE billing_detail_id IN (${placeholders})
+    //                         AND billing_id = ?
+    //                         FOR UPDATE
+    //                         `,
+    //                             [
+    //                                 ...detailIds,
+    //                                 billingId
+    //                             ]
+    //                         );
+
+
+    //                     if (details.length !== detailIds.length) {
+    //                         throw new Error(`Invalid billing details for billing ${billingId}`);
+    //                     }
+
+
+    //                     /*  6. CALCULATE ITEM PAYMENT */
+
+    //                     let itemPaymentTotal = 0;
+    //                     for (const item of items) {
+    //                         const detail = details?.find(row => Number(row?.billing_detail_id) === Number(item?.billing_detail_id));
+
+    //                         if (!detail) {
+    //                             throw new Error(`Billing detail ${item.billing_detail_id} not found`);
+    //                         }
+
+    //                         if (detail.bill_item_status === "PAID") {
+    //                             throw new Error(`Billing detail ${item.billing_detail_id} is already paid`);
+    //                         }
+
+    //                         const paidAmount = Number(item.paid_amount || 0);
+
+    //                         const detailAmount = Number(detail.amount || 0);
+
+    //                         if (paidAmount <= 0) {
+    //                             throw new Error(`Invalid paid amount for billing detail ${item.billing_detail_id}`);
+    //                         }
+
+    //                         if (paidAmount > detailAmount) {
+    //                             throw new Error(`Paid amount exceeds billing detail amount for ${item.billing_detail_id}`);
+    //                         }
+
+    //                         itemPaymentTotal +=
+    //                             paidAmount;
+    //                     }
+
+
+    //                     /* 7. ITEM TOTAL MUST MATCH BILL PAYMENT */
+
+    //                     if (Number(itemPaymentTotal.toFixed(2)) !==
+    //                         Number(paymentAmount.toFixed(2))
+    //                     ) {
+    //                         throw new Error(
+    //                             `Item payment total does not match billing ${billingId} payment amount`
+    //                         );
+    //                     }
+
+
+    //                     /*8. INSERT PAYMENT MASTER  */
+
+    //                     const [paymentResult] =
+    //                         await connection.promise().query(
+    //                             `
+    //                         INSERT INTO patient_bill_payment
+    //                         (
+    //                             billing_id,
+    //                             amount,
+    //                             payment_mode,
+    //                             collected_by,
+    //                             collected_location,
+    //                             remarks,
+    //                             payment_status
+    //                         )
+    //                         VALUES (?, ?, ?, ?, ?, ?, 'SUCCESS')
+    //                         `,
+    //                             [
+    //                                 billingId,
+    //                                 paymentAmount,
+    //                                 payment_mode,
+    //                                 collected_by,
+    //                                 collected_location,
+    //                                 transaction_id || null
+    //                             ]
+    //                         );
+
+
+    //                     const paymentId =
+    //                         paymentResult.insertId;
+
+
+    //                     /*9. INSERT PAYMENT DETAILS */
+
+    //                     for (const item of items) {
+    //                         const paidAmount = Number(item.paid_amount);
+
+    //                         await connection.promise().query(
+    //                             `
+    //                         INSERT INTO patient_bill_payment_detail
+    //                         (
+    //                             payment_id,
+    //                             billing_detail_id,
+    //                             paid_amount
+    //                         )
+    //                         VALUES (?, ?, ?)
+    //                         `,
+    //                             [
+    //                                 paymentId,
+    //                                 item.billing_detail_id,
+    //                                 paidAmount
+    //                             ]
+    //                         );
+
+    //                         /*  MARK BILL DETAIL PAID */
+    //                         const detail =
+    //                             details?.find(
+    //                                 row =>
+    //                                     Number(row.billing_detail_id) ===
+    //                                     Number(item.billing_detail_id)
+    //                             );
+
+    //                         const detailAmount =
+    //                             Number(detail.amount || 0);
+    //                         if (
+    //                             Number(paidAmount.toFixed(2)) ===
+    //                             Number(detailAmount.toFixed(2))
+    //                         ) {
+
+    //                             await connection.promise().query(
+    //                                 `
+    //                             UPDATE patient_billing_detail
+    //                             SET bill_item_status = 'PAID'
+    //                             WHERE billing_detail_id = ?
+    //                             `,
+    //                                 [
+    //                                     item.billing_detail_id
+    //                                 ]
+    //                             );
+
+    //                         }
+
+    //                     }
+
+
+    //                     /*10. UPDATE BILLING MASTER */
+
+    //                     const newPaidAmount = Number(billing.paid_amount || 0) + paymentAmount;
+
+    //                     const newBalance = Number(billing.total_amount || 0) - newPaidAmount;
+
+
+    //                     let billingStatus = "PARTIAL";
+
+    //                     if (newBalance <= 0) {
+    //                         billingStatus = "PAID";
+    //                     }
+
+
+    //                     await connection.promise().query(
+    //                         `
+    //                     UPDATE patient_billing
+    //                     SET
+    //                         paid_amount = ?,
+    //                         balance_amount = ?,
+    //                         billing_status = ?,
+    //                         updated_by = ?,
+    //                         updated_at = CURRENT_TIMESTAMP
+    //                     WHERE billing_id = ?
+    //                     `,
+    //                         [
+    //                             newPaidAmount,
+    //                             Math.max(
+    //                                 0,
+    //                                 newBalance
+    //                             ),
+    //                             billingStatus,
+    //                             collected_by,
+    //                             billingId
+    //                         ]
+    //                     );
+
+
+    //                     paymentResults.push({
+    //                         billing_id: billingId,
+    //                         payment_id: paymentId,
+    //                         amount: paymentAmount,
+    //                         paid_amount: newPaidAmount,
+    //                         balance_amount:
+    //                             Math.max(
+    //                                 0,
+    //                                 newBalance
+    //                             ),
+    //                         billing_status:
+    //                             billingStatus
+    //                     });
+
+    //                 }
+
+
+    //                 /* 11. COMMIT  */
+
+    //                 await connection.promise().commit();
+
+    //                 connection.release();
+    //                 return callback(null, {
+    //                     amount: Number(amount),
+    //                     payment_mode,
+    //                     payment_status: "SUCCESS",
+    //                     payments: paymentResults
+    //                 });
+
+    //             } catch (error) {
+    //                 /*ROLLBACK EVERYTHING*/
+    //                 await connection.promise().rollback();
+    //                 connection.release();
+    //                 return callback(error);
+    //             }
+
+    //         });
+
+    //     });
+    // }
+    createBillingPaymentService: (data, callback) => {
+
+        const {
+            amount,
+            payment_mode,
+            collected_by,
+            collected_location,
+            transaction_id,
+            payments
+        } = data;
+
+        if (!Array.isArray(payments) || payments.length === 0) {
+            return callback(new Error("Payment details are missing"));
+        }
+
+        pool.getConnection((err, connection) => {
+
+            if (err) {
+                return callback(err);
+            }
+
+            connection.beginTransaction(err => {
+
+                if (err) {
+                    connection.release();
+                    return callback(err);
+                }
+
+                const rollback = error => {
+                    connection.rollback(() => {
+                        connection.release();
+                        callback(error);
+                    });
+                };
+
+                const commit = result => {
+                    connection.commit(err => {
+
+                        if (err) {
+                            return rollback(err);
+                        }
+
+                        connection.release();
+                        callback(null, result);
+                    });
+                };
+
+                try {
+
+                    /*
+                    1. VALIDATE TOP LEVEL AMOUNT
+                    */
+
+                    const calculatedTotal = payments.reduce(
+                        (sum, payment) =>
+                            sum + Number(payment?.amount || 0),
+                        0
+                    );
+
+                    if (
+                        Number(calculatedTotal.toFixed(2)) !==
+                        Number(Number(amount || 0).toFixed(2))
+                    ) {
+
+                        return rollback(
+                            new Error(
+                                `Payment amount mismatch. Expected ${amount}, received ${calculatedTotal}`
+                            )
+                        );
+                    }
+
+
+                    /*
+                    2. PROCESS EACH BILLING
+                    */
+
+                    const paymentResults = [];
+
+                    const processBilling = index => {
+
+                        if (index >= payments.length) {
+
+                            /*
+                            11. COMMIT
+                            */
+
+                            return commit({
+                                amount: Number(amount),
+                                payment_mode,
+                                payment_status: "SUCCESS",
+                                payments: paymentResults
+                            });
+                        }
+
+
+                        const payment = payments[index];
+
+                        const billingId =
+                            Number(payment?.billing_id);
+
+                        const paymentAmount =
+                            Number(payment?.amount || 0);
+
+                        const items =
+                            Array.isArray(payment?.items)
+                                ? payment.items
+                                : [];
+
+
+                        /*
+                        VALIDATE BILLING
+                        */
+
+                        if (!billingId) {
+                            return rollback(
+                                new Error("Invalid billing_id")
+                            );
+                        }
+
+                        if (paymentAmount <= 0) {
+                            return rollback(
+                                new Error(
+                                    `Invalid payment amount for billing ${billingId}`
+                                )
+                            );
+                        }
+
+                        if (!items.length) {
+                            return rollback(
+                                new Error(
+                                    `Payment items missing for billing ${billingId}`
+                                )
+                            );
+                        }
+
+
+                        /*
+                        3. LOCK BILLING ROW
+                        */
+
+                        connection.query(
+                            `
+                        SELECT
+                            billing_id,
+                            total_amount,
+                            paid_amount,
+                            balance_amount,
+                            billing_status
+                        FROM patient_billing
+                        WHERE billing_id = ?
+                        FOR UPDATE
+                        `,
+                            [billingId],
+                            (err, billingRows) => {
+
+                                if (err) {
+                                    return rollback(err);
+                                }
+
+                                if (!billingRows.length) {
+                                    return rollback(
+                                        new Error(
+                                            `Billing ${billingId} not found`
+                                        )
+                                    );
+                                }
+
+                                const billing =
+                                    billingRows[0];
+
+
+                                if (
+                                    billing.billing_status ===
+                                    "CANCELLED"
+                                ) {
+
+                                    return rollback(
+                                        new Error(
+                                            `Billing ${billingId} is cancelled`
+                                        )
+                                    );
+                                }
+
+
+                                /*
+                                4. VALIDATE BILL PAYMENT AMOUNT
+                                */
+
+                                const currentBalance =
+                                    Number(
+                                        billing.balance_amount || 0
+                                    );
+
+                                if (
+                                    paymentAmount >
+                                    currentBalance
+                                ) {
+
+                                    return rollback(
+                                        new Error(
+                                            `Payment amount exceeds balance for billing ${billingId}`
+                                        )
+                                    );
+                                }
+
+
+                                /*
+                                5. VALIDATE PAYMENT ITEMS
+                                */
+
+                                const detailIds =
+                                    items.map(item =>
+                                        Number(
+                                            item?.billing_detail_id
+                                        )
+                                    );
+
+                                if (
+                                    detailIds.some(id => !id)
+                                ) {
+
+                                    return rollback(
+                                        new Error(
+                                            `Invalid billing detail for billing ${billingId}`
+                                        )
+                                    );
+                                }
+
+
+                                const placeholders =
+                                    detailIds
+                                        .map(() => "?")
+                                        .join(",");
+
+
+                                connection.query(
+                                    `
+                                SELECT
+                                    billing_detail_id,
+                                    billing_id,
+                                    amount,
+                                    bill_item_status
+                                FROM patient_billing_detail
+                                WHERE billing_detail_id IN (${placeholders})
+                                AND billing_id = ?
+                                FOR UPDATE
+                                `,
+                                    [
+                                        ...detailIds,
+                                        billingId
+                                    ],
+                                    (err, details) => {
+
+                                        if (err) {
+                                            return rollback(err);
+                                        }
+
+
+                                        /*
+                                        MAKE SURE EVERY DETAIL EXISTS
+                                        */
+
+                                        if (
+                                            details.length !==
+                                            detailIds.length
+                                        ) {
+
+                                            return rollback(
+                                                new Error(
+                                                    `Invalid billing details for billing ${billingId}`
+                                                )
+                                            );
+                                        }
+
+
+                                        /*
+                                        6. CALCULATE ITEM PAYMENT
+                                        */
+
+                                        let itemPaymentTotal = 0;
+
+
+                                        for (const item of items) {
+
+                                            const detail =
+                                                details.find(row =>
+                                                    Number(
+                                                        row.billing_detail_id
+                                                    ) ===
+                                                    Number(
+                                                        item.billing_detail_id
+                                                    )
+                                                );
+
+
+                                            if (!detail) {
+                                                return rollback(
+                                                    new Error(
+                                                        `Billing detail ${item.billing_detail_id} not found`
+                                                    )
+                                                );
+                                            }
+
+
+                                            if (
+                                                detail.bill_item_status ===
+                                                "PAID"
+                                            ) {
+
+                                                return rollback(
+                                                    new Error(
+                                                        `Billing detail ${item.billing_detail_id} is already paid`
+                                                    )
+                                                );
+                                            }
+
+
+                                            const paidAmount =
+                                                Number(
+                                                    item?.paid_amount || 0
+                                                );
+
+                                            const detailAmount =
+                                                Number(
+                                                    detail?.amount || 0
+                                                );
+
+
+                                            if (
+                                                paidAmount <= 0
+                                            ) {
+
+                                                return rollback(
+                                                    new Error(
+                                                        `Invalid paid amount for billing detail ${item.billing_detail_id}`
+                                                    )
+                                                );
+                                            }
+
+
+                                            if (
+                                                paidAmount >
+                                                detailAmount
+                                            ) {
+
+                                                return rollback(
+                                                    new Error(
+                                                        `Paid amount exceeds billing detail amount for ${item.billing_detail_id}`
+                                                    )
+                                                );
+                                            }
+
+
+                                            itemPaymentTotal +=
+                                                paidAmount;
+                                        }
+
+
+                                        /*
+                                        
+                                        7. ITEM TOTAL MUST MATCH PAYMENT
+                                        
+                                        */
+
+                                        if (
+                                            Number(
+                                                itemPaymentTotal.toFixed(2)
+                                            ) !==
+                                            Number(
+                                                paymentAmount.toFixed(2)
+                                            )
+                                        ) {
+
+                                            return rollback(
+                                                new Error(
+                                                    `Item payment total does not match billing ${billingId} payment amount`
+                                                )
+                                            );
+                                        }
+
+
+                                        /*
+                                        
+                                        8. INSERT PAYMENT MASTER
+                                        */
+
+                                        connection.query(
+                                            `
+                                        INSERT INTO patient_bill_payment
+                                        (
+                                            billing_id,
+                                            amount,
+                                            payment_mode,
+                                            collected_by,
+                                            collected_location,
+                                            remarks,
+                                            payment_status
+                                        )
+                                        VALUES (?, ?, ?, ?, ?, ?, 'SUCCESS')
+                                        `,
+                                            [
+                                                billingId,
+                                                paymentAmount,
+                                                payment_mode,
+                                                collected_by,
+                                                collected_location,
+                                                transaction_id || null
+                                            ],
+                                            (err, paymentResult) => {
+
+                                                if (err) {
+                                                    return rollback(err);
+                                                }
+
+
+                                                const paymentId =
+                                                    paymentResult.insertId;
+
+
+                                                /*
+                                                
+                                                9. INSERT PAYMENT DETAILS
+                                                
+                                                */
+
+                                                const processItem = itemIndex => {
+
+                                                    if (
+                                                        itemIndex >=
+                                                        items.length
+                                                    ) {
+
+                                                        /*
+                                                        =========================
+                                                        10. UPDATE BILLING MASTER
+                                                        =========================
+                                                        */
+
+                                                        const newPaidAmount =
+                                                            Number(
+                                                                billing.paid_amount || 0
+                                                            ) +
+                                                            paymentAmount;
+
+
+                                                        const newBalance =
+                                                            Number(
+                                                                billing.total_amount || 0
+                                                            ) -
+                                                            newPaidAmount;
+
+
+                                                        let billingStatus =
+                                                            "PARTIAL";
+
+
+                                                        if (
+                                                            newBalance <= 0
+                                                        ) {
+                                                            billingStatus =
+                                                                "PAID";
+                                                        }
+
+
+                                                        connection.query(
+                                                            `
+                                                        UPDATE patient_billing
+                                                        SET
+                                                            paid_amount = ?,
+                                                            balance_amount = ?,
+                                                            billing_status = ?,
+                                                            updated_by = ?,
+                                                            updated_at = CURRENT_TIMESTAMP
+                                                        WHERE billing_id = ?
+                                                        `,
+                                                            [
+                                                                newPaidAmount,
+                                                                Math.max(
+                                                                    0,
+                                                                    newBalance
+                                                                ),
+                                                                billingStatus,
+                                                                collected_by,
+                                                                billingId
+                                                            ],
+                                                            err => {
+
+                                                                if (err) {
+                                                                    return rollback(err);
+                                                                }
+
+
+                                                                paymentResults.push({
+                                                                    billing_id:
+                                                                        billingId,
+
+                                                                    payment_id:
+                                                                        paymentId,
+
+                                                                    amount:
+                                                                        paymentAmount,
+
+                                                                    paid_amount:
+                                                                        newPaidAmount,
+
+                                                                    balance_amount:
+                                                                        Math.max(
+                                                                            0,
+                                                                            newBalance
+                                                                        ),
+
+                                                                    billing_status:
+                                                                        billingStatus
+                                                                });
+
+
+                                                                /*
+                                                                =================
+                                                                NEXT BILLING
+                                                                =================
+                                                                */
+
+                                                                processBilling(
+                                                                    index + 1
+                                                                );
+
+                                                            }
+                                                        );
+
+                                                        return;
+                                                    }
+
+
+                                                    const item =
+                                                        items[itemIndex];
+
+                                                    const paidAmount =
+                                                        Number(
+                                                            item.paid_amount
+                                                        );
+
+
+                                                    /*
+                                                    INSERT PAYMENT DETAIL
+                                                    */
+
+                                                    connection.query(
+                                                        `
+                                                    INSERT INTO patient_bill_payment_detail
+                                                    (
+                                                        payment_id,
+                                                        billing_detail_id,
+                                                        paid_amount
+                                                    )
+                                                    VALUES (?, ?, ?)
+                                                    `,
+                                                        [
+                                                            paymentId,
+                                                            item.billing_detail_id,
+                                                            paidAmount
+                                                        ],
+                                                        err => {
+
+                                                            if (err) {
+                                                                return rollback(err);
+                                                            }
+
+
+                                                            /*
+                                                            GET DETAIL AMOUNT
+                                                            */
+
+                                                            const detail =
+                                                                details.find(row =>
+                                                                    Number(
+                                                                        row.billing_detail_id
+                                                                    ) ===
+                                                                    Number(
+                                                                        item.billing_detail_id
+                                                                    )
+                                                                );
+
+
+                                                            const detailAmount =
+                                                                Number(
+                                                                    detail?.amount || 0
+                                                                );
+
+
+                                                            /*
+                                                            MARK DETAIL PAID
+                                                            */
+
+                                                            if (
+                                                                Number(
+                                                                    paidAmount.toFixed(2)
+                                                                ) ===
+                                                                Number(
+                                                                    detailAmount.toFixed(2)
+                                                                )
+                                                            ) {
+
+                                                                connection.query(
+                                                                    `
+                                                                UPDATE patient_billing_detail
+                                                                SET bill_item_status = 'PAID'
+                                                                WHERE billing_detail_id = ?
+                                                                `,
+                                                                    [
+                                                                        item.billing_detail_id
+                                                                    ],
+                                                                    err => {
+
+                                                                        if (err) {
+                                                                            return rollback(err);
+                                                                        }
+
+                                                                        processItem(
+                                                                            itemIndex + 1
+                                                                        );
+
+                                                                    }
+                                                                );
+
+                                                            } else {
+                                                                /*
+                                                                Partial item
+                                                                remains OPEN
+                                                                */
+                                                                processItem(
+                                                                    itemIndex + 1
+                                                                );
+                                                            }
+
+                                                        }
+                                                    );
+
+                                                };
+
+
+                                                processItem(0);
+
+                                            }
+                                        );
+
+                                    }
+                                );
+
+                            }
+                        );
+
+                    };
+
+
+                    /*
+                    START BILLING PROCESS
+                    */
+
+                    processBilling(0);
+
+                } catch (error) {
+
+                    return rollback(error);
+
+                }
+
+            });
+
+        });
+    }
 };

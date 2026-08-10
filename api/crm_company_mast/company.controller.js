@@ -1,6 +1,6 @@
 
 const { validateCompanyName } = require('../../validation/validation_schema');
-const { companyInsert, checKCompany, viewCompany, updateCompany, getActiveCompany } = require('./company.service')
+const { companyInsert, checKCompany, viewCompany, updateCompany, getActiveCompany, crfNotificationInsert, getCrfNotification, crfNotificationUpdate } = require('./company.service')
 module.exports = {
     companyInsert: (req, res) => {
         const body = req.body;
@@ -112,5 +112,58 @@ module.exports = {
             })
 
         })
+    },
+
+    crfNotificationInsert: (req, res) => {
+        const body = req.body;
+        crfNotificationInsert(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Inserted Successfully"
+            });
+        });
+    },
+
+    getCrfNotification: (req, res) => {
+        getCrfNotification((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (results && results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Records"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
+    crfNotificationUpdate: (req, res) => {
+        const body = req.body;
+        crfNotificationUpdate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Updated Successfully"
+            });
+        });
     },
 }

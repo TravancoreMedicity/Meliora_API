@@ -349,4 +349,68 @@ module.exports = {
       }
     );
   },
+
+  userBasedLoginVerificationRep: (data, callBack) => {
+    pool.query(
+      `SELECT 
+        rep.name as em_name,
+        u.email as emp_username,
+        u.password as emp_password,
+        'Medical Rep' as desg_name,
+        'dummy_app_token' as app_token,
+        rep.departmentId as em_department,
+        u.users_id as em_id,
+        u.users_id as emp_no,
+        u.users_id as empdtl_slno,
+        rep.companyId as em_dept_section,
+        'Company' as sec_name,
+        'Department' as dept_name,
+        current_timestamp() as login,
+        0 as supervisor,
+        '' as section_incharge_name,
+        0 as section_incharge_id,
+        '' as section_hod_name,
+        0 as section_hod_id,
+        1 as login_type,
+        365 as password_validity,
+        current_timestamp() as last_passwd_change_date,
+        current_timestamp() as password_validity_expiry_date,
+        current_timestamp() as last_login_date,
+        1 as login_method_allowed
+      FROM indent_users u
+      LEFT JOIN indent_medicalrep rep ON rep.userId = u.users_id
+      WHERE u.email = ? AND u.disablestatus = 0`,
+      [data.userName],
+      (error, results, fields) => {
+        if (error) {
+          // logger.error(error);
+          return callBack(error);
+        }
+        return callBack(null, results);
+      }
+    );
+  },
+
+  userBasedInsertRefreshTokenrep: (data, callBack) => {
+
+    // `UPDATE user
+    // SET token = ? ,
+    // sessionid = ? ,
+    // WHERE user_slno = ? `,
+    pool.query(
+      ` UPDATE indent_users 
+            SET resetPasswordToken = ? 
+            WHERE  users_id = ?`,
+      [data.refresh_token, data.empdtl_slno],
+      (error, results, fields) => {
+
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      }
+    );
+  },
+
+
 };

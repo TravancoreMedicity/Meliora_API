@@ -10,7 +10,8 @@ const {
     getRefershToken,
     logOutFunctionality,
     userBasedLoginVerificationRep,
-    userBasedLoginVerification, getelidertoken, getKmctoken
+    userBasedLoginVerification, getelidertoken, getKmctoken,
+    getMelioraAccessToken
 } = require('./user.controller');
 
 router.post('/insertUser', verifyToken, insertUser);
@@ -24,6 +25,7 @@ router.post('/checkUserCres', userBasedLoginVerification)
 router.get('/get-elider-token', verifyToken, getelidertoken);
 router.get('/get-Kmc-token', verifyToken, getKmctoken);
 router.post('/checkUserCres/medicalrep', userBasedLoginVerificationRep)
+router.get('/get-access-token', getMelioraAccessToken);
 
 
 module.exports = router

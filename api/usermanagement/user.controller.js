@@ -547,10 +547,10 @@ module.exports = {
                     }
                   });
                   res.cookie("accessToken", accessToken, {
-                    // httpOnly: true,
-                    secure: false, // Set to false for HTTP (localhost). Use true for HTTPS (production).
+                    httpOnly: true,
+                    secure: true, // Set to false for HTTP (localhost). Use true for HTTPS (production).
                     maxAge: process.env.COOKIE_TIME, // Optional: sets cookie expiry time in milliseconds  15 min
-                    sameSite: "Lax", // Helps with CSRF protection; strict is better than lax for security reasons
+                    sameSite: "None", // Helps with CSRF protection; strict is better than lax for security reasons
                     // in Production change samsite : "None" and the secure:true for  only https
                   });
                   res.json({
@@ -571,4 +571,23 @@ module.exports = {
       }
     });
   },
+  // getting accesstoken
+  getMelioraAccessToken: (req, res) => {
+    const accessToken = req.cookies.accessToken;
+
+    if (!accessToken) {
+      return res.status(401).json({
+        success: 0,
+        message: "No access token found"
+      });
+    }
+
+    res.json({
+      success: 1,
+      accessToken: accessToken,
+      message: "Token retrieved successfully"
+    });
+  },
+
+
 };

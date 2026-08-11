@@ -27,6 +27,13 @@ module.exports = {
         const startDate = `${date} 00:00:00`;
         const endDate = `${date} 23:59:59`;
 
+
+        console.log({
+            startDate,
+            endDate
+        });
+        
+
         const query = `
         SELECT 
             pds.patient_diet_id,

@@ -18,7 +18,8 @@ const {
     DieticanStatus,
     getAllActiveNursingStation,
     getPatientActiveDietHistory,
-    getPatientFullDetail
+    getPatientFullDetail,
+    getPlanRemarksDetails
 } = require('./patientdietplan.service');
 
 module.exports = {
@@ -617,6 +618,32 @@ module.exports = {
         });
     },
 
+    getPlanRemarksDetails: (req, res) => {
+        const { plan_id } = req.params;
+
+        if (!plan_id) {
+            return res.status(200).json({
+                success: 0,
+                message: "Plan Is is Missing Here!"
+            });
+        }
+
+        getPlanRemarksDetails(plan_id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: "Remarks Fetched Successfully!"
+            });
+
+        });
+    },
 
 
 

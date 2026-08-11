@@ -19,7 +19,8 @@ const {
     DieticanStatus,
     getAllActiveNursingStation,
     getPatientActiveDietHistory,
-    getPatientFullDetail
+    getPatientFullDetail,
+    getPlanRemarksDetails
 } = require('./patientdietplan.controller');
 
 const router = require('express').Router();
@@ -64,5 +65,7 @@ router.post("/activenspatient", checkToken, getAllActiveNursingStation);
 router.post("/diethistory", checkToken, getPatientActiveDietHistory);
 
 router.post("/patientdtl", checkToken, getPatientFullDetail);
+
+router.get("/plan-remarks/:plan_id", checkToken, getPlanRemarksDetails);
 
 module.exports = router;

@@ -14,10 +14,11 @@ module.exports = {
                 end_date,
                 doctor_id,
                 is_consultation,
+                remarks,
                 diet_status,
                 created_by
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 data.patient_id,
                 data.admission_id,
@@ -26,6 +27,7 @@ module.exports = {
                 data.end_date,
                 data.doctor_id,
                 data.is_consultation,
+                data.remarks,
                 data.diet_status,
                 data.created_by
             ],
@@ -66,6 +68,7 @@ SELECT
     pdp.diet_id,
     pdp.dietitian_id,
     pdp.is_consultation,
+    pdp.remarks,
 
     pdm.diet_name,
     pdm.calories_per_day,
@@ -159,6 +162,7 @@ ORDER BY dp.fb_ip_no DESC;
     pdp.end_date,
     pdp.diet_id,
     pdp.dietitian_id,
+    pdp.remarks,
 
     pdm.diet_name,
     pdm.calories_per_day,
@@ -236,6 +240,7 @@ ORDER BY dp.fb_ip_no DESC
                 pdp.diet_id,
                 pdp.start_date,
                 pdp.end_date,
+                pdp.remarks,
 
                 dp.fb_ptc_name        AS ptc_ptname,   
 
@@ -348,6 +353,7 @@ ORDER BY dp.fb_ip_no DESC
                 end_date = ?,
                 doctor_id = ?,
                 diet_status = ?,
+                remarks= ?,
                 is_active = ?,
                 is_consultation=?,
                 updated_by = ?
@@ -358,6 +364,7 @@ ORDER BY dp.fb_ip_no DESC
                 data.end_date,
                 data.doctor_id,
                 data.diet_status,
+                data.remarks,
                 data.is_active,
                 data.is_consultation,
                 data.updated_by,
@@ -379,6 +386,7 @@ ORDER BY dp.fb_ip_no DESC
                 pdp.plan_id,
                 pdp.patient_id,
                 pdp.admission_id,
+                pdp.remarks,
 
                 do.order_id,
                 do.order_date,
@@ -455,6 +463,7 @@ WHERE
     pdp.start_date,
     pdp.end_date,
     pdp.is_consultation,
+    pdp.remarks,
 
     pda.assignment_id,
     pda.assigned_to,
@@ -713,7 +722,7 @@ ORDER BY dty.start_time;
 
                 dt.template_id,
                 dt.template_name,
-
+                
                 dty.type_slno AS type_id,
                 dty.type_desc,
                 TIME(dty.start_time) AS start_time,
@@ -738,7 +747,7 @@ ORDER BY dty.start_time;
 
             ORDER BY 
                 pdm.diet_id,
-                dty.start_time
+                TIME(dty.start_time);
             `,
             [date, date],
             (error, results) => {
@@ -940,7 +949,7 @@ WHERE bed.fb_ns_code IN (?)
         );
     },
 
-  getPatientFullDetail: (ptno, ipno, callback) => {
+    getPatientFullDetail: (ptno, ipno, callback) => {
         const sql = `
             SELECT
                 ipa.fb_ip_no AS admission_id,
@@ -998,8 +1007,24 @@ WHERE bed.fb_ns_code IN (?)
         );
     },
 
-    
 
+    getPlanRemarksDetails: (plan_id, callback) => {
+        const sql = `
+                    SELECT 
+                        remarks, patient_id, admission_id, plan_id, diet_status
+                    FROM
+                        patient_diet_plan
+                    WHERE
+                        plan_id = ? AND is_active = 1`;
+        pool.query(
+            sql,
+            [plan_id],
+            (err, results) => {
+                if (err) return callback(err);
+                return callback(null, results);
+            }
+        );
+    },
 
 
 

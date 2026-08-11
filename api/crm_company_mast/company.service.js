@@ -92,4 +92,80 @@ module.exports = {
             }
         );
     },
+
+    crfNotificationInsert: (data, callback) => {
+
+        pool.query(
+            `INSERT INTO crm_notification (
+                dep_id,
+                depsec_id,
+                emp_id,
+                mobile_no
+            ) VALUES(?,?,?,?)`,
+            [
+                data.dept,
+                data.deptsec,
+                data.empId,
+                data.mobile
+            ],
+            (error, results, fields) => {
+
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    getCrfNotification: (callback) => {
+        pool.query(
+            `SELECT 
+                notification_id,
+                dep_id,
+                depsec_id,
+                emp_id,
+                mobile_no,
+                crm_notification.create_date,
+                crm_notification.update_date,
+                dept_name,
+                sec_name,
+                em_name
+             FROM crm_notification
+             LEFT JOIN co_department_mast ON co_department_mast.dept_id = crm_notification.dep_id
+             LEFT JOIN co_deptsec_mast ON co_deptsec_mast.sec_id = crm_notification.depsec_id
+             LEFT JOIN co_employee_master ON co_employee_master.em_id = crm_notification.emp_id`,
+            [],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
+
+    crfNotificationUpdate: (data, callback) => {
+        pool.query(
+            `UPDATE crm_notification 
+             SET dep_id=?,
+                 depsec_id=?,
+                 emp_id=?,
+                 mobile_no=?
+             WHERE notification_id=?`,
+            [
+                data.dept,
+                data.deptsec,
+                data.empId,
+                data.mobile,
+                data.notification_id
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callback(error);
+                }
+                return callback(null, results);
+            }
+        );
+    },
 }

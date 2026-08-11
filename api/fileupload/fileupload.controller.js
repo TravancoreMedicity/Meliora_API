@@ -2,7 +2,32 @@ const multer = require('multer');
 const path = require('path');
 const fs = require("fs")
 
-const { ItemMastUpdate, InsertFileDetails } = require('../fileupload/fileupload.services')
+const { ItemMastUpdate, InsertFileDetails, getMedicineRepAndToken, insertCertificatesAndOtherDetails } = require('../fileupload/fileupload.services')
+
+const medicalDocsStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const id = req.body.id;
+        const filepath = path.join('D:/DocMeliora/Meliora/MedicalDocs', `${id}`)
+        if (!fs.existsSync(filepath)) {
+            fs.mkdirSync(filepath, { recursive: true });
+        }
+        cb(null, filepath);
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    },
+})
+
+const uploadMedicalDocs = multer({
+    storage: medicalDocsStorage,
+    limits: { fileSize: 25 * 1024 * 1024 }
+}).fields([
+    { name: 'gmpFile', maxCount: 1 },
+    { name: 'analysisFile', maxCount: 1 },
+    { name: 'quotationFile', maxCount: 1 },
+    { name: 'productFile', maxCount: 1 },
+    { name: 'supportingFiles', maxCount: 10 }
+]);
 
 const itemDetailStorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -679,6 +704,124 @@ module.exports = {
                     success: 1,
                     data: files // Send the list of files
                 });
+            });
+        });
+    },
+
+    uploadFileMedicalDocs: (req, res) => {
+        uploadMedicalDocs(req, res, (err) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+
+            const id = req.body.id;
+            if (!id) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "Record ID (id) is required"
+                });
+            }
+
+            getMedicineRepAndToken(id, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err.message || "Failed to fetch medicine metadata"
+                    });
+                }
+
+                const medInfo = results && results.length > 0 ? results[0] : {};
+                const tokenid = medInfo.tokenid || null;
+                const medicalrepid = medInfo.medicalrepid || null;
+
+                const certFiles = [];
+                const otherFiles = [];
+                const pathStr = `D:/DocMeliora/Meliora/MedicalDocs/${id}`;
+
+                // GMP Certificate (upload_file_id: 1)
+                if (req.files && req.files['gmpFile'] && req.files['gmpFile'][0]) {
+                    const file = req.files['gmpFile'][0];
+                    certFiles.push([
+                        id, 0, 0, tokenid, medicalrepid, 1, pathStr, file.originalname, new Date(), new Date()
+                    ]);
+                }
+
+                // Analysis Certificate (upload_file_id: 2)
+                if (req.files && req.files['analysisFile'] && req.files['analysisFile'][0]) {
+                    const file = req.files['analysisFile'][0];
+                    certFiles.push([
+                        id, 0, 0, tokenid, medicalrepid, 2, pathStr, file.originalname, new Date(), new Date()
+                    ]);
+                }
+
+                // Quotation (upload_file_id: 3)
+                if (req.files && req.files['quotationFile'] && req.files['quotationFile'][0]) {
+                    const file = req.files['quotationFile'][0];
+                    certFiles.push([
+                        id, 0, 0, tokenid, medicalrepid, 3, pathStr, file.originalname, new Date(), new Date()
+                    ]);
+                }
+
+                // Product Cover / Insert (upload_file_id: 4)
+                if (req.files && req.files['productFile'] && req.files['productFile'][0]) {
+                    const file = req.files['productFile'][0];
+                    certFiles.push([
+                        id, 0, 0, tokenid, medicalrepid, 4, pathStr, file.originalname, new Date(), new Date()
+                    ]);
+                }
+
+                // Supporting Files (other details)
+                if (req.files && req.files['supportingFiles']) {
+                    req.files['supportingFiles'].forEach(file => {
+                        otherFiles.push([
+                            id, pathStr, file.originalname, new Date(), new Date(), 0
+                        ]);
+                    });
+                }
+
+                insertCertificatesAndOtherDetails({ certFiles, otherFiles }, (dbErr, dbRes) => {
+                    if (dbErr) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: dbErr.message || "Failed to save upload metadata to database"
+                        });
+                    }
+
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Medical Documentation files uploaded and saved successfully"
+                    });
+                });
+            });
+        });
+    },
+
+    getMedicalDocFile: (req, res) => {
+        const id = req.query.id || req.params.id;
+        const filename = req.query.filename;
+        if (!id || !filename) {
+            return res.status(400).json({ success: 0, message: "id and filename are required" });
+        }
+
+        const folderPath = path.join('D:/DocMeliora/Meliora/MedicalDocs', String(id));
+        const filePath = path.join(folderPath, filename);
+
+        // Prevent directory traversal attacks by ensuring the resolved path starts with the intended folderPath
+        if (!filePath.startsWith(folderPath)) {
+            return res.status(403).json({ success: 0, message: "Invalid file path" });
+        }
+
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+                return res.status(404).json({ success: 0, message: "File not found" });
+            }
+            res.download(filePath, filename, (downloadErr) => {
+                if (downloadErr) {
+                    res.status(500).send("Error downloading file");
+                }
             });
         });
     }

@@ -1,8 +1,8 @@
 const router = require('express').Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { uploadFileModel, uploadFilesubModel, uploadFileCategory, uploadFileSubCategory,
-    uploadFileGroup, uploadFileSubGroup, uploadFileItem, uploadFileItemDetail, getCategoryFile
-
+    uploadFileGroup, uploadFileSubGroup, uploadFileItem, uploadFileItemDetail, getCategoryFile,
+    uploadFileMedicalDocs, getMedicalDocFile
 } = require('../fileupload/fileupload.controller')
 
 
@@ -16,10 +16,12 @@ router.post("/uploadFile/Group", checkToken, uploadFileGroup)
 router.post("/uploadFile/SubGroup", checkToken, uploadFileSubGroup)
 router.post("/uploadFile/Item", checkToken, uploadFileItem)
 router.post("/uploadFile/ItemDetail", checkToken, uploadFileItemDetail)
+router.post("/uploadFile/MedicalDocs", checkToken, uploadFileMedicalDocs)
 
 
 
 router.get("/uploadFile/getCategoryFile/:id", getCategoryFile)
+router.get("/getMedicalDocFile", checkToken, getMedicalDocFile)
 
 
 

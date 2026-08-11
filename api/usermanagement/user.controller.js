@@ -19,7 +19,9 @@ const {
   userBasedInsertRefreshToken,
   userBasedInsertEliderToken,
   userBasedInsertKMCToken,
-  getelidertoken, getKmctoken
+  getelidertoken, getKmctoken,
+  userBasedLoginVerificationRep,
+  userBasedInsertRefreshTokenrep
 } = require("./user.service");
 
 const { addHours, format } = require("date-fns");
@@ -424,6 +426,149 @@ module.exports = {
         success: 1,
         data: results,
       });
+    });
+  },
+
+
+  userBasedLoginVerificationRep: async (req, res) => {
+    const body = req.body;
+    // CHECK USER BASED VALIDATION FIRST CHECK THE PASSWORD CREDENTIAL THEN REST
+    userBasedLoginVerificationRep(body, (error, results) => {
+      if (error) {
+        // logger.error(error);
+        return res.status(500).json({
+          success: 0,
+          message: "Database connection error",
+        });
+      }
+      if (results.length === 0) {
+        return res.status(200).json({
+          success: 1,
+          message: "Incorrect User Credentials",
+        });
+      }
+      if (results.length > 0) {
+        const userData = results[0];
+        const userPassword = body.passWord;
+        const validated = compareSync(userPassword, userData.emp_password);
+
+        if (validated) {
+          const {
+            empdtl_slno, // user_slno
+            login_type,
+            password_validity,
+            last_passwd_change_date,
+            password_validity_expiry_date,
+            last_login_date,
+            login_method_allowed,
+            em_id,
+            emp_no,
+          } = userData;
+          const validatingUserLogin = validateUserLoginCheck(
+            password_validity,
+            last_passwd_change_date,
+            last_login_date,
+            login_method_allowed,
+            body.method
+          );
+          const { message, status } = validatingUserLogin;
+          if (status) {
+            return res.status(200).json({
+              success: 1,
+              message,
+            });
+          } else {
+            const accessToken = generateAccessToken(empdtl_slno);
+            const refreshToken = generateRefreshToken(empdtl_slno); //instead use empdtl_slno
+            const eliderID = generateEliderID(empdtl_slno)
+            const elidertoken = generateEliderToken(eliderID)
+            const kmctoken = generateKmcToken(empdtl_slno)
+            //insert elider token
+
+            // insert the refresh token
+            //user_slno to empdtl_slno
+            userBasedInsertRefreshTokenrep(
+              { empdtl_slno, refresh_token: refreshToken },
+              (error, results) => {
+                if (error) {
+                  // logger.error(error);
+                  return res.status(500).json({
+                    success: 0,
+                    message: "Database connection error",
+                  });
+                }
+                if (results) {
+                  const returnData = {
+                    empdtl_slno,
+                    login_method_allowed,
+                    emp_no,
+                    emp_id: userData.em_id,
+                    token: accessToken,
+                    user: userData.emp_username,
+                    emp_name: userData.em_name,
+                    emp_sec: userData.sec_name,
+                    emp_secid: userData.em_dept_section,
+                    app_token: userData.app_token,
+                    emp_dept: userData.em_department,
+                    dept_name: userData.dept_name,
+                    logintime: userData.login,
+                    supervisor: userData.supervisor,
+                    logOutTime: format(
+                      addHours(new Date(userData.login), 1),
+                      "yyyy-MM-dd HH:mm:ss"
+                    ),
+                    desg_name: userData.desg_name,
+                    section_incharge_name: userData.section_incharge_name,
+                    section_incharge_id: userData.section_incharge_id,
+                    section_hod_name: userData.section_hod_name,
+                    section_hod_id: userData.section_hod_id
+
+                  };
+
+                  userBasedInsertEliderToken({
+                    Elider_token: elidertoken, Elider_Id: eliderID
+                  }, (error, result) => {
+                    if (error) {
+                      return res.status(500).json({
+                        success: 0,
+                        message: "Token Not Inserted",
+                      });
+                    }
+                  });
+
+                  userBasedInsertKMCToken({
+                    KMC_token: kmctoken
+                  }, (error, result) => {
+                    if (error) {
+                      return res.status(500).json({
+                        success: 0,
+                        message: "Token Not Inserted",
+                      });
+                    }
+                  });
+                  res.cookie("accessToken", accessToken, {
+                    httpOnly: true,
+                    secure: true, // Set to false for HTTP (localhost). Use true for HTTPS (production).
+                    maxAge: process.env.COOKIE_TIME, // Optional: sets cookie expiry time in milliseconds  15 min
+                    sameSite: "None", // Helps with CSRF protection; strict is better than lax for security reasons
+                    // in Production change samsite : "None" and the secure:true for  only https
+                  });
+                  res.json({
+                    success: 2,
+                    userInfo: JSON.stringify(returnData),
+                    message: "User Credentials verified successfully",
+                  });
+                }
+              }
+            );
+          }
+        } else {
+          return res.status(200).json({
+            success: 1,
+            message: "Incorrect User Credentials",
+          });
+        }
+      }
     });
   },
   // getting accesstoken

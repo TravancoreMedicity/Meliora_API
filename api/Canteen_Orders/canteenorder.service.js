@@ -646,10 +646,6 @@ GROUP BY
 
 
     getAllActivePatients: (ns_code, callback) => {
-        console.log({
-            ns_code
-        });
-
         const query = `
                SELECT 
                 ip.fb_ip_no,

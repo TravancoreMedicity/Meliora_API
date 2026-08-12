@@ -292,10 +292,7 @@ const getExtraOrderPrice = (delivery_id, connection, callback) => {
 
         const row = result[0];
 
-        console.log({
-            row
-        });
-
+       
 
         const quantity = Number(row.delivered_qty || 1);
         const unit_rate = Number(row.price || 0);

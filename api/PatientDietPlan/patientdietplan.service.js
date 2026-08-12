@@ -632,92 +632,250 @@ ORDER BY pdp.plan_id DESC`,
     },
 
 
+    //     getCurrentTemplateFood: (template_id, typeIds, callBack) => {
+    //         pool.query(
+    //             `
+    //           SELECT 
+    //     dtf.template_food_id,
+    //     dtf.template_id,
+    //     dtf.week_day,
+    //     dtf.type_id,
+
+    //     dty.type_desc,
+    //     TIME(dty.start_time) AS start_time,
+    //     TIME(dty.end_time) AS end_time,
+
+    //     im.item_id,
+    //     im.item_name,
+    //     ia.alias_name,
+    //     im.description,
+
+    //     ig.group_name,
+    //     ic.category_name,
+
+    //     dtf.quantity,
+    //     um.unit_name,
+    //     um.unit_code,
+    //     um.unit_id,
+
+    //     cip.party_type_id,
+    //     opt.party_name,   
+    //     cip.price,
+    //     cip.gst_rate,
+    //     cip.discount,
+    //     cip.discount_rate
+
+    // FROM diet_template_food dtf
+
+    // LEFT JOIN diet_type dty 
+    //     ON dtf.type_id = dty.type_slno
+    //     AND dty.status = 1
+
+    // LEFT JOIN item_master im 
+    //     ON dtf.item_id = im.item_id
+
+    // LEFT JOIN item_alias ia 
+    //     ON im.item_id = ia.item_id 
+    //     AND ia.is_active = 1
+
+    // LEFT JOIN item_group_master ig 
+    //     ON im.item_group_id = ig.item_group_id
+
+    // LEFT JOIN item_category_master ic 
+    //     ON im.item_category_id = ic.item_category_id
+
+    // LEFT JOIN unit_master um 
+    //     ON dtf.unit_id = um.unit_id
+
+    // LEFT JOIN canteen_item_price cip
+    //     ON cip.item_id = dtf.item_id
+
+    // LEFT JOIN order_party_type opt
+    //     ON cip.party_type_id = opt.party_type_id
+
+    // WHERE 
+    //     dtf.template_id = ?
+    //     AND dtf.is_active = 1
+    //     AND dtf.week_day = WEEKDAY(CURDATE()) + 1
+    //     AND dtf.type_id IN (?)   
+
+    // ORDER BY dty.start_time;
+    //             `,
+    //             [template_id, typeIds],
+    //             (error, results) => {
+
+    //                 if (error) return callBack(error);
+
+    //                 return callBack(null, results);
+    //             }
+    //         );
+    //     },
+
     getCurrentTemplateFood: (template_id, typeIds, callBack) => {
+
         pool.query(
             `
-          SELECT 
-    dtf.template_food_id,
-    dtf.template_id,
-    dtf.week_day,
-    dtf.type_id,
+        SELECT
+            CURDATE() AS process_date,
 
-    dty.type_desc,
-    TIME(dty.start_time) AS start_time,
-    TIME(dty.end_time) AS end_time,
+            dtf.template_food_id,
+            dtf.template_id,
+            dtf.week_day,
+            dtf.type_id,
 
-    im.item_id,
-    im.item_name,
-    ia.alias_name,
-    im.description,
+            dty.type_desc,
+            TIME(dty.start_time) AS start_time,
+            TIME(dty.end_time) AS end_time,
 
-    ig.group_name,
-    ic.category_name,
+            im.item_id,
+            im.item_name,
+            ia.alias_name,
+            im.description,
 
-    dtf.quantity,
-    um.unit_name,
-    um.unit_code,
-    um.unit_id,
+            ig.group_name,
+            ic.category_name,
 
-    cip.party_type_id,
-    opt.party_name,   
-    cip.price,
-    cip.gst_rate,
-    cip.discount,
-    cip.discount_rate
+            dtf.quantity,
 
-FROM diet_template_food dtf
+            um.unit_name,
+            um.unit_code,
+            um.unit_id,
 
-LEFT JOIN diet_type dty 
-    ON dtf.type_id = dty.type_slno
-    AND dty.status = 1
+            cip.party_type_id,
+            opt.party_name,
+            cip.price,
+            cip.gst_rate,
+            cip.discount,
+            cip.discount_rate
 
-LEFT JOIN item_master im 
-    ON dtf.item_id = im.item_id
+        FROM diet_template_food dtf
 
-LEFT JOIN item_alias ia 
-    ON im.item_id = ia.item_id 
-    AND ia.is_active = 1
+        LEFT JOIN diet_type dty
+            ON dtf.type_id = dty.type_slno
+            AND dty.status = 1
 
-LEFT JOIN item_group_master ig 
-    ON im.item_group_id = ig.item_group_id
+        LEFT JOIN item_master im
+            ON dtf.item_id = im.item_id
 
-LEFT JOIN item_category_master ic 
-    ON im.item_category_id = ic.item_category_id
+        LEFT JOIN item_alias ia
+            ON im.item_id = ia.item_id
+            AND ia.is_active = 1
 
-LEFT JOIN unit_master um 
-    ON dtf.unit_id = um.unit_id
+        LEFT JOIN item_group_master ig
+            ON im.item_group_id = ig.item_group_id
 
-LEFT JOIN canteen_item_price cip
-    ON cip.item_id = dtf.item_id
+        LEFT JOIN item_category_master ic
+            ON im.item_category_id = ic.item_category_id
 
-LEFT JOIN order_party_type opt
-    ON cip.party_type_id = opt.party_type_id
+        LEFT JOIN unit_master um
+            ON dtf.unit_id = um.unit_id
 
-WHERE 
-    dtf.template_id = ?
-    AND dtf.is_active = 1
-    AND dtf.week_day = WEEKDAY(CURDATE()) + 1
-    AND dtf.type_id IN (?)   
+        LEFT JOIN canteen_item_price cip
+            ON cip.item_id = dtf.item_id
 
-ORDER BY dty.start_time;
-            `,
-            [template_id, typeIds],
+        LEFT JOIN order_party_type opt
+            ON cip.party_type_id = opt.party_type_id
+
+        WHERE
+            dtf.template_id = ?
+            AND dtf.is_active = 1
+            AND dtf.week_day = WEEKDAY(CURDATE()) + 1
+            AND dtf.type_id IN (?)
+
+        UNION ALL
+
+        SELECT
+            DATE_ADD(CURDATE(), INTERVAL 1 DAY) AS process_date,
+
+            dtf.template_food_id,
+            dtf.template_id,
+            dtf.week_day,
+            dtf.type_id,
+
+            dty.type_desc,
+            TIME(dty.start_time) AS start_time,
+            TIME(dty.end_time) AS end_time,
+
+            im.item_id,
+            im.item_name,
+            ia.alias_name,
+            im.description,
+
+            ig.group_name,
+            ic.category_name,
+
+            dtf.quantity,
+
+            um.unit_name,
+            um.unit_code,
+            um.unit_id,
+
+            cip.party_type_id,
+            opt.party_name,
+            cip.price,
+            cip.gst_rate,
+            cip.discount,
+            cip.discount_rate
+
+        FROM diet_template_food dtf
+
+        LEFT JOIN diet_type dty
+            ON dtf.type_id = dty.type_slno
+            AND dty.status = 1
+
+        LEFT JOIN item_master im
+            ON dtf.item_id = im.item_id
+
+        LEFT JOIN item_alias ia
+            ON im.item_id = ia.item_id
+            AND ia.is_active = 1
+
+        LEFT JOIN item_group_master ig
+            ON im.item_group_id = ig.item_group_id
+
+        LEFT JOIN item_category_master ic
+            ON im.item_category_id = ic.item_category_id
+
+        LEFT JOIN unit_master um
+            ON dtf.unit_id = um.unit_id
+
+        LEFT JOIN canteen_item_price cip
+            ON cip.item_id = dtf.item_id
+
+        LEFT JOIN order_party_type opt
+            ON cip.party_type_id = opt.party_type_id
+
+        WHERE
+            dtf.template_id = ?
+            AND dtf.is_active = 1
+            AND dtf.week_day =
+                WEEKDAY(DATE_ADD(CURDATE(), INTERVAL 1 DAY)) + 1
+            AND dtf.type_id IN (?)
+
+        ORDER BY
+            process_date,
+            start_time
+        `,
+            [
+                template_id,
+                typeIds,
+
+                template_id,
+                typeIds
+            ],
             (error, results) => {
 
-                if (error) return callBack(error);
+                if (error) {
+                    return callBack(error);
+                }
 
                 return callBack(null, results);
             }
         );
     },
 
-
-
     getAllDietProcessList: (date, callBack) => {
-        console.log({
-            date
-        });
-        
+   
         pool.query(
             `
 SELECT DISTINCT

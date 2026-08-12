@@ -38,6 +38,7 @@ router.post("/fetchallactivepatient", checkToken, FetchAllActivePatient); // may
 router.post("/ptmeal-type", checkToken, fetchAllPatientMealType); // maybe not reqiyied
 
 router.post("/gettemplatedtl", checkToken, getAllTemplateDetail);
+
 router.post("/gettodaytemplatedtl", checkToken, getCurrentTemplateFood);
 
 router.post("/activepatient", checkToken, getAllActiveDietPatient);

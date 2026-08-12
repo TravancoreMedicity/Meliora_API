@@ -318,7 +318,7 @@ module.exports = {
     },
 
     getAllDietProcessList: (req, res) => {
-        const { date } = req.body;
+        const { date } = req.body;        
 
         if (!date || !isValid(parseISO(date))) {
             return res.status(200).json({

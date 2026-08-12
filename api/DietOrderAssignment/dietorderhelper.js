@@ -467,9 +467,6 @@ const insertServiceLedger = (ledgerData, empid, connection, callback) => {
 };
 
 const createDietMealCharge = (delivery_id, empid, connection, callback) => {
-    console.log({
-        delivery_id
-    });
 
 
     const getMealPriceQuery = `

@@ -28,11 +28,6 @@ module.exports = {
         const endDate = `${date} 23:59:59`;
 
 
-        console.log({
-            startDate,
-            endDate
-        });
-        
 
         const query = `
         SELECT 
@@ -167,7 +162,8 @@ module.exports = {
         WHERE 
             pds.is_active = 1
             AND pds.plan_id = ?
-            AND DATE(pds.process_date) = CURDATE();
+            AND DATE(pds.process_date) BETWEEN CURDATE()
+                                   AND DATE_ADD(CURDATE(), INTERVAL 1 DAY)
     `;
 
         pool.query(query, [plan_id], (error, results) => {

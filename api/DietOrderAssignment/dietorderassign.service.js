@@ -709,9 +709,7 @@ module.exports = {
             updated_by,
             type_slno
         } = data;
-        console.log({
-            data
-        });
+       
 
         let query = `
         UPDATE diet_delivery_assignment_detail
@@ -1883,10 +1881,7 @@ ORDER BY dmc.created_at
                 return next();
             }
 
-            console.log({
-                dietItems
-            });
-
+     
 
             const conditions = [];
             const values = [];

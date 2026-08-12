@@ -714,40 +714,44 @@ ORDER BY dty.start_time;
 
 
     getAllDietProcessList: (date, callBack) => {
+        console.log({
+            date
+        });
+        
         pool.query(
             `
-            SELECT DISTINCT
-                pdm.diet_name,
-                pdm.diet_id,
+SELECT DISTINCT
+    pdm.diet_name,
+    pdm.diet_id,
 
-                dt.template_id,
-                dt.template_name,
-                
-                dty.type_slno AS type_id,
-                dty.type_desc,
-                TIME(dty.start_time) AS start_time,
-                TIME(dty.end_time) AS end_time
+    dt.template_id,
+    dt.template_name,
 
-            FROM patient_diet_master pdm
+    dty.type_slno AS type_id,
+    dty.type_desc,
+    TIME(dty.start_time) AS start_time,
+    TIME(dty.end_time) AS end_time
 
-            LEFT JOIN diet_template dt 
-                ON dt.diet_id = pdm.diet_id
-                AND dt.is_active = 1
-                AND DATE(?) BETWEEN dt.effective_from AND dt.effective_to 
+FROM patient_diet_master pdm
 
-            LEFT JOIN diet_template_food dtf 
-                ON dt.template_id = dtf.template_id
-                AND dtf.is_active = 1
-                AND dtf.week_day = WEEKDAY(?) + 1  
+LEFT JOIN diet_template dt 
+    ON dt.diet_id = pdm.diet_id
+    AND dt.is_active = 1
+    AND DATE(?) BETWEEN DATE(dt.effective_from)
+                     AND DATE(dt.effective_to)
 
-            INNER JOIN diet_type dty   
-                ON dtf.type_id = dty.type_slno
-                AND dty.status = 1
-                AND TIME(dty.start_time) > CURTIME()
+LEFT JOIN diet_template_food dtf 
+    ON dt.template_id = dtf.template_id
+    AND dtf.is_active = 1
+    AND dtf.week_day = WEEKDAY(?) + 1  
 
-            ORDER BY 
-                pdm.diet_id,
-                TIME(dty.start_time);
+INNER JOIN diet_type dty   
+    ON dtf.type_id = dty.type_slno
+    AND dty.status = 1
+
+ORDER BY 
+    pdm.diet_id,
+    TIME(dty.start_time);
             `,
             [date, date],
             (error, results) => {

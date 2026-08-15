@@ -20,7 +20,9 @@ const {
     getAllActiveNursingStation,
     getPatientActiveDietHistory,
     getPatientFullDetail,
-    getPlanRemarksDetails
+    getPlanRemarksDetails,
+    getTotalIpPatientList,
+    getNewIpAdmissionDetails
 } = require('./patientdietplan.controller');
 
 const router = require('express').Router();
@@ -68,5 +70,9 @@ router.post("/diethistory", checkToken, getPatientActiveDietHistory);
 router.post("/patientdtl", checkToken, getPatientFullDetail);
 
 router.get("/plan-remarks/:plan_id", checkToken, getPlanRemarksDetails);
+
+router.get('/total-ip-patient', checkToken, getTotalIpPatientList)
+
+router.get('/new-admission', checkToken, getNewIpAdmissionDetails)
 
 module.exports = router;

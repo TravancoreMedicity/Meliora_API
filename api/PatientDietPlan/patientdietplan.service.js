@@ -875,7 +875,6 @@ ORDER BY pdp.plan_id DESC`,
     },
 
     getAllDietProcessList: (date, callBack) => {
-   
         pool.query(
             `
 SELECT DISTINCT
@@ -1188,6 +1187,122 @@ WHERE bed.fb_ns_code IN (?)
         );
     },
 
+    getTotalIpPatientList: (callBack) => {
+        pool.query(
+            `
+            SELECT
+                COUNT(*) as Total_patient
+            FROM fb_ipadmiss
+            WHERE
+                COALESCE(fb_ipc_curstatus, '') <> 'PCO'
+
+                AND fb_ipd_disc IS NULL
+                AND fb_ipd_disc_new IS NULL
+
+                AND fb_dmd_date IS NULL
+                AND fb_dmd_date_new IS NULL
+
+            ORDER BY fb_ipd_date DESC
+            `,
+            [],
+            (error, results) => {
+
+                if (error) return callBack(error);
+
+                return callBack(null, results);
+            }
+        );
+    },
+
+    getNewAdmissionPatients: (createdAt, callBack) => {
+        pool.query(
+            `
+        SELECT
+            fba.fb_ipad_slno,
+            fba.fb_ip_no,
+            fba.fb_ipd_date,
+            fba.fb_pt_no,
+            fba.fb_ptc_name,
+            fba.fb_ptc_sex,
+            fba.fb_ptd_dob,
+            fba.fb_ptn_dayage,
+            fba.fb_ptn_monthage,
+            fba.fb_ptn_yearage,
+            fba.fb_ptc_loadd1,
+            fba.fb_ptc_loadd2,
+            fba.fb_ptc_loadd3,
+            fba.fb_ptc_lopin,
+            fba.fb_bd_code,
+            fba.fb_do_code,
+            fba.fb_rs_code,
+            fba.fb_ptc_mobile,
+            fba.fb_ipc_mhcode,
+            fba.fb_doc_name,
+            fba.fb_ipc_curstatus,
+            fba.fb_dep_desc,
+            fbnsm.fb_ns_name
+
+        FROM fb_ipadmiss fba
+
+        LEFT JOIN fb_bed
+            ON fb_bed.fb_bd_code = fba.fb_bd_code
+
+        LEFT JOIN fb_nurse_station_master fbnsm
+            ON fbnsm.fb_ns_code = fb_bed.fb_ns_code
+
+        WHERE
+            COALESCE(fba.fb_ipc_curstatus, '') <> 'PCO'
+
+            AND fba.fb_ipd_disc IS NULL
+
+            AND fba.fb_dmd_date IS NULL
+
+            AND fba.create_date > ?
+
+            AND NOT EXISTS (
+                SELECT 1
+                FROM patient_diet_plan pdp
+                WHERE
+                    pdp.patient_id = fba.fb_pt_no
+                    AND pdp.admission_id = fba.fb_ip_no
+                    AND pdp.is_active = 1
+                    AND pdp.diet_status = 'ACTIVE'
+            )
+
+        ORDER BY fba.fb_ipd_date DESC
+        `,
+            [createdAt],
+            (error, results) => {
+
+                if (error) {
+                    return callBack(error);
+                }
+
+                return callBack(null, results);
+            }
+        );
+    },
+    getLastDietProcessTime: (callBack) => {
+        pool.query(
+            `
+        SELECT MAX(created_at) AS created_at
+        FROM patient_diet_schedule
+        WHERE is_active = 1
+        `,
+            [],
+            (error, results) => {
+
+                if (error) {
+                    return callBack(error);
+                }
+
+                return callBack(
+                    null,
+                    results?.[0]?.created_at || null
+                );
+            }
+        );
+    },
 
 
 };

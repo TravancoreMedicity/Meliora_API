@@ -126,10 +126,17 @@ const server = http.createServer(app);
 const io = socketUtils.WSIO(server);
 socketUtils.connection(io);
 
+
+// MySQL fb_ipadmiss INSERT listener
+const startAdmissionListener = require('./events/mysqlEvents');
+
+startAdmissionListener(io);
+
 const socketIOMiddlewre = (req, res, next) => {
   req.io = io;
   next();
 };
+
 
 
 const userRouter = require("./api/user/user.router");
@@ -563,7 +570,7 @@ app.use('/api/patientdietplan', socketIOMiddlewre, PatientDietPlan)
 app.use('/api/dietbatch', PatientDietProcess)
 app.use('/api/allergen', DietAllergenceMaster)
 app.use('/api/billingcategory', billingCategroyMaster)
-app.use('/api/fooddietorder',socketIOMiddlewre, dietOrder)
+app.use('/api/fooddietorder', socketIOMiddlewre, dietOrder)
 app.use('/api/dietschedule', dietscheduled)
 app.use('/api/canteenorder', socketIOMiddlewre, canteenorder)
 app.use('/api/patientExtraOrder', paitentextraorder)

@@ -19,7 +19,10 @@ const {
     getAllActiveNursingStation,
     getPatientActiveDietHistory,
     getPatientFullDetail,
-    getPlanRemarksDetails
+    getPlanRemarksDetails,
+    getTotalIpPatientList,
+    getNewAdmissionPatients,
+    getLastDietProcessTime
 } = require('./patientdietplan.service');
 
 module.exports = {
@@ -318,7 +321,7 @@ module.exports = {
     },
 
     getAllDietProcessList: (req, res) => {
-        const { date } = req.body;        
+        const { date } = req.body;
 
         if (!date || !isValid(parseISO(date))) {
             return res.status(200).json({
@@ -644,8 +647,54 @@ module.exports = {
 
         });
     },
+    getTotalIpPatientList: (req, res) => {
 
+        getTotalIpPatientList((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
 
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: "Count Fetched SuccessFully"
+            });
+
+        });
+    },
+    getNewIpAdmissionDetails: (req, res) => {
+        getLastDietProcessTime((err, createDate) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            console.log({
+                createDate
+            });
+
+            getNewAdmissionPatients(createDate, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 2,
+                    data: results,
+                    message: "Count Fetched SuccessFully"
+                });
+
+            });
+        })
+
+    },
 
 
 

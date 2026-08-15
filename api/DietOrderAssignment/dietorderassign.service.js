@@ -709,7 +709,7 @@ module.exports = {
             updated_by,
             type_slno
         } = data;
-       
+
 
         let query = `
         UPDATE diet_delivery_assignment_detail
@@ -1280,6 +1280,8 @@ module.exports = {
             dmc.meal_charge_id AS bill_id,
             'DIET_ORDER' AS billing_type,
 
+            dmc.party_type_id AS party_type_id,
+
             CASE
                 WHEN dmc.party_type_id = 2 THEN 'PATIENT'
                 ELSE 'BYSTANDER'
@@ -1287,6 +1289,7 @@ module.exports = {
 
             dmc.admission_id,
             dmc.pt_no,
+            
 
             dt.type_desc AS meal_name,
 
@@ -1336,6 +1339,7 @@ module.exports = {
                 ELSE 'UNKNOWN'
             END AS billing_type,
 
+             dsl.party_type_id AS party_type_id,
 
             CASE
                 WHEN dsl.party_type_id = 2 THEN 'PATIENT'
@@ -1398,6 +1402,8 @@ module.exports = {
 
     'BYSTANDER' AS party,
 
+    1 as party_type_id,
+
     dsl.admission_id,
 
     dsl.pt_no,
@@ -1447,12 +1453,20 @@ ORDER BY dsl.created_at
     getPatientExtraOrder: (ipNo, ptNo, status, callback) => {
         const query = `
          SELECT
-
     dsl.ledger_id AS bill_id,
 
-    'EXTRA_ORDER' AS billing_type,
+    CASE
+        WHEN ddl.source_type = 'PATIENT_EXTRA_ORDER'
+            THEN 'EXTRA_ORDER'
+
+        WHEN ddl.source_type = 'CANTEEN_ORDER'
+            THEN 'PATIENT_CANTEEN_ORDER'
+
+        ELSE 'UNKNOWN'
+    END AS billing_type,
 
     'PATIENT' AS party,
+    dsl.party_type_id,
 
     dsl.admission_id,
     dsl.pt_no,
@@ -1460,30 +1474,23 @@ ORDER BY dsl.created_at
     dt.type_desc AS meal_name,
 
     im.item_name,
+    im.item_id,
 
     dsl.quantity,
-
     dsl.unit_rate,
-
     dsl.discount,
 
     dsl.gst_rate,
-
     dsl.gst_amount,
-
     dsl.net_amount,
 
     dsl.ledger_status AS status,
-
     dsl.created_at
 
 FROM diet_service_ledger dsl
 
 INNER JOIN diet_delivery_log ddl
     ON ddl.delivery_id = dsl.delivery_id
-
-INNER JOIN patient_diet_schedule pds
-    ON pds.patient_diet_id = ddl.patient_diet_id
 
 INNER JOIN diet_type dt
     ON dt.type_slno = ddl.type_slno
@@ -1492,12 +1499,17 @@ INNER JOIN item_master im
     ON im.item_id = dsl.item_id
 
 WHERE dsl.party_type_id = 2
-AND ddl.source_type = 'PATIENT_EXTRA_ORDER'
+
+AND ddl.source_type IN (
+    'PATIENT_EXTRA_ORDER',
+    'CANTEEN_ORDER'
+)
+
 AND dsl.admission_id = ?
 AND dsl.pt_no = ?
 AND dsl.ledger_status = ?
 
-ORDER BY dsl.created_at
+ORDER BY dsl.created_at;
     `;
 
         executeQuery(query, [ipNo, ptNo, status], callback);
@@ -1566,6 +1578,218 @@ ORDER BY dmc.created_at
 
     ///billing portion comes here bro 
 
+    // createPatientBillingService: async (data, callback) => {
+
+    //     const {
+    //         patient_id,
+    //         admission_id,
+    //         total_amount,
+    //         created_by,
+    //         items = []
+    //     } = data;
+
+
+    //     pool.getConnection(async (err, connection) => {
+    //         if (err) {
+    //             return callback(err);
+    //         }
+    //         const query = (sql, params = []) => {
+    //             return new Promise((resolve, reject) => {
+    //                 connection.query(sql, params, (err, result) => {
+    //                     if (err) {
+    //                         reject(err);
+    //                     } else {
+    //                         resolve(result);
+    //                     }
+
+    //                 });
+
+    //             });
+    //         };
+
+
+    //         try {
+    //             await new Promise((resolve, reject) => {
+    //                 connection.beginTransaction(err => {
+    //                     if (err) {
+    //                         reject(err);
+    //                     } else {
+    //                         resolve();
+    //                     }
+    //                 });
+
+    //             });
+
+
+    //             /*
+    //       **********************************************
+    //       VALIDATE ITEMS
+    //       **********************************************
+    //       */
+
+    //             if (!Array.isArray(items) || items.length === 0) {
+    //                 throw new Error("No billing items found.");
+    //             }
+    //             /*
+    //             **********************************************
+    //             CREATE BILL HEADER
+    //             **********************************************
+    //             */
+    //             const headerQuery = `
+    //             INSERT INTO patient_billing
+    //             (
+    //                 patient_id,
+    //                 admission_id,
+    //                 billing_date,
+    //                 total_amount,
+    //                 billing_status,
+    //                 created_by
+    //             )
+    //             VALUES
+    //             (
+    //                 ?,
+    //                 ?,
+    //                 CURDATE(),
+    //                 ?,
+    //                 'OPEN',
+    //                 ?
+    //             )
+    //         `;
+    //             const headerResult = await query(headerQuery, [
+    //                 patient_id,
+    //                 admission_id,
+    //                 total_amount,
+    //                 created_by
+    //             ]);
+    //             const billingId = headerResult.insertId;
+    //             /*
+    //             **********************************************
+    //             INSERT BILL DETAILS + UPDATE SOURCE
+    //             **********************************************
+    //             */
+    //             for (const item of items) {
+    //                 let categoryId;
+    //                 let referenceTable;
+    //                 switch (item.billing_type) {
+    //                     case "DIET_ORDER":
+    //                         categoryId = 1;
+    //                         referenceTable = "diet_meal_charge";
+    //                         break;
+
+    //                     case "EXTRA_ORDER":
+    //                     case "PATIENT_CANTEEN_ORDER":
+    //                     case "BYSTANDER_CANTEEN_ORDER":
+
+    //                         categoryId = 2;
+    //                         referenceTable = "diet_service_ledger";
+    //                         break;
+    //                     default:
+    //                         throw new Error(
+    //                             `Unknown billing type : ${item.billing_type}`
+    //                         );
+    //                 }
+
+
+
+    //                 const detailQuery = `
+    //                 INSERT INTO patient_billing_detail
+    //                 (
+    //                     billing_id,
+    //                     category_id,
+    //                     description,
+    //                     item_id,
+    //                     quantity,
+    //                     rate,
+    //                     gst,
+    //                     gst_amount,
+    //                     discount,
+    //                     amount,
+    //                     reference_table,
+    //                     reference_id,
+    //                     service_date
+    //                 )
+    //                 VALUES
+    //                 (
+    //                     ?,?,?,?,?,?,?,?,?,?,?,?,?
+    //                 )
+    //             `;
+    //                 await query(detailQuery, [
+    //                     billingId,
+    //                     categoryId,
+    //                     item.description,
+    //                     item.item_id,
+    //                     item.quantity,
+    //                     item.unit_rate,
+    //                     item.gst_rate,
+    //                     item.gst_amount,
+    //                     item.discount,
+    //                     item.net_amount,
+    //                     referenceTable,
+    //                     item.bill_id,
+    //                     item.created_at
+    //                 ]);
+
+    //                 /*
+    //                 **********************************************
+    //                 UPDATE SOURCE STATUS
+    //                 **********************************************
+    //                 */
+    //                 if (item.billing_type === "DIET_ORDER") {
+    //                     await query(
+    //                         `
+    //                     UPDATE diet_meal_charge
+    //                     SET charge_status = 'BILLED'
+    //                     WHERE meal_charge_id = ?
+    //                     `,
+    //                         [
+    //                             item.bill_id
+    //                         ]
+    //                     );
+
+
+    //                 } else {
+    //                     await query(
+    //                         `
+    //                     UPDATE diet_service_ledger
+    //                     SET ledger_status = 'BILLED'
+    //                     WHERE ledger_id = ?
+    //                     `,
+    //                         [
+    //                             item.bill_id
+    //                         ]
+    //                     );
+    //                 }
+    //             }
+    //             /*
+    //             **********************************************
+    //             COMMIT
+    //             **********************************************
+    //             */
+    //             connection.commit(err => {
+    //                 if (err) {
+    //                     return connection.rollback(() => {
+    //                         connection.release();
+    //                         callback(err);
+    //                     })
+    //                 }
+    //                 connection.release();
+    //                 callback(null, {
+    //                     billing_id: billingId,
+    //                     total_amount,
+    //                     total_items: items.length
+    //                 });
+    //             });
+
+    //         } catch (error) {
+    //             connection.rollback(() => {
+    //                 connection.release();
+    //                 callback(error);
+    //             });
+    //         }
+    //     });
+
+
+    // },
     createPatientBillingService: async (data, callback) => {
 
         const {
@@ -1576,14 +1800,17 @@ ORDER BY dmc.created_at
             items = []
         } = data;
 
-
         pool.getConnection(async (err, connection) => {
+
             if (err) {
                 return callback(err);
             }
+
             const query = (sql, params = []) => {
                 return new Promise((resolve, reject) => {
+
                     connection.query(sql, params, (err, result) => {
+
                         if (err) {
                             reject(err);
                         } else {
@@ -1595,31 +1822,57 @@ ORDER BY dmc.created_at
                 });
             };
 
-
             try {
+
+                /*
+                **********************************************
+                BEGIN TRANSACTION
+                **********************************************
+                */
+
                 await new Promise((resolve, reject) => {
+
                     connection.beginTransaction(err => {
+
                         if (err) {
                             reject(err);
                         } else {
                             resolve();
                         }
+
                     });
 
                 });
+
+
+                /*
+                **********************************************
+                VALIDATE ITEMS
+                **********************************************
+                */
+
+                if (!Array.isArray(items) || items.length === 0) {
+                    throw new Error("No billing items found.");
+                }
+
 
                 /*
                 **********************************************
                 CREATE BILL HEADER
                 **********************************************
                 */
+
                 const headerQuery = `
                 INSERT INTO patient_billing
                 (
                     patient_id,
                     admission_id,
                     billing_date,
+                    bill_type,
+                    bill_generated_location,
                     total_amount,
+                    paid_amount,
+                    balance_amount,
                     billing_status,
                     created_by
                 )
@@ -1628,31 +1881,89 @@ ORDER BY dmc.created_at
                     ?,
                     ?,
                     CURDATE(),
+                    'PRE_GENERATED',
+                    'CANTEEN',
+                    ?,
+                    0,
                     ?,
                     'OPEN',
                     ?
                 )
             `;
+
                 const headerResult = await query(headerQuery, [
                     patient_id,
                     admission_id,
                     total_amount,
+                    total_amount,
                     created_by
                 ]);
+
                 const billingId = headerResult.insertId;
+
+
                 /*
                 **********************************************
-                INSERT BILL DETAILS + UPDATE SOURCE
+                GENERATE BILL NUMBER
                 **********************************************
                 */
+
+                const today = new Date()
+                    .toISOString()
+                    .slice(0, 10)
+                    .replace(/-/g, "");
+
+                const billNo =
+                    `BIL-${today}-${String(billingId).padStart(6, "0")}`;
+
+
+                /*
+                **********************************************
+                UPDATE BILL NUMBER
+                **********************************************
+                */
+
+                await query(
+                    `
+                    UPDATE patient_billing
+                    SET bill_no = ?
+                    WHERE billing_id = ?
+                `,
+                    [
+                        billNo,
+                        billingId
+                    ]
+                );
+
+
+                /*
+                **********************************************
+                INSERT BILL DETAILS
+                + UPDATE SOURCE STATUS
+                **********************************************
+                */
+
                 for (const item of items) {
+
                     let categoryId;
                     let referenceTable;
+
+
+                    /*
+                    ******************************************
+                    DETERMINE BILLING CATEGORY
+                    ******************************************
+                    */
+
                     switch (item.billing_type) {
+
                         case "DIET_ORDER":
+
                             categoryId = 1;
                             referenceTable = "diet_meal_charge";
+
                             break;
+
 
                         case "EXTRA_ORDER":
                         case "PATIENT_CANTEEN_ORDER":
@@ -1660,20 +1971,47 @@ ORDER BY dmc.created_at
 
                             categoryId = 2;
                             referenceTable = "diet_service_ledger";
+
                             break;
+
+
                         default:
+
                             throw new Error(
-                                `Unknown billing type : ${item.billing_type}`
+                                `Unknown billing type: ${item.billing_type}`
                             );
                     }
 
 
+                    /*
+                    ******************************************
+                    SOURCE REFERENCE ID
+                    ******************************************
+                    */
+
+                    const referenceId =
+                        item.reference_id ?? item.bill_id;
+
+
+                    if (!referenceId) {
+                        throw new Error(
+                            `Reference ID missing for billing type: ${item.billing_type}`
+                        );
+                    }
+
+
+                    /*
+                    ******************************************
+                    INSERT BILL DETAIL
+                    ******************************************
+                    */
 
                     const detailQuery = `
                     INSERT INTO patient_billing_detail
                     (
                         billing_id,
                         category_id,
+                        party_type_id,
                         description,
                         item_id,
                         quantity,
@@ -1684,88 +2022,196 @@ ORDER BY dmc.created_at
                         amount,
                         reference_table,
                         reference_id,
-                        service_date
+                        service_date,
+                        bill_item_status
                     )
                     VALUES
                     (
-                        ?,?,?,?,?,?,?,?,?,?,?,?,?
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        'OPEN'
                     )
                 `;
+
+
                     await query(detailQuery, [
+
                         billingId,
+
                         categoryId,
-                        item.description,
-                        item.item_id,
-                        item.quantity,
-                        item.unit_rate,
-                        item.gst_rate,
-                        item.gst_amount,
-                        item.discount,
-                        item.net_amount,
+                        item.party_type_id,
+
+                        item.description ||
+                        item.item_name ||
+                        item.meal_name ||
+                        item.billing_type,
+
+                        item.item_id ?? null,
+
+                        item.quantity ?? 1,
+
+                        item.unit_rate ?? 0,
+
+                        item.gst_rate ?? 0,
+
+                        item.gst_amount ?? 0,
+
+                        item.discount ?? 0,
+
+                        item.net_amount ?? 0,
+
                         referenceTable,
-                        item.bill_id,
-                        item.created_at
+
+                        referenceId,
+
+                        item.service_date ??
+                        item.created_at ??
+                        null
+
                     ]);
 
+
                     /*
-                    **********************************************
+                    ******************************************
                     UPDATE SOURCE STATUS
-                    **********************************************
+                    ******************************************
                     */
+
                     if (item.billing_type === "DIET_ORDER") {
-                        await query(
+
+                        const updateResult = await query(
                             `
-                        UPDATE diet_meal_charge
-                        SET charge_status = 'BILLED'
-                        WHERE meal_charge_id = ?
+                            UPDATE diet_meal_charge
+
+                            SET charge_status = 'BILLED'
+
+                            WHERE meal_charge_id = ?
+                            AND charge_status = 'PENDING'
                         `,
                             [
-                                item.bill_id
+                                referenceId
                             ]
                         );
 
+
+                        if (updateResult.affectedRows === 0) {
+
+                            throw new Error(
+                                `Diet charge ${referenceId} is already billed or unavailable.`
+                            );
+
+                        }
 
                     } else {
-                        await query(
+
+                        const updateResult = await query(
                             `
-                        UPDATE diet_service_ledger
-                        SET ledger_status = 'BILLED'
-                        WHERE ledger_id = ?
+                            UPDATE diet_service_ledger
+
+                            SET ledger_status = 'BILLED'
+
+                            WHERE ledger_id = ?
+                            AND ledger_status = 'PENDING'
                         `,
                             [
-                                item.bill_id
+                                referenceId
                             ]
                         );
+
+
+                        if (updateResult.affectedRows === 0) {
+
+                            throw new Error(
+                                `Service ledger ${referenceId} is already billed or unavailable.`
+                            );
+
+                        }
+
                     }
+
                 }
+
+
                 /*
                 **********************************************
-                COMMIT
+                COMMIT TRANSACTION
                 **********************************************
                 */
-                connection.commit(err => {
-                    if (err) {
-                        return connection.rollback(() => {
-                            connection.release();
-                            callback(err);
-                        })
-                    }
-                    connection.release();
-                    callback(null, {
-                        billing_id: billingId,
-                        total_amount,
-                        total_items: items.length
+
+                await new Promise((resolve, reject) => {
+
+                    connection.commit(err => {
+
+                        if (err) {
+                            return reject(err);
+                        }
+
+                        resolve();
+
                     });
+
                 });
+
+
+                /*
+                **********************************************
+                RELEASE CONNECTION
+                **********************************************
+                */
+
+                connection.release();
+
+
+                /*
+                **********************************************
+                SUCCESS RESPONSE
+                **********************************************
+                */
+
+                callback(null, {
+
+                    billing_id: billingId,
+
+                    bill_no: billNo,
+
+                    total_amount,
+
+                    total_items: items.length
+
+                });
+
 
             } catch (error) {
-                connection.rollback(() => {
-                    connection.release();
-                    callback(error);
-                });
-            }
-        });
 
+                /*
+                **********************************************
+                ROLLBACK
+                **********************************************
+                */
+
+                connection.rollback(() => {
+
+                    connection.release();
+
+                    callback(error);
+
+                });
+
+            }
+
+        });
 
     },
 
@@ -1824,9 +2270,135 @@ ORDER BY dmc.created_at
         });
     },
 
+    // getDeliveryBillDetailsService: (data, callback) => {
+
+    //     const dietItems = data.filter(item => item.source_type === "DIET_ORDER");
+
+    //     const serviceDeliveryIds = data
+    //         .filter(item => item.source_type !== "DIET_ORDER")
+    //         .map(item => item.delivery_id);
+
+    //     let mealCharges = [];
+    //     let serviceLedger = [];
+
+    //     const fetchServiceLedger = (next) => {
+
+    //         if (serviceDeliveryIds.length === 0) {
+    //             return next();
+    //         }
+
+    //         const sql = `
+    //         SELECT
+    //             dsl.ledger_id,
+    //             dsl.delivery_id,
+    //             'SERVICE' AS bill_source,
+    //             im.item_id,
+    //             im.item_name,
+    //             dsl.quantity,
+    //             dsl.unit_rate,
+    //             dsl.gross_amount,
+    //             dsl.discount,
+    //             dsl.gst_rate,
+    //             dsl.gst_amount,
+    //             dsl.net_amount,
+    //             dsl.ledger_status
+
+    //         FROM diet_service_ledger dsl
+
+    //         INNER JOIN item_master im
+    //             ON im.item_id = dsl.item_id
+
+    //         WHERE dsl.delivery_id IN (?)
+
+    //         ORDER BY dsl.created_at;
+    //     `;
+
+    //         pool.query(sql, [serviceDeliveryIds], (err, results) => {
+    //             if (err) return callback(err);
+
+    //             serviceLedger = results;
+    //             next();
+    //         });
+    //     };
+
+    //     const fetchMealCharges = (next) => {
+
+    //         if (dietItems.length === 0) {
+    //             return next();
+    //         }
+
+
+
+    //         const conditions = [];
+    //         const values = [];
+
+    //         dietItems.forEach(item => {
+    //             conditions.push("(dmc.patient_diet_id = ? AND dmc.type_slno = ?)");
+    //             values.push(item.patient_diet_id, item.type_slno);
+    //         });
+
+    //         const sql = `
+    //         SELECT
+    //             dmc.meal_charge_id,
+    //             'DIET' AS bill_source,
+
+    //             dmc.patient_diet_id,
+    //             dmc.diet_id,
+    //             dm.diet_name,
+
+    //             dmc.type_slno,
+    //             dt.type_desc,
+
+    //             1 AS quantity,
+    //             dmc.meal_rate AS unit_rate,
+    //             dmc.meal_rate AS gross_amount,
+    //             dmc.discount,
+    //             0 AS gst_rate,
+    //             0 AS gst_amount,
+    //             dmc.net_amount,
+    //             dmc.charge_status
+
+    //         FROM diet_meal_charge dmc
+
+
+    //         INNER JOIN patient_diet_master dm
+    //             ON dm.diet_id = dmc.diet_id
+
+    //         INNER JOIN diet_type dt
+    //             ON dt.type_slno = dmc.type_slno
+
+    //         WHERE dmc.patient_diet_id = ? AND dmc.type_slno = ?
+
+    //         ORDER BY dmc.created_at;
+    //     `;
+
+    //         pool.query(sql, values, (err, results) => {
+    //             if (err) return callback(err);
+
+    //             mealCharges = results;
+    //             next();
+    //         });
+    //     };
+
+    //     fetchMealCharges(() => {
+    //         fetchServiceLedger(() => {
+
+    //             callback(null, [
+    //                 ...mealCharges,
+    //                 ...serviceLedger
+    //             ]);
+
+    //         });
+    //     });
+
+    // },
+
+
     getDeliveryBillDetailsService: (data, callback) => {
 
-        const dietItems = data.filter(item => item.source_type === "DIET_ORDER");
+        const dietItems = data.filter(
+            item => item.source_type === "DIET_ORDER"
+        );
 
         const serviceDeliveryIds = data
             .filter(item => item.source_type !== "DIET_ORDER")
@@ -1834,6 +2406,12 @@ ORDER BY dmc.created_at
 
         let mealCharges = [];
         let serviceLedger = [];
+
+        /*
+        ============================================================
+        FETCH SERVICE LEDGER
+        ============================================================
+        */
 
         const fetchServiceLedger = (next) => {
 
@@ -1843,11 +2421,15 @@ ORDER BY dmc.created_at
 
             const sql = `
             SELECT
+
                 dsl.ledger_id,
                 dsl.delivery_id,
+
                 'SERVICE' AS bill_source,
+
                 im.item_id,
                 im.item_name,
+
                 dsl.quantity,
                 dsl.unit_rate,
                 dsl.gross_amount,
@@ -1855,25 +2437,70 @@ ORDER BY dmc.created_at
                 dsl.gst_rate,
                 dsl.gst_amount,
                 dsl.net_amount,
-                dsl.ledger_status
+
+                dsl.ledger_status,
+
+                /*
+                BILLING INFORMATION
+                */
+
+                CASE
+                    WHEN pbd.billing_detail_id IS NOT NULL
+                        THEN 'BILLED'
+                    ELSE 'NOT_BILLED'
+                END AS billing_status,
+
+                pbd.billing_detail_id,
+
+                pb.billing_id,
+                pb.bill_no,
+                pb.billing_status AS bill_status
 
             FROM diet_service_ledger dsl
 
             INNER JOIN item_master im
                 ON im.item_id = dsl.item_id
 
+            /*
+            FIND WHETHER THIS LEDGER ITEM
+            IS ALREADY PRESENT IN A BILL
+            */
+
+            LEFT JOIN patient_billing_detail pbd
+                ON pbd.reference_table = 'diet_service_ledger'
+                AND pbd.reference_id = dsl.ledger_id
+                AND pbd.bill_item_status <> 'CANCELLED'
+
+            LEFT JOIN patient_billing pb
+                ON pb.billing_id = pbd.billing_id
+
             WHERE dsl.delivery_id IN (?)
 
-            ORDER BY dsl.created_at;
+            ORDER BY dsl.created_at
         `;
 
-            pool.query(sql, [serviceDeliveryIds], (err, results) => {
-                if (err) return callback(err);
+            pool.query(
+                sql,
+                [serviceDeliveryIds],
+                (err, results) => {
 
-                serviceLedger = results;
-                next();
-            });
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    serviceLedger = results;
+
+                    next();
+                }
+            );
         };
+
+
+        /*
+        ============================================================
+        FETCH DIET MEAL CHARGES
+        ============================================================
+        */
 
         const fetchMealCharges = (next) => {
 
@@ -1881,39 +2508,68 @@ ORDER BY dmc.created_at
                 return next();
             }
 
-     
-
             const conditions = [];
             const values = [];
 
             dietItems.forEach(item => {
-                conditions.push("(dmc.patient_diet_id = ? AND dmc.type_slno = ?)");
-                values.push(item.patient_diet_id, item.type_slno);
+
+                conditions.push(
+                    `(dmc.patient_diet_id = ? AND dmc.type_slno = ?)`
+                );
+
+                values.push(
+                    item.patient_diet_id,
+                    item.type_slno
+                );
+
             });
 
             const sql = `
             SELECT
+
                 dmc.meal_charge_id,
+
                 'DIET' AS bill_source,
 
                 dmc.patient_diet_id,
                 dmc.diet_id,
+
                 dm.diet_name,
 
                 dmc.type_slno,
                 dt.type_desc,
 
                 1 AS quantity,
+
                 dmc.meal_rate AS unit_rate,
                 dmc.meal_rate AS gross_amount,
+
                 dmc.discount,
+
                 0 AS gst_rate,
                 0 AS gst_amount,
+
                 dmc.net_amount,
-                dmc.charge_status
+
+                dmc.charge_status,
+
+                /*
+                BILLING INFORMATION
+                */
+
+                CASE
+                    WHEN pbd.billing_detail_id IS NOT NULL
+                        THEN 'BILLED'
+                    ELSE 'NOT_BILLED'
+                END AS billing_status,
+
+                pbd.billing_detail_id,
+
+                pb.billing_id,
+                pb.bill_no,
+                pb.billing_status AS bill_status
 
             FROM diet_meal_charge dmc
-
 
             INNER JOIN patient_diet_master dm
                 ON dm.diet_id = dmc.diet_id
@@ -1921,20 +2577,49 @@ ORDER BY dmc.created_at
             INNER JOIN diet_type dt
                 ON dt.type_slno = dmc.type_slno
 
-            WHERE dmc.patient_diet_id = ? AND dmc.type_slno = ?
+            /*
+            FIND WHETHER THIS MEAL CHARGE
+            IS ALREADY PRESENT IN A BILL
+            */
 
-            ORDER BY dmc.created_at;
+            LEFT JOIN patient_billing_detail pbd
+                ON pbd.reference_table = 'diet_meal_charge'
+                AND pbd.reference_id = dmc.meal_charge_id
+                AND pbd.bill_item_status <> 'CANCELLED'
+
+            LEFT JOIN patient_billing pb
+                ON pb.billing_id = pbd.billing_id
+
+            WHERE ${conditions.join(" OR ")}
+
+            ORDER BY dmc.created_at
         `;
 
-            pool.query(sql, values, (err, results) => {
-                if (err) return callback(err);
+            pool.query(
+                sql,
+                values,
+                (err, results) => {
 
-                mealCharges = results;
-                next();
-            });
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    mealCharges = results;
+
+                    next();
+                }
+            );
         };
 
+
+        /*
+        ============================================================
+        EXECUTE
+        ============================================================
+        */
+
         fetchMealCharges(() => {
+
             fetchServiceLedger(() => {
 
                 callback(null, [
@@ -1943,6 +2628,7 @@ ORDER BY dmc.created_at
                 ]);
 
             });
+
         });
 
     },
@@ -1991,7 +2677,7 @@ ORDER BY dmc.created_at
             });
         }
 
-        if (Number(billing_party_type) !== 2) {
+        if (Number(billing_party_type) !== 1) {
             return callback(null, {
                 success: 0,
                 message: "This billing service is only for BYSTANDER"
@@ -2241,6 +2927,7 @@ ORDER BY dmc.created_at
                 INSERT INTO patient_billing_detail
                 (
                     billing_id,
+                    party_type_id,
                     category_id,
                     description,
                     item_id,
@@ -2270,6 +2957,7 @@ ORDER BY dmc.created_at
                     ?,
                     ?,
                     ?,
+                    ?,
                     ?
                 )
             `;
@@ -2279,6 +2967,7 @@ ORDER BY dmc.created_at
                         detailQuery,
                         [
                             billingId,
+                            1,
                             3,
                             item.description,
                             item.item_id || null,
@@ -2495,7 +3184,7 @@ ORDER BY dmc.created_at
                            pb.assignment_detail_id
 
                     WHERE pb.assignment_detail_id = ?
-                      AND pb.billing_party_type = 2
+                      AND pb.billing_party_type = 1
 
                     ORDER BY
                         pb.billing_id DESC

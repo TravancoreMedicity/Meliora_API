@@ -323,7 +323,14 @@ LEFT JOIN indent_users u
                 d.medicinename,
                 d.VerificationStatus,
                 d.finalstatus,
-                d.rejectionstatus
+                d.rejectionstatus,
+                (
+                    SELECT COUNT(*) 
+                    FROM indent_certificates_details icd 
+                    WHERE (icd.tokenid = tr.token_id OR icd.indent_medicine_slno = d.medicine_id)
+                      AND icd.filestatus = 0 
+                      AND icd.message_sent_status = 1
+                ) AS reuploaded_cert_count
             FROM indent_tokenregistration tr
             LEFT JOIN indent_medicalrep mr ON mr.medicalrep_id = tr.medicalrepid
             LEFT JOIN indent_companies c ON c.companies_id = tr.companyId

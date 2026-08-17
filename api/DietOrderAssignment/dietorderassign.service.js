@@ -1556,8 +1556,11 @@ ORDER BY dsl.created_at;
 
 FROM diet_meal_charge dmc
 
+INNER JOIN patient_diet_schedule pds
+    ON pds.patient_diet_id = dmc.patient_diet_id
+    
 INNER JOIN patient_diet_plan pdp
-    ON pdp.plan_id = dmc.patient_diet_id
+    ON pdp.plan_id = pds.plan_id
 
 INNER JOIN patient_diet_master pdm
     ON pdm.diet_id = pdp.diet_id
@@ -1567,7 +1570,6 @@ INNER JOIN diet_type dt
 
 WHERE dmc.pt_no = ?
   AND dmc.admission_id = ?
-  AND dmc.party_type_id = 2  
   AND dmc.charge_status = ?   
 
 ORDER BY dmc.created_at
@@ -1576,220 +1578,7 @@ ORDER BY dmc.created_at
         executeQuery(query, [ipNo, ptNo, status], callback);
     },
 
-    ///billing portion comes here bro 
 
-    // createPatientBillingService: async (data, callback) => {
-
-    //     const {
-    //         patient_id,
-    //         admission_id,
-    //         total_amount,
-    //         created_by,
-    //         items = []
-    //     } = data;
-
-
-    //     pool.getConnection(async (err, connection) => {
-    //         if (err) {
-    //             return callback(err);
-    //         }
-    //         const query = (sql, params = []) => {
-    //             return new Promise((resolve, reject) => {
-    //                 connection.query(sql, params, (err, result) => {
-    //                     if (err) {
-    //                         reject(err);
-    //                     } else {
-    //                         resolve(result);
-    //                     }
-
-    //                 });
-
-    //             });
-    //         };
-
-
-    //         try {
-    //             await new Promise((resolve, reject) => {
-    //                 connection.beginTransaction(err => {
-    //                     if (err) {
-    //                         reject(err);
-    //                     } else {
-    //                         resolve();
-    //                     }
-    //                 });
-
-    //             });
-
-
-    //             /*
-    //       **********************************************
-    //       VALIDATE ITEMS
-    //       **********************************************
-    //       */
-
-    //             if (!Array.isArray(items) || items.length === 0) {
-    //                 throw new Error("No billing items found.");
-    //             }
-    //             /*
-    //             **********************************************
-    //             CREATE BILL HEADER
-    //             **********************************************
-    //             */
-    //             const headerQuery = `
-    //             INSERT INTO patient_billing
-    //             (
-    //                 patient_id,
-    //                 admission_id,
-    //                 billing_date,
-    //                 total_amount,
-    //                 billing_status,
-    //                 created_by
-    //             )
-    //             VALUES
-    //             (
-    //                 ?,
-    //                 ?,
-    //                 CURDATE(),
-    //                 ?,
-    //                 'OPEN',
-    //                 ?
-    //             )
-    //         `;
-    //             const headerResult = await query(headerQuery, [
-    //                 patient_id,
-    //                 admission_id,
-    //                 total_amount,
-    //                 created_by
-    //             ]);
-    //             const billingId = headerResult.insertId;
-    //             /*
-    //             **********************************************
-    //             INSERT BILL DETAILS + UPDATE SOURCE
-    //             **********************************************
-    //             */
-    //             for (const item of items) {
-    //                 let categoryId;
-    //                 let referenceTable;
-    //                 switch (item.billing_type) {
-    //                     case "DIET_ORDER":
-    //                         categoryId = 1;
-    //                         referenceTable = "diet_meal_charge";
-    //                         break;
-
-    //                     case "EXTRA_ORDER":
-    //                     case "PATIENT_CANTEEN_ORDER":
-    //                     case "BYSTANDER_CANTEEN_ORDER":
-
-    //                         categoryId = 2;
-    //                         referenceTable = "diet_service_ledger";
-    //                         break;
-    //                     default:
-    //                         throw new Error(
-    //                             `Unknown billing type : ${item.billing_type}`
-    //                         );
-    //                 }
-
-
-
-    //                 const detailQuery = `
-    //                 INSERT INTO patient_billing_detail
-    //                 (
-    //                     billing_id,
-    //                     category_id,
-    //                     description,
-    //                     item_id,
-    //                     quantity,
-    //                     rate,
-    //                     gst,
-    //                     gst_amount,
-    //                     discount,
-    //                     amount,
-    //                     reference_table,
-    //                     reference_id,
-    //                     service_date
-    //                 )
-    //                 VALUES
-    //                 (
-    //                     ?,?,?,?,?,?,?,?,?,?,?,?,?
-    //                 )
-    //             `;
-    //                 await query(detailQuery, [
-    //                     billingId,
-    //                     categoryId,
-    //                     item.description,
-    //                     item.item_id,
-    //                     item.quantity,
-    //                     item.unit_rate,
-    //                     item.gst_rate,
-    //                     item.gst_amount,
-    //                     item.discount,
-    //                     item.net_amount,
-    //                     referenceTable,
-    //                     item.bill_id,
-    //                     item.created_at
-    //                 ]);
-
-    //                 /*
-    //                 **********************************************
-    //                 UPDATE SOURCE STATUS
-    //                 **********************************************
-    //                 */
-    //                 if (item.billing_type === "DIET_ORDER") {
-    //                     await query(
-    //                         `
-    //                     UPDATE diet_meal_charge
-    //                     SET charge_status = 'BILLED'
-    //                     WHERE meal_charge_id = ?
-    //                     `,
-    //                         [
-    //                             item.bill_id
-    //                         ]
-    //                     );
-
-
-    //                 } else {
-    //                     await query(
-    //                         `
-    //                     UPDATE diet_service_ledger
-    //                     SET ledger_status = 'BILLED'
-    //                     WHERE ledger_id = ?
-    //                     `,
-    //                         [
-    //                             item.bill_id
-    //                         ]
-    //                     );
-    //                 }
-    //             }
-    //             /*
-    //             **********************************************
-    //             COMMIT
-    //             **********************************************
-    //             */
-    //             connection.commit(err => {
-    //                 if (err) {
-    //                     return connection.rollback(() => {
-    //                         connection.release();
-    //                         callback(err);
-    //                     })
-    //                 }
-    //                 connection.release();
-    //                 callback(null, {
-    //                     billing_id: billingId,
-    //                     total_amount,
-    //                     total_items: items.length
-    //                 });
-    //             });
-
-    //         } catch (error) {
-    //             connection.rollback(() => {
-    //                 connection.release();
-    //                 callback(error);
-    //             });
-    //         }
-    //     });
-
-
-    // },
     createPatientBillingService: async (data, callback) => {
 
         const {
@@ -3340,338 +3129,7 @@ ORDER BY dmc.created_at
             execute();
         });
     },
-    // createBillingPaymentService: (
-    //     data,
-    //     callback
-    // ) => {
 
-    //     const {
-    //         amount,
-    //         payment_mode,
-    //         collected_by,
-    //         collected_location,
-    //         transaction_id,
-    //         payments
-    //     } = data;
-
-    //     pool.getConnection((err, connection) => {
-    //         if (err) {
-    //             return callback(err);
-    //         }
-    //         connection.beginTransaction(async err => {
-    //             if (err) {
-    //                 connection.release();
-    //                 return callback(err);
-    //             }
-    //             try {
-    //                 /* 1. VALIDATE TOP LEVEL AMOUNT  */
-    //                 const calculatedTotal = payments.reduce(
-    //                     (sum, payment) => sum + Number(payment.amount || 0),
-    //                     0
-    //                 );
-    //                 if (Number(calculatedTotal.toFixed(2)) !== Number(Number(amount).toFixed(2))) {
-    //                     throw new Error(`Payment amount mismatch. Expected ${amount}, received ${calculatedTotal}`);
-    //                 }
-
-    //                 /*2. PROCESS EACH BILLING  */
-
-    //                 const paymentResults = [];
-    //                 for (const payment of payments) {
-    //                     const billingId = Number(payment.billing_id);
-    //                     const paymentAmount = Number(payment.amount || 0);
-    //                     const items =
-    //                         Array.isArray(payment.items)
-    //                             ? payment.items
-    //                             : [];
-
-    //                     if (!billingId) {
-    //                         throw new Error("Invalid billing_id");
-    //                     }
-    //                     if (paymentAmount <= 0) {
-    //                         throw new Error(`Invalid payment amount for billing ${billingId}`);
-    //                     }
-    //                     if (!items.length) {
-    //                         throw new Error(`Payment items missing for billing ${billingId}`);
-    //                     }
-
-    //                     /* 3. LOCK BILLING ROW */
-
-    //                     const [billingRows] =
-    //                         await connection.promise().query(
-    //                             `
-    //                         SELECT
-    //                             billing_id,
-    //                             total_amount,
-    //                             paid_amount,
-    //                             balance_amount,
-    //                             billing_status
-    //                         FROM patient_billing
-    //                         WHERE billing_id = ?
-    //                         FOR UPDATE
-    //                         `,
-    //                             [billingId]
-    //                         );
-
-    //                     if (!billingRows.length) {
-    //                         throw new Error(`Billing ${billingId} not found`);
-    //                     }
-    //                     const billing = billingRows[0];
-
-    //                     if (billing.billing_status === "CANCELLED") {
-    //                         throw new Error(`Billing ${billingId} is cancelled`);
-    //                     }
-
-    //                     /*4. VALIDATE BILL PAYMENT AMOUNT */
-    //                     const currentBalance = Number(billing?.balance_amount || 0);
-
-    //                     if (paymentAmount > currentBalance) {
-    //                         throw new Error(`Payment amount exceeds balance for billing ${billingId}`);
-    //                     }
-    //                     /* 5. VALIDATE PAYMENT ITEMS */
-
-    //                     const detailIds =
-    //                         items?.map(item =>
-    //                             Number(
-    //                                 item?.billing_detail_id
-    //                             )
-    //                         );
-
-    //                     const placeholders =
-    //                         detailIds
-    //                             .map(() => "?")
-    //                             .join(",");
-
-
-    //                     const [details] =
-    //                         await connection.promise().query(
-    //                             `
-    //                         SELECT
-    //                             billing_detail_id,
-    //                             billing_id,
-    //                             amount,
-    //                             bill_item_status
-    //                         FROM patient_billing_detail
-    //                         WHERE billing_detail_id IN (${placeholders})
-    //                         AND billing_id = ?
-    //                         FOR UPDATE
-    //                         `,
-    //                             [
-    //                                 ...detailIds,
-    //                                 billingId
-    //                             ]
-    //                         );
-
-
-    //                     if (details.length !== detailIds.length) {
-    //                         throw new Error(`Invalid billing details for billing ${billingId}`);
-    //                     }
-
-
-    //                     /*  6. CALCULATE ITEM PAYMENT */
-
-    //                     let itemPaymentTotal = 0;
-    //                     for (const item of items) {
-    //                         const detail = details?.find(row => Number(row?.billing_detail_id) === Number(item?.billing_detail_id));
-
-    //                         if (!detail) {
-    //                             throw new Error(`Billing detail ${item.billing_detail_id} not found`);
-    //                         }
-
-    //                         if (detail.bill_item_status === "PAID") {
-    //                             throw new Error(`Billing detail ${item.billing_detail_id} is already paid`);
-    //                         }
-
-    //                         const paidAmount = Number(item.paid_amount || 0);
-
-    //                         const detailAmount = Number(detail.amount || 0);
-
-    //                         if (paidAmount <= 0) {
-    //                             throw new Error(`Invalid paid amount for billing detail ${item.billing_detail_id}`);
-    //                         }
-
-    //                         if (paidAmount > detailAmount) {
-    //                             throw new Error(`Paid amount exceeds billing detail amount for ${item.billing_detail_id}`);
-    //                         }
-
-    //                         itemPaymentTotal +=
-    //                             paidAmount;
-    //                     }
-
-
-    //                     /* 7. ITEM TOTAL MUST MATCH BILL PAYMENT */
-
-    //                     if (Number(itemPaymentTotal.toFixed(2)) !==
-    //                         Number(paymentAmount.toFixed(2))
-    //                     ) {
-    //                         throw new Error(
-    //                             `Item payment total does not match billing ${billingId} payment amount`
-    //                         );
-    //                     }
-
-
-    //                     /*8. INSERT PAYMENT MASTER  */
-
-    //                     const [paymentResult] =
-    //                         await connection.promise().query(
-    //                             `
-    //                         INSERT INTO patient_bill_payment
-    //                         (
-    //                             billing_id,
-    //                             amount,
-    //                             payment_mode,
-    //                             collected_by,
-    //                             collected_location,
-    //                             remarks,
-    //                             payment_status
-    //                         )
-    //                         VALUES (?, ?, ?, ?, ?, ?, 'SUCCESS')
-    //                         `,
-    //                             [
-    //                                 billingId,
-    //                                 paymentAmount,
-    //                                 payment_mode,
-    //                                 collected_by,
-    //                                 collected_location,
-    //                                 transaction_id || null
-    //                             ]
-    //                         );
-
-
-    //                     const paymentId =
-    //                         paymentResult.insertId;
-
-
-    //                     /*9. INSERT PAYMENT DETAILS */
-
-    //                     for (const item of items) {
-    //                         const paidAmount = Number(item.paid_amount);
-
-    //                         await connection.promise().query(
-    //                             `
-    //                         INSERT INTO patient_bill_payment_detail
-    //                         (
-    //                             payment_id,
-    //                             billing_detail_id,
-    //                             paid_amount
-    //                         )
-    //                         VALUES (?, ?, ?)
-    //                         `,
-    //                             [
-    //                                 paymentId,
-    //                                 item.billing_detail_id,
-    //                                 paidAmount
-    //                             ]
-    //                         );
-
-    //                         /*  MARK BILL DETAIL PAID */
-    //                         const detail =
-    //                             details?.find(
-    //                                 row =>
-    //                                     Number(row.billing_detail_id) ===
-    //                                     Number(item.billing_detail_id)
-    //                             );
-
-    //                         const detailAmount =
-    //                             Number(detail.amount || 0);
-    //                         if (
-    //                             Number(paidAmount.toFixed(2)) ===
-    //                             Number(detailAmount.toFixed(2))
-    //                         ) {
-
-    //                             await connection.promise().query(
-    //                                 `
-    //                             UPDATE patient_billing_detail
-    //                             SET bill_item_status = 'PAID'
-    //                             WHERE billing_detail_id = ?
-    //                             `,
-    //                                 [
-    //                                     item.billing_detail_id
-    //                                 ]
-    //                             );
-
-    //                         }
-
-    //                     }
-
-
-    //                     /*10. UPDATE BILLING MASTER */
-
-    //                     const newPaidAmount = Number(billing.paid_amount || 0) + paymentAmount;
-
-    //                     const newBalance = Number(billing.total_amount || 0) - newPaidAmount;
-
-
-    //                     let billingStatus = "PARTIAL";
-
-    //                     if (newBalance <= 0) {
-    //                         billingStatus = "PAID";
-    //                     }
-
-
-    //                     await connection.promise().query(
-    //                         `
-    //                     UPDATE patient_billing
-    //                     SET
-    //                         paid_amount = ?,
-    //                         balance_amount = ?,
-    //                         billing_status = ?,
-    //                         updated_by = ?,
-    //                         updated_at = CURRENT_TIMESTAMP
-    //                     WHERE billing_id = ?
-    //                     `,
-    //                         [
-    //                             newPaidAmount,
-    //                             Math.max(
-    //                                 0,
-    //                                 newBalance
-    //                             ),
-    //                             billingStatus,
-    //                             collected_by,
-    //                             billingId
-    //                         ]
-    //                     );
-
-
-    //                     paymentResults.push({
-    //                         billing_id: billingId,
-    //                         payment_id: paymentId,
-    //                         amount: paymentAmount,
-    //                         paid_amount: newPaidAmount,
-    //                         balance_amount:
-    //                             Math.max(
-    //                                 0,
-    //                                 newBalance
-    //                             ),
-    //                         billing_status:
-    //                             billingStatus
-    //                     });
-
-    //                 }
-
-
-    //                 /* 11. COMMIT  */
-
-    //                 await connection.promise().commit();
-
-    //                 connection.release();
-    //                 return callback(null, {
-    //                     amount: Number(amount),
-    //                     payment_mode,
-    //                     payment_status: "SUCCESS",
-    //                     payments: paymentResults
-    //                 });
-
-    //             } catch (error) {
-    //                 /*ROLLBACK EVERYTHING*/
-    //                 await connection.promise().rollback();
-    //                 connection.release();
-    //                 return callback(error);
-    //             }
-
-    //         });
-
-    //     });
-    // }
     createBillingPaymentService: (data, callback) => {
 
         const {
@@ -4341,5 +3799,76 @@ ORDER BY dmc.created_at
             });
 
         });
-    }
+    },
+
+
+    getBillablePatientDetail: (status, callback) => {
+        const query = `
+SELECT
+    pending.admission_id,
+    pending.pt_no,
+
+    p.fb_ptc_name AS patient_name,
+    p.fb_ptc_sex AS sex,
+    p.fb_ptd_dob AS date_of_birth,
+    p.fb_ptc_mobile AS mobile,
+    p.fb_dep_desc AS department,
+    p.fb_bd_code AS bed_code,
+    b.fb_bdc_no AS bed_name,
+    p.fb_ipd_date AS admission_date,
+
+    ns.fb_ns_code AS nursing_station_code,
+    ns.fb_ns_name AS nursing_station_name,
+
+    pending.pending_items,
+    pending.pending_amount
+
+FROM (
+    SELECT
+        admission_id,
+        pt_no,
+
+        COUNT(*) AS pending_items,
+        SUM(net_amount) AS pending_amount
+
+    FROM (
+        SELECT
+            admission_id,
+            pt_no,
+            party_type_id,
+            net_amount
+        FROM diet_meal_charge
+        WHERE charge_status = ?
+
+        UNION ALL
+
+        SELECT
+            admission_id,
+            pt_no,
+            party_type_id,
+            net_amount
+        FROM diet_service_ledger
+        WHERE ledger_status = ?
+    ) charges
+
+    GROUP BY
+        admission_id,
+        pt_no
+) pending
+
+INNER JOIN fb_ipadmiss p
+    ON p.fb_ip_no = pending.admission_id
+
+LEFT JOIN fb_bed b
+    ON b.fb_bd_code = p.fb_bd_code
+
+LEFT JOIN fb_nurse_station_master ns
+    ON ns.fb_ns_code = b.fb_ns_code
+
+ORDER BY pending.admission_id DESC
+    `;
+
+        executeQuery(query, [status, status], callback);
+    },
+
 };

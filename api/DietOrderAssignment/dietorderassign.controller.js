@@ -1,6 +1,6 @@
 // dietdeliveryassign.controller.js
 
-const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientDietBill, getPatientExtraOrder, createPatientBillingService, updateBulkPickingUpService, getDeliveryBillDetailsService, CreateBystanderBilling, getBystanderBillingDetails, createBillingPaymentService } = require("./dietorderassign.service");
+const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientDietBill, getPatientExtraOrder, createPatientBillingService, updateBulkPickingUpService, getDeliveryBillDetailsService, CreateBystanderBilling, getBystanderBillingDetails, createBillingPaymentService, getBillablePatientDetail } = require("./dietorderassign.service");
 
 
 module.exports = {
@@ -647,6 +647,28 @@ module.exports = {
             }
         );
     },
+
+    getBillablePatientDetail: (req, res) => {
+        const { status } = req.params;
+        getBillablePatientDetail(status, (err, result) => {
+            if (err) {
+                console.error("Billable Patient Fetching Error :", err);
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message ||
+                        "Fetching Error~!"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                message: "Billable Patient Fetched successfully",
+                data: result
+            });
+        }
+        );
+    },
+
 
 
 

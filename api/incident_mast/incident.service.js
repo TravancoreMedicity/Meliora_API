@@ -4745,9 +4745,7 @@ LIMIT 50;
     },
 
     DeletemessageDetail: (id, callback) => {
-        console.log(
-            id
-        );
+
         if (!id) return callback(null, []);
 
         pool.query(

@@ -57,7 +57,7 @@ const handleFileUpload = (uploadMiddleware, baseFolder) => {
 
                 existingFiles.forEach(file => {
                     if (!finalKeepList.includes(file)) {
-                        console.log("Deleting:", file);
+                        // console.log("Deleting:", file);
                         fs.unlinkSync(path.join(targetFolder, file));
                     }
                 });

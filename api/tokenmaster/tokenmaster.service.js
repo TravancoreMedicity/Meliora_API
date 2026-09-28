@@ -108,9 +108,11 @@ module.exports = {
 
     GetDateThisMonth: (callBack) => {
         const query = `
-       SELECT date_slno, schedule_date, if(schedule_status = 1 ,'Yes','No') status,token_count,total_token_count
+             SELECT date_slno, schedule_date, if(schedule_status = 1 ,'Yes','No') status,token_count,total_token_count
        FROM indent_date_schedule
-       WHERE DATE(schedule_date) >= CURDATE()`;
+       WHERE date_slno = (SELECT MAX(date_slno) FROM indent_date_schedule WHERE schedule_status = 1)
+         AND COALESCE(token_count, 0) < 25
+      `;
         pool.query(query, (error, results) => {
             if (error) {
                 return callBack(error);

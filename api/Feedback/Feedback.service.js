@@ -1896,7 +1896,8 @@ fb_nurse_stn_slno,
         fb_ns_name,
         fb_floor_code,
         rm_floor_creation.rm_floor_name ,
-        	rm_floor_alias
+        	rm_floor_alias,
+            bed_count
 		
 FROM 
 		fb_nurse_station_master
@@ -1934,6 +1935,7 @@ FROM fb_transaction_mast;
             fb_ns_name = ?,
             fb_floor_code = ?,
             fb_ns_status=?,
+            bed_count=?,
             edit_user = ?
             WHERE fb_nurse_stn_slno = ?
             `,
@@ -1942,6 +1944,7 @@ FROM fb_transaction_mast;
                 data.fb_ns_name,
                 data.fb_floor_code,
                 data.fb_ns_status,
+                data.total_beds,
                 data.edit_user,
                 data.fb_nurse_stn_slno
             ],

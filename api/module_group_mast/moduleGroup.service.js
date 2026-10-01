@@ -2,7 +2,7 @@ const { pool } = require('../../config/database');
 
 module.exports = {
     create: (data, callBack) => {
-        console.log(data);
+        // console.log(data);
 
         pool.query(
             `INSERT INTO module_group_mast (
@@ -57,7 +57,7 @@ module.exports = {
         )
     },
     update: (data, callBack) => {
-        console.log(data, "update");
+        // console.log(data, "update");
 
         pool.query(
             `UPDATE module_group_mast 

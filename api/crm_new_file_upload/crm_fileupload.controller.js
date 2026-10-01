@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require("fs")
 const { CrfImageStatusUpdate, CrfDataColectionImageStatusUpdate, ImageInsertHODStatusUpdate,
     ImageInsertDMSStatusUpdate, ImageInsertMSStatusUpdate, ImageInsertMOStatusUpdate, ImageInsertSMOStatusUpdate,
-    ImageInsertGMStatusUpdate, ImageInsertMDStatusUpdate, ImageInsertEDStatusUpdate, ImageInsertMAangeStatusUpdate,
+    ImageInsertGMStatusUpdate, ImageInsertMDStatusUpdate, ImageInsertEDStatusUpdate, ImageInsertMAangeStatusUpdate, Getcredentialing
 }
     = require('../crm_new_file_upload/crm_fileupload.service');
 const logger = require('../../logger/logger');
@@ -2515,5 +2515,40 @@ module.exports = {
         });
     },
 
-
+    Getcredentialing: (req, res) => {
+        const folderPath = `D:/DocMeliora/Meliora/fileshows/credentialing`;
+        fs.readdir(folderPath, (err, files) => {
+            if (err) {
+                // console.error(err);
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message,
+                });
+            }
+            else if (!files || files.length === 0) {
+                // No images found
+                return res.status(200).json({
+                    success: 1,
+                    data: [] // or files if you prefer to return the empty array
+                });
+            }
+            else {
+                // Otherwise, create the ZIP archive and pipe it
+                res.setHeader('Content-Type', 'application/zip');
+                res.setHeader('Content-Disposition', `attachment; filename="images.zip"`);
+                const archive = archiver('zip', { zlib: { level: 9 } });
+                archive.on('error', (archiveErr) => {
+                    // console.error('Archive error:', archiveErr);
+                    res.status(500).json({ success: 0, message: archiveErr.message });
+                });
+                archive.pipe(res);
+                // Optionally, filter for image extensions only
+                files.forEach((filename) => {
+                    const filePath = path.join(folderPath, filename);
+                    archive.file(filePath, { name: filename });
+                });
+                archive.finalize();
+            }
+        });
+    },
 }

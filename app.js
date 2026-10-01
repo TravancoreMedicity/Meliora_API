@@ -128,9 +128,13 @@ socketUtils.connection(io);
 
 
 // MySQL fb_ipadmiss INSERT listener
-const startAdmissionListener = require('./events/mysqlEvents');
+const {
+  startAdmissionListener,
+  startPrintQueueListener
+} = require('./events/mysqlEvents');
 
 // startAdmissionListener(io);
+// startPrintQueueListener(io);
 
 const socketIOMiddlewre = (req, res, next) => {
   req.io = io;
@@ -355,6 +359,9 @@ const ElliderUpdation = require('./api/elliderUpdation/elliderUpdation.router')
 
 const CanteenHighlight = require('./api/canteenHighlights/highlight.router')
 const CanteenHighlightMapping = require('./api/canteenHighlightsMapping/highlightmapping.router')
+
+
+const dailycashclosing = require('./api/daily_cash_closing/dailycashclosing.router');
 
 
 app.use(express.json({ limit: "50mb" }));
@@ -594,6 +601,9 @@ app.use('/api/ElliderUpdation', ElliderUpdation)
 app.use('/api/tokenMaster', tokenMaster)
 app.use('/api/indent', indent)
 app.use('/api/ElliderUpdation', ElliderUpdation)
+
+
+app.use('/api/cashclosing', dailycashclosing)
 
 
 const { initCrfApprovalCron } = require("./cronjob/crfApprovalCron");

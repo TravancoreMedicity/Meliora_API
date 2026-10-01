@@ -2,7 +2,8 @@ const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { sign } = require("jsonwebtoken");
 const { employeeinsert, employeeupdate, getemplpyee, employeeGetById, checkUpdateVal, checkInsertVal, employeedelete,
     getEmployeeByUserName, empInsert, updateserialnum, employeeGetAll, updateEmployee, updateEmployeeCo,
-    checkEmployeeExist, employeemoduleGroup, updatemodulegroup, updateserialnumempDetl, changepasword
+    checkEmployeeExist, employeemoduleGroup, updatemodulegroup, updateserialnumempDetl, changepasword,
+    getEmployeeDetails
 } = require('../employee/employee.service');
 const { validateuserCreation, validateEmployee } = require('../../validation/validation_schema')
 const logger = require('../../logger/logger');
@@ -214,6 +215,7 @@ module.exports = {
         const body = req.body;
         const body_result = validateuserCreation.validate(body);
 
+
         if (body_result.error) {
             return res.status(200).json({
                 success: 2,
@@ -225,6 +227,7 @@ module.exports = {
 
         checkEmployeeExist(body, (err, results) => {
             const value = JSON.parse(JSON.stringify(results))
+
             if (Object.keys(value).length === 0) {
                 // Insert the values
                 empInsert(body, (err, results) => {
@@ -429,6 +432,32 @@ module.exports = {
 
         });
     },
+
+
+    getEmployeeDetails: (req, res) => {
+        const search = req.query;
+        getEmployeeDetails(search, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: res.err
+                });
+            }
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "Record Not Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                message: "Employee Detail Fetched SuccessFully!",
+                data: results
+            });
+        });
+    },
+
 
 
 }

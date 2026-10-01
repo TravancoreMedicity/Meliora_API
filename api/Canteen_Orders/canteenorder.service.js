@@ -273,63 +273,138 @@ module.exports = {
     //     },
 
 
+    //     getFullOrders: (status, callback) => {
+
+    //         const includeDietJoin = status !== 'CONFIRMED';
+
+    //         const query = `
+    // SELECT 
+    //     co.canteen_order_id,
+    //     co.admission_id,
+    //     co.order_time,
+    //     co.order_status,
+
+    //     ns.fb_ns_name,
+    //     ns.fb_ns_code,
+
+    //     fb.fb_bd_code,
+    //     fb.fb_bdc_no,
+
+    //     ip.fb_ptc_name,
+    //     ip.fb_pt_no,
+    //     ip.fb_ipad_slno,
+    //     ip.fb_ipc_curstatus,
+
+    //     opt.party_name,
+    //     opt.party_type_id
+
+    //     ${includeDietJoin ? `,
+    //     d.order_id,
+    //     d.order_date,
+    //     d.plan_id
+    //     ` : ``}
+
+    // FROM canteen_order co
+
+    // LEFT JOIN fb_nurse_station_master ns 
+    //     ON co.nursing_station_id = ns.fb_nurse_stn_slno
+
+    // LEFT JOIN fb_bed fb 
+    //     ON co.room_id = fb.fb_bed_slno
+
+    // LEFT JOIN fb_ipadmiss ip 
+    //     ON co.admission_id = ip.fb_ip_no
+
+    // LEFT JOIN order_party_type opt
+    //     ON co.party_type_id = opt.party_type_id
+
+    // ${includeDietJoin ? `
+    // LEFT JOIN diet_order d 
+    //     ON d.patient_id = ip.fb_ipad_slno
+    //     AND co.party_type_id = 2
+    //     AND d.order_status = ?
+    // ` : ``}
+
+    // WHERE co.order_status = ?
+
+    // ORDER BY 
+    //     co.order_time ASC,
+    //     co.canteen_order_id ASC
+    // `;
+
+    //         const params = includeDietJoin
+    //             ? [status, status]
+    //             : [status];
+
+    //         executeQuery(query, params, callback);
+    //     },
     getFullOrders: (status, callback) => {
 
-        const includeDietJoin = status !== 'CONFIRMED';
+        const includeDietJoin = status !== "CONFIRMED";
+
+        const dateCondition =
+            status === "PENDING"
+                ? ""
+                : `
+                AND co.order_time >= CURDATE()
+                AND co.order_time < CURDATE() + INTERVAL 1 DAY
+              `;
 
         const query = `
-SELECT 
-    co.canteen_order_id,
-    co.admission_id,
-    co.order_time,
-    co.order_status,
+        SELECT
+            co.canteen_order_id,
+            co.admission_id,
+            co.order_time,
+            co.order_status,
 
-    ns.fb_ns_name,
-    ns.fb_ns_code,
+            ns.fb_ns_name,
+            ns.fb_ns_code,
 
-    fb.fb_bd_code,
-    fb.fb_bdc_no,
+            fb.fb_bd_code,
+            fb.fb_bdc_no,
 
-    ip.fb_ptc_name,
-    ip.fb_pt_no,
-    ip.fb_ipad_slno,
+            ip.fb_ptc_name,
+            ip.fb_pt_no,
+            ip.fb_ipad_slno,
+            ip.fb_ipc_curstatus,
 
-    opt.party_name,
-    opt.party_type_id
+            opt.party_name,
+            opt.party_type_id
 
-    ${includeDietJoin ? `,
-    d.order_id,
-    d.order_date,
-    d.plan_id
-    ` : ``}
+            ${includeDietJoin ? `,
+            d.order_id,
+            d.order_date,
+            d.plan_id
+            ` : ``}
 
-FROM canteen_order co
+        FROM canteen_order co
 
-LEFT JOIN fb_nurse_station_master ns 
-    ON co.nursing_station_id = ns.fb_nurse_stn_slno
+        LEFT JOIN fb_nurse_station_master ns
+            ON co.nursing_station_id = ns.fb_nurse_stn_slno
 
-LEFT JOIN fb_bed fb 
-    ON co.room_id = fb.fb_bed_slno
+        LEFT JOIN fb_bed fb
+            ON co.room_id = fb.fb_bed_slno
 
-LEFT JOIN fb_ipadmiss ip 
-    ON co.admission_id = ip.fb_ip_no
+        LEFT JOIN fb_ipadmiss ip
+            ON co.admission_id = ip.fb_ip_no
 
-LEFT JOIN order_party_type opt
-    ON co.party_type_id = opt.party_type_id
+        LEFT JOIN order_party_type opt
+            ON co.party_type_id = opt.party_type_id
 
-${includeDietJoin ? `
-LEFT JOIN diet_order d 
-    ON d.patient_id = ip.fb_ipad_slno
-    AND co.party_type_id = 2
-    AND d.order_status = ?
-` : ``}
+        ${includeDietJoin ? `
+        LEFT JOIN diet_order d
+            ON d.patient_id = ip.fb_ipad_slno
+            AND co.party_type_id = 2
+            AND d.order_status = ?
+        ` : ``}
 
-WHERE co.order_status = ?
+        WHERE co.order_status = ?
+        ${dateCondition}
 
-ORDER BY 
-    co.order_time ASC,
-    co.canteen_order_id ASC
-`;
+        ORDER BY
+            co.order_time ASC,
+            co.canteen_order_id ASC
+    `;
 
         const params = includeDietJoin
             ? [status, status]
@@ -337,6 +412,7 @@ ORDER BY
 
         executeQuery(query, params, callback);
     },
+
     /*  GET ONE */
     getOrderById: (id, callback) => {
         const query = `
@@ -435,7 +511,7 @@ LEFT JOIN diet_type dt
 LEFT JOIN item_master im
     ON im.item_id = coi.item_id
 WHERE coi.canteen_order_id IN (${placeholders})
-AND co.order_status = 'CONFIRMED'
+AND co.order_status = 'CONFIRMED' AND coi.is_active = 1
 GROUP BY
     coi.type_slno,
     coi.item_id,

@@ -75,4 +75,7 @@ router.get('/total-ip-patient', checkToken, getTotalIpPatientList)
 
 router.get('/new-admission', checkToken, getNewIpAdmissionDetails)
 
+
+
+
 module.exports = router;

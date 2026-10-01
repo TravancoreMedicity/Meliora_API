@@ -57,6 +57,7 @@ module.exports = {
             p.fb_ptn_yearage AS age,
             p.fb_doc_name,
             p.fb_dep_desc,
+            p.fb_ipc_curstatus,
 
             -- BED / ROOM
             b.fb_bdc_no AS bed_no,

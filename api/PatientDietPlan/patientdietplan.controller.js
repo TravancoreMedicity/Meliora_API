@@ -30,7 +30,7 @@ module.exports = {
     insertPatientDietPlan: (req, res) => {
         const data = req.body;
 
-        if (!data.patient_id || !data.admission_id || !data.diet_id) {
+        if (!data.patient_id || !data.admission_id) {
             return res.status(200).json({
                 success: 0,
                 message: "Patient ID, Admission ID and Diet ID are required"
@@ -673,9 +673,7 @@ module.exports = {
                     message: err
                 });
             }
-            console.log({
-                createDate
-            });
+
 
             getNewAdmissionPatients(createDate, (err, results) => {
                 if (err) {
@@ -695,6 +693,7 @@ module.exports = {
         })
 
     },
+
 
 
 

@@ -10,6 +10,7 @@ module.exports = {
                 patient_id,
                 admission_id,
                 diet_id,
+                diet_type,
                 start_date,
                 end_date,
                 doctor_id,
@@ -18,11 +19,12 @@ module.exports = {
                 diet_status,
                 created_by
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 data.patient_id,
                 data.admission_id,
                 data.diet_id,
+                data.diet_type,
                 data.start_date,
                 data.end_date,
                 data.doctor_id,
@@ -55,6 +57,7 @@ SELECT
     dp.fb_do_code          AS do_code,
     dp.fb_doc_name         AS doc_name,
     dp.fb_ipd_disc,
+    dp.fb_ipc_curstatus,
 
     rc.fb_rcc_desc,
     fb.fb_bdc_no,
@@ -65,6 +68,7 @@ SELECT
 
     pdp.plan_id,
     pdp.diet_status,
+    pdp.diet_type,
     pdp.diet_id,
     pdp.dietitian_id,
     pdp.is_consultation,
@@ -163,6 +167,7 @@ ORDER BY dp.fb_ip_no DESC;
     pdp.diet_id,
     pdp.dietitian_id,
     pdp.remarks,
+    pdp.diet_type,
 
     pdm.diet_name,
     pdm.calories_per_day,
@@ -186,7 +191,7 @@ FROM fb_ipadmiss dp
 INNER JOIN patient_diet_plan pdp 
     ON dp.fb_pt_no = pdp.patient_id
     AND dp.fb_ip_no = pdp.admission_id
-    AND pdp.is_active = 1
+    AND pdp.is_active = 1 AND pdp.diet_type = 'DIET'
 
 LEFT JOIN fb_bed fb 
     ON dp.fb_bd_code = fb.fb_bd_code
@@ -236,6 +241,7 @@ ORDER BY dp.fb_ip_no DESC
             SELECT 
                 pdp.plan_id,
                 pdp.patient_id,
+                pdp.diet_type,
                 pdp.admission_id,
                 pdp.diet_id,
                 pdp.start_date,
@@ -280,7 +286,7 @@ ORDER BY dp.fb_ip_no DESC
             LEFT JOIN unit_master um  
                 ON dtf.unit_id = um.unit_id
 
-            WHERE pdp.is_active = 1
+            WHERE pdp.is_active = 1 AND pdp.diet_type = 'DIET'
            
             ORDER BY pdp.plan_id DESC
             `,
@@ -301,11 +307,13 @@ ORDER BY dp.fb_ip_no DESC
             SELECT DISTINCT
                 pdp.plan_id,
                 pdp.patient_id,
+                pdp.diet_type,
                 pdp.admission_id,
                 pdp.diet_id,
                 pdm.diet_name,
                 dtf.type_id,
-                dp.fb_ptc_name
+                dp.fb_ptc_name,
+                dp.fb_ipc_curstatus
 
             FROM patient_diet_plan pdp
 
@@ -326,7 +334,8 @@ ORDER BY dp.fb_ip_no DESC
                 ON dt.template_id = dtf.template_id
                 AND dtf.week_day = WEEKDAY(?) + 1
 
-            WHERE pdp.is_active = 1
+             WHERE pdp.is_active = 1 AND pdp.diet_type = 'DIET'
+           
 
             ORDER BY pdp.plan_id DESC
             `,
@@ -349,6 +358,7 @@ ORDER BY dp.fb_ip_no DESC
             `UPDATE patient_diet_plan
             SET
                 diet_id = ?,
+                diet_type = ?,
                 start_date = ?,
                 end_date = ?,
                 doctor_id = ?,
@@ -360,6 +370,7 @@ ORDER BY dp.fb_ip_no DESC
             WHERE plan_id = ?`,
             [
                 data.diet_id,
+                data.diet_type,
                 data.start_date,
                 data.end_date,
                 data.doctor_id,
@@ -386,6 +397,7 @@ ORDER BY dp.fb_ip_no DESC
                 pdp.plan_id,
                 pdp.patient_id,
                 pdp.admission_id,
+                pdp.diet_type,
                 pdp.remarks,
 
                 do.order_id,
@@ -416,7 +428,7 @@ ORDER BY dp.fb_ip_no DESC
             LEFT JOIN unit_master um
                 ON dod.unit_id = um.unit_id
 
-            WHERE pdp.plan_id = ?`,
+            WHERE pdp.plan_id = ?  WHERE pdp.is_active = 1 AND pdp.diet_type = 'DIET' `,
             [
                 plan_id
             ],
@@ -456,6 +468,7 @@ WHERE
             `SELECT
     pdp.plan_id,
     pdp.patient_id,
+    pdp.diet_type,
     pdp.admission_id,
     pdp.diet_id,
     pdp.dietitian_id,
@@ -528,6 +541,8 @@ WHERE
     pdp.is_active = 1
     AND pdp.is_consultation = 1
     AND pdp.diet_status = 'ACTIVE'
+    AND pdp.is_active = 1 AND pdp.diet_type = 'DIET'
+           
     AND (
         dp.fb_ipc_curstatus IS NULL
         OR dp.fb_ipc_curstatus <> 'PCO'
@@ -1145,7 +1160,10 @@ WHERE bed.fb_ns_code IN (?)
                 bed.fb_rm_code AS room_no,
 
                 ns.fb_ns_code,
-                ns.fb_ns_name AS nursing_station
+                ns.fb_ns_name AS nursing_station,
+                pdp.plan_id,
+                pdm.diet_name
+
 
             FROM fb_ipadmiss ipa
 
@@ -1154,6 +1172,12 @@ WHERE bed.fb_ns_code IN (?)
 
             LEFT JOIN fb_nurse_station_master ns
                 ON ns.fb_ns_code = bed.fb_ns_code
+            
+            LEFT JOIN patient_diet_plan pdp
+                ON pdp.admission_id = ipa.fb_ip_no
+            
+            LEFT JOIN patient_diet_master pdm
+                ON pdm.diet_id = pdp.diet_id
 
             WHERE
             ipa.fb_pt_no = ?

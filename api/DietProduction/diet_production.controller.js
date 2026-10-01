@@ -17,7 +17,8 @@ module.exports = {
             BatchDetail,
             SelectedOrders,
             processed_by,
-            remark
+            remark,
+            ProductionDate
         } = req.body;
 
         if (
@@ -51,6 +52,7 @@ module.exports = {
             BatchDetail,
             SelectedOrders,
             processed_by, remark,
+            ProductionDate,
             (err, results) => {
 
                 if (err) {

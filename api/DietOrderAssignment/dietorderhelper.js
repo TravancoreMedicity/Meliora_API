@@ -292,7 +292,7 @@ const getExtraOrderPrice = (delivery_id, connection, callback) => {
 
         const row = result[0];
 
-       
+
 
         const quantity = Number(row.delivered_qty || 1);
         const unit_rate = Number(row.price || 0);
@@ -760,6 +760,785 @@ const createServiceLedger = (delivery_id, empid, connection, callback) => {
 
 
 
+
+const FinalizePatientDietAfterBilling = (
+    admissionId,
+    ptNo,
+    billingId,
+    employeeId,
+    connection,
+    callback
+) => {
+    /*
+     * IMPORTANT:
+     * ------------------------------------------------------------
+     * This function runs inside the SAME transaction as billing.
+     *
+     * DO NOT commit / rollback / release connection here.
+     *
+     * If anything fails, callback(error) will allow the caller
+     * to rollback the complete billing transaction.
+     * ------------------------------------------------------------
+     */
+
+    const query = (sql, params = []) => {
+        return new Promise((resolve, reject) => {
+            connection.query(sql, params, (error, result) => {
+                if (error) {
+                    return reject(error);
+                }
+
+                resolve(result);
+            });
+        });
+    };
+
+    const placeholders = (values) => {
+        return values.map(() => "?").join(",");
+    };
+
+    const uniqueIds = (ids) => {
+        return [...new Set(
+            ids
+                .filter(id => id !== null && id !== undefined)
+                .map(id => Number(id))
+                .filter(id => !Number.isNaN(id))
+        )];
+    };
+
+    (async () => {
+        try {
+            /*
+             * ============================================================
+             * 1. GET PATIENT INTERNAL ID
+             * ============================================================
+             *
+             * patient_extra_order.patient_id references
+             * fb_ipadmiss.fb_ipad_slno.
+             *
+             * admissionId here is assumed to be fb_ip_no.
+             */
+
+            const patientRows = await query(
+                `
+                    SELECT fb_ipad_slno
+                    FROM fb_ipadmiss
+                    WHERE fb_ip_no = ?
+                    LIMIT 1
+                `,
+                [admissionId]
+            );
+
+            if (patientRows.length === 0) {
+                throw new Error(
+                    `Patient admission ${admissionId} not found.`
+                );
+            }
+
+            const patientInternalId =
+                patientRows[0].fb_ipad_slno;
+
+
+            /*
+             * ============================================================
+             * 2. GET ACTIVE DIET PLAN IDs
+             * ============================================================
+             */
+
+            const activePlans = await query(
+                `
+                    SELECT plan_id
+                    FROM patient_diet_plan
+                    WHERE admission_id = ?
+                      AND patient_id = ?
+                      AND diet_status = 'ACTIVE'
+                      AND is_active = 1
+                `,
+                [
+                    admissionId,
+                    ptNo
+                ]
+            );
+
+            const planIds = uniqueIds(
+                activePlans.map(row => row.plan_id)
+            );
+
+
+            /*
+             * ============================================================
+             * 3. GET ALL PATIENT EXTRA ORDER IDs
+             * ============================================================
+             *
+             * Do this BEFORE cancelling them because these IDs may be
+             * required to find their delivery/canteen records.
+             */
+
+            const extraOrders = await query(
+                `
+                    SELECT extra_order_id
+                    FROM patient_extra_order
+                    WHERE patient_id = ?
+                      AND order_status IN ('PENDING', 'CONFIRMED')
+                      AND is_active = 1
+                `,
+                [patientInternalId]
+            );
+
+            const extraOrderIds = uniqueIds(
+                extraOrders.map(row => row.extra_order_id)
+            );
+
+
+            /*
+             * ============================================================
+             * 4. GET PATIENT DIET SCHEDULE IDs
+             * ============================================================
+             *
+             * We need these for:
+             *
+             * - diet_delivery_log
+             * - canteen_order_item.patient_diet_id
+             */
+
+            let patientDietIds = [];
+
+            if (planIds.length > 0) {
+                const schedulePlaceholders =
+                    placeholders(planIds);
+
+                const schedules = await query(
+                    `
+                        SELECT patient_diet_id
+                        FROM patient_diet_schedule
+                        WHERE plan_id IN (${schedulePlaceholders})
+                    `,
+                    planIds
+                );
+
+                patientDietIds = uniqueIds(
+                    schedules.map(row => row.patient_diet_id)
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * 5. GET PATIENT CANTEEN ORDERS
+             * ============================================================
+             *
+             * VERY IMPORTANT:
+             *
+             * Do NOT use only:
+             *
+             *     WHERE admission_id = ?
+             *
+             * because the same admission can have BYSTANDER orders.
+             *
+             * party_type_id = 2
+             * = PATIENT
+             *
+             * Therefore only patient orders are selected.
+             *
+             * Additionally, include orders connected to the patient's
+             * diet schedules.
+             */
+
+            const canteenOrderIdSet = new Set();
+
+
+            /*
+             * 5A. Patient canteen orders directly belonging to admission
+             */
+
+            const directPatientCanteenOrders = await query(
+                `
+                    SELECT canteen_order_id
+                    FROM canteen_order
+                    WHERE admission_id = ?
+                      AND party_type_id = 2
+                      AND order_status IN ('PENDING', 'CONFIRMED')
+                `,
+                [admissionId]
+            );
+
+            directPatientCanteenOrders.forEach(row => {
+                canteenOrderIdSet.add(
+                    Number(row.canteen_order_id)
+                );
+            });
+
+
+            /*
+             * 5B. Canteen orders connected to patient's diet schedules
+             *
+             * This protects us even if the admission/party information
+             * is not enough.
+             */
+
+            if (patientDietIds.length > 0) {
+                const dietPlaceholders =
+                    placeholders(patientDietIds);
+
+                const dietCanteenOrders = await query(
+                    `
+                        SELECT DISTINCT
+                            coi.canteen_order_id
+                        FROM canteen_order_item coi
+                        INNER JOIN canteen_order co
+                            ON co.canteen_order_id =
+                               coi.canteen_order_id
+                        WHERE coi.patient_diet_id IN (
+                            ${dietPlaceholders}
+                        )
+                          AND co.party_type_id = 2
+                          AND co.order_status IN (
+                              'PENDING',
+                              'CONFIRMED'
+                          )
+                    `,
+                    patientDietIds
+                );
+
+                dietCanteenOrders.forEach(row => {
+                    canteenOrderIdSet.add(
+                        Number(row.canteen_order_id)
+                    );
+                });
+            }
+
+
+            /*
+             * 5C. Canteen orders connected to patient extra orders
+             *
+             * diet_delivery_log contains:
+             *
+             * source_type = PATIENT_EXTRA_ORDER
+             * source_id   = extra_order_id
+             * canteen_order_id
+             */
+
+            if (extraOrderIds.length > 0) {
+                const extraPlaceholders =
+                    placeholders(extraOrderIds);
+
+                const extraCanteenOrders = await query(
+                    `
+                        SELECT DISTINCT canteen_order_id
+                        FROM diet_delivery_log
+                        WHERE source_type = 'PATIENT_EXTRA_ORDER'
+                          AND source_id IN (
+                              ${extraPlaceholders}
+                          )
+                          AND canteen_order_id IS NOT NULL
+                    `,
+                    extraOrderIds
+                );
+
+                extraCanteenOrders.forEach(row => {
+                    canteenOrderIdSet.add(
+                        Number(row.canteen_order_id)
+                    );
+                });
+            }
+
+
+            const canteenOrderIds =
+                uniqueIds([...canteenOrderIdSet]);
+
+
+            /*
+             * ============================================================
+             * 6. STOP ACTIVE DIET PLANS
+             * ============================================================
+             */
+
+            const stoppedPlansResult = await query(
+                `
+                    UPDATE patient_diet_plan
+                    SET
+                        diet_status = 'STOPPED',
+                        is_active = 0,
+                        end_date = NOW(),
+                        updated_by = ?,
+                        updated_at = NOW()
+                    WHERE admission_id = ?
+                      AND patient_id = ?
+                      AND diet_status = 'ACTIVE'
+                      AND is_active = 1
+                `,
+                [
+                    employeeId,
+                    admissionId,
+                    ptNo
+                ]
+            );
+
+
+            /*
+             * ============================================================
+             * 7. CANCEL PENDING DIET SCHEDULES
+             * ============================================================
+             */
+
+            let cancelledScheduleResult = {
+                affectedRows: 0
+            };
+
+            if (planIds.length > 0) {
+                const planPlaceholders =
+                    placeholders(planIds);
+
+                cancelledScheduleResult = await query(
+                    `
+                        UPDATE patient_diet_schedule
+                        SET
+                            status = 'CANCELLED',
+                            is_active = 0,
+                            cancel_reason =
+                                'Cancelled after billing',
+                            cancelled_by = ?,
+                            cancelled_at = NOW(),
+                            updated_by = ?,
+                            updated_at = NOW()
+                        WHERE plan_id IN (
+                            ${planPlaceholders}
+                        )
+                          AND status = 'PENDING'
+                          AND is_active = 1
+                    `,
+                    [
+                        employeeId,
+                        employeeId,
+                        ...planIds
+                    ]
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * 8. CANCEL DIET ORDERS
+             * ============================================================
+             */
+
+            let cancelledDietOrdersResult = {
+                affectedRows: 0
+            };
+
+            if (planIds.length > 0) {
+                const planPlaceholders =
+                    placeholders(planIds);
+
+                cancelledDietOrdersResult = await query(
+                    `
+                        UPDATE diet_order
+                        SET
+                            order_status = 'CANCELLED',
+                            updated_by = ?,
+                            updated_at = NOW()
+                        WHERE plan_id IN (
+                            ${planPlaceholders}
+                        )
+                          AND order_status IN (
+                              'PENDING',
+                              'CONFIRMED'
+                          )
+                    `,
+                    [
+                        employeeId,
+                        ...planIds
+                    ]
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * 9. DEACTIVATE DIET ORDER DETAILS
+             * ============================================================
+             */
+
+            let deactivatedDietDetailsResult = {
+                affectedRows: 0
+            };
+
+            if (planIds.length > 0) {
+                const planPlaceholders =
+                    placeholders(planIds);
+
+                deactivatedDietDetailsResult = await query(
+                    `
+                        UPDATE diet_order_detail dod
+                        INNER JOIN diet_order do
+                            ON do.order_id = dod.order_id
+                        SET
+                            dod.is_active = 0
+                        WHERE do.plan_id IN (
+                            ${planPlaceholders}
+                        )
+                          AND do.order_status = 'CANCELLED'
+                          AND dod.is_active = 1
+                    `,
+                    planIds
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * 10. CANCEL PATIENT EXTRA ORDERS
+             * ============================================================
+             */
+
+            let cancelledExtraOrdersResult = {
+                affectedRows: 0
+            };
+
+            if (extraOrderIds.length > 0) {
+                const extraPlaceholders =
+                    placeholders(extraOrderIds);
+
+                cancelledExtraOrdersResult = await query(
+                    `
+                        UPDATE patient_extra_order
+                        SET
+                            order_status = 'CANCELLED',
+                            is_active = 0,
+                            updated_by = ?,
+                            updated_at = NOW()
+                        WHERE extra_order_id IN (
+                            ${extraPlaceholders}
+                        )
+                          AND order_status IN (
+                              'PENDING',
+                              'CONFIRMED'
+                          )
+                    `,
+                    [
+                        employeeId,
+                        ...extraOrderIds
+                    ]
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * 11. CANCEL PATIENT CANTEEN ORDERS
+             * ============================================================
+             *
+             * ONLY patient orders.
+             *
+             * Bystander orders are NOT included in canteenOrderIds.
+             */
+
+            let cancelledCanteenOrdersResult = {
+                affectedRows: 0
+            };
+
+            if (canteenOrderIds.length > 0) {
+                const orderPlaceholders =
+                    placeholders(canteenOrderIds);
+
+                cancelledCanteenOrdersResult = await query(
+                    `
+                        UPDATE canteen_order
+                        SET
+                            order_status = 'CANCELLED',
+                            updated_by = ?,
+                            updated_at = NOW()
+                        WHERE canteen_order_id IN (
+                            ${orderPlaceholders}
+                        )
+                          AND order_status IN (
+                              'PENDING',
+                              'CONFIRMED'
+                          )
+                          AND party_type_id = 2
+                    `,
+                    [
+                        employeeId,
+                        ...canteenOrderIds
+                    ]
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * 12. DEACTIVATE PATIENT CANTEEN ORDER ITEMS
+             * ============================================================
+             */
+
+            let deactivatedCanteenItemsResult = {
+                affectedRows: 0
+            };
+
+            if (canteenOrderIds.length > 0) {
+                const orderPlaceholders =
+                    placeholders(canteenOrderIds);
+
+                deactivatedCanteenItemsResult = await query(
+                    `
+                        UPDATE canteen_order_item
+                        SET
+                            is_active = 0
+                        WHERE canteen_order_id IN (
+                            ${orderPlaceholders}
+                        )
+                          AND is_active = 1
+                    `,
+                    canteenOrderIds
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * 13. CANCEL ONLY PATIENT ASSIGNMENT DETAILS
+             * ============================================================
+             *
+             * IMPORTANT:
+             *
+             * We DO NOT touch diet_delivery_assignment.
+             *
+             * Example:
+             *
+             * Assignment 62
+             *   detail 209 -> Patient A -> CANCELLED
+             *   detail 210 -> Patient B -> PENDING
+             *   detail 211 -> Patient C -> PENDING
+             *
+             * Assignment 62 remains untouched.
+             */
+
+            let cancelledAssignmentDetailsResult = {
+                affectedRows: 0
+            };
+
+            if (canteenOrderIds.length > 0) {
+                const orderPlaceholders =
+                    placeholders(canteenOrderIds);
+
+                cancelledAssignmentDetailsResult = await query(
+                    `
+                        UPDATE diet_delivery_assignment_detail
+                        SET
+                            delivery_status = 'CANCELLED',
+                            remarks =
+                                'Cancelled after patient billing'
+                        WHERE canteen_order_id IN (
+                            ${orderPlaceholders}
+                        )
+                          AND delivery_status IN (
+                              'PENDING',
+                              'PARTIAL'
+                          )
+                    `,
+                    canteenOrderIds
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * 14. CANCEL DIET DELIVERY LOGS
+             * ============================================================
+             *
+             * We cancel ONLY pending/prepared delivery records.
+             *
+             * DELIVERED
+             * PICKEDUP
+             * RETURNED
+             * UNDELIVERED
+             *
+             * are historical and are NOT changed.
+             */
+
+            let cancelledDeliveryLogsResult = {
+                affectedRows: 0
+            };
+
+            const deliveryConditions = [];
+            const deliveryParams = [];
+
+            /*
+             * 14A. Delivery logs connected to diet schedules
+             */
+
+            if (patientDietIds.length > 0) {
+                const dietPlaceholders =
+                    placeholders(patientDietIds);
+
+                deliveryConditions.push(`
+                    (
+                        patient_diet_id IN (
+                            ${dietPlaceholders}
+                        )
+                        AND delivery_status IN (
+                            'PENDING',
+                            'PREPARED'
+                        )
+                    )
+                `);
+
+                deliveryParams.push(
+                    ...patientDietIds
+                );
+            }
+
+
+            /*
+             * 14B. Delivery logs connected to patient canteen orders
+             */
+
+            if (canteenOrderIds.length > 0) {
+                const orderPlaceholders =
+                    placeholders(canteenOrderIds);
+
+                deliveryConditions.push(`
+                    (
+                        canteen_order_id IN (
+                            ${orderPlaceholders}
+                        )
+                        AND delivery_status IN (
+                            'PENDING',
+                            'PREPARED'
+                        )
+                    )
+                `);
+
+                deliveryParams.push(
+                    ...canteenOrderIds
+                );
+            }
+
+
+            /*
+             * 14C. Delivery logs connected to patient extra orders
+             */
+
+            if (extraOrderIds.length > 0) {
+                const extraPlaceholders =
+                    placeholders(extraOrderIds);
+
+                deliveryConditions.push(`
+                    (
+                        source_type = 'PATIENT_EXTRA_ORDER'
+                        AND source_id IN (
+                            ${extraPlaceholders}
+                        )
+                        AND delivery_status IN (
+                            'PENDING',
+                            'PREPARED'
+                        )
+                    )
+                `);
+
+                deliveryParams.push(
+                    ...extraOrderIds
+                );
+            }
+
+
+            if (deliveryConditions.length > 0) {
+                cancelledDeliveryLogsResult = await query(
+                    `
+                        UPDATE diet_delivery_log
+                        SET
+                            delivery_status = 'CANCELLED',
+                            updated_by = ?,
+                            updated_at = NOW(),
+                            updated_remarks =
+                                'Cancelled after patient billing'
+                        WHERE
+                            ${deliveryConditions.join(" OR ")}
+                    `,
+                    [
+                        employeeId,
+                        ...deliveryParams
+                    ]
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * 15. DO NOT TOUCH PRODUCTION BATCHES
+             * ============================================================
+             *
+             * We intentionally do NOT update:
+             *
+             * diet_production_batch
+             * diet_production_items
+             * diet_production_order_map
+             *
+             * because a production batch can contain multiple patients.
+             */
+
+
+            /*
+             * ============================================================
+             * 16. SUCCESS
+             * ============================================================
+             */
+
+            return callback(null, {
+                success: true,
+
+                admission_id: admissionId,
+                pt_no: ptNo,
+                billing_id: billingId,
+
+                stopped_plan_ids: planIds,
+
+                patient_diet_ids: patientDietIds,
+
+                patient_extra_order_ids:
+                    extraOrderIds,
+
+                cancelled_canteen_order_ids:
+                    canteenOrderIds,
+
+                counts: {
+                    stopped_plans:
+                        stoppedPlansResult.affectedRows,
+
+                    cancelled_schedules:
+                        cancelledScheduleResult.affectedRows,
+
+                    cancelled_diet_orders:
+                        cancelledDietOrdersResult.affectedRows,
+
+                    deactivated_diet_order_details:
+                        deactivatedDietDetailsResult.affectedRows,
+
+                    cancelled_extra_orders:
+                        cancelledExtraOrdersResult.affectedRows,
+
+                    cancelled_canteen_orders:
+                        cancelledCanteenOrdersResult.affectedRows,
+
+                    deactivated_canteen_items:
+                        deactivatedCanteenItemsResult.affectedRows,
+
+                    cancelled_assignment_details:
+                        cancelledAssignmentDetailsResult.affectedRows,
+
+                    cancelled_delivery_logs:
+                        cancelledDeliveryLogsResult.affectedRows
+                }
+            });
+
+        } catch (error) {
+            return callback(error);
+        }
+    })();
+};
+
+
 module.exports = {
-    createServiceLedger
+    createServiceLedger,
+    FinalizePatientDietAfterBilling
 }

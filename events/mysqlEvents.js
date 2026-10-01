@@ -170,4 +170,110 @@ const startAdmissionListener = async (io) => {
 };
 
 
-module.exports = startAdmissionListener;
+const startPrintQueueListener = async (io) => {
+    try {
+        const dbConfig = {
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASS,
+            port: Number(process.env.DB_PORT || 3306),
+            database: process.env.MYSQL_DB,
+        };
+
+        const mysqlEvents = new MySQLEvents(dbConfig, {
+            startAtEnd: true,
+        });
+
+        mysqlEvents.on(
+            MySQLEvents.EVENTS.CONNECTION_ERROR,
+            (error) => {
+                console.error(
+                    "MySQL Print Queue Connection Error:",
+                    error
+                );
+            }
+        );
+
+        mysqlEvents.on(
+            MySQLEvents.EVENTS.ZONGJI_ERROR,
+            (error) => {
+                console.error(
+                    "MySQL Print Queue ZongJi Error:",
+                    error
+                );
+            }
+        );
+
+        await mysqlEvents.start();
+
+        await mysqlEvents.addTrigger({
+            name: "print_queue_insert_listener",
+            expression: "meliora.print_queue",
+            statement: MySQLEvents.STATEMENTS.INSERT,
+
+            onEvent: async (event) => {
+                try {
+
+                    const affectedRows =
+                        event?.affectedRows || [];
+
+                    if (!affectedRows.length) {
+                        return;
+                    }
+
+                    const pendingPrints = await queryDatabase(`
+                        SELECT
+                            print_id,
+                            packing_id,
+                            packet_uid,
+                            meal_type,
+                            order_id,
+                            admission_id,
+                            patient_no,
+                            patient_name,
+                            bed_code,
+                            nursing_station,
+                            party_name,
+                            status,
+                            attempts
+                        FROM print_queue
+                        WHERE status = 'PENDING'
+                        ORDER BY print_id ASC
+                    `);
+
+                    if (!pendingPrints.length) {
+                        return;
+                    }
+
+                    console.log({
+                        pendingPrints
+                    });
+
+
+                    io.emit("print-queue", {
+                        count: pendingPrints.length,
+                        data: pendingPrints,
+                    });
+
+                } catch (error) {
+                    console.error(
+                        "Error processing print queue event:",
+                        error
+                    );
+                }
+            },
+        });
+
+        console.log(
+            "MySQL Print Queue Listener Started"
+        );
+
+    } catch (error) {
+        console.error(
+            "MySQL Print Queue Listener Error:",
+            error
+        );
+    }
+};
+
+module.exports = { startAdmissionListener, startPrintQueueListener };

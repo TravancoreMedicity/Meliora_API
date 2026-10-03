@@ -777,8 +777,7 @@ module.exports = {
                                     const billingQuery = `
                                     UPDATE patient_billing
                                     SET
-                                        is_settled = 'Y',
-                                        settled_id = ?,
+                                        closing_id = ?,
                                         updated_by = ?,
                                         updated_at = NOW()
                                     WHERE billing_id IN (${placeholders})
@@ -1205,9 +1204,8 @@ module.exports = {
         FROM daily_collection_closing dcc
 
         LEFT JOIN patient_billing pb
-            ON pb.settled_id = dcc.closing_id
-            AND pb.is_settled = 'Y'
-
+            ON pb.closing_id = dcc.closing_id
+    
         WHERE dcc.closing_date = CURDATE()
           AND dcc.closing_status = 'CLOSED'
 

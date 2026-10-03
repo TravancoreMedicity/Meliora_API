@@ -2823,7 +2823,10 @@ ORDER BY dmc.created_at
 
 
     createPatientBillingService: async (data, callback) => {
-
+        console.log({
+            data
+        });
+        
         const {
             patient_id,
             admission_id,
@@ -2899,6 +2902,7 @@ ORDER BY dmc.created_at
                 (
                     patient_id,
                     admission_id,
+                    billing_party_type,
                     billing_date,
                     bill_type,
                     bill_generated_by,
@@ -2911,6 +2915,7 @@ ORDER BY dmc.created_at
                 )
                 VALUES
                 (
+                    ?,
                     ?,
                     ?,
                     CURDATE(),
@@ -2928,6 +2933,7 @@ ORDER BY dmc.created_at
                 const headerResult = await query(headerQuery, [
                     patient_id,
                     admission_id,
+                    2,
                     created_by,
                     total_amount,
                     total_amount,
@@ -3288,10 +3294,10 @@ ORDER BY dmc.created_at
     `;
 
 
-        // =========================================================
+        // =======
         // GET ALL ITEMS BELONGING TO THE SELECTED
         // CANTEEN ORDER + MEAL TYPE
-        // =========================================================
+        // =======
 
         const getOrderItemsSql = `
         SELECT
@@ -3325,9 +3331,9 @@ ORDER BY dmc.created_at
     `;
 
 
-        // =========================================================
+        // =======
         // INSERT DELIVERY LOG
-        // =========================================================
+        // =======
 
         const insertDeliveryLogSql = `
         INSERT INTO diet_delivery_log (
@@ -3350,9 +3356,9 @@ ORDER BY dmc.created_at
     `;
 
 
-        // =========================================================
+        // =======
         // CREATE PROFORMA HEADER
-        // =========================================================
+        // =======
 
         const insertProformaSql = `
         INSERT INTO proforma_invoice (
@@ -3371,12 +3377,12 @@ ORDER BY dmc.created_at
     `;
 
 
-        // =========================================================
+        // =======
         // CREATE PROFORMA DETAIL
         //
         // ledger_id IS NULL BECAUSE SERVICE LEDGER
         // WILL ONLY BE CREATED AFTER ACTUAL DELIVERY.
-        // =========================================================
+        // =======
 
         const insertProformaDetailSql = `
         INSERT INTO proforma_invoice_detail (
@@ -3416,9 +3422,9 @@ ORDER BY dmc.created_at
 
                 try {
 
-                    // =====================================================
+                    // ===
                     // PROCESS EVERY SELECTED ASSIGNMENT
-                    // =====================================================
+                    // ===
 
                     for (const item of Items) {
 
@@ -3710,9 +3716,9 @@ ORDER BY dmc.created_at
                     }
 
 
-                    // =====================================================
+                    // ===
                     // 9. COMMIT TRANSACTION
-                    // =====================================================
+                    // ===
 
                     connection.commit(err => {
 
@@ -3743,9 +3749,9 @@ ORDER BY dmc.created_at
 
                 } catch (error) {
 
-                    // =====================================================
+                    // ===
                     // ROLLBACK EVERYTHING IF ANYTHING FAILS
-                    // =====================================================
+                    // ===
 
                     connection.rollback(() => {
 
@@ -3777,9 +3783,9 @@ ORDER BY dmc.created_at
         let serviceLedger = [];
 
         /*
-        ============================================================
+        ==========
         FETCH SERVICE LEDGER
-        ============================================================
+        ==========
         */
 
         const fetchServiceLedger = (next) => {
@@ -3868,9 +3874,9 @@ ORDER BY dmc.created_at
 
 
         /*
-        ============================================================
+        ==========
         FETCH DIET MEAL CHARGES
-        ============================================================
+        ==========
         */
 
         const fetchMealCharges = (next) => {
@@ -3984,9 +3990,9 @@ ORDER BY dmc.created_at
 
 
         /*
-        ============================================================
+        ==========
         EXECUTE
-        ============================================================
+        ==========
         */
 
         fetchMealCharges(() => {
@@ -4449,9 +4455,9 @@ ORDER BY dmc.created_at
         } = data;
 
         /*
-        ==================================================
+        
         VALIDATION
-        ==================================================
+        
         */
 
         if (!assignment_detail_id) {
@@ -4461,9 +4467,9 @@ ORDER BY dmc.created_at
             });
         }
         /*
-        ==================================================
+        
         GET CONNECTION
-        ==================================================
+        
         */
 
         pool.getConnection((err, connection) => {
@@ -4472,9 +4478,9 @@ ORDER BY dmc.created_at
             }
 
             /*
-            ==================================================
+            
             QUERY HELPER
-            ==================================================
+            
             */
 
             const query = (sql, params = []) => {
@@ -4493,9 +4499,9 @@ ORDER BY dmc.created_at
                 });
             };
             /*
-            ==================================================
+            
             MAIN LOGIC
-            ==================================================
+            
             */
 
             const execute = async () => {
@@ -4503,9 +4509,9 @@ ORDER BY dmc.created_at
                 try {
 
                     /*
-                    ==================================================
+                    
                     1. GET ALL BILL HEADERS
-                    ==================================================
+                    
                     */
 
                     const billQuery = `
@@ -4573,9 +4579,9 @@ ORDER BY dmc.created_at
 
 
                     /*
-                    ==================================================
+                    
                     2. NO BILL FOUND
-                    ==================================================
+                    
                     */
 
                     if (!bills || bills.length === 0) {
@@ -4595,9 +4601,9 @@ ORDER BY dmc.created_at
 
 
                     /*
-                    ==================================================
+                    
                     3. GET BILL IDS
-                    ==================================================
+                    
                     */
 
                     const billIds = bills.map(
@@ -4611,9 +4617,9 @@ ORDER BY dmc.created_at
 
 
                     /*
-                    ==================================================
+                    
                     4. GET ALL BILL ITEMS
-                    ==================================================
+                    
                     */
 
                     const billItemQuery = `
@@ -4674,15 +4680,15 @@ ORDER BY dmc.created_at
                         billIds
                     );
                     /*
-                    ==================================================
+                    
                     5. RELEASE CONNECTION
-                    ==================================================
+                    
                     */
                     connection.release();
                     /*
-                    ==================================================
+                    
                     6. SUCCESS RESPONSE
-                    ==================================================
+                    
                     */
 
                     return callback(null, {
@@ -4695,9 +4701,9 @@ ORDER BY dmc.created_at
                     });
                 } catch (error) {
                     /*
-                    ==================================================
+                    
                     ERROR
-                    ==================================================
+                    
                     */
                     connection.release();
                     console.error(
@@ -5200,6 +5206,8 @@ ORDER BY dmc.created_at
                                                             paid_amount = ?,
                                                             balance_amount = ?,
                                                             billing_status = ?,
+                                                            is_settled = 'Y',
+                                                            settled_id = ?,
                                                             updated_by = ?,
                                                             updated_at = CURRENT_TIMESTAMP
                                                         WHERE billing_id = ?
@@ -5211,6 +5219,7 @@ ORDER BY dmc.created_at
                                                                     newBalance
                                                                 ),
                                                                 billingStatus,
+                                                                paymentId,
                                                                 collected_by,
                                                                 billingId
                                                             ],
@@ -5470,6 +5479,8 @@ ORDER BY dmc.created_at
 
     //         executeQuery(query, [status, status], callback);
     //     },
+
+
     getBillablePatientDetail: (status, callback) => {
         const query = `
         SELECT
@@ -5575,13 +5586,9 @@ ORDER BY dmc.created_at
 
         ORDER BY pending.admission_id DESC
     `;
-
         executeQuery(
             query,
-            [
-                status, // diet_meal_charge
-                status  // patient extra orders
-            ],
+            [status, status],
             callback
         );
     },
@@ -6488,9 +6495,9 @@ ORDER BY dmc.created_at
                         }
 
 
-                        // ==================================================
+                        // 
                         // 1. INSERT PACKING MASTER
-                        // ==================================================
+                        // 
 
                         const packingInsertQuery = `
                         INSERT INTO canteen_order_packing
@@ -6549,9 +6556,9 @@ ORDER BY dmc.created_at
                                     packingResult.insertId;
 
 
-                                // ==================================================
+                                // 
                                 // 2. INSERT PACKET DETAILS
-                                // ==================================================
+                                // 
 
                                 const detailInsertQuery = `
 
@@ -7434,11 +7441,10 @@ ORDER BY p.payment_date DESC;
                 pb.billing_id
             ) AS billing_ids,
 
-            /* OPEN BILLS */
+            /* BILLS NOT YET CLOSED */
             COUNT(
                 DISTINCT CASE
-                    WHEN pb.is_settled = 'N'
-                     AND pb.settled_id IS NULL
+                    WHEN pb.closing_id IS NULL
                     THEN pb.billing_id
                 END
             ) AS open_bill_count,
@@ -7446,8 +7452,7 @@ ORDER BY p.payment_date DESC;
             COALESCE(
                 SUM(
                     CASE
-                        WHEN pb.is_settled = 'N'
-                         AND pb.settled_id IS NULL
+                        WHEN pb.closing_id IS NULL
                         THEN pb.total_amount
                         ELSE 0
                     END
@@ -7458,8 +7463,7 @@ ORDER BY p.payment_date DESC;
             COALESCE(
                 SUM(
                     CASE
-                        WHEN pb.is_settled = 'N'
-                         AND pb.settled_id IS NULL
+                        WHEN pb.closing_id IS NULL
                         THEN pb.paid_amount
                         ELSE 0
                     END
@@ -7470,8 +7474,7 @@ ORDER BY p.payment_date DESC;
             COALESCE(
                 SUM(
                     CASE
-                        WHEN pb.is_settled = 'N'
-                         AND pb.settled_id IS NULL
+                        WHEN pb.closing_id IS NULL
                         THEN pb.balance_amount
                         ELSE 0
                     END
@@ -7481,8 +7484,7 @@ ORDER BY p.payment_date DESC;
 
             JSON_ARRAYAGG(
                 CASE
-                    WHEN pb.is_settled = 'N'
-                     AND pb.settled_id IS NULL
+                    WHEN pb.closing_id IS NULL
                     THEN pb.billing_id
                 END
             ) AS open_billing_ids

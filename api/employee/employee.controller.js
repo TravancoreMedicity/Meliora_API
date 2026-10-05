@@ -345,7 +345,7 @@ module.exports = {
                 logger.logwindow(err)
                 return res.status(400).json({
                     success: 0,
-                    message: res.err
+                    message: res.sqlMessage
                 });
             }
             if (!results) {
@@ -376,6 +376,11 @@ module.exports = {
                     if (!results) {
                         employeemoduleGroup(body, (err, results) => {
                             if (err) {
+
+                                console.log({
+                                    err
+                                });
+
                                 logger.logwindow(err.message)
                                 return res.status(400).json({
                                     success: 0,

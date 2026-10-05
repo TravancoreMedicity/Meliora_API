@@ -3,7 +3,7 @@
 const router = require('express').Router();
 
 const { checkToken } = require('../../authentication/token_validation');
-const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientExtraOrder, getPatientDietBill, createPatientBilling, updateBulkPickingUp, getDeliveryBillDetails, CreateBystanderBilling, GetBystanderBillingDetails, createBillingPayment, getBillablePatientDetail, getProformaDetails, convertProformaToBillController, insertOrderPackingController, getOrderPackingByAssignmentController, createPrintQueue, getCashSummaryDetails, getPaymentModeDetails, getPaymentHistoryDetail, getPaymentHistoryBillDetail, getCashReturnDetails, returnAmountSettlement, getReturnDetails, getEmployeePettyCashDetails, getBillCollectionSummary, getCollectionDetails, getEmployeePettyCashDetailsByClosingIds, getPendingBilledDetails, settleBilling } = require('./dietorderassign.controller');
+const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientExtraOrder, getPatientDietBill, createPatientBilling, updateBulkPickingUp, getDeliveryBillDetails, CreateBystanderBilling, GetBystanderBillingDetails, createBillingPayment, getBillablePatientDetail, getProformaDetails, convertProformaToBillController, insertOrderPackingController, getOrderPackingByAssignmentController, createPrintQueue, getCashSummaryDetails, getPaymentModeDetails, getPaymentHistoryDetail, getPaymentHistoryBillDetail, getCashReturnDetails, returnAmountSettlement, getReturnDetails, getEmployeePettyCashDetails, getBillCollectionSummary, getCollectionDetails, getEmployeePettyCashDetailsByClosingIds, getPendingBilledDetails, settleBilling, getTodaySettledBillDetails, getTodayDetailedSummary } = require('./dietorderassign.controller');
 
 
 
@@ -281,4 +281,20 @@ router.post(
     checkToken,
     settleBilling
 );
+
+router.get(
+    "/today-settle-bill",
+    checkToken,
+    getTodaySettledBillDetails
+);
+
+
+
+router.get(
+    "/today-detailed-summary",
+    checkToken,
+    getTodayDetailedSummary
+);
+
+
 module.exports = router;

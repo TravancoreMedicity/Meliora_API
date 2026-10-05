@@ -1,6 +1,6 @@
 // dietdeliveryassign.controller.js
 
-const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientDietBill, getPatientExtraOrder, createPatientBillingService, updateBulkPickingUpService, getDeliveryBillDetailsService, CreateBystanderBilling, getBystanderBillingDetails, createBillingPaymentService, getBillablePatientDetail, getProformaDetailsService, convertProformaToBill, insertOrderPacking, getOrderPackingByAssignment, createPrintQueueService, getCashSummaryDetails, getPaymentModeDetails, getPaymentHistoryDetail, getPaymentHistoryBillDetail, getCashReturnDetails, returnAmountSettlement, getReturnDetails, getEmployeePettyCashDetails, getBillCollectionSummary, getCollectionDetails, getEmployeePettyCashDetailsByClosingIds, getPendingBilledDetails, settleBilling } = require("./dietorderassign.service");
+const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientDietBill, getPatientExtraOrder, createPatientBillingService, updateBulkPickingUpService, getDeliveryBillDetailsService, CreateBystanderBilling, getBystanderBillingDetails, createBillingPaymentService, getBillablePatientDetail, getProformaDetailsService, convertProformaToBill, insertOrderPacking, getOrderPackingByAssignment, createPrintQueueService, getCashSummaryDetails, getPaymentModeDetails, getPaymentHistoryDetail, getPaymentHistoryBillDetail, getCashReturnDetails, returnAmountSettlement, getReturnDetails, getEmployeePettyCashDetails, getBillCollectionSummary, getCollectionDetails, getEmployeePettyCashDetailsByClosingIds, getPendingBilledDetails, settleBilling, getTodaySettledBillDetails, getTodayDetailedSummary } = require("./dietorderassign.service");
 
 
 module.exports = {
@@ -1428,6 +1428,58 @@ module.exports = {
                 });
             }
         );
+    },
+
+    getTodaySettledBillDetails: (req, res) => {
+        getTodaySettledBillDetails((err, results) => {
+            if (err) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err,
+                });
+            };
+
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: `Not Settled Billed Today!`,
+                    data: []
+                });
+            };
+
+            return res.status(200).json({
+                success: 1,
+                message: "Settled Detail Fetched SuccessFully!",
+                data: results
+            });
+        });
+    },
+
+    getTodayDetailedSummary: (req, res) => {
+        getTodayDetailedSummary((err, results) => {
+            if (err) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err,
+                });
+            };
+
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: `Not Settled Billed Today!`,
+                    data: []
+                });
+            };
+
+            return res.status(200).json({
+                success: 1,
+                message: "Settled Detail Fetched SuccessFully!",
+                data: results
+            });
+        });
     },
 
 };

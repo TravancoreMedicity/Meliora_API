@@ -2826,7 +2826,7 @@ ORDER BY dmc.created_at
         console.log({
             data
         });
-        
+
         const {
             patient_id,
             admission_id,
@@ -5410,75 +5410,120 @@ ORDER BY dmc.created_at
     },
 
 
-    //     getBillablePatientDetail: (status, callback) => {
-    //         const query = `
-    // SELECT
-    //     pending.admission_id,
-    //     pending.pt_no,
 
-    //     p.fb_ptc_name AS patient_name,
-    //     p.fb_ptc_sex AS sex,
-    //     p.fb_ptd_dob AS date_of_birth,
-    //     p.fb_ptc_mobile AS mobile,
-    //     p.fb_dep_desc AS department,
-    //     p.fb_bd_code AS bed_code,
-    //     b.fb_bdc_no AS bed_name,
-    //     p.fb_ipd_date AS admission_date,
-    //     p.fb_ipc_curstatus,
 
-    //     ns.fb_ns_code AS nursing_station_code,
-    //     ns.fb_ns_name AS nursing_station_name,
 
-    //     pending.pending_items,
-    //     pending.pending_amount
+    // getBillablePatientDetail: (status, callback) => {
+    //     const query = `
+    //     SELECT 
+    //         pending.admission_id, 
+    //         pending.pt_no, 
 
-    // FROM (
-    //     SELECT
-    //         admission_id,
-    //         pt_no,
+    //         p.fb_ptc_name AS patient_name, 
+    //         p.fb_ptc_sex AS sex, 
+    //         p.fb_ptd_dob AS date_of_birth, 
+    //         p.fb_ptc_mobile AS mobile, 
+    //         p.fb_dep_desc AS department, 
+    //         p.fb_bd_code AS bed_code, 
+    //         b.fb_bdc_no AS bed_name, 
+    //         p.fb_ipd_date AS admission_date, 
+    //         p.fb_ipc_curstatus, 
 
-    //         COUNT(*) AS pending_items,
-    //         SUM(net_amount) AS pending_amount
+    //         ns.fb_ns_code AS nursing_station_code, 
+    //         ns.fb_ns_name AS nursing_station_name, 
+
+    //         pending.pending_items, 
+    //         pending.pending_amount,
+
+    //         CASE
+    //             WHEN EXISTS (
+    //                 SELECT 1
+    //                 FROM patient_billing pb
+    //                 WHERE pb.admission_id = pending.admission_id
+    //                   AND pb.is_settled = 'Y'
+    //             )
+    //             THEN 'Y'
+    //             ELSE 'N'
+    //         END AS is_settled
 
     //     FROM (
-    //         SELECT
-    //             admission_id,
-    //             pt_no,
-    //             party_type_id,
-    //             net_amount
-    //         FROM diet_meal_charge
-    //         WHERE charge_status = ?
+    //         SELECT 
+    //             admission_id, 
+    //             pt_no, 
+    //             COUNT(*) AS pending_items, 
+    //             SUM(net_amount) AS pending_amount 
 
-    //         UNION ALL
+    //         FROM (
+    //             SELECT 
+    //                 dmc.admission_id, 
+    //                 dmc.pt_no, 
+    //                 dmc.net_amount 
+    //             FROM diet_meal_charge dmc 
+    //             WHERE dmc.charge_status = ?
 
-    //         SELECT
-    //             admission_id,
-    //             pt_no,
-    //             party_type_id,
-    //             net_amount
-    //         FROM diet_service_ledger
-    //         WHERE ledger_status = ?
-    //     ) charges
+    //             UNION ALL
 
-    //     GROUP BY
-    //         admission_id,
-    //         pt_no
-    // ) pending
+    //             SELECT 
+    //                 dsl.admission_id, 
+    //                 dsl.pt_no, 
+    //                 dsl.net_amount 
+    //             FROM diet_service_ledger dsl 
+    //             WHERE dsl.ledger_status = ? 
+    //               AND dsl.party_type_id <> 1
 
-    // INNER JOIN fb_ipadmiss p
-    //     ON p.fb_ip_no = pending.admission_id
+    //             UNION ALL
 
-    // LEFT JOIN fb_bed b
-    //     ON b.fb_bd_code = p.fb_bd_code
+    //             SELECT 
+    //                 dsl.admission_id, 
+    //                 dsl.pt_no, 
+    //                 dsl.net_amount 
+    //             FROM diet_service_ledger dsl 
+    //             WHERE dsl.party_type_id = 1 
+    //               AND dsl.ledger_status = 'BILLED' 
 
-    // LEFT JOIN fb_nurse_station_master ns
-    //     ON ns.fb_ns_code = b.fb_ns_code
+    //               AND EXISTS (
+    //                     SELECT 1
+    //                     FROM patient_billing_detail pbd 
+    //                     INNER JOIN patient_billing pb 
+    //                         ON pb.billing_id = pbd.billing_id 
+    //                     WHERE pbd.reference_table = 'CANTEEN' 
+    //                       AND pbd.reference_id = dsl.canteen_order_id 
+    //                       AND pbd.item_id = dsl.item_id 
+    //                       AND pbd.party_type_id = 1 
+    //                       AND pbd.bill_item_status = 'OPEN' 
+    //                       AND pb.billing_party_type = 1 
+    //                       AND pb.billing_status IN ('OPEN', 'PARTIAL') 
+    //                       AND pb.balance_amount > 0
+    //               )
 
-    // ORDER BY pending.admission_id DESC
-    //     `;
+    //         ) charges
 
-    //         executeQuery(query, [status, status], callback);
-    //     },
+    //         GROUP BY admission_id, pt_no
+
+    //     ) pending
+
+    //     INNER JOIN fb_ipadmiss p 
+    //         ON p.fb_ip_no = pending.admission_id 
+
+    //     LEFT JOIN fb_bed b 
+    //         ON b.fb_bd_code = p.fb_bd_code 
+
+    //     LEFT JOIN fb_nurse_station_master ns 
+    //         ON ns.fb_ns_code = b.fb_ns_code
+
+    //     WHERE p.fb_ipc_curstatus IS NULL
+    //        OR p.fb_ipc_curstatus <> 'PCO'
+
+    //     ORDER BY pending.admission_id DESC
+    // `;
+
+    //     executeQuery(
+    //         query,
+    //         [status, status],
+    //         callback
+    //     );
+    // },
+
 
 
     getBillablePatientDetail: (status, callback) => {
@@ -5501,13 +5546,19 @@ ORDER BY dmc.created_at
             ns.fb_ns_name AS nursing_station_name,
 
             pending.pending_items,
-            pending.pending_amount
+            pending.pending_amount,
+
+            CASE
+                WHEN settled.has_settled = 1
+                     AND settled.has_pending_bill = 0
+                THEN 'Y'
+                ELSE 'N'
+            END AS is_settled
 
         FROM (
             SELECT
                 admission_id,
                 pt_no,
-
                 COUNT(*) AS pending_items,
                 SUM(net_amount) AS pending_amount
 
@@ -5516,11 +5567,8 @@ ORDER BY dmc.created_at
                     dmc.admission_id,
                     dmc.pt_no,
                     dmc.net_amount
-
                 FROM diet_meal_charge dmc
-
                 WHERE dmc.charge_status = ?
-
 
                 UNION ALL
 
@@ -5528,43 +5576,36 @@ ORDER BY dmc.created_at
                     dsl.admission_id,
                     dsl.pt_no,
                     dsl.net_amount
-
                 FROM diet_service_ledger dsl
-
                 WHERE dsl.ledger_status = ?
                   AND dsl.party_type_id <> 1
 
-
                 UNION ALL
 
                 SELECT
                     dsl.admission_id,
                     dsl.pt_no,
                     dsl.net_amount
-
                 FROM diet_service_ledger dsl
-
                 WHERE dsl.party_type_id = 1
                   AND dsl.ledger_status = 'BILLED'
 
                   AND EXISTS (
-                        SELECT 1
+                      SELECT 1
+                      FROM patient_billing_detail pbd
 
-                        FROM patient_billing_detail pbd
+                      INNER JOIN patient_billing pb
+                          ON pb.billing_id = pbd.billing_id
 
-                        INNER JOIN patient_billing pb
-                            ON pb.billing_id = pbd.billing_id
+                      WHERE pbd.reference_table = 'CANTEEN'
+                        AND pbd.reference_id = dsl.canteen_order_id
+                        AND pbd.item_id = dsl.item_id
+                        AND pbd.party_type_id = 1
+                        AND pbd.bill_item_status = 'OPEN'
 
-                        WHERE pbd.reference_table = 'CANTEEN'
-                          AND pbd.reference_id = dsl.canteen_order_id
-                          AND pbd.item_id = dsl.item_id
-                          AND pbd.party_type_id = 1
-
-                          AND pbd.bill_item_status = 'OPEN'
-
-                          AND pb.billing_party_type = 1
-                          AND pb.billing_status IN ('OPEN', 'PARTIAL')
-                          AND pb.balance_amount > 0
+                        AND pb.billing_party_type = 1
+                        AND pb.billing_status IN ('OPEN', 'PARTIAL')
+                        AND pb.balance_amount > 0
                   )
 
             ) charges
@@ -5584,8 +5625,47 @@ ORDER BY dmc.created_at
         LEFT JOIN fb_nurse_station_master ns
             ON ns.fb_ns_code = b.fb_ns_code
 
-        ORDER BY pending.admission_id DESC
+        LEFT JOIN (
+            SELECT
+                admission_id,
+
+                MAX(
+                    CASE
+                        WHEN is_settled = 'Y'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS has_settled,
+
+                MAX(
+                    CASE
+                        WHEN billing_status IN ('OPEN', 'PARTIAL')
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS has_pending_bill
+
+            FROM patient_billing
+
+            WHERE billing_status <> 'CANCELLED'
+
+            GROUP BY
+                admission_id
+
+        ) settled
+            ON settled.admission_id = pending.admission_id
+
+        WHERE
+            settled.has_settled IS NULL
+            OR settled.has_settled = 0
+            OR settled.has_pending_bill = 1
+            OR p.fb_ipc_curstatus IS NULL
+            OR p.fb_ipc_curstatus <> 'PCO'
+
+        ORDER BY
+            pending.admission_id DESC
     `;
+
         executeQuery(
             query,
             [status, status],
@@ -5661,345 +5741,6 @@ ORDER BY dmc.created_at
             }
         );
     },
-
-    // convertProformaToBill: (
-    //     payload,
-    //     callback
-    // ) => {
-
-    //     const {
-    //         proforma_id,
-    //         bill,
-    //         details
-    //     } = payload;
-
-    //     // --------------------------------------------------
-    //     // GET CONNECTION
-    //     // --------------------------------------------------
-
-    //     pool.getConnection((connectionError, connection) => {
-
-    //         if (connectionError) {
-    //             console.error(
-    //                 "convertProformaToBill Connection Error:",
-    //                 connectionError
-    //             );
-    //             return callback(
-    //                 connectionError,
-    //                 null
-    //             );
-    //         }
-
-    //         // --------------------------------------------------
-    //         // COMMON ERROR HANDLER
-    //         // --------------------------------------------------
-
-    //         const handleError = (error) => {
-    //             connection.rollback((rollbackError) => {
-    //                 if (rollbackError) {
-    //                     console.error(
-    //                         "convertProformaToBill Rollback Error:",
-    //                         rollbackError
-    //                     );
-    //                 }
-    //                 connection.release();
-    //                 return callback(
-    //                     error,
-    //                     null
-    //                 );
-    //             });
-    //         };
-
-    //         // --------------------------------------------------
-    //         // START TRANSACTION
-    //         // --------------------------------------------------
-
-    //         connection.beginTransaction((transactionError) => {
-    //             if (transactionError) {
-    //                 console.error(
-    //                     "convertProformaToBill Transaction Error:",
-    //                     transactionError
-    //                 );
-    //                 connection.release();
-    //                 return callback(
-    //                     transactionError,
-    //                     null
-    //                 );
-    //             }
-
-    //             // --------------------------------------------------
-    //             // 1. INSERT BILL MASTER
-    //             // --------------------------------------------------
-
-    //             const billInsertQuery = `
-    //             INSERT INTO patient_billing (
-    //                 patient_id,
-    //                 admission_id,
-    //                 assignment_detail_id,
-    //                 billing_party_type,
-    //                 billing_date,
-    //                 bill_type,
-    //                 bill_generated_by,
-    //                 bill_generated_location,
-    //                 total_amount,
-    //                 paid_amount,
-    //                 balance_amount,
-    //                 billing_status,
-    //                 created_by,
-    //                 bill_pay_type
-    //             )
-    //             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    //         `;
-
-    //             connection.query(
-    //                 billInsertQuery,
-    //                 [
-    //                     bill.patient_id,
-    //                     bill.admission_id,
-    //                     bill.assignment_detail_id || null,
-    //                     bill.billing_party_type,
-    //                     bill.billing_date,
-    //                     bill.bill_type,
-    //                     bill.employeeId,
-    //                     bill.bill_generated_location,
-    //                     bill.total_amount,
-    //                     bill.paid_amount,
-    //                     bill.balance_amount,
-    //                     bill.billing_status,
-    //                     bill.employeeId,
-    //                     bill.bill_pay_type
-    //                 ],
-    //                 (billError, billResult) => {
-
-    //                     if (billError) {
-
-    //                         console.error(
-    //                             "Bill Master Insert Error:",
-    //                             billError
-    //                         );
-
-    //                         return handleError(
-    //                             billError
-    //                         );
-    //                     }
-
-    //                     const billingId =
-    //                         billResult.insertId;
-
-    //                     // --------------------------------------------------
-    //                     // 2. GENERATE BILL NUMBER
-    //                     // --------------------------------------------------
-
-    //                     const today = new Date()
-    //                         .toISOString()
-    //                         .slice(0, 10)
-    //                         .replace(/-/g, "");
-
-    //                     const billNo =
-    //                         `CAN-${today}-${String(
-    //                             billingId
-    //                         ).padStart(6, "0")}`;
-
-    //                     const updateBillNoQuery = `
-    //                     UPDATE patient_billing
-    //                     SET bill_no = ?
-    //                     WHERE billing_id = ?
-    //                 `;
-
-    //                     connection.query(
-    //                         updateBillNoQuery,
-    //                         [
-    //                             billNo,
-    //                             billingId
-    //                         ],
-    //                         (billNoError) => {
-
-    //                             if (billNoError) {
-
-    //                                 console.error(
-    //                                     "Bill Number Update Error:",
-    //                                     billNoError
-    //                                 );
-
-    //                                 return handleError(
-    //                                     billNoError
-    //                                 );
-    //                             }
-
-    //                             // --------------------------------------------------
-    //                             // 3. INSERT BILL DETAILS
-    //                             // --------------------------------------------------
-
-    //                             const detailInsertQuery = `
-    //                             INSERT INTO patient_billing_detail (
-    //                                 billing_id,
-    //                                 category_id,
-    //                                 party_type_id,
-    //                                 description,
-    //                                 item_id,
-    //                                 quantity,
-    //                                 rate,
-    //                                 gst,
-    //                                 gst_amount,
-    //                                 discount,
-    //                                 amount,
-    //                                 reference_table,
-    //                                 reference_id,
-    //                                 service_date
-    //                             )
-    //                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    //                         `;
-
-    //                             // --------------------------------------------------
-    //                             // INSERT DETAILS ONE BY ONE
-    //                             // --------------------------------------------------
-
-    //                             const insertDetail = (
-    //                                 index
-    //                             ) => {
-
-    //                                 // --------------------------------------------------
-    //                                 // ALL DETAILS INSERTED
-    //                                 // --------------------------------------------------
-
-    //                                 if (
-    //                                     index >=
-    //                                     details.length
-    //                                 ) {
-
-    //                                     // --------------------------------------------------
-    //                                     // 4. COMMIT TRANSACTION
-    //                                     // --------------------------------------------------
-
-    //                                     return connection.commit(
-    //                                         (commitError) => {
-
-    //                                             if (commitError) {
-
-    //                                                 console.error(
-    //                                                     "Commit Error:",
-    //                                                     commitError
-    //                                                 );
-
-    //                                                 return handleError(
-    //                                                     commitError
-    //                                                 );
-    //                                             }
-
-    //                                             // --------------------------------------------------
-    //                                             // SUCCESS
-    //                                             // --------------------------------------------------
-
-    //                                             connection.release();
-
-    //                                             return callback(
-    //                                                 null,
-    //                                                 {
-    //                                                     billing_id:
-    //                                                         billingId,
-
-    //                                                     bill_no:
-    //                                                         billNo,
-
-    //                                                     proforma_id:
-    //                                                         proforma_id,
-
-    //                                                     total_amount:
-    //                                                         bill.total_amount,
-
-    //                                                     paid_amount:
-    //                                                         bill.paid_amount,
-
-    //                                                     balance_amount:
-    //                                                         bill.balance_amount,
-
-    //                                                     billing_status:
-    //                                                         bill.billing_status,
-
-    //                                                     bill_pay_type:
-    //                                                         bill.bill_pay_type
-    //                                                 }
-    //                                             );
-    //                                         }
-    //                                     );
-    //                                 }
-
-    //                                 const item =
-    //                                     details[index];
-
-    //                                 connection.query(
-    //                                     detailInsertQuery,
-    //                                     [
-    //                                         billingId,
-
-    //                                         item.category_id,
-
-    //                                         item.party_type_id ||
-    //                                         bill.billing_party_type,
-
-    //                                         item.description,
-
-    //                                         item.item_id ||
-    //                                         null,
-
-    //                                         item.quantity ||
-    //                                         0,
-
-    //                                         item.rate ||
-    //                                         0,
-
-    //                                         item.gst ||
-    //                                         0,
-
-    //                                         item.gst_amount ||
-    //                                         0,
-
-    //                                         item.discount ||
-    //                                         0,
-
-    //                                         item.amount ||
-    //                                         0,
-
-    //                                         item.reference_table ||
-    //                                         "proforma_detail",
-
-    //                                         item.reference_id ||
-    //                                         null,
-
-    //                                         item.service_date ||
-    //                                         null
-    //                                     ],
-    //                                     (detailError) => {
-
-    //                                         if (detailError) {
-
-    //                                             console.error(
-    //                                                 `Bill Detail Insert Error at index ${index}:`,
-    //                                                 detailError
-    //                                             );
-
-    //                                             return handleError(
-    //                                                 detailError
-    //                                             );
-    //                                         }
-
-    //                                         // Move to next detail
-    //                                         insertDetail(
-    //                                             index + 1
-    //                                         );
-    //                                     }
-    //                                 );
-    //                             };
-
-    //                             // Start inserting details
-    //                             insertDetail(0);
-    //                         }
-    //                     );
-    //                 }
-    //             );
-    //         });
-    //     });
-    // },
 
     convertProformaToBill: (
         payload,
@@ -6931,21 +6672,21 @@ ORDER BY dmc.created_at
     getCashSummaryDetails: (EmId, callBack) => {
         pool.query(
             `
-  SELECT
-    collected_by,
-    SUM(amount) AS total_collected,
-    SUM(
-        CASE
-            WHEN payment_mode = 'CASH' THEN amount
-            ELSE 0
-        END
-    ) AS cash_collected,
-    COUNT(*) AS total_transactions
-FROM patient_bill_payment
-WHERE collected_by = ?
-  AND payment_status = 'SUCCESS'
- -- AND DATE(payment_date) = CURDATE()
-GROUP BY collected_by;
+            SELECT
+                collected_by,
+                SUM(amount) AS total_collected,
+                SUM(
+                    CASE
+                        WHEN payment_mode = 'CASH' THEN amount
+                        ELSE 0
+                    END
+                ) AS cash_collected,
+                COUNT(*) AS total_transactions
+            FROM patient_bill_payment
+            WHERE collected_by = ?
+            AND payment_status = 'SUCCESS'
+            -- AND DATE(payment_date) = CURDATE()
+            GROUP BY collected_by;
             `,
             [EmId],
             (error, results) => {
@@ -7690,7 +7431,13 @@ ORDER BY
         executeQuery(
             query,
             [admissionId],
-            callback
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
         );
     },
 
@@ -7853,6 +7600,448 @@ ORDER BY
         });
     },
 
+    getTodaySettledBillDetails: (callback) => {
+        const query = `
+            SELECT
+                pb.patient_id,
+                pb.admission_id,
+
+                a.fb_ptc_name AS patient_name,
+                a.fb_ptc_sex AS sex,
+                a.fb_ptc_mobile AS mobile,
+                a.fb_pt_no AS pt_no,
+
+                a.fb_bd_code AS bed_code,
+                b.fb_bdc_no AS bed_name,
+
+                a.fb_ipd_date AS admission_date,
+                a.fb_ipd_disc AS discharge_date,
+                a.fb_ipc_curstatus AS current_status,
+
+                ns.fb_ns_code AS nursing_station_code,
+                ns.fb_ns_name AS nursing_station_name,
+
+                MAX(pb.settled_id) AS settled_id
+
+            FROM patient_billing pb
+
+            LEFT JOIN fb_ipadmiss a
+                ON a.fb_pt_no = pb.patient_id
+            AND a.fb_ip_no = pb.admission_id
+
+            LEFT JOIN fb_bed b
+                ON b.fb_bd_code = a.fb_bd_code
+
+            LEFT JOIN fb_nurse_station_master ns
+                ON ns.fb_ns_code = b.fb_ns_code
+
+            WHERE pb.billing_status <> 'CANCELLED'
+            AND pb.is_settled = 'Y'
+            AND (
+                    pb.billing_party_type <> 1
+                    OR pb.bill_pay_type = 'BYSTANDER_CREDIT'
+                )
+            AND DATE(pb.updated_at) = CURDATE()
+
+            GROUP BY
+                pb.patient_id,
+                pb.admission_id,
+                a.fb_ptc_name,
+                a.fb_ptc_sex,
+                a.fb_ptc_mobile,
+                a.fb_pt_no,
+                a.fb_bd_code,
+                b.fb_bdc_no,
+                a.fb_ipd_date,
+                a.fb_ipd_disc,
+                a.fb_ipc_curstatus,
+                ns.fb_ns_code,
+                ns.fb_ns_name
+
+            ORDER BY pb.admission_id DESC
+    `;
+
+        executeQuery(
+            query,
+            [],
+            (error, results) => {
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
+
+
+
+    getTodayDetailedSummary: (callback) => {
+
+        const query = `
+        SELECT
+
+        /* =========================================================
+           INPATIENT BILLED
+        ========================================================= */
+
+        (
+            SELECT COUNT(*)
+            FROM patient_billing pb
+            WHERE pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type <> 1
+        ) AS discharge_bills,
+
+
+        (
+            SELECT COALESCE(SUM(pb.total_amount), 0)
+            FROM patient_billing pb
+            WHERE pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type <> 1
+        ) AS discharge_amount,
+
+
+        (
+            SELECT COALESCE(SUM(pb.paid_amount), 0)
+            FROM patient_billing pb
+            WHERE pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type <> 1
+        ) AS discharge_collected,
+
+
+        (
+            SELECT COALESCE(SUM(pb.balance_amount), 0)
+            FROM patient_billing pb
+            WHERE pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type <> 1
+        ) AS discharge_pending,
+
+
+        (
+    SELECT COUNT(*)
+    FROM patient_billing pb
+    WHERE pb.billing_date = CURDATE()
+      AND pb.billing_status <> 'CANCELLED'
+      AND pb.billing_party_type <> 1
+      AND pb.paid_amount > 0
+) AS discharge_collected_bills,
+
+        /* INPATIENT CASH */
+
+        (
+            SELECT COALESCE(SUM(pp.amount), 0)
+            FROM patient_bill_payment pp
+            INNER JOIN patient_billing pb
+                ON pb.billing_id = pp.billing_id
+            WHERE DATE(pp.payment_date) = CURDATE()
+              AND pp.payment_status = 'SUCCESS'
+              AND pp.payment_mode = 'CASH'
+              AND pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type <> 1
+        ) AS discharge_cash,
+
+
+        /* INPATIENT UPI */
+
+        (
+            SELECT COALESCE(SUM(pp.amount), 0)
+            FROM patient_bill_payment pp
+            INNER JOIN patient_billing pb
+                ON pb.billing_id = pp.billing_id
+            WHERE DATE(pp.payment_date) = CURDATE()
+              AND pp.payment_status = 'SUCCESS'
+              AND pp.payment_mode = 'UPI'
+              AND pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type <> 1
+        ) AS discharge_upi,
+
+
+        /* INPATIENT BANK TRANSFER */
+
+        (
+            SELECT COALESCE(SUM(pp.amount), 0)
+            FROM patient_bill_payment pp
+            INNER JOIN patient_billing pb
+                ON pb.billing_id = pp.billing_id
+            WHERE DATE(pp.payment_date) = CURDATE()
+              AND pp.payment_status = 'SUCCESS'
+              AND pp.payment_mode = 'BANK_TRANSFER'
+              AND pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type <> 1
+        ) AS discharge_bank_transfer,
+
+
+        /* =========================================================
+           BYSTANDER BILLED
+        ========================================================= */
+
+        (
+            SELECT COUNT(*)
+            FROM patient_billing pb
+            WHERE pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type = 1
+        ) AS bystander_bills,
+
+
+        (
+            SELECT COALESCE(SUM(pb.total_amount), 0)
+            FROM patient_billing pb
+            WHERE pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type = 1
+        ) AS bystander_amount,
+
+
+        (
+            SELECT COALESCE(SUM(pb.paid_amount), 0)
+            FROM patient_billing pb
+            WHERE pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type = 1
+        ) AS bystander_collected,
+
+
+    (
+    SELECT COUNT(*)
+    FROM patient_billing pb
+    WHERE pb.billing_date = CURDATE()
+      AND pb.billing_status <> 'CANCELLED'
+      AND pb.billing_party_type = 1
+      AND pb.paid_amount > 0
+) AS bystander_collected_bills,
+
+
+        (
+            SELECT COUNT(*)
+            FROM patient_billing pb
+            WHERE pb.billing_date = CURDATE()
+            AND pb.billing_status <> 'CANCELLED'
+            AND pb.billing_party_type = 1
+            AND pb.balance_amount > 0
+        ) AS bystander_pending_bills,
+
+        /* BYSTANDER CASH */
+
+        (
+            SELECT COALESCE(SUM(pp.amount), 0)
+            FROM patient_bill_payment pp
+            INNER JOIN patient_billing pb
+                ON pb.billing_id = pp.billing_id
+            WHERE DATE(pp.payment_date) = CURDATE()
+              AND pp.payment_status = 'SUCCESS'
+              AND pp.payment_mode = 'CASH'
+              AND pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type = 1
+        ) AS bystander_cash,
+
+
+        /* BYSTANDER UPI */
+
+        (
+            SELECT COALESCE(SUM(pp.amount), 0)
+            FROM patient_bill_payment pp
+            INNER JOIN patient_billing pb
+                ON pb.billing_id = pp.billing_id
+            WHERE DATE(pp.payment_date) = CURDATE()
+              AND pp.payment_status = 'SUCCESS'
+              AND pp.payment_mode = 'UPI'
+              AND pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type = 1
+        ) AS bystander_upi,
+
+
+        /* BYSTANDER BANK */
+
+        (
+            SELECT COALESCE(SUM(pp.amount), 0)
+            FROM patient_bill_payment pp
+            INNER JOIN patient_billing pb
+                ON pb.billing_id = pp.billing_id
+            WHERE DATE(pp.payment_date) = CURDATE()
+              AND pp.payment_status = 'SUCCESS'
+              AND pp.payment_mode = 'BANK_TRANSFER'
+              AND pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type = 1
+        ) AS bystander_bank_transfer,
+
+
+        /* =========================================================
+           PETTY CASH
+        ========================================================= */
+
+        (
+            SELECT COUNT(*)
+            FROM delivery_person_cash dpc
+            WHERE DATE(dpc.given_at) = CURDATE()
+        ) AS petty_cash_bills,
+
+
+        (
+            SELECT COALESCE(SUM(dpc.amount), 0)
+            FROM delivery_person_cash dpc
+            WHERE DATE(dpc.given_at) = CURDATE()
+        ) AS petty_cash_amount,
+
+
+        (
+            SELECT COALESCE(SUM(dpcs.settled_amount), 0)
+            FROM delivery_person_cash_settlement dpcs
+            INNER JOIN delivery_person_cash dpc
+                ON dpc.cash_id = dpcs.cash_id
+            WHERE DATE(dpc.given_at) = CURDATE()
+        ) AS petty_cash_collected,
+
+
+        (
+            SELECT COALESCE(
+                SUM(
+                    dpc.amount -
+                    COALESCE(
+                        (
+                            SELECT SUM(dpcs.settled_amount)
+                            FROM delivery_person_cash_settlement dpcs
+                            WHERE dpcs.cash_id = dpc.cash_id
+                        ),
+                        0
+                    )
+                ),
+                0
+            )
+            FROM delivery_person_cash dpc
+            WHERE DATE(dpc.given_at) = CURDATE()
+        ) AS petty_cash_pending,
+
+
+        (
+            SELECT COALESCE(SUM(dpcs.settled_amount), 0)
+            FROM delivery_person_cash_settlement dpcs
+            INNER JOIN delivery_person_cash dpc
+                ON dpc.cash_id = dpcs.cash_id
+            WHERE DATE(dpc.given_at) = CURDATE()
+        ) AS petty_cash_cash,
+
+
+        0 AS petty_cash_upi,
+
+
+        0 AS petty_cash_bank_transfer,
+
+
+        /* =========================================================
+           TODAY INPATIENT SETTLED - DISCHARGE
+           
+           Today's bills which are marked as settled
+        ========================================================= */
+
+        (
+            SELECT COUNT(*)
+            FROM patient_billing pb
+            WHERE pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type <> 1
+              AND pb.is_settled = 'Y'
+        ) AS settled_bills,
+
+
+        (
+            SELECT COALESCE(SUM(pb.total_amount), 0)
+            FROM patient_billing pb
+            WHERE pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type <> 1
+              AND pb.is_settled = 'Y'
+        ) AS settled_amount,
+
+
+        (
+            SELECT COALESCE(SUM(pb.paid_amount), 0)
+            FROM patient_billing pb
+            WHERE pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type <> 1
+              AND pb.is_settled = 'Y'
+        ) AS settled_collected,
+
+
+        /* SETTLED CASH */
+
+        (
+            SELECT COALESCE(SUM(pp.amount), 0)
+            FROM patient_bill_payment pp
+            INNER JOIN patient_billing pb
+                ON pb.billing_id = pp.billing_id
+            WHERE DATE(pp.payment_date) = CURDATE()
+              AND pp.payment_status = 'SUCCESS'
+              AND pp.payment_mode = 'CASH'
+              AND pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type <> 1
+              AND pb.is_settled = 'Y'
+        ) AS settled_cash,
+
+
+        /* SETTLED UPI */
+
+        (
+            SELECT COALESCE(SUM(pp.amount), 0)
+            FROM patient_bill_payment pp
+            INNER JOIN patient_billing pb
+                ON pb.billing_id = pp.billing_id
+            WHERE DATE(pp.payment_date) = CURDATE()
+              AND pp.payment_status = 'SUCCESS'
+              AND pp.payment_mode = 'UPI'
+              AND pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type <> 1
+              AND pb.is_settled = 'Y'
+        ) AS settled_upi,
+
+
+        /* SETTLED BANK TRANSFER */
+
+        (
+            SELECT COALESCE(SUM(pp.amount), 0)
+            FROM patient_bill_payment pp
+            INNER JOIN patient_billing pb
+                ON pb.billing_id = pp.billing_id
+            WHERE DATE(pp.payment_date) = CURDATE()
+              AND pp.payment_status = 'SUCCESS'
+              AND pp.payment_mode = 'BANK_TRANSFER'
+              AND pb.billing_date = CURDATE()
+              AND pb.billing_status <> 'CANCELLED'
+              AND pb.billing_party_type <> 1
+              AND pb.is_settled = 'Y'
+        ) AS settled_bank_transfer
+
+
+        FROM dual
+    `;
+
+
+        executeQuery(
+            query,
+            [],
+            (error, results) => {
+
+                if (error) {
+                    return callback(error);
+                }
+
+                return callback(null, results);
+            }
+        );
+    },
 };
 
 

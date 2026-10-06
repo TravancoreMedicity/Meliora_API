@@ -152,6 +152,7 @@ ORDER BY dp.fb_ip_no DESC;
     dp.fb_ipc_status       AS ipd_status,
     dp.fb_do_code          AS do_code,
     dp.fb_doc_name         AS doc_name,
+    dp.fb_ipc_curstatus,
 
     rc.fb_rcc_desc,
     fb.fb_bdc_no,

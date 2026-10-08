@@ -346,8 +346,8 @@ module.exports = {
             status === "PENDING"
                 ? ""
                 : `
-                AND co.order_time >= CURDATE()
-                AND co.order_time < CURDATE() + INTERVAL 1 DAY
+                AND co.order_time >= CURDATE() - INTERVAL 1 DAY
+                AND co.order_time < CURDATE() + INTERVAL 2 DAY
               `;
 
         const query = `

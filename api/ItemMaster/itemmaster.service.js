@@ -240,6 +240,8 @@ LEFT JOIN item_category_master ic
 
 LEFT JOIN item_type itm
     ON itm.item_type_id = im.item_type_id
+    
+WHERE itm.item_type_id IN (1, 3)
 
 ORDER BY
     ig.display_order,

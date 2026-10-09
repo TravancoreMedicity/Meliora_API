@@ -58,142 +58,187 @@ LEFT JOIN indent_users u
                     return callback(txErr);
                 }
 
-                // Step 1: Insert into indent_tokenregistration
+                // Step 0A: Lock the schedule date row and check token count
                 connection.query(
-                    `INSERT INTO indent_tokenregistration 
-                     ( appointmentdate, medicalrepid, companyId, departmentId, prefix, created_date, updated_date) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                    [
-                        data.selectedDate || null,
-                        data.medicalrep_id || null,
-                        data.companyId || null,
-                        data.division_id || null,
-                        data.prefix || null,
-                        new Date(),
-                        new Date()
-                    ],
-                    (tokenErr, tokenRes) => {
-                        if (tokenErr) {
+                    `SELECT token_count, schedule_status 
+                     FROM indent_date_schedule 
+                     WHERE DATE(schedule_date) = DATE(?) 
+                     FOR UPDATE`,
+                    [data.selectedDate],
+                    (schedErr, schedRes) => {
+                        if (schedErr) {
                             return connection.rollback(() => {
                                 connection.release();
-                                return callback(tokenErr);
+                                return callback(schedErr);
                             });
                         }
 
-                        const tokenId = tokenRes.insertId;
+                        if (!schedRes || schedRes.length === 0) {
+                            return connection.rollback(() => {
+                                connection.release();
+                                return callback(new Error("Selected appointment date is not scheduled"));
+                            });
+                        }
 
-                        // Step 1.5: Update tokenno field with the newly generated insertId (tokenId)
+                        const currentTokenCount = schedRes[0].token_count || 0;
+                        if (currentTokenCount >= 25) {
+                            return connection.rollback(() => {
+                                connection.release();
+                                return callback(new Error("Tokens for the selected appointment date are already full (maximum 25)"));
+                            });
+                        }
+
+                        // Step 0B: Duplicate check - prevent duplicate entry for same rep, appointment date, department and medicine
                         connection.query(
-                            `UPDATE indent_tokenregistration SET tokenno = ? WHERE token_id = ?`,
-                            [tokenId, tokenId],
-                            (updateTokenErr, updateTokenRes) => {
-                                if (updateTokenErr) {
+                            `SELECT tr.token_id 
+                             FROM indent_tokenregistration tr
+                             JOIN indent_medicine im ON im.tokenid = tr.token_id
+                             WHERE tr.medicalrepid = ? 
+                               AND DATE(tr.appointmentdate) = DATE(?) 
+                               AND tr.departmentId = ? 
+                               AND LOWER(TRIM(im.medicinename)) = LOWER(TRIM(?))
+                             LIMIT 1`,
+                            [
+                                data.medicalrep_id,
+                                data.selectedDate,
+                                data.division_id,
+                                data.medicine_name
+                            ],
+                            (dupErr, dupRes) => {
+                                if (dupErr) {
                                     return connection.rollback(() => {
                                         connection.release();
-                                        return callback(updateTokenErr);
+                                        return callback(dupErr);
                                     });
                                 }
 
-                                // Step 2: Insert into indent_medicine
+                                if (dupRes && dupRes.length > 0) {
+                                    return connection.rollback(() => {
+                                        connection.release();
+                                        return callback(new Error("This medicine has already been registered for the selected date"));
+                                    });
+                                }
+
+                                // Step 1: Insert into indent_tokenregistration
                                 connection.query(
-                                    `INSERT INTO indent_medicine 
-                                     (medicinename, description, medicalrepid,teamid, status, VerificationStatus, finalstatus, rejectionstatus, tokenid, createdAt, updatedAt, date) 
-                                     VALUES ( ?, ?, ?, 1, 1, 0, 0, 0, ?, ?, ?, ?)`,
+                                    `INSERT INTO indent_tokenregistration 
+                                     ( appointmentdate, medicalrepid, companyId, departmentId, prefix, created_date, updated_date) 
+                                     VALUES (?, ?, ?, ?, ?, ?, ?)`,
                                     [
-                                        data.medicine_name,
-                                        data.description || null,
+                                        data.selectedDate || null,
                                         data.medicalrep_id || null,
-                                        tokenId,
-                                        new Date(),
+                                        data.companyId || null,
+                                        data.division_id || null,
+                                        data.prefix || null,
                                         new Date(),
                                         new Date()
                                     ],
-                                    (error, results) => {
-                                        if (error) {
+                                    (tokenErr, tokenRes) => {
+                                        if (tokenErr) {
                                             return connection.rollback(() => {
                                                 connection.release();
-                                                return callback(error);
+                                                return callback(tokenErr);
                                             });
                                         }
 
-                                        const medicineId = results.insertId;
+                                        const tokenId = tokenRes.insertId;
 
-                                        // Step 3: Bulk insert into indent_contents_details if content_rows are provided
-                                        if (data?.content_rows && data?.content_rows.length > 0) {
-                                            const contentValues = data?.content_rows?.map(row => [
-                                                row.name,
-                                                row.qty,
-                                                medicineId,
-                                                new Date(),
-                                                new Date(),
-                                                0 // edit_status
-                                            ]);
-
-                                            connection.query(
-                                                `INSERT INTO indent_contents_details 
-                                                 (content_name, content_quantity, indent_medicine_slno, create_date, update_date, edit_status) 
-                                                 VALUES ?`,
-                                                [contentValues],
-                                                (err, res) => {
-                                                    if (err) {
-                                                        return connection.rollback(() => {
-                                                            connection.release();
-                                                            return callback(err);
-                                                        });
-                                                    }
-
-                                                    // Step 4: Update indent_date_schedule token_count & total_token_count
-                                                    connection.query(
-                                                        `UPDATE indent_date_schedule SET token_count = token_count + 1, total_token_count = ? WHERE DATE(schedule_date) = DATE(?)`,
-                                                        [tokenId, data.selectedDate],
-                                                        (updateErr, updateRes) => {
-                                                            if (updateErr) {
-                                                                return connection.rollback(() => {
-                                                                    connection.release();
-                                                                    return callback(updateErr);
-                                                                });
-                                                            }
-
-                                                            connection.commit(commitErr => {
-                                                                if (commitErr) {
-                                                                    return connection.rollback(() => {
-                                                                        connection.release();
-                                                                        return callback(commitErr);
-                                                                    });
-                                                                }
-                                                                connection.release();
-                                                                return callback(null, { insertid: medicineId, tokenid: tokenId });
-                                                            });
-                                                        }
-                                                    );
-                                                }
-                                            );
-                                        } else {
-                                            // Step 4: Update indent_date_schedule token_count & total_token_count
-                                            connection.query(
-                                                `UPDATE indent_date_schedule SET token_count = token_count + 1, total_token_count = ? WHERE DATE(schedule_date) = DATE(?)`,
-                                                [tokenId, data.selectedDate],
-                                                (updateErr, updateRes) => {
-                                                    if (updateErr) {
-                                                        return connection.rollback(() => {
-                                                            connection.release();
-                                                            return callback(updateErr);
-                                                        });
-                                                    }
-
-                                                    connection.commit(commitErr => {
-                                                        if (commitErr) {
-                                                            return connection.rollback(() => {
-                                                                connection.release();
-                                                                return callback(commitErr);
-                                                            });
-                                                        }
+                                        // Step 1.5: Update tokenno field with the newly generated insertId (tokenId)
+                                        connection.query(
+                                            `UPDATE indent_tokenregistration SET tokenno = ? WHERE token_id = ?`,
+                                            [tokenId, tokenId],
+                                            (updateTokenErr, updateTokenRes) => {
+                                                if (updateTokenErr) {
+                                                    return connection.rollback(() => {
                                                         connection.release();
-                                                        return callback(null, { insertid: medicineId, tokenid: tokenId });
+                                                        return callback(updateTokenErr);
                                                     });
                                                 }
-                                            );
-                                        }
+
+                                                // Step 2: Insert into indent_medicine
+                                                connection.query(
+                                                    `INSERT INTO indent_medicine 
+                                                     (medicinename, description, medicalrepid,teamid, status, VerificationStatus, finalstatus, rejectionstatus, tokenid, createdAt, updatedAt, date) 
+                                                     VALUES ( ?, ?, ?, 1, 1, 0, 0, 0, ?, ?, ?, ?)`,
+                                                    [
+                                                        data.medicine_name,
+                                                        data.description || null,
+                                                        data.medicalrep_id || null,
+                                                        tokenId,
+                                                        new Date(),
+                                                        new Date(),
+                                                        new Date()
+                                                    ],
+                                                    (error, results) => {
+                                                        if (error) {
+                                                            return connection.rollback(() => {
+                                                                connection.release();
+                                                                return callback(error);
+                                                            });
+                                                        }
+
+                                                        const medicineId = results.insertId;
+
+                                                        const finishTransaction = () => {
+                                                            // Step 4: Update indent_date_schedule token_count & total_token_count
+                                                            connection.query(
+                                                                `UPDATE indent_date_schedule SET token_count = token_count + 1, total_token_count = ? WHERE DATE(schedule_date) = DATE(?)`,
+                                                                [tokenId, data.selectedDate],
+                                                                (updateErr, updateRes) => {
+                                                                    if (updateErr) {
+                                                                        return connection.rollback(() => {
+                                                                            connection.release();
+                                                                            return callback(updateErr);
+                                                                        });
+                                                                    }
+
+                                                                    connection.commit(commitErr => {
+                                                                        if (commitErr) {
+                                                                            return connection.rollback(() => {
+                                                                                connection.release();
+                                                                                return callback(commitErr);
+                                                                            });
+                                                                        }
+                                                                        connection.release();
+                                                                        return callback(null, { insertid: medicineId, tokenid: tokenId });
+                                                                    });
+                                                                }
+                                                            );
+                                                        };
+
+                                                        // Step 3: Bulk insert into indent_contents_details if content_rows are provided
+                                                        if (data?.content_rows && data?.content_rows.length > 0) {
+                                                            const contentValues = data?.content_rows?.map(row => [
+                                                                row.name,
+                                                                row.qty,
+                                                                medicineId,
+                                                                new Date(),
+                                                                new Date(),
+                                                                0 // edit_status
+                                                            ]);
+
+                                                            connection.query(
+                                                                `INSERT INTO indent_contents_details 
+                                                                 (content_name, content_quantity, indent_medicine_slno, create_date, update_date, edit_status) 
+                                                                 VALUES ?`,
+                                                                [contentValues],
+                                                                (err, res) => {
+                                                                    if (err) {
+                                                                        return connection.rollback(() => {
+                                                                            connection.release();
+                                                                            return callback(err);
+                                                                        });
+                                                                    }
+                                                                    finishTransaction();
+                                                                }
+                                                            );
+                                                        } else {
+                                                            finishTransaction();
+                                                        }
+                                                    }
+                                                );
+                                            }
+                                        );
                                     }
                                 );
                             }

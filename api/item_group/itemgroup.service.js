@@ -112,5 +112,80 @@ module.exports = {
             }
         )
     },
+    insertItemGroupMaster: (data, callBack) => {
+        pool.query(
+            `INSERT INTO item_group_master
+        (
+            group_name,
+            group_code,
+            display_order,
+            is_active,
+            created_by,
+            updated_by
+        ) VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+                data.group_name,
+                data.group_code,
+                data.display_order || 0,
+                data.is_active,
+                data.created_by,
+                data.updated_by
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    updateItemGroupMaster: (data, callBack) => {
+        pool.query(
+            `UPDATE item_group_master
+         SET 
+            group_name = ?,
+            group_code = ?,
+            display_order = ?,
+            is_active = ?,
+            updated_by = ?
+         WHERE item_group_id = ?`,
+            [
+                data.group_name,
+                data.group_code,
+                data.display_order,
+                data.is_active,
+                data.updated_by,
+                data.item_group_id
+            ],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    }, getAllItemGroupMaster: (callBack) => {
+        pool.query(
+            `SELECT 
+            item_group_id,
+            group_name,
+            group_code,
+            display_order,
+            is_active,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at
+         FROM item_group_master`,
+            [],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
 
 }

@@ -316,8 +316,8 @@ module.exports = {
         data.em_id,
       ],
       (error, results, feilds) => {
-        if (error) {    
-        return callBack(error);
+        if (error) {
+          return callBack(error);
         }
         return callBack(null, results);
       }
@@ -405,6 +405,84 @@ module.exports = {
         }
 
         return callBack(null, results);
+      }
+    );
+  },
+  getEmployeeDetails: (data, callback) => {
+
+    const search = (data.search || '').trim();
+
+    if (!search) {
+      return callback(null, []);
+    }
+
+    const query = `
+        SELECT
+            emp.em_id AS employee_id,
+            emp.em_no AS employee_no,
+            emp.em_name AS employee_name,
+            emp.em_salutation AS salutation,
+            emp.em_gender AS gender,
+            emp.em_dob AS dob,
+            emp.em_doj AS doj,
+            emp.em_mobile AS mobile,
+            emp.em_email AS email,
+            emp.em_branch AS branch,
+
+            emp.em_department AS department_id,
+            dept.dept_name AS department_name,
+            dept.dept_alias AS department_alias,
+
+            emp.em_dept_section AS section_id,
+            sec.sec_name AS section_name,
+
+            emp.em_designation AS designation_id,
+            desg.desg_name AS designation_name,
+
+            emp.em_status AS employee_status,
+
+            sig.co_emp_slno AS signature_id,
+            sig.co_sign_upload AS signature_uploaded,
+            sig.co_sign_file_name AS signature_file_name,
+            sig.co_mime_type AS signature_mime_type
+
+        FROM co_employee_master emp
+
+        LEFT JOIN co_department_mast dept
+            ON dept.dept_id = emp.em_department
+
+        LEFT JOIN co_deptsec_mast sec
+            ON sec.sec_id = emp.em_dept_section
+
+        LEFT JOIN co_designation desg
+            ON desg.desg_slno = emp.em_designation
+
+        LEFT JOIN co_emp_signature sig
+            ON sig.co_emp_id = emp.em_id
+
+        WHERE emp.em_status = 1
+          AND (
+                emp.em_no = ?
+                OR emp.em_name LIKE ?
+              )
+
+        ORDER BY emp.em_name ASC
+
+        LIMIT 20
+    `;
+
+    const nameSearch = `%${search}%`;
+
+    pool.query(
+      query,
+      [search, nameSearch],
+      (err, results) => {
+
+        if (err) {
+          return callback(err);
+        }
+
+        callback(null, results);
       }
     );
   },

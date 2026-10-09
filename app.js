@@ -13,6 +13,10 @@ const fs = require("fs");
 
 //sockect io configuration
 
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // remove this there is a duplicate rk
+
 // app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
@@ -39,6 +43,7 @@ const allowedOrigins = [
   "http://192.168.22.3:3000",
   "http://192.168.22.3:7000",
   "http://192.168.22.5:3001",
+  "http://192.168.22.3:3001",
   "http://192.168.22.3:3001",
   "http://192.168.22.129:3000"
 
@@ -105,6 +110,7 @@ app.get("/warn", (req, res) => {
 });
 
 
+
 app.use(
   '/chat-files',
   express.static('D:/DocMeliora/Meliora/IncidentManagement/ChatConversationFiles')
@@ -119,15 +125,25 @@ app.use(
 //   cert: fs.readFileSync(process.env.SSL_CERT_PATH)
 // }, app);
 
-
 const server = http.createServer(app);
 const io = socketUtils.WSIO(server);
 socketUtils.connection(io);
+
+
+// MySQL fb_ipadmiss INSERT listener
+const {
+  startAdmissionListener,
+  // startPrintQueueListener
+} = require('./events/mysqlEvents');
+
+startAdmissionListener(io);
+// startPrintQueueListener(io);
 
 const socketIOMiddlewre = (req, res, next) => {
   req.io = io;
   next();
 };
+
 
 
 const userRouter = require("./api/user/user.router");
@@ -311,6 +327,31 @@ const validateAuthentication = require("./api/validate_authentication/employeeDa
 const melioraDepMaster = require("./api/Meliora_department_master/meliora_dep_master.router");
 const ContractMaster = require("./api/contract_master/contract.router");
 const condemMasters = require('./api/am_condemnation_master/condem_master.router')
+
+const GeminiRouter = require('./api/Ai/gemini.router')
+const ItemCategoryMaster = require('./api/ItemCategoryMaster/ItemCategory.router');
+const OrderPartyType = require('./api/OrderPartyType/orderpartyType.router');
+const DietSpecialityMaster = require('./api/DietSpecialityMaster/dietspecialitymaster.router');
+const UnitMaster = require('./api/unitMaster/unitmaster.router');
+const PatientDietMaster = require('./api/PatientDietMaster/patientdietmaster.router');
+const DietTemplateMaster = require('./api/DietTemplate/diettemplate.router');
+const TemplateFoodAdd = require('./api/DietTemplateFood/diettemplatefood.router');
+const FoodItemMaster = require('./api/ItemMaster/itemmaster.router');
+const ItemType = require('./api/ItemType/itemtype.router');
+const DietPriceMaster = require('./api/DietPriceMaster/dietpricemaster.router');
+const ItemAliasMaster = require('./api/ItemAlias/itemalias.router');
+const PatientDietPlan = require('./api/PatientDietPlan/patientdietplan.router');
+const PatientDietProcess = require('./api/PatientDietProcess/dietproductionbatch.router');
+const DietAllergenceMaster = require('./api/DietAllergenceMaster/dietallergencemaster.router');
+const billingCategroyMaster = require('./api/BillingCategoryMaster/billingcategorymaster.router');
+const dietOrder = require('./api/DietOrder/dietorder.router');
+const dietscheduled = require('./api/patientDietSchedule/patientdietscheduled.router');
+const canteenorder = require('./api/Canteen_Orders/canteenorder.router');
+const paitentextraorder = require('./api/PatientExtraOrder/patient_extra_order.router');
+const productionbatch = require('./api/DietProduction/diet_production.router');
+const deliveryassignment = require('./api/DietOrderAssignment/dietorderassign.router');
+
+
 const RateVariationReport = require('./api/RateVariationReport/RateVariationReport.router')
 const store_master = require('./api/store_master/store_master.router')
 const vendor_master = require('./api/vendor_master/vendor_master_.router')
@@ -318,6 +359,13 @@ const workOrder = require('./api/workOrder/workOrder.router')
 const tokenMaster = require('./api/tokenmaster/tokenmaster.router')
 const indent = require('./api/Indent_Module/indent.router')
 const ElliderUpdation = require('./api/elliderUpdation/elliderUpdation.router')
+
+const CanteenHighlight = require('./api/canteenHighlights/highlight.router')
+const CanteenHighlightMapping = require('./api/canteenHighlightsMapping/highlightmapping.router')
+
+
+const dailycashclosing = require('./api/daily_cash_closing/dailycashclosing.router');
+
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -498,7 +546,7 @@ app.use("/api/medvehilces", mv_vehicle_registration);
 app.use("/api/backuptypemast", backuptypemast);
 app.use("/api/simOperators", simOperators);
 app.use("/api/notificationMenu", notificationMenu);
-app.use("/api/user", userRegistration);
+app.use("/api/user", userRegistration); // duplicate same route please check rk
 app.use("/api/feedback", feedbackforms);
 app.get("/api/validateAccessToken", validateAccessToken);
 app.use("/api/backuptypemast", backuptypemast);
@@ -515,17 +563,55 @@ app.use("/api/melioraDepMaster", melioraDepMaster);
 app.use("/api/ContractMaster", ContractMaster);
 app.use('/api/condemApprovalLevel', condemApprovalLevel)
 app.use('/api/condemMasters', condemMasters)
+
+app.use('/api/ai', GeminiRouter)
+app.use('/api/itemcategory', ItemCategoryMaster)
+app.use('/api/orderparty', OrderPartyType)
+app.use('/api/dietspeciality', DietSpecialityMaster)
+app.use('/api/unitmaster', UnitMaster)
+app.use('/api/dietmaster', PatientDietMaster)
+app.use('/api/diettemplate', DietTemplateMaster)
+app.use('/api/templatefood', TemplateFoodAdd)
+app.use('/api/fooditemmast', FoodItemMaster)
+app.use('/api/dietitemtype', ItemType)
+app.use('/api/dietprice', DietPriceMaster)
+app.use('/api/itemalias', ItemAliasMaster)
+app.use('/api/patientdietplan', socketIOMiddlewre, PatientDietPlan)
+app.use('/api/dietbatch', PatientDietProcess)
+app.use('/api/allergen', DietAllergenceMaster)
+app.use('/api/billingcategory', billingCategroyMaster)
+app.use('/api/fooddietorder', socketIOMiddlewre, dietOrder)
+app.use('/api/dietschedule', dietscheduled)
+app.use('/api/canteenorder', socketIOMiddlewre, canteenorder)
+app.use('/api/patientExtraOrder', paitentextraorder)
+app.use('/api/productionbatch', productionbatch)
+app.use('/api/dietdelivery', socketIOMiddlewre, deliveryassignment)
+
 app.use('/api/RateVariationReport', RateVariationReport)
 app.use('/api/store_master', store_master)
 app.use('/api/vendor_master', vendor_master)
 app.use('/api/workOrder', workOrder)
+
+
+app.use('/api/highlightmaping', CanteenHighlightMapping)
+app.use('/api/highlight', CanteenHighlight)
+
+
+
+app.use('/api/ElliderUpdation', ElliderUpdation)
+
+
 app.use('/api/tokenMaster', tokenMaster)
 app.use('/api/indent', indent)
 app.use('/api/ElliderUpdation', ElliderUpdation)
 
 
+app.use('/api/cashclosing', dailycashclosing)
+
+
 const { initCrfApprovalCron } = require("./cronjob/crfApprovalCron");
 initCrfApprovalCron();
+
 
 server.listen(
   process.env.APP_PORT,

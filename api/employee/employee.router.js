@@ -1,7 +1,8 @@
 const router = require('express').Router();
 const { checkToken } = require("../../authentication/token_validation");
 const { employeeinsert, employeeupdate, getemplpyee, employeedelete, login, empInsert, employeeGetAll,
-    updateEmployee, changepasword } = require('../employee/employee.controller');
+    updateEmployee, changepasword, 
+    getEmployeeDetails} = require('../employee/employee.controller');
 
 router.post("/login", login);
 router.post('/', checkToken, employeeinsert);
@@ -15,5 +16,8 @@ router.patch('/update', checkToken, updateEmployee);
 
 router.patch('/changepasword', checkToken, changepasword);
 
+
+
+router.get('/search', checkToken, getEmployeeDetails)
 
 module.exports = router;

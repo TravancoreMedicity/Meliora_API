@@ -1,5 +1,11 @@
-const { insertExtraOrder } = require('../PatientExtraOrder/patient_extra_order.service');
+const { pool } = require('../../config/database');
+const { safeMessage, priceCanteenItems } = require('./Helper');
+
+// statuses the canteen_order table uses (see the order tabs in the web app)
+const ALLOWED_ORDER_STATUS = ['PENDING', 'CONFIRMED', 'CANCELLED'];
+
 const {
+    addItemsToOrder,
     createOrder,
     getOrderById,
     updateOrderStatus,
@@ -31,17 +37,22 @@ module.exports = {
             });
         }
 
-        createOrder(order, items, (err, result) => {
-            if (err) return res.status(200).json({ success: 0, message: err });
+        // price, gst and gst_amount are rebuilt from canteen_item_price - the client values are ignored
+        priceCanteenItems(pool, order.party_type_id, items, (priceErr, pricedItems) => {
+            if (priceErr) return res.status(200).json({ success: 0, message: safeMessage(priceErr) });
 
-            req.io.emit("newCanteenOrder", {
-                orderId: result?.orderId
-            });
+            createOrder(order, pricedItems, (err, result) => {
+                if (err) return res.status(200).json({ success: 0, message: safeMessage(err) });
 
-            return res.status(200).json({
-                success: 1,
-                message: "Order Created",
-                data: result
+                req.io?.emit("newCanteenOrder", {
+                    orderId: result?.orderId
+                });
+
+                return res.status(200).json({
+                    success: 1,
+                    message: "Order Created",
+                    data: result
+                });
             });
         });
     },
@@ -53,7 +64,7 @@ module.exports = {
         getFullOrders(status, (err, result) => {
 
             if (err) {
-                return res.status(200).json({ success: 0, message: err });
+                return res.status(200).json({ success: 0, message: safeMessage(err) });
             }
             if (result && result.length === 0) {
                 return res.status(200).json({
@@ -80,7 +91,7 @@ module.exports = {
         }
 
         getOrderById(canteen_order_id, (err, result) => {
-            if (err) return res.status(200).json({ success: 0, message: err });
+            if (err) return res.status(200).json({ success: 0, message: safeMessage(err) });
 
             return res.status(200).json({
                 success: 1,
@@ -92,8 +103,23 @@ module.exports = {
     updateCanteenOrderStatus: (req, res) => {
         const { canteen_order_id, status, updated_by } = req.body;
 
-        updateOrderStatus(canteen_order_id, status, updated_by, (err) => {
-            if (err) return res.status(200).json({ success: 0, message: err });
+        if (!canteen_order_id) {
+            return res.status(200).json({ success: 0, message: "Order ID missing" });
+        }
+
+        if (!ALLOWED_ORDER_STATUS.includes(status)) {
+            return res.status(200).json({ success: 0, message: "Invalid order status" });
+        }
+
+        updateOrderStatus(canteen_order_id, status, updated_by, (err, result) => {
+            if (err) return res.status(200).json({ success: 0, message: safeMessage(err) });
+
+            if (result?.affectedRows === 0) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "Order not found or it is already cancelled"
+                });
+            }
 
             return res.status(200).json({
                 success: 1,
@@ -105,9 +131,18 @@ module.exports = {
     cancelCanteenOrder: (req, res) => {
         const { canteen_order_id } = req.body;
 
-        cancelOrder(canteen_order_id, (err) => {
-            if (err) return res.status(200).json({ success: 0, message: err });
-            req.io.emit("cancelCanteenOrder", {
+        if (!canteen_order_id) {
+            return res.status(200).json({ success: 0, message: "Order ID missing" });
+        }
+
+        cancelOrder(canteen_order_id, (err, result) => {
+            if (err) return res.status(200).json({ success: 0, message: safeMessage(err) });
+
+            if (result?.affectedRows === 0) {
+                return res.status(200).json({ success: 0, message: "Order not found" });
+            }
+
+            req.io?.emit("cancelCanteenOrder", {
                 orderId: canteen_order_id,
                 status: 'CANCELLED'
             });
@@ -122,8 +157,12 @@ module.exports = {
     deleteCanteenOrder: (req, res) => {
         const { canteen_order_id } = req.body;
 
+        if (!canteen_order_id) {
+            return res.status(200).json({ success: 0, message: "Order ID missing" });
+        }
+
         deleteOrder(canteen_order_id, (err) => {
-            if (err) return res.status(200).json({ success: 0, message: err });
+            if (err) return res.status(200).json({ success: 0, message: safeMessage(err) });
 
             return res.status(200).json({
                 success: 1,
@@ -144,7 +183,7 @@ module.exports = {
         };
 
         CancelCanteenOrders(is_active, canteen_order_item_id, (err) => {
-            if (err) return res.status(200).json({ success: 0, message: err });
+            if (err) return res.status(200).json({ success: 0, message: safeMessage(err) });
 
             return res.status(200).json({
                 success: 1,
@@ -165,7 +204,7 @@ module.exports = {
         };
 
         getActivePatientDetail(bd_code, (err, result) => {
-            if (err) return res.status(200).json({ success: 0, message: err });
+            if (err) return res.status(200).json({ success: 0, message: safeMessage(err) });
 
             return res.status(200).json({
                 success: 1,
@@ -186,7 +225,7 @@ module.exports = {
         };
 
         CanteenOrderDetail(admission_Id, party_type_id, (err, result) => {
-            if (err) return res.status(200).json({ success: 0, message: err });
+            if (err) return res.status(200).json({ success: 0, message: safeMessage(err) });
 
             return res.status(200).json({
                 success: 1,
@@ -206,7 +245,7 @@ module.exports = {
         };
 
         PatientLastWeekOrders(admission_Id, party_type_id, (err, result) => {
-            if (err) return res.status(200).json({ success: 0, message: err });
+            if (err) return res.status(200).json({ success: 0, message: safeMessage(err) });
 
             return res.status(200).json({
                 success: 1,
@@ -228,7 +267,7 @@ module.exports = {
         };
 
         ExtraCanteenOrderDetail(patient_id, (err, result) => {
-            if (err) return res.status(200).json({ success: 0, message: err });
+            if (err) return res.status(200).json({ success: 0, message: safeMessage(err) });
 
             return res.status(200).json({
                 success: 1,
@@ -248,7 +287,7 @@ module.exports = {
         };
 
         getAllActivePatients(ns_code, (err, result) => {
-            if (err) return res.status(200).json({ success: 0, message: err });
+            if (err) return res.status(200).json({ success: 0, message: safeMessage(err) });
 
             return res.status(200).json({
                 success: 1,
@@ -259,7 +298,7 @@ module.exports = {
     },
     GetAllActiveBedDetail: (req, res) => {
         GetAllActiveBedDetail((err, result) => {
-            if (err) return res.status(200).json({ success: 0, message: err });
+            if (err) return res.status(200).json({ success: 0, message: safeMessage(err) });
 
             return res.status(200).json({
                 success: 1,
@@ -288,48 +327,32 @@ module.exports = {
             });
         };
 
-        const values = itemDetail.map(item => ([
-            canteen_order_id,
-            item.item_id,
-            item.qty,
-            item.price,
-            item.gst,
-            item.type_slno,
-            item.gst_amount,
-            item.patient_diet_id
-        ]));
-
-        //  MAP VALUES HERE
-        const mappedValues = itemDetail.map(item => ([
-            patient_id,
-            item.item_id,
-            item.qty,
-            order_status || 'PENDING',
-            item.price,
-            item.gst,
-            item.gst_amount,
-            created_by
-        ]));
-
-        insertExtraOrderItems(values, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (isExtra) {
-                insertExtraOrder(mappedValues, (err, result) => {
-                    if (err) return res.status(200).json({ success: 0, message: err });
-                });
-            }
-
+        if (isExtra && !patient_id) {
             return res.status(200).json({
-                success: 1,
-                message: "Items Added Successfully",
-                data: results
+                success: 0,
+                message: "Patient ID missing for the extra order"
             });
-        });
+        }
+
+        // one transaction: canteen items + extra order rows, prices from canteen_item_price,
+        // and the answer is sent once, after the commit
+        addItemsToOrder(
+            { canteen_order_id, itemDetail, isExtra, patient_id, created_by, order_status },
+            (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: safeMessage(err)
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    message: "Items Added Successfully",
+                    data: results
+                });
+            }
+        );
     },
 
     UpdateAllQuantities: (req, res) => {
@@ -399,7 +422,7 @@ module.exports = {
             if (err) {
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(err)
                 });
             }
 
@@ -423,20 +446,29 @@ module.exports = {
             });
         }
 
-        if (!updatedQty || updatedQty < 1) {
+        // whole number between 1 and 999 (was only "not below 1": decimals and text got through)
+        if (!Number.isInteger(Number(updatedQty)) || Number(updatedQty) < 1 || Number(updatedQty) > 999) {
             return res.status(200).json({
                 success: 0,
                 message: "Enter a Valid Quantity"
             });
         }
 
-        UpdateItemQuantity(canteen_order_item_id, updatedQty, (err, results) => {
+        UpdateItemQuantity(canteen_order_item_id, Number(updatedQty), (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(err)
                 });
             }
+
+            if (results?.affectedRows === 0) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "Order item not found"
+                });
+            }
+
             return res.status(200).json({
                 success: 1,
                 message: "Quantity Updated Successfully!"

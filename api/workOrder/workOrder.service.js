@@ -304,7 +304,7 @@ module.exports = {
             'total_amt', m.total_amt,
             'gross_amt', m.gross_amt
         )
-    ) FROM meliora.wo_material_details m WHERE m.wo_main_slno = w.wo_slno) AS material_details,
+    ) FROMwo_material_details m WHERE m.wo_main_slno = w.wo_slno) AS material_details,
 
     -- Labour Details
     (SELECT JSON_ARRAYAGG(
@@ -317,7 +317,7 @@ module.exports = {
             'qty', l.qty,
             'total', l.total
         )
-    ) FROM meliora.wo_labour_details l WHERE l.wo_main_slno = w.wo_slno) AS labour_details,
+    ) FROMwo_labour_details l WHERE l.wo_main_slno = w.wo_slno) AS labour_details,
 
     -- Retention Details
     (SELECT JSON_ARRAYAGG(
@@ -327,7 +327,7 @@ module.exports = {
             'rent_payment_type', r.rent_payment_type,
             'rent_amount', r.rent_amount
         )
-    ) FROM meliora.wo_rentention_details r WHERE r.wo_main_slno = w.wo_slno) AS retention_details,
+    ) FROMwo_rentention_details r WHERE r.wo_main_slno = w.wo_slno) AS retention_details,
 
     -- Terms Conditions
     (SELECT JSON_ARRAYAGG(
@@ -336,7 +336,7 @@ module.exports = {
             'wo_valid_date', t.wo_valid_date,
             'term_desc', t.term_desc
         )
-    ) FROM meliora.wo_terms_conditions t WHERE t.wo_main_slno = w.wo_slno) AS terms_conditions,
+    ) FROMwo_terms_conditions t WHERE t.wo_main_slno = w.wo_slno) AS terms_conditions,
 
     -- Payment Terms
     (SELECT JSON_ARRAYAGG(
@@ -345,7 +345,7 @@ module.exports = {
             'wo_valid_date', p.wo_valid_date,
             'term_desc', p.term_desc
         )
-    ) FROM meliora.wo_payment_terms_conditions p WHERE p.wo_main_slno = w.wo_slno) AS payment_terms,
+    ) FROMwo_payment_terms_conditions p WHERE p.wo_main_slno = w.wo_slno) AS payment_terms,
 
     -- Billing Terms
     (SELECT JSON_ARRAYAGG(
@@ -356,11 +356,11 @@ module.exports = {
             'term_desc', b.term_desc
         )
     )
-    FROM meliora.wo_billing_terms_conditions b
+    FROMwo_billing_terms_conditions b
     WHERE b.wo_main_slno = w.wo_slno
     ) AS billing_terms
 
-FROM meliora.work_order_main_tbl w
+FROMwork_order_main_tbl w
 WHERE w.wo_slno = ?
     `;
 

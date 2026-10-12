@@ -2,44 +2,127 @@ const { pool } = require('../../config/database');
 
 module.exports = {
 
+    /*
+        CREATE A DIET PLAN
+
+        A patient can have only ONE active plan. The check runs inside a transaction with the patient's
+        active plan rows locked, so a double click or two dietitians saving at the same moment cannot
+        both create a plan (test data already holds such a pair: plans 34 and 35 of admission
+        2600041315, same user, same second). The status of a new plan is always ACTIVE; diet_type must be
+        DIET (with a diet) or NPO (no diet); the end date cannot be before the start date.
+    */
     insertPatientDietPlan: (data, callBack) => {
 
-        pool.query(
-            `INSERT INTO patient_diet_plan
-            (
-                patient_id,
-                admission_id,
-                diet_id,
-                diet_type,
-                start_date,
-                end_date,
-                doctor_id,
-                is_consultation,
-                remarks,
-                diet_status,
-                created_by
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-                data.patient_id,
-                data.admission_id,
-                data.diet_id,
-                data.diet_type,
-                data.start_date,
-                data.end_date,
-                data.doctor_id,
-                data.is_consultation,
-                data.remarks,
-                data.diet_status,
-                data.created_by
-            ],
-            (error, results) => {
+        const dietType = data.diet_type;
 
-                if (error) return callBack(error);
+        if (!["DIET", "NPO"].includes(dietType)) {
+            return callBack(new Error("Diet type must be DIET or NPO"));
+        }
 
-                return callBack(null, results);
+        let dietId = null;
+
+        if (dietType === "DIET") {
+
+            dietId = Number(data.diet_id);
+
+            if (!Number.isInteger(dietId) || dietId <= 0) {
+                return callBack(new Error("Please select a diet"));
             }
-        );
+        }
+
+        const start = data.start_date ? new Date(data.start_date) : null;
+        const end = data.end_date ? new Date(data.end_date) : null;
+
+        if ((start && Number.isNaN(start.getTime())) || (end && Number.isNaN(end.getTime()))) {
+            return callBack(new Error("Invalid start or end date"));
+        }
+
+        if (start && end && end < start) {
+            return callBack(new Error("The end date cannot be before the start date"));
+        }
+
+        if (!data.doctor_id) {
+            return callBack(new Error("Doctor is required"));
+        }
+
+        pool.getConnection((connectionError, connection) => {
+
+            if (connectionError) return callBack(connectionError);
+
+            const fail = (error) => {
+                connection.rollback(() => {
+                    connection.release();
+                    callBack(error);
+                });
+            };
+
+            connection.beginTransaction((transactionError) => {
+
+                if (transactionError) {
+                    connection.release();
+                    return callBack(transactionError);
+                }
+
+                connection.query(
+                    `SELECT plan_id FROM patient_diet_plan WHERE admission_id = ? AND is_active = 1 FOR UPDATE`,
+                    [data.admission_id],
+                    (activeError, activeRows) => {
+
+                        if (activeError) return fail(activeError);
+
+                        if (activeRows?.length) {
+                            return fail(
+                                new Error(
+                                    `This patient already has an active diet plan (plan ${activeRows[0].plan_id}). Stop or edit it first`
+                                )
+                            );
+                        }
+
+                        connection.query(
+                            `INSERT INTO patient_diet_plan
+                            (
+                                patient_id,
+                                admission_id,
+                                diet_id,
+                                diet_type,
+                                start_date,
+                                end_date,
+                                doctor_id,
+                                is_consultation,
+                                remarks,
+                                diet_status,
+                                created_by
+                            )
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE', ?)`,
+                            [
+                                data.patient_id,
+                                data.admission_id,
+                                dietId,
+                                dietType,
+                                data.start_date,
+                                data.end_date,
+                                data.doctor_id,
+                                data.is_consultation,
+                                data.remarks,
+                                data.created_by
+                            ],
+                            (insertError, results) => {
+
+                                if (insertError) return fail(insertError);
+
+                                connection.commit((commitError) => {
+
+                                    if (commitError) return fail(commitError);
+
+                                    connection.release();
+                                    return callBack(null, results);
+                                });
+                            }
+                        );
+                    }
+                );
+            });
+        });
     },
 
 
@@ -353,38 +436,57 @@ ORDER BY dp.fb_ip_no DESC
 
 
 
+    /*
+        EDIT A DIET PLAN
+
+        Only the fields that are actually sent are changed (before, a field missing from the request was
+        written as NULL and wiped the plan's dates, doctor or remarks). is_active and diet_status are NOT
+        editable here - they were sent as 1 / ACTIVE by every edit, which silently re-activated a stopped
+        plan; stopping is done by StopCurrentPlan. Only an active plan can be edited.
+    */
     updatePatientDietPlan: (data, callBack) => {
+
+        const EDITABLE = ["diet_id", "diet_type", "start_date", "end_date", "doctor_id", "remarks", "is_consultation"];
+
+        const sets = [];
+        const values = [];
+
+        for (const field of EDITABLE) {
+            if (data[field] !== undefined) {
+                sets.push(`${field} = ?`);
+                values.push(data[field]);
+            }
+        }
+
+        if (!sets.length) {
+            return callBack(new Error("Nothing to update"));
+        }
+
+        if (data.diet_type !== undefined && !["DIET", "NPO"].includes(data.diet_type)) {
+            return callBack(new Error("Diet type must be DIET or NPO"));
+        }
+
+        if (data.start_date && data.end_date && new Date(data.end_date) < new Date(data.start_date)) {
+            return callBack(new Error("The end date cannot be before the start date"));
+        }
+
+        sets.push("updated_by = ?");
+        values.push(data.updated_by);
+        values.push(data.plan_id);
 
         pool.query(
             `UPDATE patient_diet_plan
-            SET
-                diet_id = ?,
-                diet_type = ?,
-                start_date = ?,
-                end_date = ?,
-                doctor_id = ?,
-                diet_status = ?,
-                remarks= ?,
-                is_active = ?,
-                is_consultation=?,
-                updated_by = ?
-            WHERE plan_id = ?`,
-            [
-                data.diet_id,
-                data.diet_type,
-                data.start_date,
-                data.end_date,
-                data.doctor_id,
-                data.diet_status,
-                data.remarks,
-                data.is_active,
-                data.is_consultation,
-                data.updated_by,
-                data.plan_id
-            ],
+            SET ${sets.join(", ")}
+            WHERE plan_id = ?
+            AND is_active = 1`,
+            values,
             (error, results) => {
 
                 if (error) return callBack(error);
+
+                if (results.affectedRows === 0) {
+                    return callBack(new Error("Diet plan not found or it is already stopped, so it cannot be edited"));
+                }
 
                 return callBack(null, results);
             }
@@ -561,24 +663,34 @@ ORDER BY pdp.plan_id DESC`,
     },
 
 
+    /*
+        STOP A DIET PLAN
+
+        The new status is fixed: STOPPED and inactive. The request used to supply diet_status and
+        is_active, so this "stop" route could also set any plan back to ACTIVE. Only an active plan can
+        be stopped. (Pending orders and scheduled meals of the plan are NOT touched here.)
+    */
     StopCurrentPlan: (data, callBack) => {
 
         pool.query(
             `UPDATE patient_diet_plan
             SET
-                diet_status = ?,
-                is_active = ?,
+                diet_status = 'STOPPED',
+                is_active = 0,
                 updated_by = ?
-            WHERE plan_id = ?`,
+            WHERE plan_id = ?
+            AND is_active = 1`,
             [
-                data.diet_status,
-                data.is_active,
                 data.updated_by,
                 data.plan_id
             ],
             (error, results) => {
 
                 if (error) return callBack(error);
+
+                if (results.affectedRows === 0) {
+                    return callBack(new Error("Diet plan not found or it is already stopped"));
+                }
 
                 return callBack(null, results);
             }

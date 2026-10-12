@@ -1,3 +1,14 @@
+const { pool } = require('../../config/database');
+const { safeMessage, priceCanteenItems } = require('../Canteen_Orders/Helper');
+
+// statuses used by diet_order (same vocabulary as canteen_order)
+const ALLOWED_DIET_STATUS = ['PENDING', 'CONFIRMED', 'CANCELLED'];
+
+const isWholeQty = (value, max = 999) => {
+    const n = Number(value);
+    return Number.isInteger(n) && n >= 1 && n <= max;
+};
+
 const {
     insertNewDietOrder,
     getOrderByPatient,
@@ -19,40 +30,69 @@ module.exports = {
 
     insertNewDietOrder: (req, res) => {
 
-        const { order, details, canteenorder, canteenorderdetail, isPending } = req.body;
+        const { order, details, canteenorder, canteenorderdetail } = req.body;
 
-        if (!order || !details) {
+        // The service only creates the canteen order when this is exactly `false`; a missing
+        // value used to save the diet order and silently skip the canteen (billing) part.
+        const isPending = req.body.isPending === true;
+
+        if (!order || !Array.isArray(details) || details.length === 0) {
             return res.status(200).json({
                 success: 0,
                 message: "Invalid payload"
             });
         }
 
-        if (!isPending && (!canteenorder || !canteenorderdetail)) {
+        if (!details.every(item => isWholeQty(item?.quantity))) {
+            return res.status(200).json({
+                success: 0,
+                message: "Quantity must be a whole number between 1 and 999"
+            });
+        }
+
+        if (!isPending && (!canteenorder || !Array.isArray(canteenorderdetail) || canteenorderdetail.length === 0)) {
             return res.status(200).json({
                 success: 0,
                 message: "Canteen Order is Not valid Please Order Again"
             });
         }
 
-        insertNewDietOrder(order, details, canteenorder, canteenorderdetail, isPending, (err, result) => {
-            if (err) {
-                return res.status(500).json({
+        const place = (pricedCanteenDetail) => {
+            insertNewDietOrder(order, details, canteenorder, pricedCanteenDetail, isPending, (err, result) => {
+                if (err) {
+                    return res.status(500).json({
+                        success: 0,
+                        message: safeMessage(err)
+                    });
+                }
+
+                req.io?.emit("newDietOrder", {
+                    message: "New Diet Order",
+                    status: 'Order'
+                });
+
+                return res.status(200).json({
+                    success: 1,
+                    message: "Order Created Successfully",
+                    order_id: result
+                });
+            });
+        };
+
+        if (isPending) {
+            return place(canteenorderdetail);
+        }
+
+        // price / gst / gst_amount are rebuilt from canteen_item_price - client values are ignored
+        priceCanteenItems(pool, canteenorder.party_type_id, canteenorderdetail, (priceErr, priced) => {
+            if (priceErr) {
+                return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(priceErr)
                 });
             }
 
-            req.io.emit("newDietOrder", {
-                message: "New Diet Order",
-                status: 'Order'
-            });
-
-            return res.status(200).json({
-                success: 1,
-                message: "Order Created Successfully",
-                order_id: result
-            });
+            place(priced);
         });
     },
 
@@ -60,10 +100,17 @@ module.exports = {
 
         const { order_id, details } = req.body;
 
-        if (!order_id || !details) {
+        if (!order_id || !Array.isArray(details) || details.length === 0) {
             return res.status(200).json({
                 success: 0,
                 message: "Invalid payload"
+            });
+        }
+
+        if (!details.every(item => isWholeQty(item?.quantity))) {
+            return res.status(200).json({
+                success: 0,
+                message: "Quantity must be a whole number between 1 and 999"
             });
         }
 
@@ -81,7 +128,7 @@ module.exports = {
             if (err) {
                 return res.status(500).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(err)
                 });
             }
 
@@ -100,7 +147,7 @@ module.exports = {
             if (err) {
                 return res.status(500).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(err)
                 });
             }
             if (results?.length === 0) {
@@ -124,7 +171,7 @@ module.exports = {
             if (err) {
                 return res.status(500).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(err)
                 });
             }
             if (results?.length === 0) {
@@ -202,7 +249,7 @@ module.exports = {
                 if (err) {
                     return res.status(500).json({
                         success: 0,
-                        message: err
+                        message: safeMessage(err)
                     });
                 }
 
@@ -231,7 +278,7 @@ module.exports = {
             if (err) {
                 return res.status(500).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(err)
                 });
             }
 
@@ -260,7 +307,7 @@ module.exports = {
             if (err) {
                 return res.status(500).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(err)
                 });
             }
 
@@ -298,7 +345,14 @@ module.exports = {
             if (err) {
                 return res.status(500).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(err)
+                });
+            }
+
+            if (result?.affectedRows === 0) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "Food item is not active (already cancelled) or was not found"
                 });
             }
 
@@ -330,10 +384,18 @@ module.exports = {
                 message: "Cancelled Employee Data is Missing"
             });
         }
-        if (newOrderItem && newOrderItem?.length === 0) {
+        // was `newOrderItem && length === 0`: a missing array skipped the check and crashed on .map
+        if (!Array.isArray(newOrderItem) || newOrderItem.length === 0) {
             return res.status(200).json({
                 success: 0,
                 message: "No New Order to be Found!"
+            });
+        }
+
+        if (!newOrderItem.every(item => item?.item_id && isWholeQty(item?.qty))) {
+            return res.status(200).json({
+                success: 0,
+                message: "Quantity must be a whole number between 1 and 999"
             });
         }
         // ?? Prepare values for bulk insert
@@ -352,7 +414,7 @@ module.exports = {
             if (err) {
                 return res.status(500).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(err)
                 });
             }
 
@@ -398,7 +460,14 @@ module.exports = {
             if (err) {
                 return res.status(500).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(err)
+                });
+            }
+
+            if (result?.affectedRows === 0) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "Nothing to cancel: this batch is already cancelled or was not found"
                 });
             }
 
@@ -425,17 +494,36 @@ module.exports = {
             });
         }
 
+        if (!ALLOWED_DIET_STATUS.includes(order_status)) {
+            return res.status(200).json({
+                success: 0,
+                message: "Invalid order status"
+            });
+        }
+
         UpdateDietStatus(order_status, order_id, updated_by, (err, result) => {
             if (err) {
                 return res.status(500).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(err)
                 });
             }
 
+            if (result?.affectedRows === 0) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "Diet order not found or it is already cancelled"
+                });
+            }
+
+            // the message used to say "Confirmed" whatever status was sent
             return res.status(200).json({
                 success: 1,
-                message: `Diet Order Confirmed`,
+                message: order_status === 'CANCELLED'
+                    ? 'Diet Order Cancelled'
+                    : order_status === 'CONFIRMED'
+                        ? 'Diet Order Confirmed'
+                        : 'Diet Order Updated',
             });
         }
         );
@@ -456,17 +544,34 @@ module.exports = {
             });
         }
 
+        // is_active is a 0/1 flag
+        if (![0, 1, '0', '1', true, false].includes(is_active)) {
+            return res.status(200).json({
+                success: 0,
+                message: "Invalid food status"
+            });
+        }
+
         UpdateFoodStatus(is_active, item_id, order_id, (err, result) => {
             if (err) {
                 return res.status(500).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(err)
                 });
             }
 
+            if (result?.affectedRows === 0) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "Food item not found in this order"
+                });
+            }
+
+            const activated = [1, '1', true].includes(is_active);
+
             return res.status(200).json({
                 success: 1,
-                message: `${FoodName} Cancelled SuccessFully`,
+                message: `${FoodName || 'Food'} ${activated ? 'Activated' : 'Cancelled'} SuccessFully`,
             });
         }
         );
@@ -492,7 +597,7 @@ module.exports = {
     //         if (err) {
     //             return res.status(500).json({
     //                 success: 0,
-    //                 message: err
+    //                 message: safeMessage(err)
     //             });
     //         }
 
@@ -549,7 +654,7 @@ module.exports = {
     //         if (err) {
     //             return res.status(200).json({
     //                 success: 0,
-    //                 message: err
+    //                 message: safeMessage(err)
     //             });
     //         }
 
@@ -566,7 +671,7 @@ module.exports = {
     //             if (err) {
     //                 return res.status(200).json({
     //                     success: 0,
-    //                     message: err
+    //                     message: safeMessage(err)
     //                 });
     //             }
 

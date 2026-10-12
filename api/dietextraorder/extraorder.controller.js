@@ -51,7 +51,6 @@ module.exports = {
     ExtraOrderInsert: (req, res) => {
         const body = req.body;
         ExtraOrderInsert(body, (err, results) => {
-            const insertId = results.insertId
             if (err) {
                 logger.logwindow(err)
                 return res.status(400).json({
@@ -59,6 +58,9 @@ module.exports = {
                     message: err
                 });
             }
+            // read insertId only after the error check: on a DB error `results` is undefined
+            // and `results.insertId` used to throw inside the callback and kill the process
+            const insertId = results.insertId
             return res.status(200).json({
                 success: 1,
                 message: "Data Inserted Successfully",
@@ -68,6 +70,12 @@ module.exports = {
     },
     ExtraOrderListInsert: (req, res) => {
         const body = req.body;
+        if (!Array.isArray(body) || body.length === 0) {
+            return res.status(400).json({
+                success: 0,
+                message: "No items to insert"
+            });
+        }
         var orderList = body.map((val, index) => {
             return [val.prod_slno, val.item_slno, val.hos_rate, val.cant_rate, val.type_slno, val.extra_status,
             val.count

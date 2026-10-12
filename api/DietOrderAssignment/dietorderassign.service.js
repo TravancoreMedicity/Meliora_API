@@ -3,6 +3,274 @@ const { pool } = require('../../config/database');
 const { executeQuery } = require('../Canteen_Orders/Helper');
 const { createServiceLedger, FinalizePatientDietAfterBilling } = require('./dietorderhelper');
 
+/*
+    Checks for a new delivery assignment, run INSIDE its transaction with the order rows locked, so two
+    supervisors assigning the same meal at the same moment cannot both succeed.
+
+      * the delivery person must exist
+      * every order must exist and be CONFIRMED (cancelled or still pending orders are not delivered)
+      * an order + meal that already has an active assignment (anything except CANCELLED, UNDELIVERED,
+        RETURNED) cannot be assigned again
+      * the same order + meal twice in one request is refused; the priority must be a known one
+*/
+const checkAssignmentOrders = (connection, { assigned_to, orders }, callback) => {
+
+    const PRIORITIES = ["NORMAL", "URGENT", "STAT"];
+
+    const assignee = Number(assigned_to);
+
+    if (!Number.isInteger(assignee) || assignee <= 0) {
+        return callback(new Error("Invalid delivery person"));
+    }
+
+    const keyOf = (orderId, typeSlno) => `${Number(orderId)}|${typeSlno ?? ""}`;
+
+    const seen = new Set();
+    const orderIds = [];
+
+    for (const order of orders) {
+
+        const orderId = Number(order?.canteen_order_id);
+
+        if (!Number.isInteger(orderId) || orderId <= 0) {
+            return callback(new Error("Invalid order in the assignment"));
+        }
+
+        const key = keyOf(orderId, order.type_slno);
+
+        if (seen.has(key)) {
+            return callback(new Error("The same order and meal is selected twice"));
+        }
+
+        seen.add(key);
+
+        if (order.delivery_priority && !PRIORITIES.includes(order.delivery_priority)) {
+            return callback(new Error("Invalid delivery priority"));
+        }
+
+        orderIds.push(orderId);
+    }
+
+    const uniqueOrderIds = [...new Set(orderIds)];
+
+    connection.query(
+        `SELECT em_id FROM co_employee_master WHERE em_id = ? LIMIT 1`,
+        [assignee],
+        (employeeError, employeeRows) => {
+
+            if (employeeError) {
+                return callback(employeeError);
+            }
+
+            if (!employeeRows?.length) {
+                return callback(new Error("Delivery person not found"));
+            }
+
+            connection.query(
+                `SELECT canteen_order_id, order_status FROM canteen_order WHERE canteen_order_id IN (?) FOR UPDATE`,
+                [uniqueOrderIds],
+                (orderError, orderRows) => {
+
+                    if (orderError) {
+                        return callback(orderError);
+                    }
+
+                    if ((orderRows || []).length !== uniqueOrderIds.length) {
+                        return callback(new Error("One or more orders were not found"));
+                    }
+
+                    const notConfirmed = orderRows.filter(row => row.order_status !== "CONFIRMED");
+
+                    if (notConfirmed.length) {
+                        return callback(
+                            new Error(
+                                `Only confirmed orders can be assigned. Not confirmed: ${notConfirmed.map(row => row.canteen_order_id).join(", ")}`
+                            )
+                        );
+                    }
+
+                    connection.query(
+                        `
+                        SELECT canteen_order_id, type_slno
+                        FROM diet_delivery_assignment_detail
+                        WHERE canteen_order_id IN (?)
+                        AND (delivery_status IS NULL OR delivery_status NOT IN ('CANCELLED', 'UNDELIVERED', 'RETURNED'))
+                        `,
+                        [uniqueOrderIds],
+                        (activeError, activeRows) => {
+
+                            if (activeError) {
+                                return callback(activeError);
+                            }
+
+                            const active = new Set(
+                                (activeRows || []).map(row => keyOf(row.canteen_order_id, row.type_slno))
+                            );
+
+                            const alreadyAssigned = orders.filter(order => active.has(keyOf(order.canteen_order_id, order.type_slno)));
+
+                            if (alreadyAssigned.length) {
+                                return callback(
+                                    new Error(
+                                        `Already assigned to a delivery person: order ${[...new Set(alreadyAssigned.map(order => order.canteen_order_id))].join(", ")}`
+                                    )
+                                );
+                            }
+
+                            return callback(null);
+                        }
+                    );
+                }
+            );
+        }
+    );
+};
+
+/*
+    Checks for a packing request, run INSIDE its transaction with the order row locked.
+
+      * packet numbers are whole, unique numbers; every packet has items; every quantity is above 0
+      * the order exists and is not cancelled
+      * every packed item belongs to THIS order and is active
+      * what is already packed for the item (earlier packings that are not cancelled / void) plus what
+        this request packs cannot exceed the ordered quantity. A second click or a retry of the same
+        request therefore fails, while extra items added to the order later can still be packed.
+*/
+const checkPackingRequest = (connection, { order_id, packets }, callback) => {
+
+    const orderId = Number(order_id);
+
+    if (!Number.isInteger(orderId) || orderId <= 0) {
+        return callback(new Error("Invalid order"));
+    }
+
+    const packetNumbers = new Set();
+    const newlyPacked = new Map();
+
+    for (const packet of packets) {
+
+        const packetNo = Number(packet?.packet_no);
+
+        if (!Number.isInteger(packetNo) || packetNo <= 0 || packetNumbers.has(packetNo)) {
+            return callback(new Error("Invalid or repeated packet number"));
+        }
+
+        packetNumbers.add(packetNo);
+
+        if (!Array.isArray(packet.items) || packet.items.length === 0) {
+            return callback(new Error("Every packet needs at least one item"));
+        }
+
+        for (const item of packet.items) {
+
+            const itemId = Number(item?.order_item_id);
+            const quantity = Number(item?.quantity);
+
+            if (!Number.isInteger(itemId) || itemId <= 0) {
+                return callback(new Error("Invalid order item in a packet"));
+            }
+
+            if (!(quantity > 0) || quantity > 9999) {
+                return callback(new Error("Packed quantity must be greater than 0"));
+            }
+
+            newlyPacked.set(itemId, (newlyPacked.get(itemId) || 0) + quantity);
+        }
+    }
+
+    const itemIds = [...newlyPacked.keys()];
+
+    connection.query(
+        `SELECT canteen_order_id, order_status FROM canteen_order WHERE canteen_order_id = ? FOR UPDATE`,
+        [orderId],
+        (orderError, orderRows) => {
+
+            if (orderError) {
+                return callback(orderError);
+            }
+
+            if (!orderRows?.length) {
+                return callback(new Error("Order not found"));
+            }
+
+            if (orderRows[0].order_status === "CANCELLED") {
+                return callback(new Error("A cancelled order cannot be packed"));
+            }
+
+            connection.query(
+                `
+                SELECT canteen_order_item_id, quantity, is_active
+                FROM canteen_order_item
+                WHERE canteen_order_id = ?
+                AND canteen_order_item_id IN (?)
+                `,
+                [orderId, itemIds],
+                (itemError, itemRows) => {
+
+                    if (itemError) {
+                        return callback(itemError);
+                    }
+
+                    if ((itemRows || []).length !== itemIds.length) {
+                        return callback(new Error("A packed item does not belong to this order"));
+                    }
+
+                    const inactive = itemRows.filter(row => row.is_active === 0);
+
+                    if (inactive.length) {
+                        return callback(new Error("A cancelled item cannot be packed"));
+                    }
+
+                    connection.query(
+                        `
+                        SELECT d.order_item_id, SUM(d.quantity) AS packed
+                        FROM canteen_order_packing_detail d
+                        INNER JOIN canteen_order_packing p ON p.packing_id = d.packing_id
+                        WHERE p.order_id = ?
+                        AND p.status <> 'CANCELLED'
+                        AND d.status <> 'VOID'
+                        AND d.order_item_id IN (?)
+                        GROUP BY d.order_item_id
+                        `,
+                        [orderId, itemIds],
+                        (packedError, packedRows) => {
+
+                            if (packedError) {
+                                return callback(packedError);
+                            }
+
+                            const alreadyPacked = new Map(
+                                (packedRows || []).map(row => [Number(row.order_item_id), Number(row.packed || 0)])
+                            );
+
+                            for (const row of itemRows) {
+
+                                const itemId = Number(row.canteen_order_item_id);
+                                const total = (alreadyPacked.get(itemId) || 0) + newlyPacked.get(itemId);
+
+                                if (total > Number(row.quantity) + 0.0001) {
+
+                                    const before = alreadyPacked.get(itemId) || 0;
+
+                                    return callback(
+                                        new Error(
+                                            before > 0
+                                                ? `Item ${itemId} is already packed (ordered ${Number(row.quantity)}, packed before ${before}, now ${newlyPacked.get(itemId)})`
+                                                : `Packed quantity is more than ordered for item ${itemId} (ordered ${Number(row.quantity)}, packing ${newlyPacked.get(itemId)})`
+                                        )
+                                    );
+                                }
+                            }
+
+                            return callback(null);
+                        }
+                    );
+                }
+            );
+        }
+    );
+};
+
 module.exports = {
 
     // CREATE DELIVERY ASSIGNMENT
@@ -34,7 +302,19 @@ module.exports = {
                     });
                 }
 
-                // INSERT MASTER
+                // CHECK THE ORDERS (inside the transaction, rows locked), then INSERT MASTER
+                checkAssignmentOrders(connection, { assigned_to, orders }, (checkError) => {
+
+                if (checkError) {
+                    return connection.rollback(() => {
+                        connection.release();
+                        callBack({
+                            stage: "VALIDATION",
+                            message: checkError
+                        });
+                    });
+                }
+
                 connection.query(
                     `INSERT INTO diet_delivery_assignment
                     (
@@ -70,7 +350,7 @@ module.exports = {
                             item.canteen_order_id,
                             item.type_slno,
                             item.delivery_priority || 'NORMAL',
-                            item.delivery_status || 'PENDING',
+                            'PENDING',      // a new assignment always starts PENDING (was taken from the request)
                             item.remarks || null
                         ]));
 
@@ -120,6 +400,7 @@ module.exports = {
                         );
                     }
                 );
+                });   // end of checkAssignmentOrders
             });
         });
     },
@@ -2822,18 +3103,25 @@ ORDER BY dmc.created_at
     },
 
 
+    /*
+        CREATE THE FINAL PATIENT BILL
+
+        The screen sends the list of charges to bill (billing_type + the charge id) AND every amount
+        of them. The amounts are no longer used: each charge is read from diet_meal_charge /
+        diet_service_ledger (and locked), it must belong to this admission and patient and still be
+        PENDING, and the bill lines and the total are built from those rows.
+    */
     createPatientBillingService: async (data, callback) => {
-        console.log({
-            data
-        });
 
         const {
             patient_id,
             admission_id,
-            total_amount,
+            total_amount: clientTotal,   // informational only, never stored
             created_by,
             items = []
         } = data;
+
+        const round2 = value => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
 
         pool.getConnection(async (err, connection) => {
 
@@ -2888,6 +3176,189 @@ ORDER BY dmc.created_at
 
                 if (!Array.isArray(items) || items.length === 0) {
                     throw new Error("No billing items found.");
+                }
+
+
+                /*
+                **********************************************
+                READ THE CHARGES FROM THE DATABASE
+                **********************************************
+                */
+
+                const SOURCE_OF = {
+                    DIET_ORDER: "meal",
+                    EXTRA_ORDER: "ledger",
+                    PATIENT_CANTEEN_ORDER: "ledger",
+                    BYSTANDER_CANTEEN_ORDER: "ledger"
+                };
+
+                const requested = [];
+                const seenCharges = new Set();
+                const mealIds = [];
+                const ledgerIds = [];
+
+                for (const item of items) {
+
+                    const kind = SOURCE_OF[item?.billing_type];
+
+                    if (!kind) {
+                        throw new Error(`Unknown billing type: ${item?.billing_type}`);
+                    }
+
+                    const chargeId = Number(item.reference_id ?? item.bill_id);
+
+                    if (!Number.isInteger(chargeId) || chargeId <= 0) {
+                        throw new Error(`Reference ID missing for billing type: ${item.billing_type}`);
+                    }
+
+                    const key = `${kind}:${chargeId}`;
+
+                    if (seenCharges.has(key)) {
+                        throw new Error("The same charge is selected twice");
+                    }
+
+                    seenCharges.add(key);
+                    requested.push({ billing_type: item.billing_type, kind, chargeId });
+                    (kind === "meal" ? mealIds : ledgerIds).push(chargeId);
+                }
+
+                // Lock the charge rows first: two people billing the same charge are serialised, and
+                // the second one finds it BILLED. (Names are read with sub-selects so that only the
+                // charge rows are locked.)
+                const mealRows = mealIds.length
+                    ? await query(
+                        `
+                        SELECT
+                            dmc.meal_charge_id,
+                            dmc.admission_id,
+                            dmc.pt_no,
+                            dmc.party_type_id,
+                            dmc.meal_rate,
+                            dmc.discount,
+                            dmc.net_amount,
+                            dmc.charge_status,
+                            dmc.created_at,
+                            (SELECT dt.type_desc FROM diet_type dt WHERE dt.type_slno = dmc.type_slno) AS type_desc
+                        FROM diet_meal_charge dmc
+                        WHERE dmc.meal_charge_id IN (?)
+                        FOR UPDATE
+                        `,
+                        [mealIds]
+                    )
+                    : [];
+
+                const ledgerRows = ledgerIds.length
+                    ? await query(
+                        `
+                        SELECT
+                            dsl.ledger_id,
+                            dsl.admission_id,
+                            dsl.pt_no,
+                            dsl.party_type_id,
+                            dsl.item_id,
+                            dsl.quantity,
+                            dsl.unit_rate,
+                            dsl.discount,
+                            dsl.gst_rate,
+                            dsl.gst_amount,
+                            dsl.net_amount,
+                            dsl.ledger_status,
+                            dsl.created_at,
+                            (SELECT im.item_name FROM item_master im WHERE im.item_id = dsl.item_id) AS item_name
+                        FROM diet_service_ledger dsl
+                        WHERE dsl.ledger_id IN (?)
+                        FOR UPDATE
+                        `,
+                        [ledgerIds]
+                    )
+                    : [];
+
+                const mealById = new Map(mealRows.map(row => [Number(row.meal_charge_id), row]));
+                const ledgerById = new Map(ledgerRows.map(row => [Number(row.ledger_id), row]));
+
+                // the charge must belong to the patient / admission being billed
+                const belongsToBill = (row) =>
+                    String(row.admission_id) === String(admission_id) &&
+                    (!row.pt_no || String(row.pt_no) === String(patient_id));
+
+                // Same shape the old client payload had, so the insert loop below is unchanged.
+                const lines = requested.map(({ billing_type, kind, chargeId }) => {
+
+                    if (kind === "meal") {
+
+                        const row = mealById.get(chargeId);
+
+                        if (!row) {
+                            throw new Error(`Diet charge ${chargeId} was not found.`);
+                        }
+
+                        if (row.charge_status !== "PENDING") {
+                            throw new Error(`Diet charge ${chargeId} is already billed or unavailable.`);
+                        }
+
+                        if (!belongsToBill(row)) {
+                            throw new Error(`Diet charge ${chargeId} does not belong to this patient.`);
+                        }
+
+                        return {
+                            billing_type,
+                            reference_id: chargeId,
+                            party_type_id: row.party_type_id,
+                            description: `Diet Package - ${row.type_desc || "Meal"}`,
+                            item_id: null,
+                            quantity: 1,
+                            unit_rate: Number(row.meal_rate || 0),
+                            gst_rate: 0,
+                            gst_amount: 0,
+                            discount: Number(row.discount || 0),
+                            net_amount: Number(row.net_amount || 0),
+                            service_date: row.created_at
+                        };
+                    }
+
+                    const row = ledgerById.get(chargeId);
+
+                    if (!row) {
+                        throw new Error(`Service ledger ${chargeId} was not found.`);
+                    }
+
+                    if (row.ledger_status !== "PENDING") {
+                        throw new Error(`Service ledger ${chargeId} is already billed or unavailable.`);
+                    }
+
+                    if (!belongsToBill(row)) {
+                        throw new Error(`Service ledger ${chargeId} does not belong to this patient.`);
+                    }
+
+                    return {
+                        billing_type,
+                        reference_id: chargeId,
+                        party_type_id: row.party_type_id,
+                        description: row.item_name || billing_type,
+                        item_id: row.item_id ?? null,
+                        quantity: Number(row.quantity ?? 1),
+                        unit_rate: Number(row.unit_rate || 0),
+                        gst_rate: Number(row.gst_rate || 0),
+                        gst_amount: Number(row.gst_amount || 0),
+                        discount: Number(row.discount || 0),
+                        net_amount: Number(row.net_amount || 0),
+                        service_date: row.created_at
+                    };
+                });
+
+                const total_amount = round2(
+                    lines.reduce((sum, line) => sum + line.net_amount, 0)
+                );
+
+                if (!(total_amount >= 0)) {
+                    throw new Error("The bill amount is not valid.");
+                }
+
+                // Informational only: the total the screen calculated is never stored
+                if (clientTotal !== undefined && Math.abs(round2(clientTotal) - total_amount) > 0.01) {
+                    console.warn(
+                        `createPatientBilling: screen total ${clientTotal} differs from server total ${total_amount} (admission ${admission_id})`
+                    );
                 }
 
 
@@ -2984,7 +3455,7 @@ ORDER BY dmc.created_at
                 **********************************************
                 */
 
-                for (const item of items) {
+                for (const item of lines) {
 
                     let categoryId;
                     let referenceTable;
@@ -4016,21 +4487,15 @@ ORDER BY dmc.created_at
             items = []
         } = data;
 
+        // Only these are used from the request. billing_date, bill_type, bill_generated_*, paid_amount,
+        // balance_amount, billing_status and updated_by are decided here (see the note further down).
         const {
             patient_id,
             admission_id,
             billing_party_type,
-            billing_date,
             assignment_detail_id,
-            bill_type,
-            bill_generated_by,
-            bill_generated_location,
-            total_amount,
-            paid_amount = 0,
-            balance_amount,
-            billing_status = "OPEN",
-            created_by,
-            updated_by = null,
+            total_amount,      // informational only
+            created_by,        // the controller sets this to the logged-in employee
             bill_pay_type
         } = billing;
 
@@ -4127,50 +4592,87 @@ ORDER BY dmc.created_at
                 });
                 /*
                 **********************************************
-                VALIDATE BILLING ITEMS
+                THE BILL IS BUILT FROM THE DATABASE
+
+                The app sends the ledger ids (reference_id) and every amount. The amounts, the paid /
+                balance / status of the bill, the status of the lines, the bill type and the billing
+                date are no longer taken from the request: the ledger rows are read and locked, must
+                be PENDING bystander charges of this admission, and the lines and the total come from
+                them. A new bystander bill always starts unpaid (paid 0, balance = total, OPEN).
                 **********************************************
                 */
-                for (const item of items) {
-                    if (Number(item.category_id) !== 3) {
-                        throw new Error(
-                            "Invalid billing category for bystander"
-                        );
-                    }
-                    if (item.reference_table !== "diet_service_ledger") {
-                        throw new Error("Invalid billing reference table");
-                    }
+                const round2 = value => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
 
-                    if (!item.reference_id) {
-                        throw new Error("Billing reference ID is missing");
-                    }
+                const PAY_TYPES = ["INPATIENT_CREDIT", "CASH", "BYSTANDER_CREDIT"];
+
+                if (!PAY_TYPES.includes(bill_pay_type)) {
+                    throw new Error("Invalid bill pay type");
                 }
+
+                const assignmentDetailId =
+                    assignment_detail_id === undefined || assignment_detail_id === null || assignment_detail_id === ""
+                        ? null
+                        : Number(assignment_detail_id);
+
+                if (assignmentDetailId !== null && (!Number.isInteger(assignmentDetailId) || assignmentDetailId <= 0)) {
+                    throw new Error("Invalid delivery assignment");
+                }
+
+                const now = new Date();
+                const serverBillingDate =
+                    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
                 /*
                 **********************************************
                 GET REFERENCE IDS
                 **********************************************
                 */
-                const referenceIds = items.map(
-                    item => Number(item.reference_id)
-                );
-                const placeholders = referenceIds
-                    .map(() => "?")
-                    .join(",");
+                const referenceIds = [];
+
+                for (const item of items) {
+
+                    if (item?.reference_table !== "diet_service_ledger") {
+                        throw new Error("Invalid billing reference table");
+                    }
+
+                    const ledgerId = Number(item.reference_id);
+
+                    if (!Number.isInteger(ledgerId) || ledgerId <= 0) {
+                        throw new Error("Billing reference ID is missing");
+                    }
+
+                    if (referenceIds.includes(ledgerId)) {
+                        throw new Error("The same item is selected twice");
+                    }
+
+                    referenceIds.push(ledgerId);
+                }
                 /*
                 **********************************************
-                LOCK LEDGER ROWS
+                LOCK AND READ THE LEDGER ROWS
                 **********************************************
                 */
-                const ledgerCheckQuery = `
-                SELECT
-                    ledger_id,
-                    ledger_status
-                FROM diet_service_ledger
-                WHERE ledger_id IN (${placeholders})
-                FOR UPDATE
-            `;
                 const ledgerRows = await query(
-                    ledgerCheckQuery,
-                    referenceIds
+                    `
+                    SELECT
+                        dsl.ledger_id,
+                        dsl.admission_id,
+                        dsl.pt_no,
+                        dsl.party_type_id,
+                        dsl.item_id,
+                        dsl.quantity,
+                        dsl.unit_rate,
+                        dsl.discount,
+                        dsl.gst_rate,
+                        dsl.gst_amount,
+                        dsl.net_amount,
+                        dsl.ledger_status,
+                        (SELECT im.item_name FROM item_master im WHERE im.item_id = dsl.item_id) AS item_name
+                    FROM diet_service_ledger dsl
+                    WHERE dsl.ledger_id IN (?)
+                    FOR UPDATE
+                    `,
+                    [referenceIds]
                 );
                 /*
                 **********************************************
@@ -4180,26 +4682,64 @@ ORDER BY dmc.created_at
                 if (!ledgerRows || ledgerRows.length !== referenceIds.length) {
                     throw new Error("One or more billing items were not found");
                 }
-                /*
-                **********************************************
-                CHECK ALREADY BILLED
-                **********************************************
-                */
-                const alreadyBilled =
-                    ledgerRows?.filter(
-                        item =>
-                            item.ledger_status === "BILLED"
-                    );
 
-                if (alreadyBilled.length > 0) {
-                    throw new Error("One or more selected items are already billed");
-                }
+                const ledgerById = new Map(ledgerRows.map(row => [Number(row.ledger_id), row]));
+
                 /*
                 **********************************************
-                CALCULATE TOTAL
+                CHECK EACH CHARGE AND BUILD THE BILL LINES
                 **********************************************
                 */
-                const calculatedTotal = items?.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+                const lines = referenceIds.map(ledgerId => {
+
+                    const row = ledgerById.get(ledgerId);
+
+                    if (row.ledger_status !== "PENDING") {
+                        throw new Error(`Ledger ${ledgerId} is already billed or unavailable`);
+                    }
+
+                    if (Number(row.party_type_id) !== 1) {
+                        throw new Error(`Ledger ${ledgerId} is not a bystander charge`);
+                    }
+
+                    if (
+                        String(row.admission_id) !== String(admission_id) ||
+                        (row.pt_no && String(row.pt_no) !== String(patient_id))
+                    ) {
+                        throw new Error(`Ledger ${ledgerId} does not belong to this patient`);
+                    }
+
+                    return {
+                        description: row.item_name || "Item",
+                        item_id: row.item_id || null,
+                        quantity: Number(row.quantity ?? 1),
+                        rate: Number(row.unit_rate || 0),
+                        gst: Number(row.gst_rate || 0),
+                        gst_amount: Number(row.gst_amount || 0),
+                        discount: Number(row.discount || 0),
+                        amount: Number(row.net_amount || 0),
+                        reference_id: ledgerId,
+                        service_date: serverBillingDate,
+                        bill_item_status: "OPEN"
+                    };
+                });
+                /*
+                **********************************************
+                CALCULATE TOTAL (from the ledger rows)
+                **********************************************
+                */
+                const calculatedTotal = round2(lines.reduce((sum, line) => sum + line.amount, 0));
+
+                if (!(calculatedTotal >= 0)) {
+                    throw new Error("The bill amount is not valid");
+                }
+
+                // Informational only: the total the app calculated is never stored
+                if (total_amount !== undefined && Math.abs(round2(total_amount) - calculatedTotal) > 0.01) {
+                    console.warn(
+                        `CreateBystanderBilling: app total ${total_amount} differs from server total ${calculatedTotal} (admission ${admission_id})`
+                    );
+                }
                 /*
                 **********************************************
                 CREATE BILL HEADER
@@ -4249,23 +4789,19 @@ ORDER BY dmc.created_at
                     [
                         patient_id,
                         admission_id,
-                        assignment_detail_id,
-                        billing_party_type,
-                        billing_date,
-                        bill_type ||
+                        assignmentDetailId,
+                        1,                       // BYSTANDER (checked above)
+                        serverBillingDate,
                         "DELIVERY_GENERATED",
-                        bill_generated_by ||
-                        created_by,
-                        bill_generated_location ||
+                        created_by,              // bill_generated_by: the logged-in employee
                         "DELIVERY",
                         calculatedTotal,
-                        Number(paid_amount || 0),
-                        balance_amount ??
-                        calculatedTotal,
-                        billing_status,
+                        0,                       // a new bill is always unpaid
+                        calculatedTotal,         // balance = total
+                        "OPEN",
                         bill_pay_type,
                         created_by,
-                        updated_by
+                        null
                     ]
                 );
 
@@ -4343,7 +4879,7 @@ ORDER BY dmc.created_at
                 )
             `;
 
-                for (const item of items) {
+                for (const item of lines) {
                     await query(
                         detailQuery,
                         [
@@ -4361,8 +4897,7 @@ ORDER BY dmc.created_at
                             "diet_service_ledger",
                             Number(item.reference_id),
                             item.service_date || null,
-                            item.bill_item_status ||
-                            "OPEN"
+                            "OPEN"          // lines always start OPEN; they become PAID only through a payment
                         ]
                     );
                     /*
@@ -4421,14 +4956,12 @@ ORDER BY dmc.created_at
                         bill_no: billNo,
                         patient_id,
                         admission_id,
-                        billing_party_type,
+                        billing_party_type: 1,
                         total_amount: calculatedTotal,
-                        paid_amount: Number(paid_amount || 0),
-                        balance_amount:
-                            balance_amount ??
-                            calculatedTotal,
-                        billing_status,
-                        total_items: items?.length
+                        paid_amount: 0,
+                        balance_amount: calculatedTotal,
+                        billing_status: "OPEN",
+                        total_items: lines.length
                     }
                 });
             } catch (error) {
@@ -4439,9 +4972,19 @@ ORDER BY dmc.created_at
                 */
                 connection.rollback(() => {
                     connection.release();
+
+                    // our own refusals are shown as they are; a database error is logged and hidden
+                    const isOurRefusal = error instanceof Error && !error.code && !error.sqlMessage;
+
+                    if (!isOurRefusal) {
+                        console.error("CreateBystanderBilling failed:", error);
+                    }
+
                     callback(null, {
                         success: 0,
-                        message: error?.message || "Failed to generate bystander bill"
+                        message: isOurRefusal && error.message
+                            ? error.message
+                            : "Failed to generate bystander bill"
                     });
                 });
             }
@@ -4740,6 +5283,45 @@ ORDER BY dmc.created_at
 
         if (!Array.isArray(payments) || payments?.length === 0) {
             return callback(new Error("Payment details are missing"));
+        }
+
+        /*
+        CASH / CHANGE VALIDATION (server side, never trust the client)
+
+        Change is a property of the whole cash handover, not of each bill.
+        It is stored on the FIRST bill's payment row only, otherwise a
+        multi-bill payment would record the same change once per bill.
+        */
+        const round2 = value => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+        const isCashPayment = String(payment_mode || "").toUpperCase() === "CASH";
+
+        let verifiedReceived = null;
+        let verifiedChange = null;
+        let verifiedChangeStatus = null;
+
+        if (isCashPayment) {
+
+            verifiedReceived = round2(received_amount);
+
+            if (!Number.isFinite(verifiedReceived) || verifiedReceived < round2(amount)) {
+                return callback(
+                    new Error("Cash received cannot be less than the payment amount")
+                );
+            }
+
+            verifiedChange = round2(verifiedReceived - round2(amount));
+
+            if (
+                change_amount !== null &&
+                change_amount !== undefined &&
+                Math.abs(round2(change_amount) - verifiedChange) > 0.01
+            ) {
+                return callback(
+                    new Error("Change amount does not match received amount")
+                );
+            }
+
+            verifiedChangeStatus = verifiedChange > 0 ? "PENDING" : null;
         }
 
         pool.getConnection((err, connection) => {
@@ -5137,11 +5719,11 @@ ORDER BY dmc.created_at
                                                 payment_mode,
                                                 collected_by,
                                                 collected_location,
-                                                received_amount,
-                                                change_amount,
+                                                index === 0 ? verifiedReceived : null,
+                                                index === 0 ? verifiedChange : null,
                                                 transaction_id || null,
                                                 remarks,
-                                                change_status
+                                                index === 0 ? verifiedChangeStatus : null
                                             ],
                                             (err, paymentResult) => {
 
@@ -5742,7 +6324,207 @@ ORDER BY dmc.created_at
         );
     },
 
+    /*
+        CONVERT A PROFORMA INTO A BILL
+
+        The browser used to send the whole bill (totals, paid amount, status, every line
+        amount, even the employee) and the server inserted it as it came. Now the client
+        only says WHICH proforma and HOW it is paid; everything else is rebuilt here:
+
+          * proforma header, party, patient, admission  -> proforma_invoice
+          * lines and amounts                           -> proforma_invoice_detail
+                                                           (CANCELLED / UNDELIVERED / RETURNED
+                                                            lines are not billed)
+          * employee who owns the bill (cash collector) -> the delivery person the proforma's
+                                                           assignment was given to
+          * paid_amount = 0, balance = total, status OPEN (payment is a separate step)
+
+        The actual inserts are done by _insertConvertedBill() below, whose last statement still
+        flips the proforma OPEN -> CONVERTED atomically, so two people converting the same
+        proforma at once cannot both succeed.
+    */
     convertProformaToBill: (
+        payload,
+        callback
+    ) => {
+
+        const round2 = value => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+
+        const NOT_BILLABLE = ['CANCELLED', 'UNDELIVERED', 'RETURNED'];
+        const PAY_TYPES = ['CASH', 'INPATIENT_CREDIT', 'BYSTANDER_CREDIT'];
+
+        const proformaId = Number(payload?.proforma_id);
+        const billPayType = payload?.bill_pay_type;
+
+        if (!Number.isInteger(proformaId) || proformaId <= 0) {
+            return callback(new Error("Proforma ID is required"));
+        }
+
+        if (!PAY_TYPES.includes(billPayType)) {
+            return callback(new Error("Invalid bill pay type"));
+        }
+
+        // 1. proforma header + the delivery person it was assigned to
+        pool.query(
+            `
+            SELECT
+                pi.proforma_id,
+                pi.patient_id,
+                pi.admission_id,
+                pi.party_type_id,
+                pi.assignment_detail_id,
+                pi.status,
+                a.assigned_to
+            FROM proforma_invoice pi
+            LEFT JOIN diet_delivery_assignment_detail d
+                ON d.assignment_detail_id = pi.assignment_detail_id
+            LEFT JOIN diet_delivery_assignment a
+                ON a.assignment_id = d.assignment_id
+            WHERE pi.proforma_id = ?
+            `,
+            [proformaId],
+            (headerError, headerRows) => {
+
+                if (headerError) {
+                    return callback(headerError);
+                }
+
+                const proforma = headerRows?.[0];
+
+                if (!proforma) {
+                    return callback(new Error("Proforma not found"));
+                }
+
+                if (proforma.status !== 'OPEN') {
+                    return callback(
+                        new Error(`Proforma is already ${String(proforma.status).toLowerCase()}`)
+                    );
+                }
+
+                // The bill belongs to whoever collects the cash: the delivery person of the
+                // assignment. Only if the proforma has no assignment, the value sent by the
+                // screen is used - and it must be a real employee.
+                const employeeId = Number(proforma.assigned_to) || Number(payload?.employeeId);
+
+                if (!Number.isInteger(employeeId) || employeeId <= 0) {
+                    return callback(new Error("Employee for the bill could not be determined"));
+                }
+
+                // 2. the employee must exist
+                pool.query(
+                    `SELECT em_id FROM co_employee_master WHERE em_id = ? LIMIT 1`,
+                    [employeeId],
+                    (employeeError, employeeRows) => {
+
+                        if (employeeError) {
+                            return callback(employeeError);
+                        }
+
+                        if (!employeeRows?.length) {
+                            return callback(new Error("Employee for the bill was not found"));
+                        }
+
+                        // 3. billable lines, straight from the database
+                        pool.query(
+                            `
+                            SELECT
+                                proforma_detail_id,
+                                item_id,
+                                description,
+                                quantity,
+                                rate,
+                                gst,
+                                gst_amount,
+                                discount,
+                                amount,
+                                service_date,
+                                delivery_status
+                            FROM proforma_invoice_detail
+                            WHERE proforma_id = ?
+                            AND delivery_status NOT IN (?)
+                            ORDER BY proforma_detail_id ASC
+                            `,
+                            [proformaId, NOT_BILLABLE],
+                            (lineError, lineRows) => {
+
+                                if (lineError) {
+                                    return callback(lineError);
+                                }
+
+                                if (!lineRows?.length) {
+                                    return callback(new Error("This proforma has no billable items"));
+                                }
+
+                                const details = lineRows.map(line => ({
+                                    category_id: 2,
+                                    party_type_id: proforma.party_type_id,
+                                    description: line.description || "Item",
+                                    item_id: line.item_id || null,
+                                    quantity: Number(line.quantity || 0),
+                                    rate: Number(line.rate || 0),
+                                    gst: Number(line.gst || 0),
+                                    gst_amount: Number(line.gst_amount || 0),
+                                    discount: Number(line.discount || 0),
+                                    amount: Number(line.amount || 0),
+                                    // same reference value the existing bills carry
+                                    reference_table: "proforma_detail",
+                                    reference_id: line.proforma_detail_id,
+                                    service_date: line.service_date || null
+                                }));
+
+                                const totalAmount = round2(
+                                    details.reduce((sum, line) => sum + line.amount, 0)
+                                );
+
+                                if (!(totalAmount > 0)) {
+                                    return callback(new Error("The bill amount must be greater than zero"));
+                                }
+
+                                // Informational only: the screen's own total is never used
+                                if (
+                                    payload?.client_total !== undefined &&
+                                    Math.abs(round2(payload.client_total) - totalAmount) > 0.01
+                                ) {
+                                    console.warn(
+                                        `convertProformaToBill: screen total ${payload.client_total} differs from server total ${totalAmount} for proforma ${proformaId}`
+                                    );
+                                }
+
+                                const now = new Date();
+                                const billingDate =
+                                    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
+                                const bill = {
+                                    patient_id: proforma.patient_id,
+                                    admission_id: proforma.admission_id,
+                                    assignment_detail_id: proforma.assignment_detail_id,
+                                    billing_party_type: proforma.party_type_id,
+                                    billing_date: billingDate,
+                                    bill_type: "PRE_GENERATED",
+                                    bill_generated_location: "CANTEEN",
+                                    total_amount: totalAmount,
+                                    paid_amount: 0,
+                                    balance_amount: totalAmount,
+                                    billing_status: "OPEN",
+                                    bill_pay_type: billPayType,
+                                    employeeId
+                                };
+
+                                module.exports._insertConvertedBill(
+                                    { proforma_id: proformaId, bill, details },
+                                    callback
+                                );
+                            }
+                        );
+                    }
+                );
+            }
+        );
+    },
+
+    // Inserts a bill that has ALREADY been built and verified by convertProformaToBill().
+    // Not meant to be called with data from a request.
+    _insertConvertedBill: (
         payload,
         callback
     ) => {
@@ -6236,9 +7018,16 @@ ORDER BY dmc.created_at
                         }
 
 
-                        // 
+                        // CHECK THE REQUEST (inside the transaction, order row locked)
+                        checkPackingRequest(connection, { order_id, packets }, (checkError) => {
+
+                        if (checkError) {
+                            return handleError(checkError);
+                        }
+
+                        //
                         // 1. INSERT PACKING MASTER
-                        // 
+                        //
 
                         const packingInsertQuery = `
                         INSERT INTO canteen_order_packing
@@ -6269,7 +7058,7 @@ ORDER BY dmc.created_at
                             packingInsertQuery,
                             [
                                 order_id,
-                                packet_count,
+                                packets.length,          // was packet_count from the request
                                 assignment_detail_id,
                                 type_slno,
                                 created_by
@@ -6516,6 +7305,8 @@ ORDER BY dmc.created_at
                             }
 
                         );
+
+                        });   // end of checkPackingRequest
 
                     }
 
@@ -7006,6 +7797,19 @@ ORDER BY p.payment_date DESC;
     },
     returnAmountSettlement: (data, callBack) => {
 
+        const round2 = value => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+
+        const paymentId = Number(data?.payment_id);
+        const returnedAmount = round2(data?.returned_amount);
+
+        if (!Number.isInteger(paymentId) || paymentId <= 0) {
+            return callBack(new Error("Invalid payment id"));
+        }
+
+        if (!Number.isFinite(returnedAmount) || returnedAmount <= 0) {
+            return callBack(new Error("Returned amount must be greater than 0"));
+        }
+
         pool.getConnection((error, connection) => {
             if (error) {
                 return callBack(error);
@@ -7017,65 +7821,140 @@ ORDER BY p.payment_date DESC;
                     return callBack(error);
                 }
 
-                // 1. Insert this return transaction
+                const fail = (err) => {
+                    connection.rollback(() => {
+                        connection.release();
+                        callBack(err);
+                    });
+                };
+
+                // 1. Lock the payment row so two returns cannot run together
                 connection.query(
                     `
-                INSERT INTO patient_bill_change_return
-                (
+                SELECT
                     payment_id,
-                    returned_amount,
-                    returned_by,
-                    remarks
-                )
-                VALUES (?, ?, ?, ?)
+                    payment_mode,
+                    payment_status,
+                    change_amount,
+                    change_status,
+                    collected_by
+                FROM patient_bill_payment
+                WHERE payment_id = ?
+                FOR UPDATE
                 `,
-                    [
-                        data?.payment_id,
-                        data?.returned_amount,
-                        data?.returned_by,
-                        data?.remarks
-                    ],
-                    (error, results) => {
+                    [paymentId],
+                    (error, paymentRows) => {
 
                         if (error) {
+                            return fail(error);
+                        }
+
+                        const payment = paymentRows?.[0];
+
+                        // Same "nothing updated" contract the controller already handles
+                        if (
+                            !payment ||
+                            String(payment.payment_mode).toUpperCase() !== "CASH" ||
+                            payment.payment_status !== "SUCCESS" ||
+                            payment.change_status !== "PENDING"
+                        ) {
                             return connection.rollback(() => {
                                 connection.release();
-                                callBack(error);
+                                callBack(null, { affectedRows: 0 });
                             });
                         }
 
-                        // 2. Update only the current status
+                        // The change is owed by whoever collected the cash (the mobile list of pending
+                        // returns is built from collected_by). Somebody else must not pay it out.
+                        if (Number(payment.collected_by) !== Number(data?.returned_by)) {
+                            return fail(
+                                new Error("This change belongs to a payment collected by another employee")
+                            );
+                        }
+
+                        // 2. How much has already been returned
                         connection.query(
                             `
-                        UPDATE patient_bill_payment
-                        SET change_status = ?
+                        SELECT COALESCE(SUM(returned_amount), 0) AS total_returned
+                        FROM patient_bill_change_return
                         WHERE payment_id = ?
                         `,
-                            [
-                                data?.change_status,
-                                data?.payment_id
-                            ],
-                            (error, results) => {
+                            [paymentId],
+                            (error, returnRows) => {
 
                                 if (error) {
-                                    return connection.rollback(() => {
-                                        connection.release();
-                                        callBack(error);
-                                    });
+                                    return fail(error);
                                 }
 
-                                connection.commit((error) => {
+                                const changeAmount = round2(payment.change_amount);
+                                const alreadyReturned = round2(returnRows?.[0]?.total_returned);
+                                const remaining = round2(changeAmount - alreadyReturned);
 
-                                    if (error) {
-                                        return connection.rollback(() => {
-                                            connection.release();
-                                            callBack(error);
-                                        });
+                                if (returnedAmount > remaining) {
+                                    return fail(
+                                        new Error(
+                                            `Returned amount exceeds the remaining change (${remaining.toFixed(2)})`
+                                        )
+                                    );
+                                }
+
+                                // The server decides the status, not the client
+                                const newStatus =
+                                    round2(remaining - returnedAmount) <= 0
+                                        ? "RETURNED"
+                                        : "PENDING";
+
+                                // 3. Insert this return transaction
+                                connection.query(
+                                    `
+                                INSERT INTO patient_bill_change_return
+                                (
+                                    payment_id,
+                                    returned_amount,
+                                    returned_by,
+                                    remarks
+                                )
+                                VALUES (?, ?, ?, ?)
+                                `,
+                                    [
+                                        paymentId,
+                                        returnedAmount,
+                                        data?.returned_by,
+                                        data?.remarks
+                                    ],
+                                    (error) => {
+
+                                        if (error) {
+                                            return fail(error);
+                                        }
+
+                                        // 4. Update the payment status
+                                        connection.query(
+                                            `
+                                        UPDATE patient_bill_payment
+                                        SET change_status = ?
+                                        WHERE payment_id = ?
+                                        `,
+                                            [newStatus, paymentId],
+                                            (error, results) => {
+
+                                                if (error) {
+                                                    return fail(error);
+                                                }
+
+                                                connection.commit((error) => {
+
+                                                    if (error) {
+                                                        return fail(error);
+                                                    }
+
+                                                    connection.release();
+                                                    return callBack(null, results);
+                                                });
+                                            }
+                                        );
                                     }
-
-                                    connection.release();
-                                    return callBack(null, results);
-                                });
+                                );
                             }
                         );
                     }

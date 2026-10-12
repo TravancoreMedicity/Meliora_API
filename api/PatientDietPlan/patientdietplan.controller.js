@@ -1,4 +1,5 @@
 const { isValid, parseISO } = require('date-fns');
+const { safeMessage } = require('../Canteen_Orders/Helper');
 const {
     insertPatientDietPlan: insertService,
     getAllPatientDietPlan: getAllService,
@@ -30,23 +31,24 @@ module.exports = {
     insertPatientDietPlan: (req, res) => {
         const data = req.body;
 
+        // (an NPO plan has no diet, so the diet is checked in the service, depending on diet_type)
         if (!data.patient_id || !data.admission_id) {
             return res.status(200).json({
                 success: 0,
-                message: "Patient ID, Admission ID and Diet ID are required"
+                message: "Patient ID and Admission ID are required"
             });
         }
 
         insertService(data, (err, result) => {
             if (err) {
-                console.log(err);
+                // our own refusals (already has an active plan, invalid dates ...) are shown; database errors are hidden
                 return res.status(200).json({
                     success: 0,
-                    message: "Error in Inserting Patient Diet Plan"
+                    message: safeMessage(err, "Error in Inserting Patient Diet Plan")
                 });
             }
             // EMIT SOCKET EVENT HERE
-            req.io.emit("newDietPlanCreated", {
+            req.io?.emit("newDietPlanCreated", {
                 plan_id: result?.insertId,
                 patient_id: data.patient_id,
                 admission_id: data.admission_id,
@@ -448,7 +450,7 @@ module.exports = {
             if (err) {
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(err, "Error in updating the diet plan")
                 });
             }
 
@@ -526,7 +528,7 @@ module.exports = {
             if (err) {
                 return res.status(200).json({
                     success: 0,
-                    message: err
+                    message: safeMessage(err, "Error in stopping the diet plan")
                 });
             }
 

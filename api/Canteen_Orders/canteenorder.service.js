@@ -1,5 +1,5 @@
 const { pool } = require('../../config/database');
-const { executeQuery } = require('./Helper');
+const { executeQuery, priceCanteenItems } = require('./Helper');
 
 module.exports = {
 
@@ -455,11 +455,13 @@ module.exports = {
 
     /*  UPDATE STATUS */
     updateOrderStatus: (id, status, updated_by, callback) => {
+        // a CANCELLED order is final: it cannot be confirmed or re-opened any more
         const query = `
             UPDATE canteen_order
             SET order_status = ?,
             updated_by = ?
             WHERE canteen_order_id = ?
+            AND order_status <> 'CANCELLED'
         `;
 
         executeQuery(query, [status, updated_by, id], callback);
@@ -533,13 +535,15 @@ GROUP BY
         executeQuery(query, [id], callback);
     },
     UpdateItemQuantity: (canteen_order_item_id, updatedQty, callback) => {
+        // gst_amount is stored per line, so it has to follow the new quantity
         const query = `
             UPDATE canteen_order_item
-            SET quantity = ?
+            SET quantity = ?,
+                gst_amount = ROUND(COALESCE(price, 0) * ? * COALESCE(gst, 0) / 100, 2)
             WHERE canteen_order_item_id = ?
         `;
 
-        executeQuery(query, [updatedQty, canteen_order_item_id], callback);
+        executeQuery(query, [updatedQty, updatedQty, canteen_order_item_id], callback);
     },
 
 
@@ -638,23 +642,219 @@ GROUP BY
         executeQuery(query, bd_code, callback);
     },
 
-    /*  DELETE */
-    deleteOrder: (id, callback) => {
+    /*
+        ADD ITEMS TO AN EXISTING ORDER (one transaction)
 
-        const deleteItems = `
-            DELETE FROM canteen_order_item 
-            WHERE canteen_order_id = ?
-        `;
+        Before, the canteen items and the patient_extra_order rows were inserted by two
+        separate calls and the HTTP answer was sent before the second one finished.
+        Now both inserts commit together or not at all.
 
-        const deleteOrder = `
-            DELETE FROM canteen_order 
-            WHERE canteen_order_id = ?
-        `;
+        data = { canteen_order_id, itemDetail, isExtra, patient_id, created_by, order_status }
+        Prices / gst are read from canteen_item_price, not from the request.
+    */
+    addItemsToOrder: (data, callback) => {
 
-        executeQuery(deleteItems, [id], (err) => {
+        const {
+            canteen_order_id,
+            itemDetail,
+            isExtra,
+            patient_id,
+            created_by,
+            order_status
+        } = data;
+
+        pool.getConnection((err, conn) => {
             if (err) return callback(err);
 
-            executeQuery(deleteOrder, [id], callback);
+            const fail = (error) => {
+                conn.rollback(() => {
+                    conn.release();
+                    callback(error);
+                });
+            };
+
+            conn.beginTransaction(err => {
+                if (err) {
+                    conn.release();
+                    return callback(err);
+                }
+
+                // lock the order so it cannot be cancelled while items are added
+                conn.query(
+                    `
+                    SELECT canteen_order_id, party_type_id, order_status
+                    FROM canteen_order
+                    WHERE canteen_order_id = ?
+                    FOR UPDATE
+                    `,
+                    [canteen_order_id],
+                    (err, orderRows) => {
+
+                        if (err) return fail(err);
+
+                        const order = orderRows?.[0];
+
+                        if (!order) {
+                            return fail(new Error("Order not found"));
+                        }
+
+                        if (!['PENDING', 'CONFIRMED'].includes(order.order_status)) {
+                            return fail(
+                                new Error(`Items cannot be added to a ${String(order.order_status).toLowerCase()} order`)
+                            );
+                        }
+
+                        priceCanteenItems(conn, order.party_type_id, itemDetail, (err, priced) => {
+
+                            if (err) return fail(err);
+
+                            const values = priced.map(item => ([
+                                canteen_order_id,
+                                item.item_id,
+                                item.qty,
+                                item.price,
+                                item.gst,
+                                item.type_slno,
+                                item.gst_amount,
+                                item.patient_diet_id
+                            ]));
+
+                            conn.query(
+                                `
+                                INSERT INTO canteen_order_item (
+                                    canteen_order_id,
+                                    item_id,
+                                    quantity,
+                                    price,
+                                    gst,
+                                    type_slno,
+                                    gst_amount,
+                                    patient_diet_id
+                                )
+                                VALUES ?
+                                `,
+                                [values],
+                                (err, results) => {
+
+                                    if (err) return fail(err);
+
+                                    const finish = () => {
+                                        conn.commit(err => {
+                                            if (err) return fail(err);
+
+                                            conn.release();
+                                            return callback(null, results);
+                                        });
+                                    };
+
+                                    if (!isExtra) return finish();
+
+                                    const extraValues = priced.map(item => ([
+                                        patient_id,
+                                        item.item_id,
+                                        item.qty,
+                                        order_status || 'PENDING',
+                                        item.price,
+                                        item.gst,
+                                        item.gst_amount,
+                                        created_by
+                                    ]));
+
+                                    conn.query(
+                                        `
+                                        INSERT INTO patient_extra_order (
+                                            patient_id,
+                                            item_id,
+                                            quantity,
+                                            order_status,
+                                            price,
+                                            gst,
+                                            gst_amount,
+                                            created_by
+                                        ) VALUES ?
+                                        `,
+                                        [extraValues],
+                                        (err) => {
+                                            if (err) return fail(err);
+                                            finish();
+                                        }
+                                    );
+                                }
+                            );
+                        });
+                    }
+                );
+            });
+        });
+    },
+
+    /*
+        DELETE - only an order that is still PENDING can be removed, and the items and
+        the order are removed together. Confirmed / cancelled orders must be kept
+        (billing and audit refer to them); use cancel for those.
+    */
+    deleteOrder: (id, callback) => {
+
+        pool.getConnection((err, conn) => {
+            if (err) return callback(err);
+
+            const fail = (error) => {
+                conn.rollback(() => {
+                    conn.release();
+                    callback(error);
+                });
+            };
+
+            conn.beginTransaction(err => {
+                if (err) {
+                    conn.release();
+                    return callback(err);
+                }
+
+                conn.query(
+                    `SELECT order_status FROM canteen_order WHERE canteen_order_id = ? FOR UPDATE`,
+                    [id],
+                    (err, rows) => {
+
+                        if (err) return fail(err);
+
+                        if (!rows?.length) {
+                            return fail(new Error("Order not found"));
+                        }
+
+                        if (rows[0].order_status !== 'PENDING') {
+                            return fail(
+                                new Error("Only a pending order can be deleted. Cancel the order instead")
+                            );
+                        }
+
+                        conn.query(
+                            `DELETE FROM canteen_order_item WHERE canteen_order_id = ?`,
+                            [id],
+                            (err) => {
+
+                                if (err) return fail(err);
+
+                                conn.query(
+                                    `DELETE FROM canteen_order WHERE canteen_order_id = ?`,
+                                    [id],
+                                    (err, results) => {
+
+                                        if (err) return fail(err);
+
+                                        conn.commit(err => {
+                                            if (err) return fail(err);
+
+                                            conn.release();
+                                            return callback(null, results);
+                                        });
+                                    }
+                                );
+                            }
+                        );
+                    }
+                );
+            });
         });
     },
 
@@ -973,6 +1173,35 @@ GROUP BY
                     await runQuery(dietQuery);
                     await runQuery(canteenQuery);
                     await runQuery(extraQuery);
+
+                    /*
+                     * gst_amount is stored per line (price x quantity x gst / 100), so it
+                     * must follow the new quantity or billing totals drift.
+                     */
+                    const canteenIds = canteen.map(item => item.canteen_order_item_id).filter(Boolean);
+                    const extraIds = extra.map(item => item.extra_order_id).filter(Boolean);
+
+                    if (canteenIds.length) {
+                        await runQuery({
+                            sql: `
+                                UPDATE canteen_order_item
+                                SET gst_amount = ROUND(COALESCE(price, 0) * quantity * COALESCE(gst, 0) / 100, 2)
+                                WHERE canteen_order_item_id IN (?)
+                            `,
+                            values: [canteenIds]
+                        });
+                    }
+
+                    if (extraIds.length) {
+                        await runQuery({
+                            sql: `
+                                UPDATE patient_extra_order
+                                SET gst_amount = ROUND(COALESCE(price, 0) * quantity * COALESCE(gst, 0) / 100, 2)
+                                WHERE extra_order_id IN (?)
+                            `,
+                            values: [extraIds]
+                        });
+                    }
 
                     /*
                      * Commit transaction

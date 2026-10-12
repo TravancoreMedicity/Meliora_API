@@ -11,15 +11,41 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const fs = require("fs");
 
+/*
+  Safety net: one error thrown inside a database callback (for example a DB error that a
+  controller does not handle) used to end the whole Node process, disconnecting every web
+  and mobile user until somebody restarted it. These handlers log the problem and keep the
+  API running.
+  NOTE: if the API is run under pm2 / a service manager that restarts it automatically, you
+  may prefer to log and then call process.exit(1) inside uncaughtException instead, because
+  the process state is not guaranteed to be clean after an uncaught exception.
+*/
+process.on("uncaughtException", (error) => {
+  console.error("UNCAUGHT EXCEPTION:", error);
+  try {
+    logger.productionLogger.log("error", `Uncaught exception: ${error?.stack || error}`);
+  } catch (logError) {
+    // logging must never throw from inside the handler
+  }
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("UNHANDLED REJECTION:", reason);
+  try {
+    logger.productionLogger.log("error", `Unhandled rejection: ${reason?.stack || reason}`);
+  } catch (logError) {
+    // logging must never throw from inside the handler
+  }
+});
+
 //sockect io configuration
 
-
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 app.use(express.json()); // remove this there is a duplicate rk
 
 // app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({extended: true, limit: "50mb"}));
+app.use(express.json({limit: "50mb"}));
 app.use(cookieParser());
 // app.use(lusca.csrf());
 
@@ -45,16 +71,16 @@ const allowedOrigins = [
   "http://192.168.22.5:3001",
   "http://192.168.22.3:3001",
   "http://192.168.22.3:3001",
-  "http://192.168.22.129:3000"
-
+  "http://192.168.22.129:3000",
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://192.168.22.170:3000",
+  "http://192.168.22.170:3001",
 ];
-
-
 
 // Dynamically allow based on Origin
 app.use(
   cors({
-
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
@@ -65,21 +91,14 @@ app.use(
     },
 
     credentials: true,
-  })
+  }),
 );
-
-
-
 
 // ----- logger display For Info ----
 app.get("/info", (req, res) => {
   fs.readFile("./errorlog/info.log", (error, txtString) => {
     if (error) throw err;
-    res.write(
-      '<div id="content"><pre>' +
-      txtString.toString().replace(/\n/g, "<br />") +
-      "</pre>"
-    );
+    res.write('<div id="content"><pre>' + txtString.toString().replace(/\n/g, "<br />") + "</pre>");
     res.end();
   });
 });
@@ -87,11 +106,7 @@ app.get("/info", (req, res) => {
 app.get("/error", (req, res) => {
   fs.readFile("./errorlog/error.log", (error, txtString) => {
     if (error) throw err;
-    res.write(
-      '<div id="content"><pre>' +
-      txtString.toString().replace(/\n/g, "<br />") +
-      "</pre>"
-    );
+    res.write('<div id="content"><pre>' + txtString.toString().replace(/\n/g, "<br />") + "</pre>");
     res.end();
   });
 });
@@ -100,23 +115,14 @@ app.get("/error", (req, res) => {
 app.get("/warn", (req, res) => {
   fs.readFile("./errorlog/warn.log", (error, txtString) => {
     if (error) throw err;
-    res.write(
-      '<div id="content"><pre>' +
-      txtString.toString().replace(/\n/g, "<br />") +
-      "</pre>"
-    );
+    res.write('<div id="content"><pre>' + txtString.toString().replace(/\n/g, "<br />") + "</pre>");
     res.end();
   });
 });
 
+app.use("/chat-files", express.static("D:/DocMeliora/Meliora/IncidentManagement/ChatConversationFiles"));
 
-
-app.use(
-  '/chat-files',
-  express.static('D:/DocMeliora/Meliora/IncidentManagement/ChatConversationFiles')
-);
-
-// https code 
+// https code
 
 // const https = require("https");
 
@@ -129,12 +135,11 @@ const server = http.createServer(app);
 const io = socketUtils.WSIO(server);
 socketUtils.connection(io);
 
-
 // MySQL fb_ipadmiss INSERT listener
 const {
   startAdmissionListener,
   // startPrintQueueListener
-} = require('./events/mysqlEvents');
+} = require("./events/mysqlEvents");
 
 startAdmissionListener(io);
 // startPrintQueueListener(io);
@@ -143,8 +148,6 @@ const socketIOMiddlewre = (req, res, next) => {
   req.io = io;
   next();
 };
-
-
 
 const userRouter = require("./api/user/user.router");
 const employeeRouter = require("./api/employee/employee.router");
@@ -314,10 +317,10 @@ const feedbackforms = require("./api/Feedback/Feedback.router");
 const backuptypemast = require("./api/it_backup_type_master/backup_type.router");
 const simOperators = require("./api/it_sim_operators/sim_operators.router");
 const notificationMenu = require("./api/notificationMenu/notification.router");
-const { validateAccessToken, } = require("./api/tokenValidation/tokenValidation");
+const {validateAccessToken} = require("./api/tokenValidation/tokenValidation");
 const AssetCondemnation = require("./api/am_condem_details/am_condem.router");
-const condemApprovalLevel = require('./api/am_asset_condem_approval_level_mast/approval_level_mast.router')
-const { validateTokenFrontend } = require("./authentication/ValidationCheck");
+const condemApprovalLevel = require("./api/am_asset_condem_approval_level_mast/approval_level_mast.router");
+const {validateTokenFrontend} = require("./authentication/ValidationCheck");
 const crfDeliveryMarking = require("./api/crm_delivery_marking/delivery_marking_router");
 const companyMast = require("./api/crm_company_mast/company.router");
 const crmDashboard = require("./api/crm_dashboard/crmDasboard.router");
@@ -326,48 +329,45 @@ const amsAntibiotic = require("./api/ams_antibiotic/ams.router");
 const validateAuthentication = require("./api/validate_authentication/employeeData.router");
 const melioraDepMaster = require("./api/Meliora_department_master/meliora_dep_master.router");
 const ContractMaster = require("./api/contract_master/contract.router");
-const condemMasters = require('./api/am_condemnation_master/condem_master.router')
+const condemMasters = require("./api/am_condemnation_master/condem_master.router");
 
-const GeminiRouter = require('./api/Ai/gemini.router')
-const ItemCategoryMaster = require('./api/ItemCategoryMaster/ItemCategory.router');
-const OrderPartyType = require('./api/OrderPartyType/orderpartyType.router');
-const DietSpecialityMaster = require('./api/DietSpecialityMaster/dietspecialitymaster.router');
-const UnitMaster = require('./api/unitMaster/unitmaster.router');
-const PatientDietMaster = require('./api/PatientDietMaster/patientdietmaster.router');
-const DietTemplateMaster = require('./api/DietTemplate/diettemplate.router');
-const TemplateFoodAdd = require('./api/DietTemplateFood/diettemplatefood.router');
-const FoodItemMaster = require('./api/ItemMaster/itemmaster.router');
-const ItemType = require('./api/ItemType/itemtype.router');
-const DietPriceMaster = require('./api/DietPriceMaster/dietpricemaster.router');
-const ItemAliasMaster = require('./api/ItemAlias/itemalias.router');
-const PatientDietPlan = require('./api/PatientDietPlan/patientdietplan.router');
-const PatientDietProcess = require('./api/PatientDietProcess/dietproductionbatch.router');
-const DietAllergenceMaster = require('./api/DietAllergenceMaster/dietallergencemaster.router');
-const billingCategroyMaster = require('./api/BillingCategoryMaster/billingcategorymaster.router');
-const dietOrder = require('./api/DietOrder/dietorder.router');
-const dietscheduled = require('./api/patientDietSchedule/patientdietscheduled.router');
-const canteenorder = require('./api/Canteen_Orders/canteenorder.router');
-const paitentextraorder = require('./api/PatientExtraOrder/patient_extra_order.router');
-const productionbatch = require('./api/DietProduction/diet_production.router');
-const deliveryassignment = require('./api/DietOrderAssignment/dietorderassign.router');
+const GeminiRouter = require("./api/Ai/gemini.router");
+const ItemCategoryMaster = require("./api/ItemCategoryMaster/ItemCategory.router");
+const OrderPartyType = require("./api/OrderPartyType/orderpartyType.router");
+const DietSpecialityMaster = require("./api/DietSpecialityMaster/dietspecialitymaster.router");
+const UnitMaster = require("./api/unitMaster/unitmaster.router");
+const PatientDietMaster = require("./api/PatientDietMaster/patientdietmaster.router");
+const DietTemplateMaster = require("./api/DietTemplate/diettemplate.router");
+const TemplateFoodAdd = require("./api/DietTemplateFood/diettemplatefood.router");
+const FoodItemMaster = require("./api/ItemMaster/itemmaster.router");
+const ItemType = require("./api/ItemType/itemtype.router");
+const DietPriceMaster = require("./api/DietPriceMaster/dietpricemaster.router");
+const ItemAliasMaster = require("./api/ItemAlias/itemalias.router");
+const PatientDietPlan = require("./api/PatientDietPlan/patientdietplan.router");
+const PatientDietProcess = require("./api/PatientDietProcess/dietproductionbatch.router");
+const DietAllergenceMaster = require("./api/DietAllergenceMaster/dietallergencemaster.router");
+const billingCategroyMaster = require("./api/BillingCategoryMaster/billingcategorymaster.router");
+const dietOrder = require("./api/DietOrder/dietorder.router");
+const dietscheduled = require("./api/patientDietSchedule/patientdietscheduled.router");
+const canteenorder = require("./api/Canteen_Orders/canteenorder.router");
+const paitentextraorder = require("./api/PatientExtraOrder/patient_extra_order.router");
+const productionbatch = require("./api/DietProduction/diet_production.router");
+const deliveryassignment = require("./api/DietOrderAssignment/dietorderassign.router");
 
+const RateVariationReport = require("./api/RateVariationReport/RateVariationReport.router");
+const store_master = require("./api/store_master/store_master.router");
+const vendor_master = require("./api/vendor_master/vendor_master_.router");
+const workOrder = require("./api/workOrder/workOrder.router");
+const tokenMaster = require("./api/tokenmaster/tokenmaster.router");
+const indent = require("./api/Indent_Module/indent.router");
+const ElliderUpdation = require("./api/elliderUpdation/elliderUpdation.router");
 
-const RateVariationReport = require('./api/RateVariationReport/RateVariationReport.router')
-const store_master = require('./api/store_master/store_master.router')
-const vendor_master = require('./api/vendor_master/vendor_master_.router')
-const workOrder = require('./api/workOrder/workOrder.router')
-const tokenMaster = require('./api/tokenmaster/tokenmaster.router')
-const indent = require('./api/Indent_Module/indent.router')
-const ElliderUpdation = require('./api/elliderUpdation/elliderUpdation.router')
+const CanteenHighlight = require("./api/canteenHighlights/highlight.router");
+const CanteenHighlightMapping = require("./api/canteenHighlightsMapping/highlightmapping.router");
 
-const CanteenHighlight = require('./api/canteenHighlights/highlight.router')
-const CanteenHighlightMapping = require('./api/canteenHighlightsMapping/highlightmapping.router')
+const dailycashclosing = require("./api/daily_cash_closing/dailycashclosing.router");
 
-
-const dailycashclosing = require('./api/daily_cash_closing/dailycashclosing.router');
-
-
-app.use(express.json({ limit: "50mb" }));
+app.use(express.json({limit: "50mb"}));
 
 app.use((req, res, next) => {
   // console.log(req);
@@ -561,65 +561,56 @@ app.use("/api/amsAntibiotic", amsAntibiotic);
 app.use("/api/validateAuthentication", validateAuthentication);
 app.use("/api/melioraDepMaster", melioraDepMaster);
 app.use("/api/ContractMaster", ContractMaster);
-app.use('/api/condemApprovalLevel', condemApprovalLevel)
-app.use('/api/condemMasters', condemMasters)
+app.use("/api/condemApprovalLevel", condemApprovalLevel);
+app.use("/api/condemMasters", condemMasters);
 
-app.use('/api/ai', GeminiRouter)
-app.use('/api/itemcategory', ItemCategoryMaster)
-app.use('/api/orderparty', OrderPartyType)
-app.use('/api/dietspeciality', DietSpecialityMaster)
-app.use('/api/unitmaster', UnitMaster)
-app.use('/api/dietmaster', PatientDietMaster)
-app.use('/api/diettemplate', DietTemplateMaster)
-app.use('/api/templatefood', TemplateFoodAdd)
-app.use('/api/fooditemmast', FoodItemMaster)
-app.use('/api/dietitemtype', ItemType)
-app.use('/api/dietprice', DietPriceMaster)
-app.use('/api/itemalias', ItemAliasMaster)
-app.use('/api/patientdietplan', socketIOMiddlewre, PatientDietPlan)
-app.use('/api/dietbatch', PatientDietProcess)
-app.use('/api/allergen', DietAllergenceMaster)
-app.use('/api/billingcategory', billingCategroyMaster)
-app.use('/api/fooddietorder', socketIOMiddlewre, dietOrder)
-app.use('/api/dietschedule', dietscheduled)
-app.use('/api/canteenorder', socketIOMiddlewre, canteenorder)
-app.use('/api/patientExtraOrder', paitentextraorder)
-app.use('/api/productionbatch', productionbatch)
-app.use('/api/dietdelivery', socketIOMiddlewre, deliveryassignment)
+app.use("/api/ai", GeminiRouter);
+app.use("/api/itemcategory", ItemCategoryMaster);
+app.use("/api/orderparty", OrderPartyType);
+app.use("/api/dietspeciality", DietSpecialityMaster);
+app.use("/api/unitmaster", UnitMaster);
+app.use("/api/dietmaster", PatientDietMaster);
+app.use("/api/diettemplate", DietTemplateMaster);
+app.use("/api/templatefood", TemplateFoodAdd);
+app.use("/api/fooditemmast", FoodItemMaster);
+app.use("/api/dietitemtype", ItemType);
+app.use("/api/dietprice", DietPriceMaster);
+app.use("/api/itemalias", ItemAliasMaster);
+app.use("/api/patientdietplan", socketIOMiddlewre, PatientDietPlan);
+app.use("/api/dietbatch", PatientDietProcess);
+app.use("/api/allergen", DietAllergenceMaster);
+app.use("/api/billingcategory", billingCategroyMaster);
+app.use("/api/fooddietorder", socketIOMiddlewre, dietOrder);
+app.use("/api/dietschedule", dietscheduled);
+app.use("/api/canteenorder", socketIOMiddlewre, canteenorder);
+app.use("/api/patientExtraOrder", paitentextraorder);
+app.use("/api/productionbatch", productionbatch);
+app.use("/api/dietdelivery", socketIOMiddlewre, deliveryassignment);
 
-app.use('/api/RateVariationReport', RateVariationReport)
-app.use('/api/store_master', store_master)
-app.use('/api/vendor_master', vendor_master)
-app.use('/api/workOrder', workOrder)
+app.use("/api/RateVariationReport", RateVariationReport);
+app.use("/api/store_master", store_master);
+app.use("/api/vendor_master", vendor_master);
+app.use("/api/workOrder", workOrder);
 
+app.use("/api/highlightmaping", CanteenHighlightMapping);
+app.use("/api/highlight", CanteenHighlight);
 
-app.use('/api/highlightmaping', CanteenHighlightMapping)
-app.use('/api/highlight', CanteenHighlight)
+app.use("/api/ElliderUpdation", ElliderUpdation);
 
+app.use("/api/tokenMaster", tokenMaster);
+app.use("/api/indent", indent);
+app.use("/api/ElliderUpdation", ElliderUpdation);
 
+app.use("/api/cashclosing", dailycashclosing);
 
-app.use('/api/ElliderUpdation', ElliderUpdation)
+// menu numbers for requireMenuRight are read from menu_master (see authentication/menuNumbers.js)
+require("./authentication/menuNumbers").startMenuNumberRefresh(require("./config/database").pool);
 
-
-app.use('/api/tokenMaster', tokenMaster)
-app.use('/api/indent', indent)
-app.use('/api/ElliderUpdation', ElliderUpdation)
-
-
-app.use('/api/cashclosing', dailycashclosing)
-
-
-const { initCrfApprovalCron } = require("./cronjob/crfApprovalCron");
+const {initCrfApprovalCron} = require("./cronjob/crfApprovalCron");
 initCrfApprovalCron();
-
 
 server.listen(
   process.env.APP_PORT,
   () => console.log(`Server Up and Running ${process.env.APP_PORT}`),
-  logger.productionLogger.log(
-    "info",
-    `Server Up and Running ${process.env.APP_PORT}`,
-    { meta1: "meta1" }
-  )
+  logger.productionLogger.log("info", `Server Up and Running ${process.env.APP_PORT}`, {meta1: "meta1"}),
 );
-

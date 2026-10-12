@@ -254,8 +254,14 @@ module.exports = {
 
                                     // Step 5: Commit transaction
                                     conn.commit(err5 => {
+                                        // roll back BEFORE releasing the connection
+                                        if (err5) {
+                                            return conn.rollback(() => {
+                                                conn.release();
+                                                callback(err5);
+                                            });
+                                        }
                                         conn.release();
-                                        if (err5) return callback(err5);
                                         return callback(null, order_id);
                                     });
                                 });
@@ -265,10 +271,14 @@ module.exports = {
 
                             // Step 3 (alternative): Only diet, no canteen creation
                             conn.commit(err3 => {
-                                conn.release();
+                                // roll back BEFORE releasing the connection (it was released first)
                                 if (err3) {
-                                    return conn.rollback(() => callback(err3));
+                                    return conn.rollback(() => {
+                                        conn.release();
+                                        callback(err3);
+                                    });
                                 }
+                                conn.release();
                                 return callback(null, order_id);
                             });
                         }
@@ -611,8 +621,9 @@ module.exports = {
             production_item_status = 0,
             cancelled_by = ?,
             cancelled_date = ?
-        WHERE plan_id = ? 
-        AND production_item_id = ?         
+        WHERE plan_id = ?
+        AND production_item_id = ?
+        AND production_item_status = 1
     `;
         const currentDate = new Date(); // current date/time
         pool.query(
@@ -662,9 +673,10 @@ module.exports = {
             cancelled_by = ?,
             cancelled_date = NOW(),
             cancelled_reason = ?
-        WHERE 
-            plan_id = ? 
+        WHERE
+            plan_id = ?
             AND batch_id = ?
+            AND production_item_status = 1
     `;
 
         pool.query(
@@ -687,8 +699,9 @@ module.exports = {
         SET 
             order_status = ?,
             updated_by = ?
-        WHERE 
-            order_id = ? 
+        WHERE
+            order_id = ?
+            AND order_status <> 'CANCELLED'
     `;
 
         pool.query(

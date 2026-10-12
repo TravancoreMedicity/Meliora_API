@@ -1,4 +1,5 @@
 const { checkToken } = require('../../authentication/token_validation');
+const { stampActor } = require('../../authentication/userChecks');
 
 const {
     insertPatientDietPlan,
@@ -27,11 +28,12 @@ const {
 
 const router = require('express').Router();
 
-router.post("/insert", checkToken, insertPatientDietPlan);
+// "who did it" fields are set from the logged-in employee (stampActor), not taken from the request
+router.post("/insert", checkToken, stampActor('created_by'), insertPatientDietPlan);
 router.post("/getall", checkToken, getAllPatientDietPlan);
-router.patch("/update", checkToken, updatePatientDietPlan);
+router.patch("/update", checkToken, stampActor('updated_by'), updatePatientDietPlan);
 router.get("/getdietecian", checkToken, getDieticians);
-router.patch("/update-status", checkToken, StopCurrentPlan);
+router.patch("/update-status", checkToken, stampActor('updated_by'), StopCurrentPlan);
 
 
 router.post("/getprocesslist", checkToken, getAllDietProcessList)
@@ -54,6 +56,7 @@ router.get('/get-consultation', checkToken, getConsultationRequired);
 router.post(
     "/assign-dietician",
     checkToken,
+    stampActor('assigned_by'),      // assigned_to (the dietician) stays as chosen
     AssingDieticain
 );
 

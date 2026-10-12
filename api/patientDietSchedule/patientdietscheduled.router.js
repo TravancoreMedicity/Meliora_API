@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { checkToken } = require('../../authentication/token_validation');
+const { stampActor } = require('../../authentication/userChecks');
 
 const {
     schedulePatientDietDetail,
@@ -11,14 +12,15 @@ const {
     ServedSchedule
 } = require('./patientdietscheduled.controller');
 
-router.post("/schedule/list", checkToken, schedulePatientDietDetail);
+// "who did it" fields are set from the logged-in employee (stampActor), not taken from the request
+router.post("/schedule/list", checkToken, stampActor('created_by'), schedulePatientDietDetail);
 router.post("/getall/schedule", checkToken, getAllScheduledPatient);
 
 
-router.post("/schedule/update/status", checkToken, updateScheduleStatus);
-router.post("/schedule/cancel", checkToken, cancelSchedule);
-router.post("/schedule/deactivate", checkToken, deactivateSchedule);
-router.post("/schedule/serve", checkToken, ServedSchedule);
+router.post("/schedule/update/status", checkToken, stampActor('updated_by'), updateScheduleStatus);
+router.post("/schedule/cancel", checkToken, stampActor('cancelled_by', 'updated_by'), cancelSchedule);
+router.post("/schedule/deactivate", checkToken, stampActor('updated_by'), deactivateSchedule);
+router.post("/schedule/serve", checkToken, stampActor('updated_by'), ServedSchedule);
 
 router.post('/schedule/processfood',checkToken,getPatientProcesssedFood)
 

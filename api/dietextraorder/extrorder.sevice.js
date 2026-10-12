@@ -121,7 +121,8 @@ left join room_master on room_master.rm_code=ora_bed.rm_code
             function (err, results) {
 
                 if (err) {
-                    return callBack(error)
+                    // was callBack(error): `error` is not defined here -> ReferenceError on any DB error
+                    return callBack(err)
                 }
                 return callBack(null, results)
             }

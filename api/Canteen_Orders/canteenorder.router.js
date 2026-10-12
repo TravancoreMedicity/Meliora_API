@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { checkToken } = require('../../authentication/token_validation');
+const { stampActor } = require('../../authentication/userChecks');
 
 const {
     createCanteenOrder,
@@ -21,8 +22,9 @@ const {
     UpdateItemQuantity
 } = require('./canteeorder.controller');
 
+// "who did it" fields are set from the logged-in employee (stampActor), not taken from the request
 /* CREATE */
-router.post("/create", checkToken, createCanteenOrder);
+router.post("/create", checkToken, stampActor('order.created_by'), createCanteenOrder);
 
 /* READ */
 router.post("/list", checkToken, getAllCanteenOrders);
@@ -30,12 +32,12 @@ router.post("/list", checkToken, getAllCanteenOrders);
 router.post("/get", checkToken, getCanteenOrderById);
 
 /* UPDATE */
-router.patch("/status", checkToken, updateCanteenOrderStatus);
+router.patch("/status", checkToken, stampActor('updated_by'), updateCanteenOrderStatus);
 
 /* CANCEL */
 router.patch("/cancel", checkToken, cancelCanteenOrder);
 
-router.post("/add/items", checkToken, addItemsToExistingOrder);
+router.post("/add/items", checkToken, stampActor('created_by'), addItemsToExistingOrder);
 
 /* DELETE */
 router.delete("/delete", checkToken, deleteCanteenOrder);
@@ -54,7 +56,7 @@ router.post('/activepatient', checkToken, getAllActivePatients);
 
 router.get("/allactivebed", checkToken, GetAllActiveBedDetail);
 
-router.patch("/update/quantity", checkToken, UpdateAllQuantities);
+router.patch("/update/quantity", checkToken, stampActor('extra[].updated_by'), UpdateAllQuantities);
 
 
 router.post('/getbatchitemdetail', checkToken, getBatchItemDetail);

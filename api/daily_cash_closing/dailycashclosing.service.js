@@ -1,5 +1,146 @@
 const { pool } = require('../../config/database');
 
+const round2 = value => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+
+/*
+    Cash closing used to trust every total sent by the browser.
+
+    This recalculates everything that can be derived on the server:
+      * denomination totals / pieces      -> from denominations
+      * expected collection               -> from the employee's OPEN bills
+      * bills to close                    -> only open bills of that employee
+      * counted / difference              -> from the above
+
+    The values sent by the client are only compared with the server numbers.
+*/
+const prepareCashClosing = (rawData, callback) => {
+
+    const employeeId = Number(rawData?.employee_id);
+
+    const billingIds = [
+        ...new Set(
+            (Array.isArray(rawData?.billing_ids) ? rawData.billing_ids : [])
+                .map(id => Number(id))
+                .filter(id => Number.isInteger(id) && id > 0)
+        )
+    ];
+
+    if (!Number.isInteger(employeeId) || employeeId <= 0) {
+        return callback(new Error('Invalid employee'));
+    }
+
+    if (billingIds.length === 0) {
+        return callback(new Error('Billing Ids Are Missing For the Settlements!'));
+    }
+
+    const sumDenominations = (group) => {
+        let amount = 0;
+        let pieces = 0;
+
+        for (const [value, quantity] of Object.entries(group || {})) {
+            const denomination = Number(value);
+            const qty = Number(quantity) || 0;
+
+            if (!(denomination > 0) || !Number.isInteger(qty) || qty < 0) {
+                return null;
+            }
+
+            amount += denomination * qty;
+            pieces += qty;
+        }
+
+        return { amount: round2(amount), pieces };
+    };
+
+    const cash = sumDenominations(rawData?.denominations?.cash);
+    const coin = sumDenominations(rawData?.denominations?.coins);
+
+    if (!cash || !coin) {
+        return callback(new Error('Invalid denominations'));
+    }
+
+    // Only bills that belong to this employee and are not closed yet
+    pool.query(
+        `
+        SELECT billing_id, total_amount
+        FROM patient_billing
+        WHERE billing_id IN (?)
+        AND closing_id IS NULL
+        AND created_by = ?
+        `,
+        [billingIds, employeeId],
+        (error, openBills) => {
+
+            if (error) {
+                return callback(error);
+            }
+
+            if (!openBills?.length) {
+                return callback(new Error('No open bills found for this employee'));
+            }
+
+            const expected = round2(
+                openBills.reduce((sum, bill) => sum + Number(bill.total_amount || 0), 0)
+            );
+
+            if (Math.abs(expected - round2(rawData?.collection_amount)) > 0.01) {
+                return callback(
+                    new Error(
+                        `Collection amount is out of date (expected ${expected.toFixed(2)}). Please reload and try again`
+                    )
+                );
+            }
+
+            const counted = round2(cash.amount + coin.amount);
+
+            // Pending petty cash of the employee, same formula the FIFO settlement uses.
+            // The screen shows difference = counted - (collection + pending petty cash).
+            pool.query(
+                `
+                SELECT COALESCE(SUM(pending.pending_amount), 0) AS pending_petty_cash
+                FROM (
+                    SELECT
+                        dpc.amount - COALESCE(
+                            (
+                                SELECT SUM(dpcs.settled_amount)
+                                FROM delivery_person_cash_settlement dpcs
+                                WHERE dpcs.cash_id = dpc.cash_id
+                            ),
+                            0
+                        ) AS pending_amount
+                    FROM delivery_person_cash dpc
+                    WHERE dpc.employee_id = ?
+                ) pending
+                WHERE pending.pending_amount > 0
+                `,
+                [employeeId],
+                (pettyError, pettyRows) => {
+
+                    if (pettyError) {
+                        return callback(pettyError);
+                    }
+
+                    const pendingPettyCash = round2(pettyRows?.[0]?.pending_petty_cash || 0);
+
+                    callback(null, {
+                        ...rawData,
+                        employee_id: employeeId,
+                        billing_ids: openBills.map(bill => Number(bill.billing_id)),
+                        collection_amount: expected,
+                        cash_amount: cash.amount,
+                        coin_amount: coin.amount,
+                        counted_amount: counted,
+                        difference: round2(counted - (expected + pendingPettyCash)),
+                        cash_pieces: cash.pieces,
+                        coin_pieces: coin.pieces,
+                        total_pieces: cash.pieces + coin.pieces
+                    });
+                }
+            );
+        }
+    );
+};
+
 module.exports = {
 
     // createCashClosing: (data, callback) => {
@@ -542,7 +683,18 @@ module.exports = {
 
     // },
 
-    createCashClosing: (data, callback) => {
+    createCashClosing: (rawData, callback) => {
+        prepareCashClosing(rawData, (prepareError, data) => {
+
+            if (prepareError) {
+                return callback(prepareError);
+            }
+
+            module.exports.createCashClosingVerified(data, callback);
+        });
+    },
+
+    createCashClosingVerified: (data, callback) => {
         pool.getConnection((connectionError, connection) => {
 
             if (connectionError) {
@@ -781,13 +933,16 @@ module.exports = {
                                         updated_by = ?,
                                         updated_at = NOW()
                                     WHERE billing_id IN (${placeholders})
+                                    AND closing_id IS NULL
+                                    AND created_by = ?
                                 `;
 
 
                                     const billingValues = [
                                         closingId,
                                         data.created_by,
-                                        ...billingIds
+                                        ...billingIds,
+                                        employee_id
                                     ];
 
 
@@ -823,6 +978,21 @@ module.exports = {
                                                     stage: 'BILLING_UPDATE',
                                                     message: billingError
                                                 });
+                                            });
+
+                                        }
+
+                                        // Another closing may have taken some of these bills meanwhile
+                                        if (billingUpdated !== billingIds.length) {
+
+                                            return connection.rollback(() => {
+                                                connection.release();
+
+                                                callback(
+                                                    new Error(
+                                                        'Some bills were already closed. Please reload and try again'
+                                                    )
+                                                );
                                             });
 
                                         }
@@ -1390,7 +1560,71 @@ ORDER BY dpc.given_at DESC;
     //         }
     //     );
     // },
+    /*
+        ISSUE PETTY CASH TO AN EMPLOYEE
+
+        The controller has already checked the shape of the request (positive amount with at
+        most 2 decimals, below the limit, whole employee ids). Here, with the database:
+          * the employee receiving the cash and the person giving it must both exist
+          * the same employee / amount / giver within the last 30 seconds is refused, so a
+            double click or a retry does not issue the cash twice
+        then the row is inserted by _insertPettyCash().
+    */
     AssignEmployeePettyCashDetails: (data, callback) => {
+
+        const ids = [...new Set([Number(data.employee_id), Number(data.given_by)])];
+
+        pool.query(
+            `SELECT em_id FROM co_employee_master WHERE em_id IN (?)`,
+            [ids],
+            (employeeError, employeeRows) => {
+
+                if (employeeError) {
+                    return callback(employeeError);
+                }
+
+                const found = new Set((employeeRows || []).map(row => Number(row.em_id)));
+
+                if (!found.has(Number(data.employee_id))) {
+                    return callback(new Error("Employee not found"));
+                }
+
+                if (!found.has(Number(data.given_by))) {
+                    return callback(new Error("The person issuing the cash was not found"));
+                }
+
+                pool.query(
+                    `
+                    SELECT cash_id
+                    FROM delivery_person_cash
+                    WHERE employee_id = ?
+                    AND given_by = ?
+                    AND amount = ?
+                    AND given_at >= NOW() - INTERVAL 30 SECOND
+                    LIMIT 1
+                    `,
+                    [data.employee_id, data.given_by, data.amount],
+                    (duplicateError, duplicateRows) => {
+
+                        if (duplicateError) {
+                            return callback(duplicateError);
+                        }
+
+                        if (duplicateRows?.length) {
+                            return callback(
+                                new Error("The same petty cash was just issued. Please check before issuing it again")
+                            );
+                        }
+
+                        module.exports._insertPettyCash(data, callback);
+                    }
+                );
+            }
+        );
+    },
+
+    // Plain insert - only call it after the checks in AssignEmployeePettyCashDetails().
+    _insertPettyCash: (data, callback) => {
 
         const insertQuery = `
         INSERT INTO delivery_person_cash (

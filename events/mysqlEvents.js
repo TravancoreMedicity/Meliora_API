@@ -44,7 +44,8 @@ const startAdmissionListener = async (io) => {
         await mysqlEvents.addTrigger({
             name: "fb_ipadmiss_insert_listener",
             // Table to monitor
-            expression: "meliora.fb_ipadmiss",
+            // schema name comes from MYSQL_DB (was hard-coded "meliora")
+            expression: `${process.env.MYSQL_DB}.fb_ipadmiss`,
             // Only INSERT
             statement: MySQLEvents.STATEMENTS.INSERT,
             onEvent: async (event) => {
@@ -208,7 +209,8 @@ const startPrintQueueListener = async (io) => {
 
         await mysqlEvents.addTrigger({
             name: "print_queue_insert_listener",
-            expression: "meliora.print_queue",
+            // schema name comes from MYSQL_DB (was hard-coded "meliora")
+            expression: `${process.env.MYSQL_DB}.print_queue`,
             statement: MySQLEvents.STATEMENTS.INSERT,
 
             onEvent: async (event) => {

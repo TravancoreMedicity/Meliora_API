@@ -1,5 +1,8 @@
 /node_modules
 .env
+# any copy / backup of the real .env (they contain secrets); the template stays tracked
+.env.*
+!.env.example
 /errorlog
 
 

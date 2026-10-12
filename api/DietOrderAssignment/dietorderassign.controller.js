@@ -3,6 +3,8 @@
 const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientDietBill, getPatientExtraOrder, createPatientBillingService, updateBulkPickingUpService, getDeliveryBillDetailsService, CreateBystanderBilling, getBystanderBillingDetails, createBillingPaymentService, getBillablePatientDetail, getProformaDetailsService, convertProformaToBill, insertOrderPacking, getOrderPackingByAssignment, createPrintQueueService, getCashSummaryDetails, getPaymentModeDetails, getPaymentHistoryDetail, getPaymentHistoryBillDetail, getCashReturnDetails, returnAmountSettlement, getReturnDetails, getEmployeePettyCashDetails, getBillCollectionSummary, getCollectionDetails, getEmployeePettyCashDetailsByClosingIds, getPendingBilledDetails, settleBilling, getTodaySettledBillDetails, getTodayDetailedSummary } = require("./dietorderassign.service");
 
 
+const { safeMessage } = require('../Canteen_Orders/Helper');
+
 module.exports = {
 
     // CREATE DELIVERY ASSIGNMENT
@@ -35,10 +37,13 @@ module.exports = {
         CreateDietDeliveryAssignment(data, (err, result) => {
 
             if (err) {
+                // err is { stage, message: <Error> }. Our own refusals (already assigned, not confirmed ...)
+                // are shown; a database error is logged and hidden.
+                const cause = err.message instanceof Error ? err.message : err;
                 return res.status(200).json({
                     success: 0,
                     stage: err.stage || "UNKNOWN",
-                    message: err.message || err
+                    message: safeMessage(cause, "Failed to create the delivery assignment")
                 });
             }
 
@@ -466,7 +471,9 @@ module.exports = {
     },
 
     createPatientBilling: (req, res) => {
-        const data = req.body;
+        // The bill is created by the LOGGED-IN employee (requireMenuRight set req.currentEmId from the
+        // token); a created_by sent in the request is ignored.
+        const data = { ...req.body, created_by: req.currentEmId ?? req.body?.created_by };
         const {
             patient_id,
             admission_id,
@@ -489,10 +496,12 @@ module.exports = {
         }
         createPatientBillingService(data, (err, result) => {
             if (err) {
-                console.error("createPatientBilling:", err);
-                return res.status(500).json({
+                // a refusal of ours (charge already billed, belongs to another patient, ...) is shown
+                // as it is; a database error is hidden
+                const isOurRefusal = err instanceof Error && !err.code && !err.sqlMessage;
+                return res.status(isOurRefusal ? 200 : 500).json({
                     success: 0,
-                    message: err.message || "Failed to create billing.",
+                    message: safeMessage(err, "Failed to create billing."),
                 });
             }
             return res.status(201).json({
@@ -561,7 +570,12 @@ module.exports = {
     },
 
     CreateBystanderBilling: (req, res) => {
-        const data = req.body;
+        // The bill is created by the LOGGED-IN employee (identifyUser set req.currentEmId from the
+        // token); created_by in the request is ignored.
+        const data = {
+            ...req.body,
+            billing: { ...(req.body?.billing ?? {}), created_by: req.currentEmId }
+        };
         CreateBystanderBilling(data, (err, result) => {
             if (err) {
                 console.error(
@@ -605,7 +619,6 @@ module.exports = {
         const {
             amount,
             payment_mode,
-            collected_by,
             collected_location,
             transaction_id,
             payments,
@@ -614,6 +627,10 @@ module.exports = {
             remarks,
             change_status
         } = req.body;
+
+        // The cash is collected by the LOGGED-IN employee (identifyUser set req.currentEmId from the
+        // token); a collected_by sent in the request is ignored.
+        const collected_by = req.currentEmId;
 
         if (!Array.isArray(payments) || !payments.length) {
             return res.status(200).json({
@@ -742,13 +759,9 @@ module.exports = {
     },
     convertProformaToBillController: (req, res) => {
 
-        const data = req.body;
+        const data = req.body ?? {};
 
-        const {
-            proforma_id,
-            bill,
-            details
-        } = data;
+        const { proforma_id, bill } = data;
 
         // ---------------------------------------------
         // VALIDATION
@@ -761,40 +774,30 @@ module.exports = {
             });
         }
 
-        if (!bill) {
-            return res.status(200).json({
-                success: 0,
-                message: "Bill details are required"
-            });
-        }
-
-        if (!Array.isArray(details) || details.length === 0) {
-            return res.status(200).json({
-                success: 0,
-                message: "Bill details are required"
-            });
-        }
-
         // ---------------------------------------------
         // SERVICE
+        //
+        // Only the proforma id and the way of payment are used from the request. The amounts,
+        // lines, paid/balance/status and the employee are rebuilt from the database. The older
+        // request shape (everything inside `bill` / `details`) is still accepted but its
+        // amounts are ignored.
         // ---------------------------------------------
 
         convertProformaToBill(
-            data,
+            {
+                proforma_id,
+                bill_pay_type: data.bill_pay_type ?? bill?.bill_pay_type,
+                employeeId: data.employeeId ?? bill?.employeeId,
+                client_total: bill?.total_amount ?? data.client_total
+            },
             (err, result) => {
 
                 if (err) {
 
-                    console.error(
-                        "convertProformaToBillController:",
-                        err
-                    );
-
-                    return res.status(500).json({
+                    // validation messages are shown as they are; database errors are hidden
+                    return res.status(200).json({
                         success: 0,
-                        message:
-                            err.message ||
-                            "Failed to convert proforma to bill"
+                        message: safeMessage(err, "Failed to convert proforma to bill")
                     });
                 }
 
@@ -891,16 +894,13 @@ module.exports = {
 
                 if (err) {
 
-                    console.error(
-                        "insertOrderPackingController:",
-                        err
-                    );
+                    // a refusal of ours (already packed, item not in this order, ...) is shown as it is
+                    // with HTTP 200 so the screen can display it; a database error is hidden
+                    const isOurRefusal = err instanceof Error && !err.code && !err.sqlMessage;
 
-                    return res.status(500).json({
+                    return res.status(isOurRefusal ? 200 : 500).json({
                         success: 0,
-                        message:
-                            err.message ||
-                            "Failed to save order packing"
+                        message: safeMessage(err, "Failed to save order packing")
                     });
 
                 }
@@ -1132,13 +1132,18 @@ module.exports = {
     },
     returnAmountSettlement: (req, res) => {
         // const { EmId } = req.params;
-        const data = req.body;
+        // returned_by is the LOGGED-IN employee (identifyUser set req.currentEmId from the token)
+        const data = { ...req.body, returned_by: req.currentEmId };
 
         returnAmountSettlement(data, (err, results) => {
             if (err) {
+                console.error("returnAmountSettlement error:", err);
                 return res.status(200).json({
                     success: 0,
-                    message: err,
+                    // mysql errors carry a .code; show only our own validation messages
+                    message: (err?.message && !err?.code)
+                        ? err.message
+                        : "Cash return settlement failed",
                 });
             };
 

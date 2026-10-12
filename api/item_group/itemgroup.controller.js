@@ -1,6 +1,6 @@
 const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { sign } = require("jsonwebtoken");
-const { itemgroupInsert, getItemgroup, updateItemgrp, checkInsertVal, checkUpdateVal, getItemgrpname } = require('../item_group/itemgroup.service');
+const { itemgroupInsert, getItemgroup, updateItemgrp, checkInsertVal, checkUpdateVal, getItemgrpname, insertItemGroupMaster, getAllItemGroupMaster, updateItemGroupMaster } = require('../item_group/itemgroup.service');
 const { validateitemgroup } = require('../../validation/validation_schema')
 const logger = require('../../logger/logger')
 module.exports = {
@@ -130,6 +130,117 @@ module.exports = {
                 data: results
             });
         });
+    },
+
+
+    insertGroupItemMaster: (req, res) => {
+        const data = req.body;
+
+        // Minimal validation
+        if (!data.group_name || data.group_name.trim() === "") {
+            return res.status(200).json({
+                success: 0,
+                message: "Group name is required"
+            });
+        }
+
+        if (!data.group_code || data.group_code.trim() === "") {
+            return res.status(200).json({
+                success: 0,
+                message: "Group code is required"
+            });
+        }
+
+        // Call insert function
+        insertItemGroupMaster(data, (err, results) => {
+            if (err) {
+                return res.status(500).json({
+                    success: 0,
+                    message: err.message || err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Results Found",
+                    data: []
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    getItemGroupMaster: (req, res) => {
+        getAllItemGroupMaster((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Results Found",
+                    data: results
+
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+    updateItemGroupMaster: (req, res) => {
+        const data = req.body;
+
+        // Minimal validation
+        if (!data.group_name || data.group_name.trim() === "") {
+            return res.status(400).json({
+                success: 0,
+                message: "Group name is required"
+            });
+        }
+
+        if (!data.group_code || data.group_code.trim() === "") {
+            return res.status(400).json({
+                success: 0,
+                message: "Group code is required"
+            });
+        }
+
+        updateItemGroupMaster(data, (err, results) => {
+            if (err) {
+                // logger.errorLogger(err)
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Results Found",
+                    data: results
+
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
     }
+
+
 }
 

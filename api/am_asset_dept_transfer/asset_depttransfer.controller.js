@@ -90,17 +90,17 @@ module.exports = {
     AssetTransfer: async (req, res) => {
         const body = req.body;
         const masterData = {
-            transfrd_dept: body[0].item_dept_slno,
-            transfrd_dept_sec: body[0].item_deptsec_slno,
-            transfrd_room: body[0].item_room_slno,
-            transfrd_sub_room: body[0].item_subroom_slno,
-            transfrd_employee: body[0].transfer_user,
+            transfrd_dept: body[0]?.item_dept_slno,
+            transfrd_dept_sec: body[0]?.item_deptsec_slno,
+            transfrd_room: body[0]?.item_room_slno,
+            transfrd_sub_room: body[0]?.item_subroom_slno,
+            transfrd_employee: body[0]?.transfer_user,
             transfrd_date: new Date(),
-            transfrd_type: body[0].am_custodian_trans_status,
-            transfrd_from_dept: body[0].am_trans_from_dept,
-            transfrd_from_dept_sec: body[0].am_trans_from_dept_sec,
-            transfrd_from_room: body[0].am_trans_from_room,
-            transfrd_from_sub_room: body[0].am_trans_from_subroom
+            transfrd_type: body[0]?.am_custodian_trans_status,
+            transfrd_from_dept: body[0]?.am_trans_from_dept,
+            transfrd_from_dept_sec: body[0]?.am_trans_from_dept_sec,
+            transfrd_from_room: body[0]?.am_trans_from_room,
+            transfrd_from_sub_room: body[0]?.am_trans_from_subroom
         }
         try {
             const masterId = await InsertTransferMaster(masterData);

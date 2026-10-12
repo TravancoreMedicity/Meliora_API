@@ -46,6 +46,7 @@ module.exports = {
             `SELECT 
             em_id,
             em_name,
+            em_no,
             em_department,
             em_dept_section,
             cdm.dept_name,

@@ -187,7 +187,8 @@ module.exports = {
             where diet_process_detl.proc_slno=(select proc_slno from diet_process_mast
             left join ora_bed on ora_bed.bd_code=diet_process_mast.bd_code
             left join ora_roommaster on ora_roommaster.rm_code=ora_bed.rm_code
-            where  date(process_date)=? and  ora_roommaster.rm_code=?)`,
+            where  date(process_date)=? and  ora_roommaster.rm_code=?)
+            group by type_slno`,
             [
                 data.process_date,
                 data.rm_code

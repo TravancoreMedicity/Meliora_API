@@ -135,11 +135,11 @@ socketUtils.connection(io);
 // MySQL fb_ipadmiss INSERT listener
 const {
   startAdmissionListener,
-  startPrintQueueListener
+  // startPrintQueueListener
 } = require('./events/mysqlEvents');
 
 startAdmissionListener(io);
-startPrintQueueListener(io);
+// startPrintQueueListener(io);
 
 const socketIOMiddlewre = (req, res, next) => {
   req.io = io;

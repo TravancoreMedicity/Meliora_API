@@ -2,546 +2,6 @@ const { pool } = require('../../config/database');
 
 module.exports = {
 
-    // createCashClosing: (data, callback) => {
-
-    //     pool.getConnection((connectionError, connection) => {
-
-    //         if (connectionError) {
-    //             return callback(connectionError);
-    //         }
-
-    //         connection.beginTransaction((transactionError) => {
-
-    //             if (transactionError) {
-    //                 connection.release();
-    //                 return callback(transactionError);
-    //             }
-
-    //             const {
-    //                 employee_id,
-    //                 collection_amount,
-    //                 remarks,
-    //                 denominations
-    //             } = data;
-
-
-    //             // =========================
-    //             // INSERT HEADER
-    //             // =========================
-
-    //             const headerQuery = `
-    //             INSERT INTO daily_collection_closing
-    //             (
-    //                 employee_id,
-    //                 closing_date,
-    //                 expected_amount,
-    //                 cash_amount,
-    //                 coin_amount,
-    //                 counted_amount,
-    //                 difference_amount,
-    //                 cash_pieces,
-    //                 coin_pieces,
-    //                 total_pieces,
-    //                 remarks,
-    //                 closing_status,
-    //                 created_by
-    //             )
-    //             VALUES (?, CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?, 'CLOSED', ?)
-    //         `;
-
-
-    //             const cashAmount =
-    //                 Number(data.cash_amount) || 0;
-
-    //             const coinAmount =
-    //                 Number(data.coin_amount) || 0;
-
-    //             const countedAmount =
-    //                 Number(data.counted_amount) || 0;
-
-    //             const difference =
-    //                 Number(data.difference) || 0;
-
-    //             const cashPieces =
-    //                 Number(data.cash_pieces) || 0;
-
-    //             const coinPieces =
-    //                 Number(data.coin_pieces) || 0;
-
-    //             const totalPieces =
-    //                 Number(data.total_pieces) || 0;
-
-
-    //             const headerValues = [
-    //                 employee_id,
-    //                 Number(collection_amount) || 0,
-    //                 cashAmount,
-    //                 coinAmount,
-    //                 countedAmount,
-    //                 difference,
-    //                 cashPieces,
-    //                 coinPieces,
-    //                 totalPieces,
-    //                 remarks || null,
-    //                 data.created_by
-    //             ];
-
-
-    //             connection.query(
-    //                 headerQuery,
-    //                 headerValues,
-    //                 (headerError, headerResult) => {
-
-    //                     if (headerError) {
-
-    //                         return connection.rollback(() => {
-    //                             connection.release();
-    //                             callback(headerError);
-    //                         });
-
-    //                     }
-
-
-    //                     const closingId =
-    //                         headerResult.insertId;
-
-
-    //                     // =========================
-    //                     // DENOMINATIONS
-    //                     // =========================
-
-    //                     const denominationRows = [];
-
-
-    //                     Object.entries(
-    //                         denominations?.cash || {}
-    //                     ).forEach(([value, quantity]) => {
-
-    //                         const qty = Number(quantity) || 0;
-
-    //                         if (qty > 0) {
-
-    //                             denominationRows.push([
-    //                                 closingId,
-    //                                 Number(value),
-    //                                 'CASH',
-    //                                 qty,
-    //                                 Number(value) * qty
-    //                             ]);
-
-    //                         }
-
-    //                     });
-
-
-    //                     Object.entries(
-    //                         denominations?.coins || {}
-    //                     ).forEach(([value, quantity]) => {
-
-    //                         const qty = Number(quantity) || 0;
-
-    //                         if (qty > 0) {
-
-    //                             denominationRows.push([
-    //                                 closingId,
-    //                                 Number(value),
-    //                                 'COIN',
-    //                                 qty,
-    //                                 Number(value) * qty
-    //                             ]);
-
-    //                         }
-
-    //                     });
-
-
-    //                     if (denominationRows.length === 0) {
-
-    //                         return connection.rollback(() => {
-    //                             connection.release();
-
-    //                             callback(
-    //                                 new Error(
-    //                                     'At least one denomination is required'
-    //                                 )
-    //                             );
-    //                         });
-
-    //                     }
-
-
-    //                     // =========================
-    //                     // INSERT DENOMINATIONS
-    //                     // =========================
-
-    //                     const denominationQuery = `
-    //                     INSERT INTO daily_collection_closing_denominations
-    //                     (
-    //                         closing_id,
-    //                         denomination_value,
-    //                         denomination_type,
-    //                         quantity,
-    //                         amount
-    //                     )
-    //                     VALUES ?
-    //                 `;
-
-
-    //                     connection.query(
-    //                         denominationQuery,
-    //                         [denominationRows],
-    //                         (denominationError) => {
-
-    //                             if (denominationError) {
-
-    //                                 return connection.rollback(() => {
-    //                                     connection.release();
-    //                                     callback(denominationError);
-    //                                 });
-
-    //                             }
-
-
-    //                             // =========================
-    //                             // COMMIT
-    //                             // =========================
-
-    //                             connection.commit(
-    //                                 (commitError) => {
-
-    //                                     if (commitError) {
-
-    //                                         return connection.rollback(() => {
-    //                                             connection.release();
-    //                                             callback(commitError);
-    //                                         });
-
-    //                                     }
-
-
-    //                                     connection.release();
-
-
-    //                                     callback(null, {
-    //                                         closing_id: closingId
-    //                                     });
-
-    //                                 }
-    //                             );
-
-    //                         }
-    //                     );
-
-    //                 }
-    //             );
-
-    //         });
-
-    //     });
-
-    // },
-    // createCashClosing: (data, callback) => {
-
-    //     pool.getConnection((connectionError, connection) => {
-
-    //         if (connectionError) {
-    //             return callback(connectionError);
-    //         }
-
-    //         connection.beginTransaction((transactionError) => {
-
-    //             if (transactionError) {
-    //                 connection.release();
-    //                 return callback(transactionError);
-    //             }
-
-    //             const {
-    //                 employee_id,
-    //                 collection_amount,
-    //                 remarks,
-    //                 denominations,
-    //                 billing_ids
-    //             } = data;
-
-    //             // =========================
-    //             // INSERT HEADER
-    //             // =========================
-
-    //             const headerQuery = `
-    //             INSERT INTO daily_collection_closing
-    //             (
-    //                 employee_id,
-    //                 closing_date,
-    //                 expected_amount,
-    //                 cash_amount,
-    //                 coin_amount,
-    //                 counted_amount,
-    //                 difference_amount,
-    //                 cash_pieces,
-    //                 coin_pieces,
-    //                 total_pieces,
-    //                 remarks,
-    //                 closing_status,
-    //                 created_by
-    //             )
-    //             VALUES (?, CURDATE(), ?, ?, ?, ?, ?, ?, ?, ?, ?, 'CLOSED', ?)
-    //         `;
-
-    //             const cashAmount =
-    //                 Number(data.cash_amount) || 0;
-
-    //             const coinAmount =
-    //                 Number(data.coin_amount) || 0;
-
-    //             const countedAmount =
-    //                 Number(data.counted_amount) || 0;
-
-    //             const difference =
-    //                 Number(data.difference) || 0;
-
-    //             const cashPieces =
-    //                 Number(data.cash_pieces) || 0;
-
-    //             const coinPieces =
-    //                 Number(data.coin_pieces) || 0;
-
-    //             const totalPieces =
-    //                 Number(data.total_pieces) || 0;
-
-    //             const headerValues = [
-    //                 employee_id,
-    //                 Number(collection_amount) || 0,
-    //                 cashAmount,
-    //                 coinAmount,
-    //                 countedAmount,
-    //                 difference,
-    //                 cashPieces,
-    //                 coinPieces,
-    //                 totalPieces,
-    //                 remarks || null,
-    //                 data.created_by
-    //             ];
-
-    //             connection.query(
-    //                 headerQuery,
-    //                 headerValues,
-    //                 (headerError, headerResult) => {
-
-    //                     if (headerError) {
-
-    //                         return connection.rollback(() => {
-    //                             connection.release();
-    //                             callback(headerError);
-    //                         });
-
-    //                     }
-
-    //                     const closingId = headerResult.insertId;
-
-    //                     // =========================
-    //                     // DENOMINATIONS
-    //                     // =========================
-
-    //                     const denominationRows = [];
-
-    //                     Object.entries(
-    //                         denominations?.cash || {}
-    //                     ).forEach(([value, quantity]) => {
-
-    //                         const qty = Number(quantity) || 0;
-
-    //                         if (qty > 0) {
-
-    //                             denominationRows.push([
-    //                                 closingId,
-    //                                 Number(value),
-    //                                 'CASH',
-    //                                 qty,
-    //                                 Number(value) * qty
-    //                             ]);
-
-    //                         }
-
-    //                     });
-
-    //                     Object.entries(
-    //                         denominations?.coins || {}
-    //                     ).forEach(([value, quantity]) => {
-
-    //                         const qty = Number(quantity) || 0;
-
-    //                         if (qty > 0) {
-
-    //                             denominationRows.push([
-    //                                 closingId,
-    //                                 Number(value),
-    //                                 'COIN',
-    //                                 qty,
-    //                                 Number(value) * qty
-    //                             ]);
-
-    //                         }
-
-    //                     });
-
-    //                     if (denominationRows.length === 0) {
-
-    //                         return connection.rollback(() => {
-    //                             connection.release();
-
-    //                             callback(
-    //                                 new Error(
-    //                                     'At least one denomination is required'
-    //                                 )
-    //                             );
-    //                         });
-
-    //                     }
-
-    //                     // =========================
-    //                     // INSERT DENOMINATIONS
-    //                     // =========================
-
-    //                     const denominationQuery = `
-    //                     INSERT INTO daily_collection_closing_denominations
-    //                     (
-    //                         closing_id,
-    //                         denomination_value,
-    //                         denomination_type,
-    //                         quantity,
-    //                         amount
-    //                     )
-    //                     VALUES ?
-    //                 `;
-
-    //                     connection.query(
-    //                         denominationQuery,
-    //                         [denominationRows],
-    //                         (denominationError) => {
-
-    //                             if (denominationError) {
-
-    //                                 return connection.rollback(() => {
-    //                                     connection.release();
-    //                                     callback(denominationError);
-    //                                 });
-
-    //                             }
-
-    //                             // =========================
-    //                             // UPDATE PATIENT BILLING
-    //                             // =========================
-
-    //                             const billingIds = Array.isArray(billing_ids)
-    //                                 ? billing_ids
-    //                                 : [];
-
-    //                             if (billingIds.length === 0) {
-
-    //                                 return connection.commit(
-    //                                     (commitError) => {
-
-    //                                         if (commitError) {
-
-    //                                             return connection.rollback(() => {
-    //                                                 connection.release();
-    //                                                 callback(commitError);
-    //                                             });
-
-    //                                         }
-
-    //                                         connection.release();
-
-    //                                         callback(null, {
-    //                                             closing_id: closingId,
-    //                                             billing_updated: 0
-    //                                         });
-
-    //                                     }
-    //                                 );
-
-    //                             }
-
-    //                             const placeholders = billingIds
-    //                                 .map(() => '?')
-    //                                 .join(',');
-
-    //                             const billingQuery = `
-    //                             UPDATE patient_billing
-    //                             SET
-    //                                 is_settled = 'Y',
-    //                                 settled_id = ?,
-    //                                 updated_by = ?,
-    //                                 updated_at = NOW()
-    //                             WHERE billing_id IN (${placeholders})
-    //                         `;
-
-    //                             const billingValues = [
-    //                                 closingId,
-    //                                 data.created_by,
-    //                                 ...billingIds
-    //                             ];
-
-    //                             connection.query(
-    //                                 billingQuery,
-    //                                 billingValues,
-    //                                 (billingError, billingResult) => {
-
-    //                                     if (billingError) {
-
-    //                                         return connection.rollback(() => {
-    //                                             connection.release();
-
-    //                                             callback({
-    //                                                 stage: 'BILLING_UPDATE',
-    //                                                 message: billingError
-    //                                             });
-    //                                         });
-
-    //                                     }
-
-    //                                     // =========================
-    //                                     // COMMIT
-    //                                     // =========================
-
-    //                                     connection.commit(
-    //                                         (commitError) => {
-
-    //                                             if (commitError) {
-
-    //                                                 return connection.rollback(() => {
-    //                                                     connection.release();
-    //                                                     callback(commitError);
-    //                                                 });
-
-    //                                             }
-
-    //                                             connection.release();
-
-    //                                             callback(null, {
-    //                                                 closing_id: closingId,
-    //                                                 billing_updated:
-    //                                                     billingResult.affectedRows
-    //                                             });
-
-    //                                         }
-    //                                     );
-
-    //                                 }
-    //                             );
-
-    //                         }
-    //                     );
-
-    //                 }
-    //             );
-
-    //         });
-
-    //     });
-
-    // },
-
     createCashClosing: (data, callback) => {
         pool.getConnection((connectionError, connection) => {
 
@@ -1293,103 +753,142 @@ ORDER BY dpc.given_at DESC;
         );
     },
 
-    // AssignEmployeePettyCashDetails: (data, callback) => {
+    getBillDetails: (callback) => {
+        const query = `
+        SELECT
+            -- Bill details
+            pb.billing_id,
+            pb.bill_no,
+            pb.patient_id,
+            pb.admission_id,
 
-    //     const checkQuery = `
-    //     SELECT cash_id
-    //     FROM delivery_person_cash
-    //     WHERE assignment_id = ?
-    //     LIMIT 1
-    // `;
+            -- Patient details
+            ip.fb_ptc_name AS patient_name,
+            ip.fb_ptc_sex AS patient_sex,
+            ip.fb_ptd_dob AS patient_dob,
+            ip.fb_ptc_mobile AS patient_mobile,
+            ip.fb_ptc_loadd1 AS address_line1,
+            ip.fb_ptc_loadd2 AS address_line2,
+            ip.fb_ptc_loadd3 AS address_line3,
+            ip.fb_ptc_loadd4 AS address_line4,
 
-    //     pool.query(
-    //         checkQuery,
-    //         [data.assignment_id],
-    //         (error, results) => {
+            -- Admission details
+            ip.fb_ip_no AS ip_number,
+            ip.fb_ipd_date AS admission_date,
+            ip.fb_ipd_disc AS discharge_date,
+            ip.fb_ipc_status AS admission_status,
 
-    //             if (error) {
-    //                 return callback(error);
-    //             }
+            -- Bed and nursing station
+            bed.fb_bdc_no AS bed_number,
+            ns.fb_ns_name AS nursing_station,
 
-    //             // Record already exists → UPDATE
-    //             if (results.length > 0) {
+            -- Billing details
+            pb.billing_date,
+            pb.bill_type,
+            pb.bill_generated_location,
+            pb.billing_party_type,
+            opt.party_name AS party_type,
+            pb.bill_pay_type,
+            pb.total_amount,
+            pb.paid_amount,
+            pb.balance_amount,
+            pb.billing_status,
+            pb.updated_at,
 
-    //                 const updateQuery = `
-    //                 UPDATE delivery_person_cash
-    //                 SET
-    //                     employee_id = ?,
-    //                     amount = ?,
-    //                     given_by = ?,
-    //                     given_at = CURRENT_TIMESTAMP,
-    //                     remarks = ?
-    //                 WHERE assignment_id = ?
-    //             `;
+            -- Assignment master details
+            ca.assignment_id,
+            ca.assignment_status AS batch_assignment_status,
+            ca.assigned_at,
+            ca.completed_at AS batch_completed_at,
+            ca.remarks,
 
-    //                 const values = [
-    //                     data.employee_id,
-    //                     data.amount,
-    //                     data.given_by,
-    //                     data.remarks || null,
-    //                     data.assignment_id
-    //                 ];
+            -- Individual bill assignment details
+            cad.assignment_detail_id,
+            cad.assignment_status,
+            cad.is_current,
+            cad.completed_at AS bill_completed_at,
 
-    //                 return pool.query(
-    //                     updateQuery,
-    //                     values,
-    //                     (error, updateResult) => {
+            -- Assigned employee
+            ca.assigned_to AS assigned_employee_id,
+            assigned_emp.em_no AS assigned_employee_no,
+            assigned_emp.em_name AS assigned_employee_name,
 
-    //                         if (error) {
-    //                             return callback(error);
-    //                         }
+            -- Employee who assigned the bills
+            ca.assigned_by AS assigned_by_employee_id,
+            assigner_emp.em_no AS assigned_by_employee_no,
+            assigner_emp.em_name AS assigned_by_employee_name
 
-    //                         return callback(null, {
-    //                             action: "UPDATE",
-    //                             cash_id: results[0].cash_id,
-    //                             result: updateResult
-    //                         });
-    //                     }
-    //                 );
-    //             }
+        FROM patient_billing pb
 
-    //             // No record → INSERT
-    //             const insertQuery = `
-    //             INSERT INTO delivery_person_cash (
-    //                 assignment_id,
-    //                 employee_id,
-    //                 amount,
-    //                 given_by,
-    //                 remarks
-    //             )
-    //             VALUES (?, ?, ?, ?, ?)
-    //         `;
+        -- Individual bill assignment
+        LEFT JOIN collection_bill_assignment_detail cad
+            ON cad.billing_id = pb.billing_id
+            AND cad.is_current = 1
+            AND cad.assignment_status <> 'CANCELLED'
 
-    //             const values = [
-    //                 data.assignment_id,
-    //                 data.employee_id,
-    //                 data.amount,
-    //                 data.given_by,
-    //                 data.remarks || null
-    //             ];
+        -- Assignment batch/master
+        LEFT JOIN collection_bill_assignment ca
+            ON ca.assignment_id = cad.assignment_id
+            AND ca.is_current = 1
+            AND ca.assignment_status <> 'CANCELLED'
 
-    //             pool.query(
-    //                 insertQuery,
-    //                 values,
-    //                 (error, insertResult) => {
+        -- Assigned employee
+        LEFT JOIN co_employee_master assigned_emp
+            ON assigned_emp.em_id = ca.assigned_to
 
-    //                     if (error) {
-    //                         return callback(error);
-    //                     }
+        -- Employee who assigned the bills
+        LEFT JOIN co_employee_master assigner_emp
+            ON assigner_emp.em_id = ca.assigned_by
 
-    //                     return callback(null, {
-    //                         action: "INSERT",
-    //                         cash_id: insertResult.insertId,
-    //                         result: insertResult
-    //                     });
-    //                 }
-    //             );
-    //         }
-    //     );
-    // },
+        -- Patient admission
+        LEFT JOIN fb_ipadmiss ip
+            ON ip.fb_ip_no = pb.admission_id
+
+        -- Bed and nursing station
+        LEFT JOIN fb_bed bed
+            ON bed.fb_bd_code = ip.fb_bd_code
+
+        LEFT JOIN fb_nurse_station_master ns
+            ON ns.fb_ns_code = bed.fb_ns_code
+
+        -- Billing party type
+        LEFT JOIN order_party_type opt
+            ON opt.party_type_id = pb.billing_party_type
+
+        WHERE
+            pb.billing_party_type = 1
+            AND (
+                pb.billing_status IN ('OPEN', 'PARTIAL')
+
+                OR (
+                    pb.billing_status = 'PAID'
+                    AND pb.updated_at >= CURDATE()
+                    AND pb.updated_at < CURDATE() + INTERVAL 1 DAY
+                )
+
+                OR pb.billing_status = 'CANCELLED'
+            )
+
+        ORDER BY
+            CASE pb.billing_status
+                WHEN 'OPEN' THEN 1
+                WHEN 'PARTIAL' THEN 2
+                WHEN 'PAID' THEN 3
+                WHEN 'CANCELLED' THEN 4
+                ELSE 5
+            END,
+            pb.billing_id DESC;
+    `;
+
+        pool.query(query, (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+
+            return callback(null, results);
+        });
+    },
+
     AssignEmployeePettyCashDetails: (data, callback) => {
 
         const insertQuery = `
@@ -1436,5 +935,305 @@ ORDER BY dpc.given_at DESC;
 
 
 
+    assignCollectionBills: (data, callback) => {
+        pool.getConnection((connectionError, connection) => {
+            if (connectionError) {
+                return callback(connectionError);
+            }
+
+            const finish = (error, result) => {
+                connection.release();
+                callback(error, result);
+            };
+
+            const rollback = (error) => {
+                connection.rollback(() => finish(error));
+            };
+
+            connection.beginTransaction((transactionError) => {
+                if (transactionError) {
+                    return finish(transactionError);
+                }
+
+                const {
+                    assigned_to,
+                    assigned_by,
+                    remarks,
+                    billing_ids,
+                } = data;
+
+                const placeholders = billing_ids.map(() => "?").join(",");
+
+                // 1. Lock and validate the bills.
+                const billQuery = `
+                SELECT
+                    billing_id,
+                    billing_status
+                FROM patient_billing
+                WHERE billing_id IN (${placeholders})
+                FOR UPDATE
+            `;
+
+                connection.query(
+                    billQuery,
+                    billing_ids,
+                    (billError, billRows) => {
+                        if (billError) {
+                            return rollback(billError);
+                        }
+
+                        if (billRows.length !== billing_ids.length) {
+                            const error = new Error(
+                                "One or more bills were not found"
+                            );
+                            error.statusCode = 404;
+                            return rollback(error);
+                        }
+
+                        const invalidBills = billRows.filter(
+                            (bill) =>
+                                !["OPEN", "PARTIAL"].includes(
+                                    String(bill.billing_status).toUpperCase()
+                                )
+                        );
+
+                        if (invalidBills.length > 0) {
+                            const error = new Error(
+                                "Only OPEN or PARTIAL bills can be assigned"
+                            );
+                            error.statusCode = 400;
+                            error.billing_ids = invalidBills.map(
+                                (bill) => bill.billing_id
+                            );
+                            return rollback(error);
+                        }
+
+                        // 2. Check for existing active assignments.
+                        const activeAssignmentQuery = `
+                        SELECT
+                            cad.billing_id
+                        FROM collection_bill_assignment_detail cad
+                        INNER JOIN collection_bill_assignment ca
+                            ON ca.assignment_id = cad.assignment_id
+                        WHERE cad.billing_id IN (${placeholders})
+                          AND cad.is_current = 1
+                          AND cad.assignment_status IN (
+                              'ASSIGNED',
+                              'IN_PROGRESS'
+                          )
+                          AND ca.is_current = 1
+                          AND ca.assignment_status IN (
+                              'ASSIGNED',
+                              'IN_PROGRESS'
+                          )
+                    `;
+
+                        connection.query(
+                            activeAssignmentQuery,
+                            billing_ids,
+                            (activeError, activeRows) => {
+                                if (activeError) {
+                                    return rollback(activeError);
+                                }
+
+                                if (activeRows.length > 0) {
+                                    const error = new Error(
+                                        "Some bills are already assigned"
+                                    );
+                                    error.statusCode = 409;
+                                    error.billing_ids = activeRows.map(
+                                        (row) => row.billing_id
+                                    );
+                                    return rollback(error);
+                                }
+
+                                // 3. Insert one master record for this batch.
+                                const masterQuery = `
+                                INSERT INTO collection_bill_assignment
+                                (
+                                    assigned_to,
+                                    assigned_by,
+                                    assignment_status,
+                                    is_current,
+                                    assigned_at,
+                                    remarks
+                                )
+                                VALUES (?, ?, 'ASSIGNED', 1, NOW(), ?)
+                            `;
+
+                                connection.query(
+                                    masterQuery,
+                                    [assigned_to, assigned_by, remarks],
+                                    (masterError, masterResult) => {
+                                        if (masterError) {
+                                            return rollback(masterError);
+                                        }
+
+                                        const assignmentId =
+                                            masterResult.insertId;
+
+                                        // 4. Insert all bills into the detail table.
+                                        const detailRows = billing_ids.map(
+                                            (billingId) => [
+                                                assignmentId,
+                                                billingId,
+                                                "ASSIGNED",
+                                                1,
+                                            ]
+                                        );
+
+                                        const detailQuery = `
+                                        INSERT INTO collection_bill_assignment_detail
+                                        (
+                                            assignment_id,
+                                            billing_id,
+                                            assignment_status,
+                                            is_current
+                                        )
+                                        VALUES ?
+                                    `;
+
+                                        connection.query(
+                                            detailQuery,
+                                            [detailRows],
+                                            (detailError, detailResult) => {
+                                                if (detailError) {
+                                                    return rollback(detailError);
+                                                }
+
+                                                // 5. Commit the entire batch.
+                                                connection.commit((commitError) => {
+                                                    if (commitError) {
+                                                        return rollback(commitError);
+                                                    }
+
+                                                    return finish(null, {
+                                                        assignment_id: assignmentId,
+                                                        assigned_to,
+                                                        assigned_by,
+                                                        total_bills: detailResult.affectedRows,
+                                                        billing_ids,
+                                                    });
+                                                });
+                                            }
+                                        );
+                                    }
+                                );
+                            }
+                        );
+                    }
+                );
+            });
+        });
+    },
+
+
+
+    getAssignedCollectionBills: (employeeId, callBack) => {
+        const query = `
+        SELECT
+            ca.assignment_id,
+            ca.assigned_to AS employee_id,
+            ca.assigned_by,
+            ca.assignment_status AS collection_status,
+            ca.assigned_at,
+
+            cad.assignment_detail_id,
+            cad.assignment_status AS bill_assignment_status,
+            cad.completed_at,
+
+            pb.billing_id,
+            pb.bill_no,
+            pb.patient_id,
+            pb.admission_id,
+            pb.billing_date,
+            pb.total_amount,
+            pb.paid_amount,
+            pb.balance_amount,
+            pb.billing_status,
+            pb.bill_pay_type,
+            pb.billing_party_type,
+            pb.bill_generated_location,
+            pb.bill_type,
+
+            -- Patient details
+            ip.fb_pt_no AS patient_number,
+            ip.fb_ptc_name AS patient_name,
+            ip.fb_ptc_sex AS patient_sex,
+            ip.fb_ptd_dob AS patient_dob,
+            ip.fb_ptc_mobile AS patient_mobile,
+            ip.fb_ip_no AS ip_number,
+            ip.fb_ipd_date AS admission_date,
+            ip.fb_ipd_disc AS discharge_date,
+            ip.fb_ipc_status AS patient_status,
+            ip.fb_ipc_curstatus AS current_patient_status,
+
+            -- Bed details
+            bed.fb_bdc_no AS bed_number,
+            bed.fb_ns_code AS nurse_station_code,
+            ns.fb_ns_name AS nurse_station_name,
+
+            -- Assignment details
+            im.em_name AS assigned_by_name,
+
+            CASE
+                WHEN cad.assignment_status = 'COMPLETED'
+                    THEN 'COMPLETED'
+                ELSE 'PENDING'
+            END AS collection_display_status
+
+        FROM collection_bill_assignment ca
+
+        INNER JOIN collection_bill_assignment_detail cad
+            ON cad.assignment_id = ca.assignment_id
+
+        INNER JOIN patient_billing pb
+            ON pb.billing_id = cad.billing_id
+
+        LEFT JOIN fb_ipadmiss ip
+            ON ip.fb_ip_no = pb.admission_id
+            OR ip.fb_pt_no = pb.patient_id
+
+        LEFT JOIN fb_bed bed
+            ON bed.fb_bd_code = ip.fb_bd_code
+
+        LEFT JOIN fb_nurse_station_master ns
+            ON ns.fb_ns_code = bed.fb_ns_code
+
+        LEFT JOIN co_employee_master im
+            ON im.em_id = ca.assigned_by
+
+        WHERE ca.assigned_to = ?
+          AND ca.is_current = 1
+          AND ca.assignment_status <> 'CANCELLED'
+          AND cad.is_current = 1
+          AND cad.assignment_status <> 'CANCELLED'
+          AND pb.billing_status <> 'CANCELLED'
+          AND (
+                cad.assignment_status IN ('ASSIGNED', 'IN_PROGRESS')
+                OR (
+                    cad.assignment_status = 'COMPLETED'
+                    AND cad.completed_at >= CURDATE()
+                    AND cad.completed_at < CURDATE() + INTERVAL 1 DAY
+                )
+          )
+
+        ORDER BY
+            CASE
+                WHEN cad.assignment_status = 'COMPLETED' THEN 1
+                ELSE 0
+            END,
+            ca.assigned_at DESC,
+            pb.billing_id DESC
+    `;
+
+        pool.query(query, [employeeId], (error, results) => {
+            if (error) {
+                return callBack(error);
+            }
+
+            return callBack(null, results);
+        });
+    },
 
 };

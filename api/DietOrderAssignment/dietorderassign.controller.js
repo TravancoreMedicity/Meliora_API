@@ -1,6 +1,6 @@
 // dietdeliveryassign.controller.js
 
-const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientDietBill, getPatientExtraOrder, createPatientBillingService, updateBulkPickingUpService, getDeliveryBillDetailsService, CreateBystanderBilling, getBystanderBillingDetails, createBillingPaymentService, getBillablePatientDetail, getProformaDetailsService, convertProformaToBill, insertOrderPacking, getOrderPackingByAssignment, createPrintQueueService, getCashSummaryDetails, getPaymentModeDetails, getPaymentHistoryDetail, getPaymentHistoryBillDetail, getCashReturnDetails, returnAmountSettlement, getReturnDetails, getEmployeePettyCashDetails, getBillCollectionSummary, getCollectionDetails, getEmployeePettyCashDetailsByClosingIds, getPendingBilledDetails, settleBilling, getTodaySettledBillDetails, getTodayDetailedSummary } = require("./dietorderassign.service");
+const { CreateDietDeliveryAssignment, getCurrentAssignedFoodDetail, FetchDeliveryByAssigny, updateDeliveryStatus, UpdateDeliveryLogDetail, FetchAssignedItemStatus, fetchDeliveryLogDetail, UpdateAssignOrderDetail, getBillingSummary, getBillingDeliveryDetail, getBillingTransactions, getBystanderBill, getPatientDietBill, getPatientExtraOrder, createPatientBillingService, updateBulkPickingUpService, getDeliveryBillDetailsService, CreateBystanderBilling, getBystanderBillingDetails, createBillingPaymentService, getBillablePatientDetail, getProformaDetailsService, convertProformaToBill, insertOrderPacking, getOrderPackingByAssignment, createPrintQueueService, getCashSummaryDetails, getPaymentModeDetails, getPaymentHistoryDetail, getPaymentHistoryBillDetail, getCashReturnDetails, returnAmountSettlement, getReturnDetails, getEmployeePettyCashDetails, getBillCollectionSummary, getCollectionDetails, getEmployeePettyCashDetailsByClosingIds, getPendingBilledDetails, settleBilling, getTodaySettledBillDetails, getTodayDetailedSummary, getBillingItemDetails } = require("./dietorderassign.service");
 
 
 module.exports = {
@@ -600,8 +600,8 @@ module.exports = {
         });
 
     },
-    createBillingPayment: (req, res) => {
 
+    createBillingPayment: (req, res) => {
         const {
             amount,
             payment_mode,
@@ -612,75 +612,115 @@ module.exports = {
             change_amount,
             received_amount,
             remarks,
-            change_status
+            change_status,
         } = req.body;
 
-        if (!Array.isArray(payments) || !payments.length) {
+        const paymentAmount = Number(amount);
+
+        if (!Array.isArray(payments) || payments.length === 0) {
             return res.status(200).json({
                 success: 0,
-                message: "Payment details are missing"
+                message: "Payment details are missing",
             });
         }
 
-        if (!amount || Number(amount) <= 0) {
+        if (!Number.isFinite(paymentAmount) || paymentAmount <= 0) {
             return res.status(200).json({
                 success: 0,
-                message: "Invalid payment amount"
+                message: "Invalid payment amount",
             });
         }
 
-        if (!payment_mode) {
+        if (!["CASH", "UPI"].includes(payment_mode)) {
             return res.status(200).json({
                 success: 0,
-                message: "Payment mode is required"
+                message: "Invalid payment method",
             });
         }
 
-        if (!collected_by) {
+        if (!Number.isInteger(Number(collected_by)) || Number(collected_by) <= 0) {
             return res.status(200).json({
                 success: 0,
-                message: "Collected by is required"
+                message: "Valid collected by employee is required",
             });
         }
 
         if (!collected_location) {
             return res.status(200).json({
                 success: 0,
-                message: "Collected location is required"
+                message: "Collected location is required",
+            });
+        }
+
+        if (
+            payment_mode === "UPI" &&
+            !/^[A-Za-z0-9]{12,35}$/.test(
+                String(transaction_id || "").trim()
+            )
+        ) {
+            return res.status(200).json({
+                success: 0,
+                message: "Please enter a valid UPI transaction ID",
+            });
+        }
+
+        if (
+            payment_mode === "CASH" &&
+            (
+                !Number.isFinite(Number(received_amount)) ||
+                Number(received_amount) < paymentAmount
+            )
+        ) {
+            return res.status(200).json({
+                success: 0,
+                message: "Cash received cannot be less than the payment amount",
             });
         }
 
         createBillingPaymentService(
             {
-                amount,
+                amount: paymentAmount,
                 payment_mode,
-                collected_by,
+                collected_by: Number(collected_by),
                 collected_location,
-                transaction_id,
+                transaction_id:
+                    payment_mode === "UPI"
+                        ? String(transaction_id).trim()
+                        : null,
                 payments,
-                change_amount,
-                change_status,
-                received_amount,
-                remarks
+                change_amount:
+                    payment_mode === "CASH"
+                        ? Number(change_amount || 0)
+                        : null,
+                change_status:
+                    payment_mode === "CASH"
+                        ? change_status || null
+                        : null,
+                received_amount:
+                    payment_mode === "CASH"
+                        ? Number(received_amount)
+                        : null,
+                remarks: remarks || null,
             },
             (err, result) => {
                 if (err) {
                     console.error("createBillingPayment error:", err);
+
                     return res.status(200).json({
                         success: 0,
-                        message: err.message ||
-                            "Payment failed"
+                        message: err.message || "Payment failed",
                     });
                 }
 
                 return res.status(200).json({
                     success: 1,
                     message: "Payment completed successfully",
-                    data: result
+                    data: result,
                 });
             }
         );
     },
+
 
     getBillablePatientDetail: (req, res) => {
         const { status } = req.params;
@@ -1481,6 +1521,42 @@ module.exports = {
             });
         });
     },
+
+    getBillingItemDetails: (req, res) => {
+        const { billId } = req.params;
+
+        if (!billId) {
+            return res.status(200).json({
+                success: 0,
+                message: "Billing Detail is Missing !",
+            });
+        }
+
+        getBillingItemDetails(billId, (err, results) => {
+            if (err) {
+
+                return res.status(200).json({
+                    success: 0,
+                    message: err,
+                });
+            };
+
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: `No Bliing Data Found !`,
+                    data: []
+                });
+            };
+
+            return res.status(200).json({
+                success: 1,
+                message: "Billing Detail Fetched SuccessFully!",
+                data: results
+            });
+        });
+    },
+
 
 };
 

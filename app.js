@@ -134,19 +134,17 @@ socketUtils.connection(io);
 
 // MySQL fb_ipadmiss INSERT listener
 const {
-  startAdmissionListener,
+  // startAdmissionListener,
   // startPrintQueueListener
 } = require('./events/mysqlEvents');
 
-startAdmissionListener(io);
+// startAdmissionListener(io);
 // startPrintQueueListener(io);
 
 const socketIOMiddlewre = (req, res, next) => {
   req.io = io;
   next();
 };
-
-
 
 const userRouter = require("./api/user/user.router");
 const employeeRouter = require("./api/employee/employee.router");
@@ -330,7 +328,7 @@ const melioraDepMaster = require("./api/Meliora_department_master/meliora_dep_ma
 const ContractMaster = require("./api/contract_master/contract.router");
 const condemMasters = require('./api/am_condemnation_master/condem_master.router')
 
-const GeminiRouter = require('./api/Ai/gemini.router')
+// const GeminiRouter = require('./api/Ai/gemini.router')
 const ItemCategoryMaster = require('./api/ItemCategoryMaster/ItemCategory.router');
 const OrderPartyType = require('./api/OrderPartyType/orderpartyType.router');
 const DietSpecialityMaster = require('./api/DietSpecialityMaster/dietspecialitymaster.router');
@@ -566,7 +564,7 @@ app.use("/api/ContractMaster", ContractMaster);
 app.use('/api/condemApprovalLevel', condemApprovalLevel)
 app.use('/api/condemMasters', condemMasters)
 
-app.use('/api/ai', GeminiRouter)
+// app.use('/api/ai', GeminiRouter)
 app.use('/api/itemcategory', ItemCategoryMaster)
 app.use('/api/orderparty', OrderPartyType)
 app.use('/api/dietspeciality', DietSpecialityMaster)

@@ -9,7 +9,10 @@ const {
     getTodayClosedEmployeesController,
     getToadyEmployeePettyCash,
     AssignEmployeePettyCashDetails,
-    getClosingDenominationDetails
+    getClosingDenominationDetails,
+    getBillDetails,
+    assignCollectionBillsController,
+    getAssignedCollectionBills
 } = require('./dailycasclosing.controller');
 
 
@@ -43,10 +46,33 @@ router.post('/assign-pettycash',
 
 
 
-router.post(    
+router.post(
     '/closing-denomination',
     checkToken,
     getClosingDenominationDetails
 );
+
+
+
+router.get(
+    '/get-bill-details',
+    checkToken,
+    getBillDetails
+);
+
+router.post(
+    "/assign-bill",
+    checkToken,
+    assignCollectionBillsController
+);
+
+
+router.get(
+    "/assigned-bills-cashier/:employeeId",
+    checkToken,
+    getAssignedCollectionBills
+);
+
+
 
 module.exports = router;

@@ -2823,10 +2823,7 @@ ORDER BY dmc.created_at
 
 
     createPatientBillingService: async (data, callback) => {
-        console.log({
-            data
-        });
-
+     
         const {
             patient_id,
             admission_id,
@@ -4722,808 +4719,692 @@ ORDER BY dmc.created_at
         });
     },
 
-    createBillingPaymentService: (data, callback) => {
-
-        const {
-            amount,
-            payment_mode,
-            collected_by,
-            collected_location,
-            transaction_id,
-            payments,
-            change_amount,
-            change_status,
-            received_amount,
-            remarks,
+    // createBillingPaymentService: (data, callback) => {
+
+    //     const {
+    //         amount,
+    //         payment_mode,
+    //         collected_by,
+    //         collected_location,
+    //         transaction_id,
+    //         payments,
+    //         change_amount,
+    //         change_status,
+    //         received_amount,
+    //         remarks,
 
-        } = data;
+    //     } = data;
 
-        if (!Array.isArray(payments) || payments?.length === 0) {
-            return callback(new Error("Payment details are missing"));
-        }
+    //     if (!Array.isArray(payments) || payments?.length === 0) {
+    //         return callback(new Error("Payment details are missing"));
+    //     }
 
-        pool.getConnection((err, connection) => {
+    //     pool.getConnection((err, connection) => {
 
-            if (err) {
-                return callback(err);
-            }
+    //         if (err) {
+    //             return callback(err);
+    //         }
 
-            connection.beginTransaction(err => {
+    //         connection.beginTransaction(err => {
 
-                if (err) {
-                    connection.release();
-                    return callback(err);
-                }
+    //             if (err) {
+    //                 connection.release();
+    //                 return callback(err);
+    //             }
 
-                const rollback = error => {
-                    connection.rollback(() => {
-                        connection.release();
-                        callback(error);
-                    });
-                };
-
-                const commit = result => {
-                    connection.commit(err => {
-
-                        if (err) {
-                            return rollback(err);
-                        }
-
-                        connection.release();
-                        callback(null, result);
-                    });
-                };
-
-                try {
-
-                    /*
-                    1. VALIDATE TOP LEVEL AMOUNT
-                    */
-
-                    const calculatedTotal = payments?.reduce(
-                        (sum, payment) =>
-                            sum + Number(payment?.amount || 0),
-                        0
-                    );
-
-                    if (
-                        Number(calculatedTotal.toFixed(2)) !==
-                        Number(Number(amount || 0).toFixed(2))
-                    ) {
-
-                        return rollback(
-                            new Error(
-                                `Payment amount mismatch. Expected ${amount}, received ${calculatedTotal}`
-                            )
-                        );
-                    }
-
-
-                    /*
-                    2. PROCESS EACH BILLING
-                    */
-
-                    const paymentResults = [];
-
-                    const processBilling = index => {
-
-                        if (index >= payments.length) {
-
-                            /*
-                            11. COMMIT
-                            */
-
-                            return commit({
-                                amount: Number(amount),
-                                payment_mode,
-                                payment_status: "SUCCESS",
-                                payments: paymentResults
-                            });
-                        }
-
-
-                        const payment = payments[index];
-
-                        const billingId =
-                            Number(payment?.billing_id);
-
-                        const paymentAmount =
-                            Number(payment?.amount || 0);
-
-                        const items =
-                            Array.isArray(payment?.items)
-                                ? payment.items
-                                : [];
-
-
-                        /*
-                        VALIDATE BILLING
-                        */
-
-                        if (!billingId) {
-                            return rollback(
-                                new Error("Invalid billing_id")
-                            );
-                        }
-
-                        if (paymentAmount <= 0) {
-                            return rollback(
-                                new Error(
-                                    `Invalid payment amount for billing ${billingId}`
-                                )
-                            );
-                        }
-
-                        if (!items.length) {
-                            return rollback(
-                                new Error(
-                                    `Payment items missing for billing ${billingId}`
-                                )
-                            );
-                        }
-
-
-                        /*
-                        3. LOCK BILLING ROW
-                        */
-
-                        connection.query(
-                            `
-                        SELECT
-                            billing_id,
-                            total_amount,
-                            paid_amount,
-                            balance_amount,
-                            billing_status
-                        FROM patient_billing
-                        WHERE billing_id = ?
-                        FOR UPDATE
-                        `,
-                            [billingId],
-                            (err, billingRows) => {
-
-                                if (err) {
-                                    return rollback(err);
-                                }
-
-                                if (!billingRows.length) {
-                                    return rollback(
-                                        new Error(
-                                            `Billing ${billingId} not found`
-                                        )
-                                    );
-                                }
-
-                                const billing =
-                                    billingRows[0];
-
-
-                                if (
-                                    billing.billing_status ===
-                                    "CANCELLED"
-                                ) {
-
-                                    return rollback(
-                                        new Error(
-                                            `Billing ${billingId} is cancelled`
-                                        )
-                                    );
-                                }
-
-
-                                /*
-                                4. VALIDATE BILL PAYMENT AMOUNT
-                                */
-
-                                const currentBalance =
-                                    Number(
-                                        billing.balance_amount || 0
-                                    );
-
-                                if (
-                                    paymentAmount >
-                                    currentBalance
-                                ) {
-
-                                    return rollback(
-                                        new Error(
-                                            `Payment amount exceeds balance for billing ${billingId}`
-                                        )
-                                    );
-                                }
-
-
-                                /*
-                                5. VALIDATE PAYMENT ITEMS
-                                */
-
-                                const detailIds =
-                                    items.map(item =>
-                                        Number(
-                                            item?.billing_detail_id
-                                        )
-                                    );
-
-                                if (
-                                    detailIds.some(id => !id)
-                                ) {
-
-                                    return rollback(
-                                        new Error(
-                                            `Invalid billing detail for billing ${billingId}`
-                                        )
-                                    );
-                                }
-
-
-                                const placeholders =
-                                    detailIds
-                                        .map(() => "?")
-                                        .join(",");
-
-
-                                connection.query(
-                                    `
-                                SELECT
-                                    billing_detail_id,
-                                    billing_id,
-                                    amount,
-                                    bill_item_status
-                                FROM patient_billing_detail
-                                WHERE billing_detail_id IN (${placeholders})
-                                AND billing_id = ?
-                                FOR UPDATE
-                                `,
-                                    [
-                                        ...detailIds,
-                                        billingId
-                                    ],
-                                    (err, details) => {
-
-                                        if (err) {
-                                            return rollback(err);
-                                        }
-
-
-                                        /*
-                                        MAKE SURE EVERY DETAIL EXISTS
-                                        */
-
-                                        if (
-                                            details.length !==
-                                            detailIds.length
-                                        ) {
-
-                                            return rollback(
-                                                new Error(
-                                                    `Invalid billing details for billing ${billingId}`
-                                                )
-                                            );
-                                        }
-
-
-                                        /*
-                                        6. CALCULATE ITEM PAYMENT
-                                        */
-
-                                        let itemPaymentTotal = 0;
-
-
-                                        for (const item of items) {
-
-                                            const detail =
-                                                details.find(row =>
-                                                    Number(
-                                                        row.billing_detail_id
-                                                    ) ===
-                                                    Number(
-                                                        item.billing_detail_id
-                                                    )
-                                                );
-
-
-                                            if (!detail) {
-                                                return rollback(
-                                                    new Error(
-                                                        `Billing detail ${item.billing_detail_id} not found`
-                                                    )
-                                                );
-                                            }
-
-
-                                            if (
-                                                detail.bill_item_status ===
-                                                "PAID"
-                                            ) {
-
-                                                return rollback(
-                                                    new Error(
-                                                        `Billing detail ${item.billing_detail_id} is already paid`
-                                                    )
-                                                );
-                                            }
-
-
-                                            const paidAmount =
-                                                Number(
-                                                    item?.paid_amount || 0
-                                                );
-
-                                            const detailAmount =
-                                                Number(
-                                                    detail?.amount || 0
-                                                );
-
-
-                                            if (
-                                                paidAmount <= 0
-                                            ) {
-
-                                                return rollback(
-                                                    new Error(
-                                                        `Invalid paid amount for billing detail ${item.billing_detail_id}`
-                                                    )
-                                                );
-                                            }
-
-
-                                            if (
-                                                paidAmount >
-                                                detailAmount
-                                            ) {
-
-                                                return rollback(
-                                                    new Error(
-                                                        `Paid amount exceeds billing detail amount for ${item.billing_detail_id}`
-                                                    )
-                                                );
-                                            }
-
-
-                                            itemPaymentTotal +=
-                                                paidAmount;
-                                        }
-
-
-                                        /*
-                                        
-                                        7. ITEM TOTAL MUST MATCH PAYMENT
-                                        
-                                        */
-
-                                        if (
-                                            Number(
-                                                itemPaymentTotal.toFixed(2)
-                                            ) !==
-                                            Number(
-                                                paymentAmount.toFixed(2)
-                                            )
-                                        ) {
-
-                                            return rollback(
-                                                new Error(
-                                                    `Item payment total does not match billing ${billingId} payment amount`
-                                                )
-                                            );
-                                        }
-
-
-                                        /*
-                                        
-                                        8. INSERT PAYMENT MASTER
-                                        */
-
-                                        connection.query(
-                                            `
-                                        INSERT INTO patient_bill_payment
-                                        (
-                                            billing_id,
-                                            amount,
-                                            payment_mode,
-                                            collected_by,
-                                            collected_location,
-                                            received_amount,
-                                            change_amount,
-                                            transaction_id,
-                                            remarks,
-                                            change_status,
-                                            payment_status
-                                        )
-                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'SUCCESS')
-                                        `,
-                                            [
-                                                billingId,
-                                                paymentAmount,
-                                                payment_mode,
-                                                collected_by,
-                                                collected_location,
-                                                received_amount,
-                                                change_amount,
-                                                transaction_id || null,
-                                                remarks,
-                                                change_status
-                                            ],
-                                            (err, paymentResult) => {
-
-                                                if (err) {
-                                                    return rollback(err);
-                                                }
-
-
-                                                const paymentId =
-                                                    paymentResult.insertId;
-
-
-                                                /*
-                                                
-                                                9. INSERT PAYMENT DETAILS
-                                                
-                                                */
-
-                                                const processItem = itemIndex => {
-
-                                                    if (
-                                                        itemIndex >=
-                                                        items.length
-                                                    ) {
-
-                                                        /*
-                                                        =========================
-                                                        10. UPDATE BILLING MASTER
-                                                        =========================
-                                                        */
-
-                                                        const newPaidAmount =
-                                                            Number(
-                                                                billing.paid_amount || 0
-                                                            ) +
-                                                            paymentAmount;
-
-
-                                                        const newBalance =
-                                                            Number(
-                                                                billing.total_amount || 0
-                                                            ) -
-                                                            newPaidAmount;
-
-
-                                                        let billingStatus =
-                                                            "PARTIAL";
-
-
-                                                        if (
-                                                            newBalance <= 0
-                                                        ) {
-                                                            billingStatus =
-                                                                "PAID";
-                                                        }
-
-
-                                                        connection.query(
-                                                            `
-                                                        UPDATE patient_billing
-                                                        SET
-                                                            paid_amount = ?,
-                                                            balance_amount = ?,
-                                                            billing_status = ?,
-                                                            is_settled = 'Y',
-                                                            settled_id = ?,
-                                                            updated_by = ?,
-                                                            updated_at = CURRENT_TIMESTAMP
-                                                        WHERE billing_id = ?
-                                                        `,
-                                                            [
-                                                                newPaidAmount,
-                                                                Math.max(
-                                                                    0,
-                                                                    newBalance
-                                                                ),
-                                                                billingStatus,
-                                                                paymentId,
-                                                                collected_by,
-                                                                billingId
-                                                            ],
-                                                            err => {
-
-                                                                if (err) {
-                                                                    return rollback(err);
-                                                                }
-
-
-                                                                paymentResults.push({
-                                                                    billing_id:
-                                                                        billingId,
-
-                                                                    payment_id:
-                                                                        paymentId,
-
-                                                                    amount:
-                                                                        paymentAmount,
-
-                                                                    paid_amount:
-                                                                        newPaidAmount,
-
-                                                                    balance_amount:
-                                                                        Math.max(
-                                                                            0,
-                                                                            newBalance
-                                                                        ),
-
-                                                                    billing_status:
-                                                                        billingStatus
-                                                                });
-
-
-                                                                /*
-                                                                =================
-                                                                NEXT BILLING
-                                                                =================
-                                                                */
-
-                                                                processBilling(
-                                                                    index + 1
-                                                                );
-
-                                                            }
-                                                        );
-
-                                                        return;
-                                                    }
-
-
-                                                    const item =
-                                                        items[itemIndex];
-
-                                                    const paidAmount =
-                                                        Number(
-                                                            item.paid_amount
-                                                        );
-
-
-                                                    /*
-                                                    INSERT PAYMENT DETAIL
-                                                    */
-
-                                                    connection.query(
-                                                        `
-                                                    INSERT INTO patient_bill_payment_detail
-                                                    (
-                                                        payment_id,
-                                                        billing_detail_id,
-                                                        paid_amount
-                                                    )
-                                                    VALUES (?, ?, ?)
-                                                    `,
-                                                        [
-                                                            paymentId,
-                                                            item.billing_detail_id,
-                                                            paidAmount
-                                                        ],
-                                                        err => {
-
-                                                            if (err) {
-                                                                return rollback(err);
-                                                            }
-
-
-                                                            /*
-                                                            GET DETAIL AMOUNT
-                                                            */
-
-                                                            const detail =
-                                                                details.find(row =>
-                                                                    Number(
-                                                                        row.billing_detail_id
-                                                                    ) ===
-                                                                    Number(
-                                                                        item.billing_detail_id
-                                                                    )
-                                                                );
-
-
-                                                            const detailAmount =
-                                                                Number(
-                                                                    detail?.amount || 0
-                                                                );
-
-
-                                                            /*
-                                                            MARK DETAIL PAID
-                                                            */
-
-                                                            if (
-                                                                Number(
-                                                                    paidAmount.toFixed(2)
-                                                                ) ===
-                                                                Number(
-                                                                    detailAmount.toFixed(2)
-                                                                )
-                                                            ) {
-
-                                                                connection.query(
-                                                                    `
-                                                                UPDATE patient_billing_detail
-                                                                SET bill_item_status = 'PAID'
-                                                                WHERE billing_detail_id = ?
-                                                                `,
-                                                                    [
-                                                                        item.billing_detail_id
-                                                                    ],
-                                                                    err => {
-
-                                                                        if (err) {
-                                                                            return rollback(err);
-                                                                        }
-
-                                                                        processItem(
-                                                                            itemIndex + 1
-                                                                        );
-
-                                                                    }
-                                                                );
-
-                                                            } else {
-                                                                /*
-                                                                Partial item
-                                                                remains OPEN
-                                                                */
-                                                                processItem(
-                                                                    itemIndex + 1
-                                                                );
-                                                            }
-
-                                                        }
-                                                    );
-
-                                                };
-
-
-                                                processItem(0);
-
-                                            }
-                                        );
-
-                                    }
-                                );
-
-                            }
-                        );
-
-                    };
-
-
-                    /*
-                    START BILLING PROCESS
-                    */
-
-                    processBilling(0);
-
-                } catch (error) {
-
-                    return rollback(error);
-
-                }
-
-            });
-
-        });
-    },
-
-
-
-
-
-    // getBillablePatientDetail: (status, callback) => {
-    //     const query = `
-    //     SELECT 
-    //         pending.admission_id, 
-    //         pending.pt_no, 
-
-    //         p.fb_ptc_name AS patient_name, 
-    //         p.fb_ptc_sex AS sex, 
-    //         p.fb_ptd_dob AS date_of_birth, 
-    //         p.fb_ptc_mobile AS mobile, 
-    //         p.fb_dep_desc AS department, 
-    //         p.fb_bd_code AS bed_code, 
-    //         b.fb_bdc_no AS bed_name, 
-    //         p.fb_ipd_date AS admission_date, 
-    //         p.fb_ipc_curstatus, 
-
-    //         ns.fb_ns_code AS nursing_station_code, 
-    //         ns.fb_ns_name AS nursing_station_name, 
-
-    //         pending.pending_items, 
-    //         pending.pending_amount,
-
-    //         CASE
-    //             WHEN EXISTS (
-    //                 SELECT 1
-    //                 FROM patient_billing pb
-    //                 WHERE pb.admission_id = pending.admission_id
-    //                   AND pb.is_settled = 'Y'
-    //             )
-    //             THEN 'Y'
-    //             ELSE 'N'
-    //         END AS is_settled
-
-    //     FROM (
-    //         SELECT 
-    //             admission_id, 
-    //             pt_no, 
-    //             COUNT(*) AS pending_items, 
-    //             SUM(net_amount) AS pending_amount 
-
-    //         FROM (
-    //             SELECT 
-    //                 dmc.admission_id, 
-    //                 dmc.pt_no, 
-    //                 dmc.net_amount 
-    //             FROM diet_meal_charge dmc 
-    //             WHERE dmc.charge_status = ?
-
-    //             UNION ALL
-
-    //             SELECT 
-    //                 dsl.admission_id, 
-    //                 dsl.pt_no, 
-    //                 dsl.net_amount 
-    //             FROM diet_service_ledger dsl 
-    //             WHERE dsl.ledger_status = ? 
-    //               AND dsl.party_type_id <> 1
-
-    //             UNION ALL
-
-    //             SELECT 
-    //                 dsl.admission_id, 
-    //                 dsl.pt_no, 
-    //                 dsl.net_amount 
-    //             FROM diet_service_ledger dsl 
-    //             WHERE dsl.party_type_id = 1 
-    //               AND dsl.ledger_status = 'BILLED' 
-
-    //               AND EXISTS (
-    //                     SELECT 1
-    //                     FROM patient_billing_detail pbd 
-    //                     INNER JOIN patient_billing pb 
-    //                         ON pb.billing_id = pbd.billing_id 
-    //                     WHERE pbd.reference_table = 'CANTEEN' 
-    //                       AND pbd.reference_id = dsl.canteen_order_id 
-    //                       AND pbd.item_id = dsl.item_id 
-    //                       AND pbd.party_type_id = 1 
-    //                       AND pbd.bill_item_status = 'OPEN' 
-    //                       AND pb.billing_party_type = 1 
-    //                       AND pb.billing_status IN ('OPEN', 'PARTIAL') 
-    //                       AND pb.balance_amount > 0
-    //               )
-
-    //         ) charges
-
-    //         GROUP BY admission_id, pt_no
-
-    //     ) pending
-
-    //     INNER JOIN fb_ipadmiss p 
-    //         ON p.fb_ip_no = pending.admission_id 
-
-    //     LEFT JOIN fb_bed b 
-    //         ON b.fb_bd_code = p.fb_bd_code 
-
-    //     LEFT JOIN fb_nurse_station_master ns 
-    //         ON ns.fb_ns_code = b.fb_ns_code
-
-    //     WHERE p.fb_ipc_curstatus IS NULL
-    //        OR p.fb_ipc_curstatus <> 'PCO'
-
-    //     ORDER BY pending.admission_id DESC
-    // `;
-
-    //     executeQuery(
-    //         query,
-    //         [status, status],
-    //         callback
-    //     );
+    //             const rollback = error => {
+    //                 connection.rollback(() => {
+    //                     connection.release();
+    //                     callback(error);
+    //                 });
+    //             };
+
+    //             const commit = result => {
+    //                 connection.commit(err => {
+
+    //                     if (err) {
+    //                         return rollback(err);
+    //                     }
+
+    //                     connection.release();
+    //                     callback(null, result);
+    //                 });
+    //             };
+
+    //             try {
+
+    //                 /*
+    //                 1. VALIDATE TOP LEVEL AMOUNT
+    //                 */
+
+    //                 const calculatedTotal = payments?.reduce(
+    //                     (sum, payment) =>
+    //                         sum + Number(payment?.amount || 0),
+    //                     0
+    //                 );
+
+    //                 if (
+    //                     Number(calculatedTotal.toFixed(2)) !==
+    //                     Number(Number(amount || 0).toFixed(2))
+    //                 ) {
+
+    //                     return rollback(
+    //                         new Error(
+    //                             `Payment amount mismatch. Expected ${amount}, received ${calculatedTotal}`
+    //                         )
+    //                     );
+    //                 }
+
+
+    //                 /*
+    //                 2. PROCESS EACH BILLING
+    //                 */
+
+    //                 const paymentResults = [];
+
+    //                 const processBilling = index => {
+
+    //                     if (index >= payments.length) {
+
+    //                         /*
+    //                         11. COMMIT
+    //                         */
+
+    //                         return commit({
+    //                             amount: Number(amount),
+    //                             payment_mode,
+    //                             payment_status: "SUCCESS",
+    //                             payments: paymentResults
+    //                         });
+    //                     }
+
+
+    //                     const payment = payments[index];
+
+    //                     const billingId =
+    //                         Number(payment?.billing_id);
+
+    //                     const paymentAmount =
+    //                         Number(payment?.amount || 0);
+
+    //                     const items =
+    //                         Array.isArray(payment?.items)
+    //                             ? payment.items
+    //                             : [];
+
+
+    //                     /*
+    //                     VALIDATE BILLING
+    //                     */
+
+    //                     if (!billingId) {
+    //                         return rollback(
+    //                             new Error("Invalid billing_id")
+    //                         );
+    //                     }
+
+    //                     if (paymentAmount <= 0) {
+    //                         return rollback(
+    //                             new Error(
+    //                                 `Invalid payment amount for billing ${billingId}`
+    //                             )
+    //                         );
+    //                     }
+
+    //                     if (!items.length) {
+    //                         return rollback(
+    //                             new Error(
+    //                                 `Payment items missing for billing ${billingId}`
+    //                             )
+    //                         );
+    //                     }
+
+
+    //                     /*
+    //                     3. LOCK BILLING ROW
+    //                     */
+
+    //                     connection.query(
+    //                         `
+    //                     SELECT
+    //                         billing_id,
+    //                         total_amount,
+    //                         paid_amount,
+    //                         balance_amount,
+    //                         billing_status
+    //                     FROM patient_billing
+    //                     WHERE billing_id = ?
+    //                     FOR UPDATE
+    //                     `,
+    //                         [billingId],
+    //                         (err, billingRows) => {
+
+    //                             if (err) {
+    //                                 return rollback(err);
+    //                             }
+
+    //                             if (!billingRows.length) {
+    //                                 return rollback(
+    //                                     new Error(
+    //                                         `Billing ${billingId} not found`
+    //                                     )
+    //                                 );
+    //                             }
+
+    //                             const billing =
+    //                                 billingRows[0];
+
+
+    //                             if (
+    //                                 billing.billing_status ===
+    //                                 "CANCELLED"
+    //                             ) {
+
+    //                                 return rollback(
+    //                                     new Error(
+    //                                         `Billing ${billingId} is cancelled`
+    //                                     )
+    //                                 );
+    //                             }
+
+
+    //                             /*
+    //                             4. VALIDATE BILL PAYMENT AMOUNT
+    //                             */
+
+    //                             const currentBalance =
+    //                                 Number(
+    //                                     billing.balance_amount || 0
+    //                                 );
+
+    //                             if (
+    //                                 paymentAmount >
+    //                                 currentBalance
+    //                             ) {
+
+    //                                 return rollback(
+    //                                     new Error(
+    //                                         `Payment amount exceeds balance for billing ${billingId}`
+    //                                     )
+    //                                 );
+    //                             }
+
+
+    //                             /*
+    //                             5. VALIDATE PAYMENT ITEMS
+    //                             */
+
+    //                             const detailIds =
+    //                                 items.map(item =>
+    //                                     Number(
+    //                                         item?.billing_detail_id
+    //                                     )
+    //                                 );
+
+    //                             if (
+    //                                 detailIds.some(id => !id)
+    //                             ) {
+
+    //                                 return rollback(
+    //                                     new Error(
+    //                                         `Invalid billing detail for billing ${billingId}`
+    //                                     )
+    //                                 );
+    //                             }
+
+
+    //                             const placeholders =
+    //                                 detailIds
+    //                                     .map(() => "?")
+    //                                     .join(",");
+
+
+    //                             connection.query(
+    //                                 `
+    //                             SELECT
+    //                                 billing_detail_id,
+    //                                 billing_id,
+    //                                 amount,
+    //                                 bill_item_status
+    //                             FROM patient_billing_detail
+    //                             WHERE billing_detail_id IN (${placeholders})
+    //                             AND billing_id = ?
+    //                             FOR UPDATE
+    //                             `,
+    //                                 [
+    //                                     ...detailIds,
+    //                                     billingId
+    //                                 ],
+    //                                 (err, details) => {
+
+    //                                     if (err) {
+    //                                         return rollback(err);
+    //                                     }
+
+
+    //                                     /*
+    //                                     MAKE SURE EVERY DETAIL EXISTS
+    //                                     */
+
+    //                                     if (
+    //                                         details.length !==
+    //                                         detailIds.length
+    //                                     ) {
+
+    //                                         return rollback(
+    //                                             new Error(
+    //                                                 `Invalid billing details for billing ${billingId}`
+    //                                             )
+    //                                         );
+    //                                     }
+
+
+    //                                     /*
+    //                                     6. CALCULATE ITEM PAYMENT
+    //                                     */
+
+    //                                     let itemPaymentTotal = 0;
+
+
+    //                                     for (const item of items) {
+
+    //                                         const detail =
+    //                                             details.find(row =>
+    //                                                 Number(
+    //                                                     row.billing_detail_id
+    //                                                 ) ===
+    //                                                 Number(
+    //                                                     item.billing_detail_id
+    //                                                 )
+    //                                             );
+
+
+    //                                         if (!detail) {
+    //                                             return rollback(
+    //                                                 new Error(
+    //                                                     `Billing detail ${item.billing_detail_id} not found`
+    //                                                 )
+    //                                             );
+    //                                         }
+
+
+    //                                         if (
+    //                                             detail.bill_item_status ===
+    //                                             "PAID"
+    //                                         ) {
+
+    //                                             return rollback(
+    //                                                 new Error(
+    //                                                     `Billing detail ${item.billing_detail_id} is already paid`
+    //                                                 )
+    //                                             );
+    //                                         }
+
+
+    //                                         const paidAmount =
+    //                                             Number(
+    //                                                 item?.paid_amount || 0
+    //                                             );
+
+    //                                         const detailAmount =
+    //                                             Number(
+    //                                                 detail?.amount || 0
+    //                                             );
+
+
+    //                                         if (
+    //                                             paidAmount <= 0
+    //                                         ) {
+
+    //                                             return rollback(
+    //                                                 new Error(
+    //                                                     `Invalid paid amount for billing detail ${item.billing_detail_id}`
+    //                                                 )
+    //                                             );
+    //                                         }
+
+
+    //                                         if (
+    //                                             paidAmount >
+    //                                             detailAmount
+    //                                         ) {
+
+    //                                             return rollback(
+    //                                                 new Error(
+    //                                                     `Paid amount exceeds billing detail amount for ${item.billing_detail_id}`
+    //                                                 )
+    //                                             );
+    //                                         }
+
+
+    //                                         itemPaymentTotal +=
+    //                                             paidAmount;
+    //                                     }
+
+
+    //                                     /*
+
+    //                                     7. ITEM TOTAL MUST MATCH PAYMENT
+
+    //                                     */
+
+    //                                     if (
+    //                                         Number(
+    //                                             itemPaymentTotal.toFixed(2)
+    //                                         ) !==
+    //                                         Number(
+    //                                             paymentAmount.toFixed(2)
+    //                                         )
+    //                                     ) {
+
+    //                                         return rollback(
+    //                                             new Error(
+    //                                                 `Item payment total does not match billing ${billingId} payment amount`
+    //                                             )
+    //                                         );
+    //                                     }
+
+
+    //                                     /*
+
+    //                                     8. INSERT PAYMENT MASTER
+    //                                     */
+
+    //                                     connection.query(
+    //                                         `
+    //                                     INSERT INTO patient_bill_payment
+    //                                     (
+    //                                         billing_id,
+    //                                         amount,
+    //                                         payment_mode,
+    //                                         collected_by,
+    //                                         collected_location,
+    //                                         received_amount,
+    //                                         change_amount,
+    //                                         transaction_id,
+    //                                         remarks,
+    //                                         change_status,
+    //                                         payment_status
+    //                                     )
+    //                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'SUCCESS')
+    //                                     `,
+    //                                         [
+    //                                             billingId,
+    //                                             paymentAmount,
+    //                                             payment_mode,
+    //                                             collected_by,
+    //                                             collected_location,
+    //                                             received_amount,
+    //                                             change_amount,
+    //                                             transaction_id || null,
+    //                                             remarks,
+    //                                             change_status
+    //                                         ],
+    //                                         (err, paymentResult) => {
+
+    //                                             if (err) {
+    //                                                 return rollback(err);
+    //                                             }
+
+
+    //                                             const paymentId =
+    //                                                 paymentResult.insertId;
+
+
+    //                                             /*
+
+    //                                             9. INSERT PAYMENT DETAILS
+
+    //                                             */
+
+    //                                             const processItem = itemIndex => {
+
+    //                                                 if (
+    //                                                     itemIndex >=
+    //                                                     items.length
+    //                                                 ) {
+
+    //                                                     /*
+    //                                                     =========================
+    //                                                     10. UPDATE BILLING MASTER
+    //                                                     =========================
+    //                                                     */
+
+    //                                                     const newPaidAmount =
+    //                                                         Number(
+    //                                                             billing.paid_amount || 0
+    //                                                         ) +
+    //                                                         paymentAmount;
+
+
+    //                                                     const newBalance =
+    //                                                         Number(
+    //                                                             billing.total_amount || 0
+    //                                                         ) -
+    //                                                         newPaidAmount;
+
+
+    //                                                     let billingStatus =
+    //                                                         "PARTIAL";
+
+
+    //                                                     if (
+    //                                                         newBalance <= 0
+    //                                                     ) {
+    //                                                         billingStatus =
+    //                                                             "PAID";
+    //                                                     }
+
+
+    //                                                     connection.query(
+    //                                                         `
+    //                                                     UPDATE patient_billing
+    //                                                     SET
+    //                                                         paid_amount = ?,
+    //                                                         balance_amount = ?,
+    //                                                         billing_status = ?,
+    //                                                         is_settled = 'Y',
+    //                                                         settled_id = ?,
+    //                                                         updated_by = ?,
+    //                                                         updated_at = CURRENT_TIMESTAMP
+    //                                                     WHERE billing_id = ?
+    //                                                     `,
+    //                                                         [
+    //                                                             newPaidAmount,
+    //                                                             Math.max(
+    //                                                                 0,
+    //                                                                 newBalance
+    //                                                             ),
+    //                                                             billingStatus,
+    //                                                             paymentId,
+    //                                                             collected_by,
+    //                                                             billingId
+    //                                                         ],
+    //                                                         err => {
+
+    //                                                             if (err) {
+    //                                                                 return rollback(err);
+    //                                                             }
+
+
+    //                                                             paymentResults.push({
+    //                                                                 billing_id:
+    //                                                                     billingId,
+
+    //                                                                 payment_id:
+    //                                                                     paymentId,
+
+    //                                                                 amount:
+    //                                                                     paymentAmount,
+
+    //                                                                 paid_amount:
+    //                                                                     newPaidAmount,
+
+    //                                                                 balance_amount:
+    //                                                                     Math.max(
+    //                                                                         0,
+    //                                                                         newBalance
+    //                                                                     ),
+
+    //                                                                 billing_status:
+    //                                                                     billingStatus
+    //                                                             });
+
+
+    //                                                             /*
+    //                                                             =================
+    //                                                             NEXT BILLING
+    //                                                             =================
+    //                                                             */
+
+    //                                                             processBilling(
+    //                                                                 index + 1
+    //                                                             );
+
+    //                                                         }
+    //                                                     );
+
+    //                                                     return;
+    //                                                 }
+
+
+    //                                                 const item =
+    //                                                     items[itemIndex];
+
+    //                                                 const paidAmount =
+    //                                                     Number(
+    //                                                         item.paid_amount
+    //                                                     );
+
+
+    //                                                 /*
+    //                                                 INSERT PAYMENT DETAIL
+    //                                                 */
+
+    //                                                 connection.query(
+    //                                                     `
+    //                                                 INSERT INTO patient_bill_payment_detail
+    //                                                 (
+    //                                                     payment_id,
+    //                                                     billing_detail_id,
+    //                                                     paid_amount
+    //                                                 )
+    //                                                 VALUES (?, ?, ?)
+    //                                                 `,
+    //                                                     [
+    //                                                         paymentId,
+    //                                                         item.billing_detail_id,
+    //                                                         paidAmount
+    //                                                     ],
+    //                                                     err => {
+
+    //                                                         if (err) {
+    //                                                             return rollback(err);
+    //                                                         }
+
+
+    //                                                         /*
+    //                                                         GET DETAIL AMOUNT
+    //                                                         */
+
+    //                                                         const detail =
+    //                                                             details.find(row =>
+    //                                                                 Number(
+    //                                                                     row.billing_detail_id
+    //                                                                 ) ===
+    //                                                                 Number(
+    //                                                                     item.billing_detail_id
+    //                                                                 )
+    //                                                             );
+
+
+    //                                                         const detailAmount =
+    //                                                             Number(
+    //                                                                 detail?.amount || 0
+    //                                                             );
+
+
+    //                                                         /*
+    //                                                         MARK DETAIL PAID
+    //                                                         */
+
+    //                                                         if (
+    //                                                             Number(
+    //                                                                 paidAmount.toFixed(2)
+    //                                                             ) ===
+    //                                                             Number(
+    //                                                                 detailAmount.toFixed(2)
+    //                                                             )
+    //                                                         ) {
+
+    //                                                             connection.query(
+    //                                                                 `
+    //                                                             UPDATE patient_billing_detail
+    //                                                             SET bill_item_status = 'PAID'
+    //                                                             WHERE billing_detail_id = ?
+    //                                                             `,
+    //                                                                 [
+    //                                                                     item.billing_detail_id
+    //                                                                 ],
+    //                                                                 err => {
+
+    //                                                                     if (err) {
+    //                                                                         return rollback(err);
+    //                                                                     }
+
+    //                                                                     processItem(
+    //                                                                         itemIndex + 1
+    //                                                                     );
+
+    //                                                                 }
+    //                                                             );
+
+    //                                                         } else {
+    //                                                             /*
+    //                                                             Partial item
+    //                                                             remains OPEN
+    //                                                             */
+    //                                                             processItem(
+    //                                                                 itemIndex + 1
+    //                                                             );
+    //                                                         }
+
+    //                                                     }
+    //                                                 );
+
+    //                                             };
+
+
+    //                                             processItem(0);
+
+    //                                         }
+    //                                     );
+
+    //                                 }
+    //                             );
+
+    //                         }
+    //                     );
+
+    //                 };
+
+
+    //                 /*
+    //                 START BILLING PROCESS
+    //                 */
+
+    //                 processBilling(0);
+
+    //             } catch (error) {
+
+    //                 return rollback(error);
+
+    //             }
+
+    //         });
+
+    //     });
     // },
-
 
 
     getBillablePatientDetail: (status, callback) => {
@@ -7163,26 +7044,20 @@ ORDER BY p.payment_date DESC;
             }
         );
     },
+
+
     getBillCollectionSummary: (callBack) => {
-        pool.query(
-            `
+        const query = `
         SELECT
-            pb.created_by AS employee_id,
+            ca.assigned_to AS employee_id,
             e.em_name AS employee_name,
 
-            /* ALL BILLS */
             COUNT(DISTINCT pb.billing_id) AS bill_count,
 
-            COALESCE(
-                SUM(pb.total_amount),
-                0
-            ) AS total_bill_amount,
+            COALESCE(SUM(pb.total_amount), 0) AS total_bill_amount,
 
-            JSON_ARRAYAGG(
-                pb.billing_id
-            ) AS billing_ids,
+            JSON_ARRAYAGG(pb.billing_id) AS billing_ids,
 
-            /* BILLS NOT YET CLOSED */
             COUNT(
                 DISTINCT CASE
                     WHEN pb.closing_id IS NULL
@@ -7227,91 +7102,104 @@ ORDER BY p.payment_date DESC;
                 CASE
                     WHEN pb.closing_id IS NULL
                     THEN pb.billing_id
+                    ELSE NULL
                 END
             ) AS open_billing_ids
 
         FROM patient_billing pb
 
+        INNER JOIN collection_bill_assignment_detail cad
+            ON cad.billing_id = pb.billing_id
+            AND cad.is_current = 1
+            AND cad.assignment_status <> 'CANCELLED'
+
+        INNER JOIN collection_bill_assignment ca
+            ON ca.assignment_id = cad.assignment_id
+            AND ca.is_current = 1
+            AND ca.assignment_status <> 'CANCELLED'
+
         LEFT JOIN co_employee_master e
-            ON e.em_id = pb.created_by
+            ON e.em_id = ca.assigned_to
 
         WHERE pb.billing_date = CURDATE()
           AND pb.billing_status <> 'CANCELLED'
 
         GROUP BY
-            pb.created_by,
+            ca.assigned_to,
             e.em_name
 
-        ORDER BY
-            e.em_name
-        `,
-            [],
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
-                }
+        ORDER BY e.em_name
+    `;
 
-                return callBack(null, results);
+        pool.query(query, (error, results) => {
+            if (error) {
+                return callBack(error);
             }
-        );
+
+            return callBack(null, results);
+        });
     },
+
 
     getCollectionDetails: (Empid, callBack) => {
-        pool.query(
-            `
-            SELECT
-    dda.assigned_to AS employee_id,
-    e.em_name AS employee_name,
+        const query = `
+        SELECT
+            ca.assigned_to AS employee_id,
+            e.em_name AS employee_name,
 
-    pb.billing_id,
-    pb.bill_no,
-    pb.patient_id,
-    pb.admission_id,
-    pb.billing_date,
+            pb.billing_id,
+            pb.bill_no,
+            pb.patient_id,
+            pb.admission_id,
+            pb.billing_date,
 
-    pb.total_amount,
-    pb.paid_amount,
-    pb.balance_amount,
+            pb.total_amount,
+            pb.paid_amount,
+            pb.balance_amount,
 
-    pb.billing_status,
-    pb.bill_pay_type,
+            pb.billing_status,
+            pb.bill_pay_type,
 
-    ddad.assignment_detail_id,
-    dda.assignment_id,
-    ddad.delivery_status,
+            cad.assignment_detail_id,
+            ca.assignment_id,
 
-    dda.assigned_at,
-    ddad.delivered_at
+            cad.assignment_status AS collection_assignment_status,
+            ca.assignment_status AS collection_status,
 
-FROM patient_billing pb
+            ca.assigned_at,
+            cad.completed_at
 
-INNER JOIN diet_delivery_assignment_detail ddad
-    ON ddad.assignment_detail_id = pb.assignment_detail_id
+        FROM patient_billing pb
 
-INNER JOIN diet_delivery_assignment dda
-    ON dda.assignment_id = ddad.assignment_id
+        INNER JOIN collection_bill_assignment_detail cad
+            ON cad.billing_id = pb.billing_id
+            AND cad.is_current = 1
+            AND cad.assignment_status <> 'CANCELLED'
 
-LEFT JOIN co_employee_master e
-    ON e.em_id = dda.assigned_to
+        INNER JOIN collection_bill_assignment ca
+            ON ca.assignment_id = cad.assignment_id
+            AND ca.is_current = 1
+            AND ca.assignment_status <> 'CANCELLED'
 
-WHERE dda.assigned_to = ?
-  AND pb.billing_date = CURDATE()
-  AND pb.billing_status <> 'CANCELLED'
+        LEFT JOIN co_employee_master e
+            ON e.em_id = ca.assigned_to
 
-ORDER BY
-    dda.assigned_to,
-    pb.billing_id;
-        `,
-            [Empid],
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
-                }
+        WHERE ca.assigned_to = ?
+          AND pb.billing_date = CURDATE()
+          AND pb.billing_status <> 'CANCELLED'
 
-                return callBack(null, results);
+        ORDER BY pb.billing_id
+    `;
+
+        pool.query(query, [Empid], (error, results) => {
+            if (error) {
+                return callBack(error);
             }
-        );
+
+            return callBack(null, results);
+        });
     },
+
 
     getEmployeePettyCashDetailsByClosingIds: (empid, closingIds, callBack) => {
 
@@ -8042,6 +7930,826 @@ ORDER BY
             }
         );
     },
-};
+
+    getBillingItemDetails: (billId, callback) => {
+        const query = `
+        SELECT
+    pbd.billing_detail_id,
+    pbd.billing_id,
+    pbd.category_id,
+    pbd.party_type_id,
+    pbd.description,
+    pbd.item_id,
+    im.item_name,
+    pbd.quantity,
+    pbd.rate,
+    pbd.gst,
+    pbd.gst_amount,
+    pbd.discount,
+    pbd.amount,
+    pbd.reference_table,
+    pbd.reference_id,
+    pbd.service_date,
+    pbd.bill_item_status,
+
+    -- Billing assignment detail
+    pb.assignment_detail_id AS billing_assignment_detail_id,
+    ddad.assignment_id,
+    ddad.canteen_order_id,
+    ddad.type_slno,
+    ddad.delivery_priority,
+    ddad.delivery_status AS item_delivery_status,
+    ddad.delivered_at,
+    ddad.delivered_by,
+    ddad.remarks AS delivery_assignment_remarks,
+
+    -- Overall delivery assignment
+    dda.assigned_to,
+    dda.assigned_by,
+    dda.assigned_at,
+    dda.pickup_time,
+    dda.completed_time,
+    dda.delivery_status AS assignment_status,
+
+    -- Latest delivery log only
+    ddl.delivery_id,
+    ddl.delivery_status AS delivery_log_status,
+    ddl.delivered_qty,
+    ddl.delivered_time,
+    ddl.delivery_remarks
+
+FROM patient_billing_detail pbd
+
+INNER JOIN patient_billing pb
+    ON pb.billing_id = pbd.billing_id
+
+LEFT JOIN item_master im
+    ON im.item_id = pbd.item_id
+
+LEFT JOIN diet_delivery_assignment_detail ddad
+    ON ddad.assignment_detail_id = pb.assignment_detail_id
+
+LEFT JOIN diet_delivery_assignment dda
+    ON dda.assignment_id = ddad.assignment_id
+
+LEFT JOIN diet_delivery_log ddl
+    ON ddl.delivery_id = (
+        SELECT ddl2.delivery_id
+        FROM diet_delivery_log ddl2
+        WHERE ddl2.canteen_order_id = ddad.canteen_order_id
+          AND ddl2.type_slno = ddad.type_slno
+          AND ddl2.source_type = 'CANTEEN_ORDER'
+        ORDER BY
+            ddl2.delivered_time DESC,
+            ddl2.delivery_id DESC
+        LIMIT 1
+    )
+
+WHERE pbd.billing_id = ?
+
+ORDER BY pbd.billing_detail_id;
+    `;
+
+        executeQuery(query, [billId], (error, results) => {
+            if (error) {
+                return callback(error);
+            }
+
+            return callback(null, results);
+        });
+    },
+
+
+    createBillingPaymentService: (data, callback) => {
+        const {
+            amount,
+            payment_mode,
+            collected_by,
+            collected_location,
+            transaction_id,
+            payments,
+            change_amount,
+            change_status,
+            received_amount,
+            remarks,
+        } = data;
+
+        if (!Array.isArray(payments) || payments.length === 0) {
+            return callback(new Error("Payment details are missing"));
+        }
+
+        const requestedAmount = Number(amount);
+
+        if (!Number.isFinite(requestedAmount) || requestedAmount <= 0) {
+            return callback(new Error("Invalid payment amount"));
+        }
+
+        if (!payment_mode) {
+            return callback(new Error("Payment mode is required"));
+        }
+
+        if (!collected_by) {
+            return callback(new Error("Collected by is required"));
+        }
+
+        if (!collected_location) {
+            return callback(new Error("Collected location is required"));
+        }
+
+        pool.getConnection((err, connection) => {
+            if (err) {
+                return callback(err);
+            }
+
+            let transactionFinished = false;
+
+            const rollback = (error) => {
+                if (transactionFinished) return;
+
+                transactionFinished = true;
+
+                connection.rollback(() => {
+                    connection.release();
+                    callback(error);
+                });
+            };
+
+            const commit = (result) => {
+                if (transactionFinished) return;
+
+                connection.commit((err) => {
+                    if (err) {
+                        transactionFinished = true;
+
+                        return connection.rollback(() => {
+                            connection.release();
+                            callback(err);
+                        });
+                    }
+
+                    transactionFinished = true;
+                    connection.release();
+                    callback(null, result);
+                });
+            };
+
+            connection.beginTransaction((err) => {
+                if (err) {
+                    connection.release();
+                    return callback(err);
+                }
+
+                try {
+                    /*
+                     * 1. Validate top-level payment amount.
+                     */
+
+                    const calculatedTotal = payments.reduce(
+                        (sum, payment) =>
+                            sum + Number(payment?.amount || 0),
+                        0
+                    );
+
+                    if (
+                        !Number.isFinite(calculatedTotal) ||
+                        Number(calculatedTotal.toFixed(2)) !==
+                        Number(requestedAmount.toFixed(2))
+                    ) {
+                        return rollback(
+                            new Error(
+                                `Payment amount mismatch. Expected ${requestedAmount}, received ${calculatedTotal}`
+                            )
+                        );
+                    }
+
+                    /*
+                     * 2. Update the assignment detail and master.
+                     *
+                     * A bill is completed only when its balance is zero.
+                     */
+
+                    const updateCollectionAssignment = (
+                        billingId,
+                        isFullyPaid,
+                        next
+                    ) => {
+                        connection.query(
+                            `
+                        UPDATE collection_bill_assignment_detail
+                        SET
+                            assignment_status = ?,
+                            completed_at = CASE
+                                WHEN ? = 'COMPLETED'
+                                    THEN CURRENT_TIMESTAMP
+                                ELSE NULL
+                            END
+                        WHERE billing_id = ?
+                          AND is_current = 1
+                          AND assignment_status IN (
+                              'ASSIGNED',
+                              'IN_PROGRESS'
+                          )
+                        `,
+                            [
+                                isFullyPaid ? "COMPLETED" : "IN_PROGRESS",
+                                isFullyPaid ? "COMPLETED" : "IN_PROGRESS",
+                                billingId,
+                            ],
+                            (err) => {
+                                if (err) {
+                                    return next(err);
+                                }
+
+                                /*
+                                 * Find assignments associated with this bill.
+                                 * The detail update above and this lookup run
+                                 * inside the same transaction.
+                                 */
+
+                                connection.query(
+                                    `
+                                SELECT DISTINCT assignment_id
+                                FROM collection_bill_assignment_detail
+                                WHERE billing_id = ?
+                                  AND is_current = 1
+                                `,
+                                    [billingId],
+                                    (err, assignmentRows) => {
+                                        if (err) {
+                                            return next(err);
+                                        }
+
+                                        const assignmentIds = [
+                                            ...new Set(
+                                                assignmentRows.map((row) =>
+                                                    Number(row.assignment_id)
+                                                )
+                                            ),
+                                        ];
+
+                                        const updateNextAssignment = (index) => {
+                                            if (index >= assignmentIds.length) {
+                                                return next(null);
+                                            }
+
+                                            const assignmentId =
+                                                assignmentIds[index];
+
+                                            connection.query(
+                                                `
+                                            UPDATE collection_bill_assignment ca
+                                            SET
+                                                ca.assignment_status = CASE
+                                                    WHEN NOT EXISTS (
+                                                        SELECT 1
+                                                        FROM collection_bill_assignment_detail cad
+                                                        WHERE cad.assignment_id =
+                                                              ca.assignment_id
+                                                          AND cad.is_current = 1
+                                                          AND cad.assignment_status IN (
+                                                              'ASSIGNED',
+                                                              'IN_PROGRESS'
+                                                          )
+                                                    )
+                                                    THEN 'COMPLETED'
+                                                    ELSE 'IN_PROGRESS'
+                                                END,
+                                                ca.completed_at = CASE
+                                                    WHEN NOT EXISTS (
+                                                        SELECT 1
+                                                        FROM collection_bill_assignment_detail cad
+                                                        WHERE cad.assignment_id =
+                                                              ca.assignment_id
+                                                          AND cad.is_current = 1
+                                                          AND cad.assignment_status IN (
+                                                              'ASSIGNED',
+                                                              'IN_PROGRESS'
+                                                          )
+                                                    )
+                                                    THEN CURRENT_TIMESTAMP
+                                                    ELSE NULL
+                                                END
+                                            WHERE ca.assignment_id = ?
+                                              AND ca.is_current = 1
+                                              AND ca.assignment_status <> 'CANCELLED'
+                                            `,
+                                                [assignmentId],
+                                                (err) => {
+                                                    if (err) {
+                                                        return next(err);
+                                                    }
+
+                                                    updateNextAssignment(index + 1);
+                                                }
+                                            );
+                                        };
+
+                                        updateNextAssignment(0);
+                                    }
+                                );
+                            }
+                        );
+                    };
+
+                    /*
+                     * 3. Process each bill sequentially.
+                     */
+
+                    const paymentResults = [];
+
+                    const processBilling = (index) => {
+                        if (index >= payments.length) {
+                            return commit({
+                                amount: Number(requestedAmount.toFixed(2)),
+                                payment_mode,
+                                payment_status: "SUCCESS",
+                                payments: paymentResults,
+                            });
+                        }
+
+                        const payment = payments[index];
+                        const billingId = Number(payment?.billing_id);
+                        const paymentAmount = Number(payment?.amount || 0);
+                        const items = Array.isArray(payment?.items)
+                            ? payment.items
+                            : [];
+
+                        if (!Number.isSafeInteger(billingId) || billingId <= 0) {
+                            return rollback(new Error("Invalid billing_id"));
+                        }
+
+                        if (
+                            !Number.isFinite(paymentAmount) ||
+                            paymentAmount <= 0
+                        ) {
+                            return rollback(
+                                new Error(
+                                    `Invalid payment amount for billing ${billingId}`
+                                )
+                            );
+                        }
+
+                        if (!items.length) {
+                            return rollback(
+                                new Error(
+                                    `Payment items missing for billing ${billingId}`
+                                )
+                            );
+                        }
+
+                        /*
+                         * Each billing detail must appear only once.
+                         */
+
+                        const detailIds = items.map((item) =>
+                            Number(item?.billing_detail_id)
+                        );
+
+                        if (
+                            detailIds.some(
+                                (id) =>
+                                    !Number.isSafeInteger(id) || id <= 0
+                            ) ||
+                            new Set(detailIds).size !== detailIds.length
+                        ) {
+                            return rollback(
+                                new Error(
+                                    `Invalid or duplicate billing detail IDs for billing ${billingId}`
+                                )
+                            );
+                        }
+
+                        /*
+                         * 4. Lock billing master.
+                         */
+
+                        connection.query(
+                            `
+                        SELECT
+                            billing_id,
+                            total_amount,
+                            paid_amount,
+                            balance_amount,
+                            billing_status
+                        FROM patient_billing
+                        WHERE billing_id = ?
+                        FOR UPDATE
+                        `,
+                            [billingId],
+                            (err, billingRows) => {
+                                if (err) {
+                                    return rollback(err);
+                                }
+
+                                if (!billingRows.length) {
+                                    return rollback(
+                                        new Error(
+                                            `Billing ${billingId} not found`
+                                        )
+                                    );
+                                }
+
+                                const billing = billingRows[0];
+
+                                if (billing.billing_status === "CANCELLED") {
+                                    return rollback(
+                                        new Error(
+                                            `Billing ${billingId} is cancelled`
+                                        )
+                                    );
+                                }
+
+                                const currentBalance = Number(
+                                    billing.balance_amount || 0
+                                );
+
+                                if (
+                                    !Number.isFinite(currentBalance) ||
+                                    currentBalance <= 0
+                                ) {
+                                    return rollback(
+                                        new Error(
+                                            `Billing ${billingId} has no outstanding balance`
+                                        )
+                                    );
+                                }
+
+                                if (
+                                    Number(paymentAmount.toFixed(2)) >
+                                    Number(currentBalance.toFixed(2))
+                                ) {
+                                    return rollback(
+                                        new Error(
+                                            `Payment amount exceeds balance for billing ${billingId}`
+                                        )
+                                    );
+                                }
+
+                                /*
+                                 * 5. Lock and validate billing details.
+                                 */
+
+                                const placeholders = detailIds
+                                    .map(() => "?")
+                                    .join(",");
+
+                                connection.query(
+                                    `
+                                SELECT
+                                    billing_detail_id,
+                                    billing_id,
+                                    amount,
+                                    bill_item_status
+                                FROM patient_billing_detail
+                                WHERE billing_detail_id IN (${placeholders})
+                                  AND billing_id = ?
+                                FOR UPDATE
+                                `,
+                                    [...detailIds, billingId],
+                                    (err, details) => {
+                                        if (err) {
+                                            return rollback(err);
+                                        }
+
+                                        if (details.length !== detailIds.length) {
+                                            return rollback(
+                                                new Error(
+                                                    `Invalid billing details for billing ${billingId}`
+                                                )
+                                            );
+                                        }
+
+                                        let itemPaymentTotal = 0;
+
+                                        for (const item of items) {
+                                            const detail = details.find(
+                                                (row) =>
+                                                    Number(row.billing_detail_id) ===
+                                                    Number(item.billing_detail_id)
+                                            );
+
+                                            if (!detail) {
+                                                return rollback(
+                                                    new Error(
+                                                        `Billing detail ${item.billing_detail_id} not found`
+                                                    )
+                                                );
+                                            }
+
+                                            if (
+                                                detail.bill_item_status === "PAID"
+                                            ) {
+                                                return rollback(
+                                                    new Error(
+                                                        `Billing detail ${item.billing_detail_id} is already paid`
+                                                    )
+                                                );
+                                            }
+
+                                            const paidAmount = Number(
+                                                item?.paid_amount
+                                            );
+                                            const detailAmount = Number(
+                                                detail.amount || 0
+                                            );
+
+                                            if (
+                                                !Number.isFinite(paidAmount) ||
+                                                paidAmount <= 0
+                                            ) {
+                                                return rollback(
+                                                    new Error(
+                                                        `Invalid paid amount for billing detail ${item.billing_detail_id}`
+                                                    )
+                                                );
+                                            }
+
+                                            if (
+                                                Number(paidAmount.toFixed(2)) >
+                                                Number(detailAmount.toFixed(2))
+                                            ) {
+                                                return rollback(
+                                                    new Error(
+                                                        `Paid amount exceeds billing detail amount for ${item.billing_detail_id}`
+                                                    )
+                                                );
+                                            }
+
+                                            itemPaymentTotal += paidAmount;
+                                        }
+
+                                        /*
+                                         * 6. Validate bill amount against items.
+                                         */
+
+                                        if (
+                                            Number(itemPaymentTotal.toFixed(2)) !==
+                                            Number(paymentAmount.toFixed(2))
+                                        ) {
+                                            return rollback(
+                                                new Error(
+                                                    `Item payment total does not match billing ${billingId} payment amount`
+                                                )
+                                            );
+                                        }
+
+                                        /*
+                                         * 7. Insert payment master.
+                                         */
+
+                                        connection.query(
+                                            `
+                                        INSERT INTO patient_bill_payment
+                                        (
+                                            billing_id,
+                                            amount,
+                                            payment_mode,
+                                            collected_by,
+                                            collected_location,
+                                            received_amount,
+                                            change_amount,
+                                            transaction_id,
+                                            remarks,
+                                            change_status,
+                                            payment_status
+                                        )
+                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'SUCCESS')
+                                        `,
+                                            [
+                                                billingId,
+                                                paymentAmount,
+                                                payment_mode,
+                                                collected_by,
+                                                collected_location,
+                                                received_amount ?? null,
+                                                change_amount ?? null,
+                                                transaction_id || null,
+                                                remarks ?? null,
+                                                change_status ?? null,
+                                            ],
+                                            (err, paymentResult) => {
+                                                if (err) {
+                                                    return rollback(err);
+                                                }
+
+                                                const paymentId =
+                                                    paymentResult.insertId;
+
+                                                /*
+                                                 * 8. Insert payment details.
+                                                 */
+
+                                                const processItem = (itemIndex) => {
+                                                    if (itemIndex >= items.length) {
+                                                        return updateBillingMaster();
+                                                    }
+
+                                                    const item = items[itemIndex];
+                                                    const paidAmount = Number(
+                                                        item.paid_amount
+                                                    );
+
+                                                    const detail = details.find(
+                                                        (row) =>
+                                                            Number(
+                                                                row.billing_detail_id
+                                                            ) ===
+                                                            Number(
+                                                                item.billing_detail_id
+                                                            )
+                                                    );
+
+                                                    const detailAmount = Number(
+                                                        detail.amount || 0
+                                                    );
+
+                                                    connection.query(
+                                                        `
+                                                    INSERT INTO patient_bill_payment_detail
+                                                    (
+                                                        payment_id,
+                                                        billing_detail_id,
+                                                        paid_amount
+                                                    )
+                                                    VALUES (?, ?, ?)
+                                                    `,
+                                                        [
+                                                            paymentId,
+                                                            item.billing_detail_id,
+                                                            paidAmount,
+                                                        ],
+                                                        (err) => {
+                                                            if (err) {
+                                                                return rollback(err);
+                                                            }
+
+                                                            /*
+                                                             * Mark the detail paid
+                                                             * only if its full amount
+                                                             * has been paid.
+                                                             */
+
+                                                            if (
+                                                                Number(
+                                                                    paidAmount.toFixed(2)
+                                                                ) ===
+                                                                Number(
+                                                                    detailAmount.toFixed(2)
+                                                                )
+                                                            ) {
+                                                                connection.query(
+                                                                    `
+                                                                UPDATE patient_billing_detail
+                                                                SET bill_item_status = 'PAID'
+                                                                WHERE billing_detail_id = ?
+                                                                  AND billing_id = ?
+                                                                `,
+                                                                    [
+                                                                        item.billing_detail_id,
+                                                                        billingId,
+                                                                    ],
+                                                                    (err) => {
+                                                                        if (err) {
+                                                                            return rollback(err);
+                                                                        }
+
+                                                                        processItem(
+                                                                            itemIndex + 1
+                                                                        );
+                                                                    }
+                                                                );
+                                                            } else {
+                                                                processItem(
+                                                                    itemIndex + 1
+                                                                );
+                                                            }
+                                                        }
+                                                    );
+                                                };
+
+                                                /*
+                                                 * 9. Update billing master.
+                                                 */
+
+                                                const updateBillingMaster = () => {
+                                                    const newPaidAmount =
+                                                        Number(
+                                                            (
+                                                                Number(
+                                                                    billing.paid_amount || 0
+                                                                ) + paymentAmount
+                                                            ).toFixed(2)
+                                                        );
+
+                                                    const newBalance = Number(
+                                                        (
+                                                            Number(
+                                                                billing.total_amount || 0
+                                                            ) - newPaidAmount
+                                                        ).toFixed(2)
+                                                    );
+
+                                                    const safeBalance = Math.max(
+                                                        0,
+                                                        newBalance
+                                                    );
+
+                                                    const billingStatus =
+                                                        safeBalance <= 0
+                                                            ? "PAID"
+                                                            : "PARTIAL";
+
+                                                    connection.query(
+                                                        `
+                                                    UPDATE patient_billing
+                                                    SET
+                                                        paid_amount = ?,
+                                                        balance_amount = ?,
+                                                        billing_status = ?,
+                                                        is_settled = ?,
+                                                        settled_id = ?,
+                                                        updated_by = ?,
+                                                        updated_at = CURRENT_TIMESTAMP
+                                                    WHERE billing_id = ?
+                                                    `,
+                                                        [
+                                                            newPaidAmount,
+                                                            safeBalance,
+                                                            billingStatus,
+                                                            safeBalance <= 0 ? "Y" : "N",
+                                                            safeBalance <= 0
+                                                                ? paymentId
+                                                                : null,
+                                                            collected_by,
+                                                            billingId,
+                                                        ],
+                                                        (err) => {
+                                                            if (err) {
+                                                                return rollback(err);
+                                                            }
+
+                                                            /*
+                                                             * 10. Update collection
+                                                             * assignment detail/master.
+                                                             */
+
+                                                            updateCollectionAssignment(
+                                                                billingId,
+                                                                safeBalance <= 0,
+                                                                (err) => {
+                                                                    if (err) {
+                                                                        return rollback(err);
+                                                                    }
+
+                                                                    paymentResults.push({
+                                                                        billing_id: billingId,
+                                                                        payment_id: paymentId,
+                                                                        amount: paymentAmount,
+                                                                        paid_amount: newPaidAmount,
+                                                                        balance_amount: safeBalance,
+                                                                        billing_status: billingStatus,
+                                                                        collection_status:
+                                                                            safeBalance <= 0
+                                                                                ? "COMPLETED"
+                                                                                : "IN_PROGRESS",
+                                                                    });
+
+                                                                    processBilling(
+                                                                        index + 1
+                                                                    );
+                                                                }
+                                                            );
+                                                        }
+                                                    );
+                                                };
+
+                                                processItem(0);
+                                            }
+                                        );
+                                    }
+                                );
+                            }
+                        );
+                    };
+
+                    processBilling(0);
+                } catch (error) {
+                    rollback(error);
+                }
+            });
+        },
+        )
+    },
+}
+
+
+
+
+
+
+
+
+
+
 
 

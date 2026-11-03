@@ -16,7 +16,11 @@ const {
     PatientLastWeekOrders,
     UpdateAllQuantitiesService,
     getBatchItemDetail,
-    UpdateItemQuantity
+    UpdateItemQuantity,
+    UpdateCanteenOrderStatus,
+    insertCanteenUrgentItems,
+    CancelOrderEmergency,
+    AcknowledgeOrderEmergency
 } = require('./canteenorder.service');
 
 module.exports = {
@@ -31,7 +35,13 @@ module.exports = {
             });
         }
 
-        createOrder(order, items, (err, result) => {
+
+        const urgentItems = order?.urgentItems || [];
+
+   
+
+
+        createOrder(order, items, urgentItems, (err, result) => {
             if (err) return res.status(200).json({ success: 0, message: err });
 
             req.io.emit("newCanteenOrder", {
@@ -270,25 +280,136 @@ module.exports = {
     },
 
 
-    addItemsToExistingOrder: (req, res) => {
+    // addItemsToExistingOrder: (req, res) => {
 
-        const { canteen_order_id, itemDetail, isExtra, patient_id, created_by, order_status } = req.body;
+    //     const { canteen_order_id, itemDetail, isExtra, patient_id, created_by, order_status, remarks, urgentItems = [], } = req.body;
+
+    //     if (!canteen_order_id) {
+    //         return res.status(200).json({
+    //             success: 0,
+    //             message: "Order ID Missing"
+    //         });
+    //     };
+
+    //     if (!Array.isArray(itemDetail) || !itemDetail?.length) {
+    //         return res.status(200).json({
+    //             success: 0,
+    //             message: "No Items to Add"
+    //         });
+    //     };
+
+
+    //     const values = itemDetail.map(item => ([
+    //         canteen_order_id,
+    //         item.item_id,
+    //         item.qty,
+    //         item.price,
+    //         item.gst,
+    //         item.type_slno,
+    //         item.gst_amount,
+    //         item.patient_diet_id
+    //     ]));
+
+    //     //  MAP VALUES HERE
+    //     const mappedValues = itemDetail.map(item => ([
+    //         patient_id,
+    //         item.item_id,
+    //         item.qty,
+    //         order_status || 'PENDING',
+    //         item.price,
+    //         item.gst,
+    //         item.gst_amount,
+    //         created_by
+    //     ]));
+
+    //     const insertItems = () => {
+    //         insertExtraOrderItems(values, (err, results) => {
+    //             if (err) {
+    //                 return res.status(200).json({
+    //                     success: 0,
+    //                     message: err
+    //                 });
+    //             }
+
+
+    //             if (isExtra) {
+    //                 insertExtraOrder(mappedValues, (err) => {
+    //                     if (err) {
+    //                         return res.status(200).json({
+    //                             success: 0,
+    //                             message: err
+    //                         });
+    //                     }
+
+    //                     return res.status(200).json({
+    //                         success: 1,
+    //                         message: "Items Added Successfully",
+    //                         data: results
+    //                     });
+    //                 });
+    //             } else {
+    //                 return res.status(200).json({
+    //                     success: 1,
+    //                     message: "Items Added Successfully",
+    //                     data: results
+    //                 });
+    //             }
+    //         });
+    //     };
+
+    //     if (remarks?.trim()) {
+    //         UpdateCanteenOrderStatus(
+    //             {
+    //                 canteen_order_id,
+    //                 remarks: remarks.trim()
+    //             },
+    //             (updaterror) => {
+    //                 if (updaterror) {
+    //                     return res.status(200).json({
+    //                         success: 0,
+    //                         message: updaterror
+    //                     });
+    //                 }
+
+    //                 insertItems();
+    //             }
+    //         );
+    //     } else {
+    //         insertItems();
+    //     }
+
+    // },
+
+
+    addItemsToExistingOrder: (req, res) => {
+        const {
+            canteen_order_id,
+            itemDetail,
+            isExtra,
+            patient_id,
+            created_by,
+            order_status,
+            remarks,
+            urgentItems = [],
+        } = req.body;
 
         if (!canteen_order_id) {
             return res.status(200).json({
                 success: 0,
-                message: "Order ID Missing"
+                message: "Order ID Missing",
             });
-        };
+        }
 
-        if (!Array.isArray(itemDetail) || !itemDetail?.length) {
+        if (!Array.isArray(itemDetail) || !itemDetail.length) {
             return res.status(200).json({
                 success: 0,
-                message: "No Items to Add"
+                message: "No Items to Add",
             });
-        };
+        }
 
-        const values = itemDetail.map(item => ([
+
+
+        const values = itemDetail.map((item) => [
             canteen_order_id,
             item.item_id,
             item.qty,
@@ -296,40 +417,101 @@ module.exports = {
             item.gst,
             item.type_slno,
             item.gst_amount,
-            item.patient_diet_id
-        ]));
+            item.patient_diet_id ?? null,
+        ]);
 
-        //  MAP VALUES HERE
-        const mappedValues = itemDetail.map(item => ([
+        const mappedValues = itemDetail.map((item) => [
             patient_id,
             item.item_id,
             item.qty,
-            order_status || 'PENDING',
+            order_status || "PENDING",
             item.price,
             item.gst,
             item.gst_amount,
-            created_by
-        ]));
+            created_by,
+        ]);
 
-        insertExtraOrderItems(values, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (isExtra) {
-                insertExtraOrder(mappedValues, (err, result) => {
-                    if (err) return res.status(200).json({ success: 0, message: err });
-                });
-            }
+        const insertItems = () => {
+            insertExtraOrderItems(values, (err, results) => {
+                if (err) {
+                    return res.status(200).json({
+                        success: 0,
+                        message: err,
+                    });
+                }
 
-            return res.status(200).json({
-                success: 1,
-                message: "Items Added Successfully",
-                data: results
+                const insertUrgentItems = (callback) => {
+                    if (!urgentItems.length) {
+                        return callback(null);
+                    }
+
+                    const urgentValues = urgentItems?.map((item) => [
+                        "CANTEEN",
+                        canteen_order_id,
+                        item.item_id,
+                        "ITEM",
+                        item.emergency_reason || "Urgent canteen item",
+                        item.type_slno,
+                        created_by,
+                    ]);
+
+                    insertCanteenUrgentItems(urgentValues, callback);
+                };
+
+                insertUrgentItems((urgentError) => {
+                    if (urgentError) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: urgentError,
+                        });
+                    }
+
+                    if (isExtra) {
+                        return insertExtraOrder(mappedValues, (extraError) => {
+                            if (extraError) {
+                                return res.status(200).json({
+                                    success: 0,
+                                    message: extraError,
+                                });
+                            }
+
+                            return res.status(200).json({
+                                success: 1,
+                                message: "Items Added Successfully",
+                                data: results,
+                            });
+                        });
+                    }
+
+                    return res.status(200).json({
+                        success: 1,
+                        message: "Items Added Successfully",
+                        data: results,
+                    });
+                });
             });
-        });
+        };
+
+        if (remarks?.trim()) {
+            UpdateCanteenOrderStatus(
+                {
+                    canteen_order_id,
+                    remarks: remarks.trim(),
+                },
+                (updateError) => {
+                    if (updateError) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: updateError,
+                        });
+                    }
+
+                    insertItems();
+                }
+            );
+        } else {
+            insertItems();
+        }
     },
 
     UpdateAllQuantities: (req, res) => {
@@ -443,5 +625,85 @@ module.exports = {
             });
         });
     },
+
+    CancelOrderEmergency: (req, res) => {
+        const { emergency_id } = req.params;
+        const { cancelled_by,
+            // cancellation_reason 
+        } = req.body;
+
+        if (!emergency_id || !cancelled_by) {
+            return res.status(200).json({
+                success: 0,
+                message: "Emergency ID and cancelled_by are required",
+            });
+        }
+
+        CancelOrderEmergency(
+            emergency_id,
+            cancelled_by,
+            (err, result) => {
+                if (err) {
+                    return res.status(500).json({
+                        success: 0,
+                        message: err,
+                    });
+                }
+                return res.status(200).json({
+                    success: 1,
+                    message: "Emergency Cancelled!",
+                    data: result
+                });
+
+            }
+        );
+    },
+
+    AcknowledgeOrderEmergency: (req, res) => {
+    const { emergency_ids, acknowledged_by } = req.body;
+
+    if (
+        !Array.isArray(emergency_ids) ||
+        emergency_ids.length === 0 ||
+        !acknowledged_by
+    ) {
+        return res.status(200).json({
+            success: 0,
+            message: "Emergency IDs and acknowledged_by are required",
+        });
+    }
+
+    const ids = [...new Set(emergency_ids.map(Number))];
+
+    if (
+        ids.some(id => !Number.isSafeInteger(id) || id <= 0) ||
+        !Number.isSafeInteger(Number(acknowledged_by)) ||
+        Number(acknowledged_by) <= 0
+    ) {
+        return res.status(200).json({
+            success: 0,
+            message: "Invalid emergency IDs or acknowledged_by",
+        });
+    }
+
+    AcknowledgeOrderEmergency(
+        ids,
+        Number(acknowledged_by),
+        (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    success: 0,
+                    message: err,
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                message: "Emergency acknowledgement completed",
+                data: result,
+            });
+        }
+    );
+},
 
 };

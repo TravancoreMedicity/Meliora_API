@@ -467,89 +467,91 @@ WHERE
     getConsultationRequired: (callBack) => {
         pool.query(
             `SELECT
-    pdp.plan_id,
-    pdp.patient_id,
-    pdp.diet_type,
-    pdp.admission_id,
-    pdp.diet_id,
-    pdp.dietitian_id,
-    pdp.diet_status,
-    pdp.start_date,
-    pdp.end_date,
-    pdp.is_consultation,
-    pdp.remarks,
+                pdp.plan_id,
+                pdp.patient_id,
+                pdp.diet_type,
+                pdp.admission_id,
+                pdp.diet_id,
+                pdp.dietitian_id,
+                pdp.diet_status,
+                pdp.start_date,
+                pdp.end_date,
+                pdp.is_consultation,
+                pdp.remarks,
 
-    pda.assignment_id,
-    pda.assigned_to,
-    pda.assigned_by,
-    pda.status AS assignment_status,
-    pda.is_current,
+                pda.assignment_id,
+                pda.assigned_to,
+                pda.assigned_by,
+                pda.status AS assignment_status,
+                pda.is_current,
+                pda.remarks as dietecian_remarks,
 
-    dp.fb_ipad_slno AS dietpt_slno,
-    dp.fb_ptc_name AS patient_name,
-    dp.fb_ptc_sex AS patient_gender,
-    dp.fb_ipd_date AS admission_date,
-    dp.fb_doc_name AS doctor_name,
-    dp.fb_do_code AS doctor_code,
-    dp.fb_bd_code AS bed_code,
-    bd.fb_bdc_no,
-    pdm.diet_name,
-    pdm.calories_per_day,
-    pdm.protein_per_day,
-    pdm.description,
-    ns.fb_ns_name,
+                dp.fb_ipad_slno AS dietpt_slno,
+                dp.fb_ptc_name AS patient_name,
+                dp.fb_ptc_sex AS patient_gender,
+                dp.fb_ipd_date AS admission_date,
+                dp.fb_doc_name AS doctor_name,
+                dp.fb_do_code AS doctor_code,
+                dp.fb_bd_code AS bed_code,
+                bd.fb_bdc_no,
+                pdm.diet_name,
+                pdm.calories_per_day,
+                pdm.protein_per_day,
+                pdm.description,
+                ns.fb_ns_name,
+                ns.fb_ns_code,
 
-    cm.em_name AS dietitian_name,
+                cm.em_name AS dietitian_name,
 
-    dt.template_id
+                dt.template_id
 
-FROM patient_diet_plan pdp
+            FROM patient_diet_plan pdp
 
-LEFT JOIN patient_diet_assignment pda
-    ON pda.plan_id = pdp.plan_id
-    AND pda.is_current = 1
+            LEFT JOIN patient_diet_assignment pda
+                ON pda.plan_id = pdp.plan_id
+                AND pda.is_current = 1
 
-LEFT JOIN fb_ipadmiss dp
-    ON dp.fb_pt_no = pdp.patient_id
-    AND dp.fb_ip_no = pdp.admission_id
+            LEFT JOIN fb_ipadmiss dp
+                ON dp.fb_pt_no = pdp.patient_id
+                AND dp.fb_ip_no = pdp.admission_id
 
-LEFT JOIN patient_diet_master pdm
-    ON pdm.diet_id = pdp.diet_id
+            LEFT JOIN patient_diet_master pdm
+                ON pdm.diet_id = pdp.diet_id
 
-LEFT JOIN fb_bed bd
-    ON dp.fb_bd_code = bd.fb_bd_code
+            LEFT JOIN fb_bed bd
+                ON dp.fb_bd_code = bd.fb_bd_code
 
-LEFT JOIN fb_nurse_station_master ns
-    ON bd.fb_ns_code = ns.fb_ns_code
-    
+            LEFT JOIN fb_nurse_station_master ns
+                ON bd.fb_ns_code = ns.fb_ns_code
+                
 
-LEFT JOIN co_employee_master cm
-    ON cm.em_id = COALESCE(
-        pda.assigned_to,
-        pdp.dietitian_id
-    )
+            LEFT JOIN co_employee_master cm
+                ON cm.em_id = COALESCE(
+                    pda.assigned_to,
+                    pdp.dietitian_id
+                )
 
-LEFT JOIN diet_template dt
-    ON dt.diet_id = pdp.diet_id
-    AND dt.is_active = 1
-    AND DATE(NOW()) >= DATE(dt.effective_from)
-    AND (
-        dt.effective_to IS NULL
-        OR DATE(NOW()) <= DATE(dt.effective_to)
-    )
+            LEFT JOIN diet_template dt
+                ON dt.diet_id = pdp.diet_id
+                AND dt.is_active = 1
+                AND DATE(NOW()) >= DATE(dt.effective_from)
+                AND (
+                    dt.effective_to IS NULL
+                    OR DATE(NOW()) <= DATE(dt.effective_to)
+                )
 
-WHERE
-    pdp.is_active = 1
-    AND pdp.is_consultation = 1
-    AND pdp.diet_status = 'ACTIVE'
-    AND pdp.is_active = 1 AND pdp.diet_type = 'DIET'
-           
-    AND (
-        dp.fb_ipc_curstatus IS NULL
-        OR dp.fb_ipc_curstatus <> 'PCO'
-    )
+            WHERE
+                pdp.is_active = 1
+                AND pdp.is_consultation = 1
+                AND pdp.diet_status = 'ACTIVE'
+                AND pdp.is_active = 1 AND pdp.diet_type = 'DIET'
+                    
+                AND (
+                    dp.fb_ipc_curstatus IS NULL
+                    OR dp.fb_ipc_curstatus <> 'PCO'
+                )
 
-ORDER BY pdp.plan_id DESC`,
+            ORDER BY pdp.plan_id DESC`,
             [],
             (error, results) => {
 
@@ -1019,19 +1021,21 @@ ORDER BY
     DieticanStatus: (payload, callback) => {
         const {
             status,
-            assignment_id
+            assignment_id,
+            approvalRemarks
         } = payload;
 
         // STEP 1: mark old as not current
         const updateOldQuery = `
         UPDATE patient_diet_assignment
-        SET status = ?
+        SET status = ?,
+        remarks = ?
         WHERE assignment_id = ? 
     `;
 
         pool.query(
             updateOldQuery,
-            [status, assignment_id],
+            [status,approvalRemarks, assignment_id],
             (err, results) => {
                 if (err) return callback(err);
                 return callback(null, results);
@@ -1328,6 +1332,25 @@ WHERE bed.fb_ns_code IN (?)
             }
         );
     },
+    updatePlanRemarks: (data, callback) => {
+        const {plan_id,remarks,dietType}  = data;
 
+        // STEP 1: mark old as not current
+        const updateOldQuery = `
+        UPDATE patient_diet_plan
+        SET remarks = ?,
+        diet_id = ?
+        WHERE plan_id = ? 
+    `;
+
+        pool.query(
+            updateOldQuery,
+            [remarks,dietType,plan_id],
+            (err, results) => {
+                if (err) return callback(err);
+                return callback(null, results);
+            }
+        );
+    },
 
 };

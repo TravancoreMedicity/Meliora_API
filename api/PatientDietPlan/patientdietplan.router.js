@@ -22,7 +22,8 @@ const {
     getPatientFullDetail,
     getPlanRemarksDetails,
     getTotalIpPatientList,
-    getNewIpAdmissionDetails
+    getNewIpAdmissionDetails,
+    updatePlanRemarks
 } = require('./patientdietplan.controller');
 
 const router = require('express').Router();
@@ -76,6 +77,7 @@ router.get('/total-ip-patient', checkToken, getTotalIpPatientList)
 router.get('/new-admission', checkToken, getNewIpAdmissionDetails)
 
 
+router.post("/update-remarks", checkToken, updatePlanRemarks);
 
 
 module.exports = router;

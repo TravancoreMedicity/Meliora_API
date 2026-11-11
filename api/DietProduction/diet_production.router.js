@@ -9,7 +9,10 @@ const {
     updateBatchStatus,
     CompletedBatchStatus,
     CancelProductionBatch,
-    getAllOrderStatusDetail
+    getAllOrderStatusDetail,
+    getBatches,
+    createBatch,
+    completeBatch
 } = require('./diet_production.controller');
 
 router.post(
@@ -66,5 +69,21 @@ router.get(
     getAllOrderStatusDetail
 )
 
+router.get(
+    "/batches/:employeeId",
+    getBatches
+);
+
+
+router.post(
+    "/batches/create",
+    createBatch
+);
+
+
+router.post(
+    "/batches/complete",
+    completeBatch
+);
 
 module.exports = router;

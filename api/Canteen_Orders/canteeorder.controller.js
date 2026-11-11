@@ -20,7 +20,8 @@ const {
     UpdateCanteenOrderStatus,
     insertCanteenUrgentItems,
     CancelOrderEmergency,
-    AcknowledgeOrderEmergency
+    AcknowledgeOrderEmergency,
+    createOpenBatchOrderDetail
 } = require('./canteenorder.service');
 
 module.exports = {
@@ -38,7 +39,7 @@ module.exports = {
 
         const urgentItems = order?.urgentItems || [];
 
-   
+
 
 
         createOrder(order, items, urgentItems, (err, result) => {
@@ -660,50 +661,173 @@ module.exports = {
     },
 
     AcknowledgeOrderEmergency: (req, res) => {
-    const { emergency_ids, acknowledged_by } = req.body;
+        const { emergency_ids, acknowledged_by } = req.body;
 
-    if (
-        !Array.isArray(emergency_ids) ||
-        emergency_ids.length === 0 ||
-        !acknowledged_by
-    ) {
-        return res.status(200).json({
-            success: 0,
-            message: "Emergency IDs and acknowledged_by are required",
-        });
-    }
-
-    const ids = [...new Set(emergency_ids.map(Number))];
-
-    if (
-        ids.some(id => !Number.isSafeInteger(id) || id <= 0) ||
-        !Number.isSafeInteger(Number(acknowledged_by)) ||
-        Number(acknowledged_by) <= 0
-    ) {
-        return res.status(200).json({
-            success: 0,
-            message: "Invalid emergency IDs or acknowledged_by",
-        });
-    }
-
-    AcknowledgeOrderEmergency(
-        ids,
-        Number(acknowledged_by),
-        (err, result) => {
-            if (err) {
-                return res.status(500).json({
-                    success: 0,
-                    message: err,
-                });
-            }
-
+        if (
+            !Array.isArray(emergency_ids) ||
+            emergency_ids.length === 0 ||
+            !acknowledged_by
+        ) {
             return res.status(200).json({
-                success: 1,
-                message: "Emergency acknowledgement completed",
-                data: result,
+                success: 0,
+                message: "Emergency IDs and acknowledged_by are required",
             });
         }
-    );
-},
+
+        const ids = [...new Set(emergency_ids.map(Number))];
+
+        if (
+            ids.some(id => !Number.isSafeInteger(id) || id <= 0) ||
+            !Number.isSafeInteger(Number(acknowledged_by)) ||
+            Number(acknowledged_by) <= 0
+        ) {
+            return res.status(200).json({
+                success: 0,
+                message: "Invalid emergency IDs or acknowledged_by",
+            });
+        }
+
+        AcknowledgeOrderEmergency(
+            ids,
+            Number(acknowledged_by),
+            (err, result) => {
+                if (err) {
+                    return res.status(500).json({
+                        success: 0,
+                        message: err,
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    message: "Emergency acknowledgement completed",
+                    data: result,
+                });
+            }
+        );
+    },
+
+    createOpenBatchOrderDetail: (req, res) => {
+
+        const {
+            batchItems,
+            dietPayload,
+            canteenPayload,
+            assignDetail
+        } = req.body;
+
+        // Validate batch items
+        if (!Array.isArray(batchItems) || batchItems.length === 0) {
+            return res.status(400).json({
+                success: 0,
+                message: "Batch items are required"
+            });
+        }
+
+        // Validate diet payload
+        if (
+            !dietPayload ||
+            !Array.isArray(dietPayload.details) ||
+            dietPayload.details.length === 0
+        ) {
+            return res.status(400).json({
+                success: 0,
+                message: "Diet order details are required"
+            });
+        }
+
+
+        // Validate canteen payload
+        if (
+            !canteenPayload ||
+            !Array.isArray(canteenPayload.items) ||
+            canteenPayload.items.length === 0
+        ) {
+            return res.status(400).json({
+                success: 0,
+                message: "Canteen order details are required"
+            });
+        }
+
+        // Validate batch ID and item details
+        const invalidItem = batchItems.find(item =>
+            !item.batch_id ||
+            !item.item_id ||
+            !item.qty ||
+            Number(item.qty) <= 0
+        );
+
+        if (invalidItem) {
+            return res.status(400).json({
+                success: 0,
+                message: "Invalid batch item details"
+            });
+        }
+
+        // Extract unique batch IDs
+        const batchIds = [
+            ...new Set(batchItems.map(item => Number(item.batch_id)))
+        ];
+
+
+        // Check that every canteen item has a batch ID
+        if (canteenPayload.items.some(item => !item.batch_id)) {
+            return res.status(400).json({
+                success: 0,
+                message: "Batch ID is missing from canteen items"
+            });
+        };
+
+
+
+        // Validate assignment details
+        if (
+            !assignDetail ||
+            !assignDetail.assigned_to ||
+            !assignDetail.assigned_by
+        ) {
+            return res.status(400).json({
+                success: 0,
+                message: "Delivery assignment details are required"
+            });
+        }
+
+
+        // Validate assignment IDs
+        if (
+            !Number.isInteger(Number(assignDetail.assigned_to)) ||
+            !Number.isInteger(Number(assignDetail.assigned_by))
+        ) {
+            return res.status(400).json({
+                success: 0,
+                message: "Invalid delivery assignment employee"
+            });
+        }
+
+        createOpenBatchOrderDetail(
+            {
+                batchItems,
+                dietPayload,
+                canteenPayload,
+                assignDetail,
+                batchIds
+            },
+            (err, result) => {
+                if (err) {
+                    return res.status(500).json({
+                        success: 0,
+                        message: err.message || err
+                    });
+                }
+                return res.status(200).json({
+                    success: 1,
+                    message: "Direct delivery order created successfully",
+                    data: result
+                });
+
+            }
+        );
+    },
+
 
 };

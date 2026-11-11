@@ -776,9 +776,84 @@ module.exports = {
             }
         );
     },
-
-
-
-
+    getBatches: (employeeId, callback) => {
+        pool.query(
+            `
+            SELECT
+            b.batch_id,
+            b.production_date,
+            b.type_id,
+            b.batch_status,
+            dt.type_desc,
+            b.batch_mode,
+            b.kitchen_status,
+            b.is_active
+        FROM diet_production_batch b
+        LEFT JOIN diet_type dt
+            ON dt.type_slno = b.type_id
+        WHERE b.processed_by = ?
+        AND b.batch_mode = 'DIRECT_DELIVERY'
+        AND b.is_active = 1
+        ORDER BY b.batch_id DESC;
+            `,
+            [employeeId],
+            (err, results) => {
+                if (err) return callback(err);
+                return callback(null, results);
+            }
+        )
+    },
+    createBatch: (data, callback) => {
+        pool.query(
+            `
+            INSERT INTO diet_production_batch (
+                production_date,
+                type_id,
+                remarks,
+                batch_mode,
+                kitchen_status,
+                batch_status,
+                is_active,
+                processed_by,
+                processed_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)
+            `,
+            [
+                data.production_date,
+                data.type_id,
+                data.remarks || null,
+                data.batch_mode,
+                data.kitchen_status,
+                data.batch_status,
+                data.processed_by,
+                data.processed_at
+            ],
+            (err, result) => {
+                if (err) return callback(err);
+                return callback(null, result);
+            }
+        );
+    },
+    completeBatch: (data, callback) => {
+        pool.query(
+            `
+            UPDATE diet_production_batch
+            SET
+                batch_status = 'COMPLETED'
+            WHERE batch_id = ?
+                AND batch_mode = 'DIRECT_DELIVERY'
+                AND is_active = 1
+                AND batch_status != 'COMPLETED'
+            `,
+            [
+                data.batch_id
+            ],
+            (err, result) => {
+                if (err) return callback(err);
+                return callback(null, result);
+            }
+        );
+    },
 
 };

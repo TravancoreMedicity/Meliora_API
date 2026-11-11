@@ -4,152 +4,227 @@ const { executeQuery } = require('../Canteen_Orders/Helper');
 module.exports = {
 
 
-    insertNewDietOrder: (order, details, canteenorder, canteenorderdetail, isPending, callback) => {
+    // insertNewDietOrder: (
+    //     order,
+    //     details,
+    //     canteenorder,
+    //     canteenorderdetail,
+    //     isPending,
+    //     callback) => {
 
-        // pool.getConnection((err, conn) => {
-        //     if (err) return callback(err);
+    //     pool.getConnection((err, conn) => {
+    //         if (err) return callback(err);
 
-        //     conn.beginTransaction(err => {
-        //         if (err) {
-        //             conn.release();
-        //             return callback(err);
-        //         }
+    //         conn.beginTransaction(err => {
+    //             if (err) {
+    //                 conn.release();
+    //                 return callback(err);
+    //             }
 
-        //         // 1 INSERT DIET ORDER
+    //             // Step 1: Insert diet_order
+    //             const insertDietOrderQuery = `
+    //             INSERT INTO diet_order 
+    //             (patient_id, plan_id, order_date, nursing_station_id, room_id, order_status, collected_by, diet_order_remark )
+    //             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    //         `;
 
-        //         const insertDietOrderQuery = `
-        //         INSERT INTO diet_order 
-        //         (patient_id, plan_id, order_date, nursing_station_id, room_id, order_status, collected_by)
-        //         VALUES (?, ?, ?, ?, ?, ?, ?)
-        //     `;
+    //             const dietValues = [
+    //                 order.patient_id,
+    //                 order.plan_id,
+    //                 order.order_date,
+    //                 order.nursing_station_id,
+    //                 order.room_id,
+    //                 order.order_status,
+    //                 order.collected_by,
+    //                 order.remarks
+    //             ];
 
-        //         const dietValues = [
-        //             order.patient_id,
-        //             order.plan_id,
-        //             order.order_date,
-        //             order.nursing_station_id,
-        //             order.room_id,
-        //             order.order_status,
-        //             order.collected_by
-        //         ];
+    //             conn.query(insertDietOrderQuery, dietValues, (err, result) => {
+    //                 if (err) {
+    //                     return conn.rollback(() => {
+    //                         conn.release();
+    //                         callback(err);
+    //                     });
+    //                 }
 
-        //         conn.query(insertDietOrderQuery, dietValues, (err, result) => {
-        //             if (err) {
-        //                 return conn.rollback(() => {
-        //                     conn.release();
-        //                     callback(err);
-        //                 });
-        //             }
+    //                 const order_id = result.insertId;
 
-        //             const order_id = result.insertId;
-        //             // 2 INSERT DIET DETAILS
-        //             const dietDetailQuery = `
-        //             INSERT INTO diet_order_detail
-        //             (order_id, diet_type_id, item_id, quantity, unit_id, is_substitute)
-        //             VALUES ?
-        //         `;
+    //                 // Step 2: Insert diet_order_detail
+    //                 const dietDetailQuery = `
+    //                 INSERT INTO diet_order_detail
+    //                 (order_id, diet_type_id, item_id, quantity, unit_id, is_substitute,patient_diet_id)
+    //                 VALUES ?
+    //             `;
 
-        //             const dietDetailValues = details.map(item => [
-        //                 order_id,
-        //                 item.diet_type_id,
-        //                 item.item_id,
-        //                 item.quantity,
-        //                 item.unit_id,
-        //                 item.is_substitute
-        //             ]);
+    //                 const dietDetailValues = details.map(item => [
+    //                     order_id,
+    //                     item.diet_type_id,
+    //                     item.item_id,
+    //                     item.quantity,
+    //                     item.unit_id,
+    //                     item.is_substitute,
+    //                     item.patient_diet_id,
 
-        //             conn.query(dietDetailQuery, [dietDetailValues], (err2) => {
-        //                 if (err2) {
-        //                     return conn.rollback(() => {
-        //                         conn.release();
-        //                         callback(err2);
-        //                     });
-        //                 }
-        //                 if (isPending === false) {
-        //                     const insertCanteenQuery = `
-        //                 INSERT INTO canteen_order
-        //                 (admission_id, party_type_id, nursing_station_id, room_id, order_status, created_by)
-        //                 VALUES (?, ?, ?, ?, ?, ?)
-        //             `;
+    //                 ]);
 
-        //                     const canteenValues = [
-        //                         canteenorder.admission_id,
-        //                         canteenorder.party_type_id,
-        //                         canteenorder.nursing_station_id,
-        //                         canteenorder.room_id,
-        //                         canteenorder.order_status,
-        //                         canteenorder.created_by
-        //                     ];
+    //                 conn.query(dietDetailQuery, [dietDetailValues], (err2) => {
+    //                     if (err2) {
+    //                         return conn.rollback(() => {
+    //                             conn.release();
+    //                             callback(err2);
+    //                         });
+    //                     }
 
-        //                     conn.query(insertCanteenQuery, canteenValues, (err3, result3) => {
-        //                         if (err3) {
-        //                             return conn.rollback(() => {
-        //                                 conn.release();
-        //                                 callback(err3);
-        //                             });
-        //                         }
+    //                     // Step 3: If no existing canteen order, create new one
+    //                     if (isPending === false) {
 
-        //                         const canteen_order_id = result3.insertId;
+    //                         const insertCanteenQuery = `
+    //                         INSERT INTO canteen_order
+    //                         (admission_id, party_type_id, nursing_station_id, room_id, order_status, created_by, order_remarks)
+    //                         VALUES (?, ?, ?, ?, ?, ?, ?)
+    //                     `;
 
-        //                         //  INSERT CANTEEN ITEMS
-        //                         const canteenItemQuery = `
-        //                     INSERT INTO canteen_order_item
-        //                     (canteen_order_id, item_id, quantity, price,gst,gst_amount)
-        //                     VALUES ?
-        //                 `;
+    //                         const canteenValues = [
+    //                             canteenorder.admission_id,
+    //                             canteenorder.party_type_id,
+    //                             canteenorder.nursing_station_id,
+    //                             canteenorder.room_id,
+    //                             canteenorder.order_status,
+    //                             canteenorder.created_by,
+    //                             canteenorder.remarks
+    //                         ];
 
-        //                         const canteenItemValues = canteenorderdetail.map(item => [
-        //                             canteen_order_id,
-        //                             item.item_id,
-        //                             item.quantity,
-        //                             item.price,
-        //                             item.gst,
-        //                             item.gst_amount
-        //                         ]);
+    //                         conn.query(insertCanteenQuery, canteenValues, (err3, result3) => {
+    //                             if (err3) {
+    //                                 return conn.rollback(() => {
+    //                                     conn.release();
+    //                                     callback(err3);
+    //                                 });
+    //                             }
 
-        //                         conn.query(canteenItemQuery, [canteenItemValues], (err4) => {
-        //                             if (err4) {
-        //                                 return conn.rollback(() => {
-        //                                     conn.release();
-        //                                     callback(err4);
-        //                                 });
-        //                             }
-        //                             // 5 FINAL COMMIT
-        //                             conn.commit(err5 => {
-        //                                 conn.release();
+    //                             const canteen_order_id = result3.insertId;
 
-        //                                 if (err5) {
-        //                                     return conn.rollback(() => {
-        //                                         callback(err5);
-        //                                     });
-        //                                 }
+    //                             // Step 4: Insert canteen items
+    //                             const canteenItemQuery = `
+    //                             INSERT INTO canteen_order_item
+    //                             (canteen_order_id, item_id, quantity, price, gst,type_slno, gst_amount,patient_diet_id)
+    //                             VALUES ?
+    //                         `;
 
-        //                                 return callback(null, order_id);
-        //                             });
-        //                         });
-        //                     });
-        //                 }
-        //                 // 3 INSERT CANTEEN ORDER
+    //                             const canteenItemValues = canteenorderdetail.map(item => [
+    //                                 canteen_order_id,
+    //                                 item.item_id,
+    //                                 item.qty,
+    //                                 item.price,
+    //                                 item.gst,
+    //                                 item.type_slno,
+    //                                 item.gst_amount,
+    //                                 item.patient_diet_id
+    //                             ]);
 
-        //             });
-        //         });
-        //     });
-        // });
+    //                             conn.query(canteenItemQuery, [canteenItemValues], (err4) => {
+    //                                 if (err4) {
+    //                                     return conn.rollback(() => {
+    //                                         conn.release();
+    //                                         callback(err4);
+    //                                     });
+    //                                 }
 
+    //                                 // Step 5: Commit transaction
+    //                                 conn.commit(err5 => {
+    //                                     conn.release();
+    //                                     if (err5) return callback(err5);
+    //                                     return callback(null, order_id);
+    //                                 });
+    //                             });
+    //                         });
+
+    //                     } else {
+
+    //                         // Step 3 (alternative): Only diet, no canteen creation
+    //                         conn.commit(err3 => {
+    //                             conn.release();
+    //                             if (err3) {
+    //                                 return conn.rollback(() => callback(err3));
+    //                             }
+    //                             return callback(null, order_id);
+    //                         });
+    //                     }
+    //                 });
+    //             });
+    //         });
+    //     });
+    // },
+
+    insertNewDietOrder: (
+        order,
+        details,
+        canteenorder,
+        canteenorderdetail,
+        isPending,
+        urgentItems = [],
+        callback
+    ) => {
         pool.getConnection((err, conn) => {
             if (err) return callback(err);
 
-            conn.beginTransaction(err => {
+            conn.beginTransaction((err) => {
                 if (err) {
                     conn.release();
                     return callback(err);
                 }
 
+                const rollback = (error) => {
+                    conn.rollback(() => {
+                        conn.release();
+                        callback(error);
+                    });
+                };
+
+                const insertEmergencyItems = (orderType, orderId, createdBy, next) => {
+                    if (!urgentItems?.length) {
+                        return next(null);
+                    }
+
+                    const emergencyQuery = `
+                    INSERT INTO order_emergency (
+                        order_type,
+                        order_id,
+                        item_id,
+                        emergency_level,
+                        emergency_reason,
+                        type_slno,
+                        created_by
+                    )
+                    VALUES ?
+                `;
+
+                    const emergencyValues = urgentItems.map((item) => [
+                        orderType,
+                        orderId,
+                        item.item_id,
+                        "ITEM",
+                        item.emergency_reason || "Urgent item",
+                        item.type_slno,
+                        createdBy,
+                    ]);
+
+                    conn.query(emergencyQuery, [emergencyValues], next);
+                };
+
                 // Step 1: Insert diet_order
                 const insertDietOrderQuery = `
-                INSERT INTO diet_order 
-                (patient_id, plan_id, order_date, nursing_station_id, room_id, order_status, collected_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO diet_order (
+                    patient_id,
+                    plan_id,
+                    order_date,
+                    nursing_station_id,
+                    room_id,
+                    order_status,
+                    collected_by,
+                    diet_order_remark
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             `;
 
                 const dietValues = [
@@ -159,174 +234,306 @@ module.exports = {
                     order.nursing_station_id,
                     order.room_id,
                     order.order_status,
-                    order.collected_by
+                    order.collected_by,
+                    order.remarks || null,
                 ];
 
                 conn.query(insertDietOrderQuery, dietValues, (err, result) => {
-                    if (err) {
-                        return conn.rollback(() => {
-                            conn.release();
-                            callback(err);
-                        });
-                    }
+                    if (err) return rollback(err);
 
                     const order_id = result.insertId;
 
                     // Step 2: Insert diet_order_detail
                     const dietDetailQuery = `
-                    INSERT INTO diet_order_detail
-                    (order_id, diet_type_id, item_id, quantity, unit_id, is_substitute,patient_diet_id)
+                    INSERT INTO diet_order_detail (
+                        order_id,
+                        diet_type_id,
+                        item_id,
+                        quantity,
+                        unit_id,
+                        is_substitute,
+                        patient_diet_id
+                    )
                     VALUES ?
                 `;
 
-                    const dietDetailValues = details.map(item => [
+                    const dietDetailValues = details.map((item) => [
                         order_id,
                         item.diet_type_id,
                         item.item_id,
                         item.quantity,
                         item.unit_id,
                         item.is_substitute,
-                        item.patient_diet_id,
-
+                        item.patient_diet_id ?? null,
                     ]);
 
                     conn.query(dietDetailQuery, [dietDetailValues], (err2) => {
-                        if (err2) {
-                            return conn.rollback(() => {
-                                conn.release();
-                                callback(err2);
-                            });
-                        }
+                        if (err2) return rollback(err2);
 
-                        // Step 3: If no existing canteen order, create new one
-                        if (isPending === false) {
+                        // Step 3: Insert DIET emergency records
+                        insertEmergencyItems(
+                            "DIET",
+                            order_id,
+                            order.collected_by,
+                            (emergencyError) => {
+                                if (emergencyError) return rollback(emergencyError);
 
-                            const insertCanteenQuery = `
-                            INSERT INTO canteen_order
-                            (admission_id, party_type_id, nursing_station_id, room_id, order_status, created_by)
-                            VALUES (?, ?, ?, ?, ?, ?)
-                        `;
+                                // Step 4: Create a new canteen order if needed
+                                if (isPending === false) {
+                                    const insertCanteenQuery = `
+                                    INSERT INTO canteen_order (
+                                        admission_id,
+                                        party_type_id,
+                                        nursing_station_id,
+                                        room_id,
+                                        order_status,
+                                        created_by,
+                                        order_remarks
+                                    )
+                                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                                `;
 
-                            const canteenValues = [
-                                canteenorder.admission_id,
-                                canteenorder.party_type_id,
-                                canteenorder.nursing_station_id,
-                                canteenorder.room_id,
-                                canteenorder.order_status,
-                                canteenorder.created_by
-                            ];
+                                    const canteenValues = [
+                                        canteenorder.admission_id,
+                                        canteenorder.party_type_id,
+                                        canteenorder.nursing_station_id,
+                                        canteenorder.room_id,
+                                        canteenorder.order_status || "PENDING",
+                                        canteenorder.created_by,
+                                        canteenorder.remarks || null,
+                                    ];
 
-                            conn.query(insertCanteenQuery, canteenValues, (err3, result3) => {
-                                if (err3) {
-                                    return conn.rollback(() => {
+                                    conn.query(
+                                        insertCanteenQuery,
+                                        canteenValues,
+                                        (err3, result3) => {
+                                            if (err3) return rollback(err3);
+
+                                            const canteen_order_id = result3.insertId;
+
+                                            // Step 5: Insert canteen items
+                                            const canteenItemQuery = `
+                                            INSERT INTO canteen_order_item (
+                                                canteen_order_id,
+                                                item_id,
+                                                quantity,
+                                                price,
+                                                gst,
+                                                type_slno,
+                                                gst_amount,
+                                                patient_diet_id
+                                            )
+                                            VALUES ?
+                                        `;
+
+                                            const canteenItemValues = canteenorderdetail.map(
+                                                (item) => [
+                                                    canteen_order_id,
+                                                    item.item_id,
+                                                    item.qty,
+                                                    item.price,
+                                                    item.gst,
+                                                    item.type_slno,
+                                                    item.gst_amount,
+                                                    item.patient_diet_id ?? null,
+                                                ]
+                                            );
+
+                                            conn.query(
+                                                canteenItemQuery,
+                                                [canteenItemValues],
+                                                (err4) => {
+                                                    if (err4) return rollback(err4);
+                                                    // Step 7: Commit transaction (DIET emergency records only)
+                                                    conn.commit((err5) => {
+                                                        if (err5) return rollback(err5);
+
+                                                        conn.release();
+                                                        return callback(null, order_id);
+                                                    });
+
+                                                }
+                                            );
+                                        }
+                                    );
+                                } else {
+                                    // Existing canteen order: only the new DIET order is created.
+                                    conn.commit((err3) => {
+                                        if (err3) return rollback(err3);
+
                                         conn.release();
-                                        callback(err3);
-                                    });
-                                }
-
-                                const canteen_order_id = result3.insertId;
-
-                                // Step 4: Insert canteen items
-                                const canteenItemQuery = `
-                                INSERT INTO canteen_order_item
-                                (canteen_order_id, item_id, quantity, price, gst,type_slno, gst_amount,patient_diet_id)
-                                VALUES ?
-                            `;
-
-                                const canteenItemValues = canteenorderdetail.map(item => [
-                                    canteen_order_id,
-                                    item.item_id,
-                                    item.qty,
-                                    item.price,
-                                    item.gst,
-                                    item.type_slno,
-                                    item.gst_amount,
-                                    item.patient_diet_id
-                                ]);
-
-                                conn.query(canteenItemQuery, [canteenItemValues], (err4) => {
-                                    if (err4) {
-                                        return conn.rollback(() => {
-                                            conn.release();
-                                            callback(err4);
-                                        });
-                                    }
-
-                                    // Step 5: Commit transaction
-                                    conn.commit(err5 => {
-                                        conn.release();
-                                        if (err5) return callback(err5);
                                         return callback(null, order_id);
                                     });
-                                });
-                            });
-
-                        } else {
-
-                            // Step 3 (alternative): Only diet, no canteen creation
-                            conn.commit(err3 => {
-                                conn.release();
-                                if (err3) {
-                                    return conn.rollback(() => callback(err3));
                                 }
-                                return callback(null, order_id);
-                            });
-                        }
+                            }
+                        );
                     });
                 });
             });
         });
     },
 
+    // getOrderByPatient: (patient_id, callback) => {
+    //     const query = `
+    //             SELECT 
+    //                 o.order_id,
+    //                 o.order_date,
+    //                 o.collected_time,
+    //                 o.order_status,
+
+    //                 d.diet_type_id,
+    //                 d.order_detail_id,
+    //                 dt.type_desc AS diet_type_name,  
+
+    //                 d.item_id,
+    //                 im.item_name,
+
+    //                 d.quantity,
+    //                 um.unit_code
+
+    //             FROM diet_order o
+
+    //             LEFT JOIN (
+    //                 SELECT order_id
+    //                 FROM diet_order
+    //                 WHERE patient_id = ?
+    //                 AND order_status <> 'PENDING'
+    //                 ORDER BY collected_time DESC
+    //                 LIMIT 5
+    //             ) latest ON o.order_id = latest.order_id
+
+    //             LEFT JOIN diet_order_detail d 
+    //                 ON o.order_id = d.order_id
+
+    //             LEFT JOIN item_master im 
+    //                 ON d.item_id = im.item_id
+
+    //             LEFT JOIN unit_master um 
+    //                 ON d.unit_id = um.unit_id
+
+    //             LEFT JOIN diet_type dt 
+    //                 ON d.diet_type_id = dt.type_slno
+
+    //             WHERE o.patient_id = ?
+    //             AND (
+    //                 o.order_status = 'PENDING'
+    //                 OR latest.order_id IS NOT NULL
+    //             )
+    //             ORDER BY 
+    //                 (o.order_status = 'PENDING') DESC,   
+    //                 o.collected_time DESC
+    // `;
+
+    //     pool.query(query, [patient_id, patient_id], (err, results) => {
+    //         if (err) return callback(err);
+
+    //         return callback(null, results);
+    //     });
+    // },
+
+
     getOrderByPatient: (patient_id, callback) => {
         const query = `
-                SELECT 
-                    o.order_id,
-                    o.order_date,
-                    o.collected_time,
-                    o.order_status,
+        SELECT 
+            o.order_id,
+            o.order_date,
+            o.collected_time,
+            o.order_status,
+            o.diet_order_remark,
 
-                    d.diet_type_id,
-                    d.order_detail_id,
-                    dt.type_desc AS diet_type_name,  
+            d.diet_type_id,
+            d.order_detail_id,
+            dt.type_desc AS diet_type_name,  
 
-                    d.item_id,
-                    im.item_name,
+            d.item_id,
+            im.item_name,
 
-                    d.quantity,
-                    um.unit_code
+            d.quantity,
+            um.unit_code,
 
-                FROM diet_order o
-
-                LEFT JOIN (
-                    SELECT order_id
-                    FROM diet_order
-                    WHERE patient_id = ?
-                    AND order_status <> 'PENDING'
-                    ORDER BY collected_time DESC
-                    LIMIT 5
-                ) latest ON o.order_id = latest.order_id
-
-                LEFT JOIN diet_order_detail d 
-                    ON o.order_id = d.order_id
-
-                LEFT JOIN item_master im 
-                    ON d.item_id = im.item_id
-
-                LEFT JOIN unit_master um 
-                    ON d.unit_id = um.unit_id
-
-                LEFT JOIN diet_type dt 
-                    ON d.diet_type_id = dt.type_slno
-
-                WHERE o.patient_id = ?
-                AND (
-                    o.order_status = 'PENDING'
-                    OR latest.order_id IS NOT NULL
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM order_emergency oe
+                    WHERE oe.order_type = 'DIET'
+                    AND oe.order_id = o.order_id
+                    AND (
+                        oe.emergency_level = 'ORDER'
+                        OR (
+                            oe.emergency_level = 'ITEM'
+                            AND oe.item_id = d.item_id
+                        )
+                    )
+                    AND oe.emergency_status <> 'CANCELLED'
                 )
-                ORDER BY 
-                    (o.order_status = 'PENDING') DESC,   
-                    o.collected_time DESC
+                THEN 1
+                ELSE 0
+            END AS is_urgent,
+
+            (
+                SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'emergency_id', oe.emergency_id,
+                        'emergency_level', oe.emergency_level,
+                        'emergency_reason', oe.emergency_reason,
+                        'emergency_status', oe.emergency_status,
+                        'item_id', oe.item_id,
+                        'type_slno', oe.type_slno,
+                        'created_by', oe.created_by,
+                        'created_at', oe.created_at,
+                        'acknowledged_by', oe.acknowledged_by,
+                        'acknowledged_at', oe.acknowledged_at,
+                        'completed_by', oe.completed_by,
+                        'completed_at', oe.completed_at,
+                        'cancelled_by', oe.cancelled_by,
+                        'cancelled_at', oe.cancelled_at
+                    )
+                )
+                FROM order_emergency oe
+                WHERE oe.order_type = 'DIET'
+                AND oe.order_id = o.order_id
+                AND (
+                    oe.emergency_level = 'ORDER'
+                    OR (
+                        oe.emergency_level = 'ITEM'
+                        AND oe.item_id = d.item_id
+                    )
+                )
+                AND oe.emergency_status <> 'CANCELLED'
+            ) AS emergency_details
+
+        FROM diet_order o
+
+        LEFT JOIN (
+            SELECT order_id
+            FROM diet_order
+            WHERE patient_id = ?
+            AND order_status <> 'PENDING'
+            ORDER BY collected_time DESC
+            LIMIT 5
+        ) latest ON o.order_id = latest.order_id
+
+        LEFT JOIN diet_order_detail d 
+            ON o.order_id = d.order_id
+
+        LEFT JOIN item_master im 
+            ON d.item_id = im.item_id
+
+        LEFT JOIN unit_master um 
+            ON d.unit_id = um.unit_id
+
+        LEFT JOIN diet_type dt 
+            ON d.diet_type_id = dt.type_slno
+
+        WHERE o.patient_id = ?
+        AND (
+            o.order_status = 'PENDING'
+            OR latest.order_id IS NOT NULL
+        )
+
+        ORDER BY 
+            (o.order_status = 'PENDING') DESC,   
+            o.collected_time DESC
     `;
 
         pool.query(query, [patient_id, patient_id], (err, results) => {
@@ -335,6 +542,7 @@ module.exports = {
             return callback(null, results);
         });
     },
+
     getAllDietDeliveryDetail: (collected_by, callback) => {
         const query = `
                 SELECT 
@@ -735,6 +943,56 @@ module.exports = {
         `;
 
         executeQuery(query, [values], callback);
+    },
+
+
+    UpdateDietOrderRemark: (payload, callback) => {
+        const query = `
+        UPDATE diet_order
+        SET diet_order_remark = CONCAT_WS(
+            '\n',
+            NULLIF(TRIM(diet_order_remark), ''),
+            NULLIF(TRIM(?), '')
+        )
+        WHERE order_id = ?
+    `;
+
+        executeQuery(
+            query,
+            [payload.remarks, payload.order_id],
+            callback
+        );
+    },
+
+    InsertDietEmergencyItems: (order_id, urgentItems, created_by, callback) => {
+        if (!urgentItems?.length) {
+            return callback(null);
+        }
+
+        const emergencyValues = urgentItems.map((item) => [
+            "DIET",
+            order_id,
+            item.item_id,
+            "ITEM",
+            item.emergency_reason || "Urgent item",
+            type_slno,
+            created_by
+        ]);
+
+        const query = `
+        INSERT INTO order_emergency (
+            order_type,
+            order_id,
+            item_id,
+            emergency_level,
+            emergency_reason,
+             type_slno,
+            created_by
+        )
+        VALUES ?
+    `;
+
+        executeQuery(query, [emergencyValues], callback);
     },
 };
 

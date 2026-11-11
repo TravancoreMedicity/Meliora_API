@@ -12,6 +12,8 @@ const {
     UpdateDietStatus,
     UpdateFoodStatus,
     AddDietItem,
+    UpdateDietOrderRemark,
+    InsertDietEmergencyItems,
     // UpdateFoodQuantity
 } = require('./dietorder.service');
 
@@ -19,7 +21,7 @@ module.exports = {
 
     insertNewDietOrder: (req, res) => {
 
-        const { order, details, canteenorder, canteenorderdetail, isPending } = req.body;
+        const { order, details, canteenorder, canteenorderdetail, isPending, urgentItems } = req.body;
 
         if (!order || !details) {
             return res.status(200).json({
@@ -35,7 +37,7 @@ module.exports = {
             });
         }
 
-        insertNewDietOrder(order, details, canteenorder, canteenorderdetail, isPending, (err, result) => {
+        insertNewDietOrder(order, details, canteenorder, canteenorderdetail, isPending, urgentItems, (err, result) => {
             if (err) {
                 return res.status(500).json({
                     success: 0,
@@ -56,43 +58,181 @@ module.exports = {
         });
     },
 
+    // AddDietItem: (req, res) => {
+
+    //     const { order_id, details } = req.body;
+
+    //     if (!order_id || !details) {
+    //         return res.status(200).json({
+    //             success: 0,
+    //             message: "Invalid payload"
+    //         });
+    //     }
+
+    //     const dietDetailValues = details.map(item => [
+    //         order_id,
+    //         item.diet_type_id,
+    //         item.item_id,
+    //         item.quantity,
+    //         item.unit_id,
+    //         item.is_substitute,
+    //         item.patient_diet_id
+    //     ]);
+
+    //     AddDietItem(dietDetailValues, (err, result) => {
+    //         if (err) {
+    //             return res.status(500).json({
+    //                 success: 0,
+    //                 message: err
+    //             });
+    //         }
+
+    //         return res.status(200).json({
+    //             success: 1,
+    //             message: "Order Created Successfully",
+    //             order_id: result
+    //         });
+    //     });
+    // },
+    // AddDietItem: (req, res) => {
+    //     const { order_id, details, remarks } = req.body;
+
+    //     if (!order_id || !Array.isArray(details) || !details.length) {
+    //         return res.status(200).json({
+    //             success: 0,
+    //             message: "Invalid payload"
+    //         });
+    //     }
+
+    //     const dietDetailValues = details.map(item => [
+    //         order_id,
+    //         item.diet_type_id,
+    //         item.item_id,
+    //         item.quantity,
+    //         item.unit_id,
+    //         item.is_substitute,
+    //         item.patient_diet_id
+    //     ]);
+
+    //     const insertItems = () => {
+    //         AddDietItem(dietDetailValues, (err, result) => {
+    //             if (err) {
+    //                 return res.status(500).json({
+    //                     success: 0,
+    //                     message: err
+    //                 });
+    //             }
+
+    //             return res.status(200).json({
+    //                 success: 1,
+    //                 message: "Items Added Successfully",
+    //                 order_id
+    //             });
+    //         });
+    //     };
+
+    //     if (remarks?.trim()) {
+    //         UpdateDietOrderRemark(
+    //             {
+    //                 order_id,
+    //                 remarks: remarks.trim()
+    //             },
+    //             (err) => {
+    //                 if (err) {
+    //                     return res.status(500).json({
+    //                         success: 0,
+    //                         message: err
+    //                     });
+    //                 }
+
+    //                 insertItems();
+    //             }
+    //         );
+    //     } else {
+    //         insertItems();
+    //     }
+    // },
+
+
     AddDietItem: (req, res) => {
+        const {
+            order_id,
+            details,
+            remarks,
+            urgentItems = [],
+            created_by,
+        } = req.body;
 
-        const { order_id, details } = req.body;
-
-        if (!order_id || !details) {
+        if (!order_id || !Array.isArray(details) || !details.length) {
             return res.status(200).json({
                 success: 0,
-                message: "Invalid payload"
+                message: "Invalid payload",
             });
         }
 
-        const dietDetailValues = details.map(item => [
+        const dietDetailValues = details.map((item) => [
             order_id,
             item.diet_type_id,
             item.item_id,
             item.quantity,
             item.unit_id,
             item.is_substitute,
-            item.patient_diet_id
+            item.patient_diet_id ?? null,
         ]);
 
-        AddDietItem(dietDetailValues, (err, result) => {
-            if (err) {
-                return res.status(500).json({
-                    success: 0,
-                    message: err
-                });
-            }
+        const insertItems = () => {
+            AddDietItem(dietDetailValues, (err) => {
+                if (err) {
+                    return res.status(500).json({
+                        success: 0,
+                        message: err,
+                    });
+                }
 
-            return res.status(200).json({
-                success: 1,
-                message: "Order Created Successfully",
-                order_id: result
+                // Insert DIET emergency records
+                InsertDietEmergencyItems(
+                    order_id,
+                    urgentItems,
+                    created_by,
+                    (emergencyError) => {
+                        if (emergencyError) {
+                            return res.status(500).json({
+                                success: 0,
+                                message: emergencyError,
+                            });
+                        }
+
+                        return res.status(200).json({
+                            success: 1,
+                            message: "Items Added Successfully",
+                            order_id,
+                        });
+                    }
+                );
             });
-        });
-    },
+        };
 
+        if (remarks?.trim()) {
+            UpdateDietOrderRemark(
+                {
+                    order_id,
+                    remarks: remarks.trim(),
+                },
+                (err) => {
+                    if (err) {
+                        return res.status(500).json({
+                            success: 0,
+                            message: err,
+                        });
+                    }
+
+                    insertItems();
+                }
+            );
+        } else {
+            insertItems();
+        }
+    },
 
     getDietOrderById: (req, res) => {
         const { patient_id } = req.body;

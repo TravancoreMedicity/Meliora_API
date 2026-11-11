@@ -18,7 +18,10 @@ const {
     PatientLastWeekOrders,
     UpdateAllQuantities,
     getBatchItemDetail,
-    UpdateItemQuantity
+    UpdateItemQuantity,
+    CancelOrderEmergency,
+    AcknowledgeOrderEmergency,
+    createOpenBatchOrderDetail
 } = require('./canteeorder.controller');
 
 /* CREATE */
@@ -56,9 +59,14 @@ router.get("/allactivebed", checkToken, GetAllActiveBedDetail);
 
 router.patch("/update/quantity", checkToken, UpdateAllQuantities);
 
-
 router.post('/getbatchitemdetail', checkToken, getBatchItemDetail);
 
 router.post('/update-qty', checkToken, UpdateItemQuantity);
+
+router.patch("/emergency/cancel/:emergency_id", CancelOrderEmergency);
+
+router.patch("/emergency/acknowledge", AcknowledgeOrderEmergency);
+
+router.post('/create-open-batch-order', checkToken, createOpenBatchOrderDetail);
 
 module.exports = router;

@@ -22,7 +22,8 @@ const {
     getPlanRemarksDetails,
     getTotalIpPatientList,
     getNewAdmissionPatients,
-    getLastDietProcessTime
+    getLastDietProcessTime,
+    updatePlanRemarks
 } = require('./patientdietplan.service');
 
 module.exports = {
@@ -225,7 +226,7 @@ module.exports = {
 
 
     DieticanStatus: (req, res) => {
-        const { assignment_id, status } = req.body;
+        const { assignment_id, status,approvalRemarks } = req.body;
 
         if (!assignment_id || !status) {
             return res.status(400).json({
@@ -234,7 +235,7 @@ module.exports = {
             });
         }
 
-        DieticanStatus({ status, assignment_id }, (err, result) => {
+        DieticanStatus({ status, assignment_id,approvalRemarks }, (err, result) => {
             if (err) {
                 return res.status(500).json({
                     success: 0,
@@ -693,7 +694,35 @@ module.exports = {
         })
 
     },
+updatePlanRemarks: (req, res) => {
+        const data = req.body;
+        const {plan_id,remarks,dietType} = data ?? {};
 
+        if (!plan_id) {
+            return res.status(200).json({
+                success: 0,
+                message: "Plan ID Required"
+            });
+        }
+        
+
+        updatePlanRemarks(data, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results,
+                message: "Patient Diet Plan Remark Changed Succesfuly"
+            });
+
+        });
+    },
 
 
 

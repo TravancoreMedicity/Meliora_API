@@ -83,13 +83,16 @@ module.exports = {
     /* GET SINGLE */
     getExtraOrderSingle: (id, status, callback) => {
 
-        
+
         const query = `
             SELECT 
                 peo.*,
+                peo.created_by as collected_by,
 
                 ip.fb_ptc_name,
                 ip.fb_pt_no,
+
+                cem.em_name,
 
                 im.item_name,
                 im.item_code,
@@ -116,6 +119,9 @@ module.exports = {
 
             LEFT JOIN item_category_master ic
                 ON im.item_category_id = ic.item_category_id
+
+            LEFT JOIN co_employee_master cem
+                ON cem.em_id = peo.created_by
 
             LEFT JOIN canteen_item_price cip
                 ON peo.item_id = cip.item_id

@@ -40,9 +40,10 @@ module.exports = {
                     room_id,
                     created_by,
                     order_status,
-                    order_remarks
+                    order_remarks,
+                    expected_delivery_date
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             `;
 
                 conn.query(
@@ -55,6 +56,7 @@ module.exports = {
                         order.created_by,
                         order.order_status || "PENDING",
                         order.remarks || null,
+                        order.expected_delivery_date,
                     ],
                     (err, result) => {
                         if (err) return rollback(err);
@@ -141,6 +143,7 @@ module.exports = {
                                         item.gst_amount,
                                         order.created_by,
                                         order.remarks || null,
+                                        order.expected_delivery_date
                                     ]);
 
                                     const extraQuery = `
@@ -153,7 +156,8 @@ module.exports = {
                                         gst,
                                         gst_amount,
                                         created_by,
-                                        extra_remark
+                                        extra_remark,
+                                        expected_delivery_date
                                     )
                                     VALUES ?
                                 `;
@@ -178,6 +182,8 @@ module.exports = {
     },
 
 
+
+
     getFullOrders: (status, callback) => {
 
         const includeDietJoin = status !== "CONFIRMED";
@@ -188,7 +194,7 @@ module.exports = {
                 : `
                 AND co.order_time >= CURDATE() - INTERVAL 1 DAY
                 AND co.order_time < CURDATE() + INTERVAL 2 DAY
-              `;
+            `;
 
         const query = `
         SELECT
@@ -197,6 +203,7 @@ module.exports = {
             co.order_time,
             co.order_status,
             co.order_remarks AS canteen_remarks,
+            co.expected_delivery_date,
 
             CASE
                 WHEN EXISTS (
@@ -227,22 +234,22 @@ module.exports = {
             fb.fb_bd_code,
             fb.fb_bdc_no,
 
+            cem.em_name as order_taken_by,
+
             ip.fb_ptc_name,
             ip.fb_pt_no,
             ip.fb_ipad_slno,
             ip.fb_ipc_curstatus,
 
             opt.party_name,
-            opt.party_type_id
+            opt.party_type_id,
 
             ${includeDietJoin ? `
-                ,
                 d.order_id,
                 d.order_date,
                 d.plan_id,
                 d.diet_order_remark AS diet_remarks
             ` : `
-                ,
                 NULL AS order_id,
                 NULL AS order_date,
                 NULL AS plan_id,
@@ -260,14 +267,37 @@ module.exports = {
         LEFT JOIN fb_ipadmiss ip
             ON co.admission_id = ip.fb_ip_no
 
+        LEFT JOIN co_employee_master cem
+            ON cem.em_id = co.created_by
+
         LEFT JOIN order_party_type opt
             ON co.party_type_id = opt.party_type_id
 
         ${includeDietJoin ? `
-            LEFT JOIN diet_order d
+            LEFT JOIN (
+                SELECT d1.*
+                FROM diet_order d1
+                INNER JOIN (
+                    SELECT
+                        patient_id,
+                        nursing_station_id,
+                        room_id,
+                        order_status,
+                        MAX(order_id) AS latest_order_id
+                    FROM diet_order
+                    WHERE order_status = ?
+                    GROUP BY
+                        patient_id,
+                        nursing_station_id,
+                        room_id,
+                        order_status
+                ) latest
+                    ON latest.latest_order_id = d1.order_id
+            ) d
                 ON d.patient_id = ip.fb_ipad_slno
+                AND d.nursing_station_id = co.nursing_station_id
+                AND d.room_id = co.room_id
                 AND co.party_type_id = 2
-                AND d.order_status = ?
         ` : ``}
 
         WHERE co.order_status = ?
@@ -286,6 +316,8 @@ module.exports = {
     },
 
 
+
+
     getOrderById: (id, callback) => {
 
         const query = `
@@ -301,6 +333,7 @@ module.exports = {
             ig.group_name,
             ic.category_name,
             dt.type_desc,
+            cem.em_name as order_taken_emp,
 
             /* Patient Diet Plan */
             pdp.plan_id,
@@ -350,6 +383,9 @@ module.exports = {
 
         LEFT JOIN diet_type dt
             ON dt.type_slno = coi.type_slno
+
+        LEFT JOIN co_employee_master cem
+            ON cem.em_id = co.created_by
 
         /* Only active patient diet plan */
         LEFT JOIN patient_diet_plan pdp
@@ -773,6 +809,10 @@ GROUP BY
             o.order_time,
             o.order_status,
             o.order_remarks,
+            o.expected_delivery_date,
+            o.created_by as collected_by,
+
+            cem.em_name,
 
             i.item_id,
             im.item_name,
@@ -782,6 +822,7 @@ GROUP BY
             i.gst_amount,
             i.type_slno,
             i.canteen_order_item_id,
+            dt.type_desc,
 
             CASE 
                 WHEN EXISTS (
@@ -842,6 +883,12 @@ GROUP BY
 
         LEFT JOIN item_master im
             ON i.item_id = im.item_id
+
+        LEFT JOIN diet_type dt
+            ON dt.type_slno = i.type_slno
+            
+        LEFT JOIN co_employee_master cem
+            ON cem.em_id = o.created_by
 
         WHERE 
             o.admission_id = ?
@@ -1402,5 +1449,130 @@ GROUP BY
                 }
             });
         });
+    },
+
+
+    createDietOrderCollectionAttempt: (data, callback) => {
+
+        const {
+            patient_id,
+            admission_id,
+            diet_type_id,
+            order_date,
+            failure_reason,
+            remarks,
+            attempted_by
+        } = data;
+
+        const query = `
+        INSERT INTO diet_order_collection_attempt (
+            patient_id,
+            admission_id,
+            diet_type_id,
+            order_date,
+            failure_reason,
+            remarks,
+            attempted_by,
+            followup_status
+        ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+        const values = [
+            patient_id,
+            admission_id,
+            diet_type_id,
+            order_date,
+            failure_reason,
+            remarks,
+            attempted_by,
+            "OPEN"
+        ];
+
+        pool.query(query, values, (err, result) => {
+
+            if (err) {
+                return callback(err);
+            }
+
+            return callback(null, {
+                attempt_id: result.insertId,
+                followup_status: "OPEN"
+            });
+        });
+    },
+
+
+    updateDietOrderCollectionAttempt: (data, callback) => {
+
+        const {
+            attempt_id,
+            followup_status,
+            followup_by,
+            followup_remarks,
+            linked_order_id
+        } = data;
+
+        const query = `
+        UPDATE diet_order_collection_attempt
+        SET
+            followup_status = ?,
+            followup_by = ?,
+            followup_at = CURRENT_TIMESTAMP,
+            followup_remarks = ?,
+            linked_order_id = ?
+        WHERE attempt_id = ?
+    `;
+
+        const values = [
+            followup_status,
+            followup_by,
+            followup_remarks,
+            linked_order_id,
+            attempt_id
+        ];
+
+        pool.query(query, values, (err, result) => {
+
+            if (err) {
+                return callback(err);
+            }
+
+            return callback(null, result);
+        });
+    },
+
+    getDietOrderCollectionAttempts: (data, callback) => {
+
+        const sql = `
+        SELECT
+            attempt_id,
+            patient_id,
+            admission_id,
+            diet_type_id,
+            order_date,
+            failure_reason,
+            remarks,
+            attempted_by,
+            attempted_at,
+            followup_status,
+            followup_by,
+            followup_at,
+            followup_remarks,
+            linked_order_id,
+            created_at
+        FROM diet_order_collection_attempt
+        WHERE patient_id = ?
+        AND admission_id = ?
+        ORDER BY attempted_at DESC, attempt_id DESC
+    `;
+
+        pool.query(
+            sql,
+            [data.patient_id, data.admission_id],
+            (err, result) => {
+                if (err) return callback(err);
+                callback(null, result);
+            }
+        );
     },
 };

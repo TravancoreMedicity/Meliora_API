@@ -21,7 +21,10 @@ const {
     UpdateItemQuantity,
     CancelOrderEmergency,
     AcknowledgeOrderEmergency,
-    createOpenBatchOrderDetail
+    createOpenBatchOrderDetail,
+    createDietOrderCollectionAttempt,
+    updateDietOrderCollectionAttempt,
+    getDietOrderCollectionAttempts
 } = require('./canteeorder.controller');
 
 /* CREATE */
@@ -68,5 +71,23 @@ router.patch("/emergency/cancel/:emergency_id", CancelOrderEmergency);
 router.patch("/emergency/acknowledge", AcknowledgeOrderEmergency);
 
 router.post('/create-open-batch-order', checkToken, createOpenBatchOrderDetail);
+
+router.post(
+    '/create-collection-attempt',
+    checkToken,
+    createDietOrderCollectionAttempt
+);
+
+router.patch(
+    '/update-collection-attempt/:attempt_id',
+    checkToken,
+    updateDietOrderCollectionAttempt
+);
+
+router.get(
+    '/get-collection-attempts',
+    checkToken,
+    getDietOrderCollectionAttempts
+);
 
 module.exports = router;

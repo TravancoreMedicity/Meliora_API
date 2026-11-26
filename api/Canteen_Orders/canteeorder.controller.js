@@ -21,7 +21,10 @@ const {
     insertCanteenUrgentItems,
     CancelOrderEmergency,
     AcknowledgeOrderEmergency,
-    createOpenBatchOrderDetail
+    createOpenBatchOrderDetail,
+    createDietOrderCollectionAttempt,
+    updateDietOrderCollectionAttempt,
+    getDietOrderCollectionAttempts
 } = require('./canteenorder.service');
 
 module.exports = {
@@ -825,6 +828,246 @@ module.exports = {
                     data: result
                 });
 
+            }
+        );
+    },
+
+
+    createDietOrderCollectionAttempt: (req, res) => {
+
+        const {
+            patient_id,
+            admission_id,
+            diet_type_id,
+            order_date,
+            failure_reason,
+            remarks,
+            attempted_by
+        } = req.body;
+
+        // Required field validation
+        if (
+            !patient_id ||
+            !admission_id ||
+            !diet_type_id ||
+            !order_date ||
+            !failure_reason ||
+            !attempted_by
+        ) {
+            return res.status(400).json({
+                success: 0,
+                message: "Required collection attempt details are missing"
+            });
+        }
+
+        // Validate numeric IDs
+        if (
+            !Number.isInteger(Number(patient_id)) ||
+            Number(patient_id) <= 0 ||
+            !Number.isInteger(Number(diet_type_id)) ||
+            Number(diet_type_id) <= 0 ||
+            !Number.isInteger(Number(attempted_by)) ||
+            Number(attempted_by) <= 0
+        ) {
+            return res.status(400).json({
+                success: 0,
+                message: "Invalid patient, diet type or employee ID"
+            });
+        }
+
+        // Validate date format
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(order_date)) {
+            return res.status(400).json({
+                success: 0,
+                message: "Invalid order date"
+            });
+        }
+
+        if (String(failure_reason).trim().length > 255) {
+            return res.status(400).json({
+                success: 0,
+                message: "Failure reason cannot exceed 255 characters"
+            });
+        }
+
+        if (remarks && String(remarks).length > 500) {
+            return res.status(400).json({
+                success: 0,
+                message: "Remarks cannot exceed 500 characters"
+            });
+        }
+
+        createDietOrderCollectionAttempt(
+            {
+                patient_id,
+                admission_id: admission_id.trim(),
+                diet_type_id,
+                order_date,
+                failure_reason: failure_reason.trim(),
+                remarks: remarks?.trim() || null,
+                attempted_by
+            },
+            (err, result) => {
+
+                if (err) {
+                    return res.status(500).json({
+                        success: 0,
+                        message: err.message || err
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    message: "Collection failure recorded successfully",
+                    data: result
+                });
+            }
+        );
+    },
+
+
+    updateDietOrderCollectionAttempt: (req, res) => {
+
+        const attempt_id = Number(req.params.attempt_id);
+
+        const {
+            followup_status,
+            followup_by,
+            followup_remarks,
+            linked_order_id
+        } = req.body;
+
+        const allowedStatuses = [
+            "OPEN",
+            "REVISITED",
+            "ORDER_PLACED",
+            "CLOSED"
+        ];
+
+        if (!Number.isInteger(attempt_id) || attempt_id <= 0) {
+            return res.status(400).json({
+                success: 0,
+                message: "Invalid attempt ID"
+            });
+        }
+
+        if (!followup_status || !allowedStatuses.includes(followup_status)) {
+            return res.status(400).json({
+                success: 0,
+                message: "Invalid follow-up status"
+            });
+        }
+
+        if (
+            !followup_by ||
+            !Number.isInteger(Number(followup_by)) ||
+            Number(followup_by) <= 0
+        ) {
+            return res.status(400).json({
+                success: 0,
+                message: "Valid follow-up employee ID is required"
+            });
+        }
+
+        if (
+            followup_remarks &&
+            String(followup_remarks).length > 500
+        ) {
+            return res.status(400).json({
+                success: 0,
+                message: "Follow-up remarks cannot exceed 500 characters"
+            });
+        }
+
+        if (
+            followup_status === "ORDER_PLACED" &&
+            (
+                !linked_order_id ||
+                !Number.isInteger(Number(linked_order_id)) ||
+                Number(linked_order_id) <= 0
+            )
+        ) {
+            return res.status(400).json({
+                success: 0,
+                message: "Linked order ID is required when order is placed"
+            });
+        }
+
+        updateDietOrderCollectionAttempt(
+            {
+                attempt_id,
+                followup_status,
+                followup_by,
+                followup_remarks: followup_remarks?.trim() || null,
+                linked_order_id:
+                    followup_status === "ORDER_PLACED"
+                        ? Number(linked_order_id)
+                        : null
+            },
+            (err, result) => {
+
+                if (err) {
+                    return res.status(500).json({
+                        success: 0,
+                        message: err.message || err
+                    });
+                }
+
+                if (result.affectedRows === 0) {
+                    return res.status(404).json({
+                        success: 0,
+                        message: "Collection attempt not found"
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    message: "Collection follow-up updated successfully"
+                });
+            }
+        );
+    },
+
+    getDietOrderCollectionAttempts: (req, res) => {
+
+        const { patient_id, admission_id } = req.query;
+
+        if (
+            !patient_id ||
+            !Number.isInteger(Number(patient_id)) ||
+            Number(patient_id) <= 0
+        ) {
+            return res.status(400).json({
+                success: 0,
+                message: "Valid patient ID is required"
+            });
+        }
+
+        if (!admission_id || !admission_id.trim()) {
+            return res.status(400).json({
+                success: 0,
+                message: "Admission ID is required"
+            });
+        }
+
+        getDietOrderCollectionAttempts(
+            {
+                patient_id: Number(patient_id),
+                admission_id: admission_id.trim()
+            },
+            (err, result) => {
+                if (err) {
+                    return res.status(500).json({
+                        success: 0,
+                        message: err.message || err
+                    });
+                }
+
+                return res.status(200).json({
+                    success: 1,
+                    message: "Collection attempts fetched successfully",
+                    data: result
+                });
             }
         );
     },

@@ -781,6 +781,7 @@ ORDER BY dpc.given_at DESC;
             -- Bed and nursing station
             bed.fb_bdc_no AS bed_number,
             ns.fb_ns_name AS nursing_station,
+            ns.fb_ns_code,
 
             -- Billing details
             pb.billing_date,

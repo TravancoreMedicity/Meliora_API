@@ -180,11 +180,40 @@ ORDER BY dp.fb_ip_no DESC;
     ns.fb_nurse_stn_slno,
 
     cm.em_name AS Dietecian_name,
+    cmr.em_name AS attempted_employee,
+
+    dca.attempt_id AS collection_attempt_id,
+    dca.diet_type_id AS collection_diet_type_id,
+    dca.order_date AS collection_order_date,
+    dca.failure_reason,
+    dca.remarks AS collection_remarks,
+    dca.attempted_at,
+    dca.followup_status,
+    dca.followup_remarks,
+    dca.followup_at,
 
     dt.template_id,
     dt.template_name,
     dt.version_no,
     dt.effective_from,
+   
+    -- Patient pending order
+    EXISTS (
+        SELECT 1
+        FROM canteen_order co
+        WHERE co.admission_id = dp.fb_ip_no
+        AND co.order_status = 'PENDING'
+        AND co.party_type_id = 2
+    ) AS patient_has_pending_order,
+
+    -- Bystander pending order
+    EXISTS (
+        SELECT 1
+        FROM canteen_order co
+        WHERE co.admission_id = dp.fb_ip_no
+        AND co.order_status = 'PENDING'
+        AND co.party_type_id = 1
+    ) AS bystander_has_pending_order,
     dt.effective_to
 
 FROM fb_ipadmiss dp  
@@ -214,6 +243,21 @@ LEFT JOIN patient_diet_master pdm
 
 LEFT JOIN co_employee_master cm 
     ON cm.em_id = pdp.dietitian_id
+
+LEFT JOIN diet_order_collection_attempt dca
+    ON dca.attempt_id = (
+        SELECT dca2.attempt_id
+        FROM diet_order_collection_attempt dca2
+        WHERE dca2.patient_id = dp.fb_ipad_slno
+        AND dca2.admission_id = dp.fb_ip_no
+        AND dca2.followup_status <> 'CLOSED'
+        ORDER BY dca2.attempted_at DESC, dca2.attempt_id DESC
+        LIMIT 1
+    )
+
+
+LEFT JOIN co_employee_master cmr 
+    ON cmr.em_id = dca.attempted_by
 
 LEFT JOIN diet_template dt
     ON dt.diet_id = pdp.diet_id
@@ -1035,7 +1079,7 @@ ORDER BY
 
         pool.query(
             updateOldQuery,
-            [status,approvalRemarks, assignment_id],
+            [status, approvalRemarks, assignment_id],
             (err, results) => {
                 if (err) return callback(err);
                 return callback(null, results);
@@ -1333,7 +1377,7 @@ WHERE bed.fb_ns_code IN (?)
         );
     },
     updatePlanRemarks: (data, callback) => {
-        const {plan_id,remarks,dietType}  = data;
+        const { plan_id, remarks, dietType } = data;
 
         // STEP 1: mark old as not current
         const updateOldQuery = `
@@ -1345,7 +1389,7 @@ WHERE bed.fb_ns_code IN (?)
 
         pool.query(
             updateOldQuery,
-            [remarks,dietType,plan_id],
+            [remarks, dietType, plan_id],
             (err, results) => {
                 if (err) return callback(err);
                 return callback(null, results);
